@@ -45,6 +45,23 @@
 
 #include "pal_raspberry.h"
 
+//#define TRUSTM_PAL_EVENT_DEBUG = 1
+
+#ifdef TRUSTM_PAL_EVENT_DEBUG
+
+#define TRUSTM_PAL_EVENT_DBG(x, ...)      fprintf(stderr, "%s:%d " x "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+#define TRUSTM_PAL_EVENT_DBGFN(x, ...)    fprintf(stderr, "%s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+#define TRUSTM_PAL_EVENT_ERRFN(x, ...)    fprintf(stderr, "Error in %s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+#define TRUSTM_PAL_EVENT_MSGFN(x, ...)    fprintf(stderr, "Message:%s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+
+#else
+
+#define TRUSTM_PAL_EVENT_DBG(x, ...)
+#define TRUSTM_PAL_EVENT_DBGFN(x, ...)
+#define TRUSTM_PAL_EVENT_ERRFN(x, ...)    fprintf(stderr, "Error in %s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+#define TRUSTM_PAL_EVENT_MSGFN(x, ...)    fprintf(stderr, "Message:%s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+
+#endif
 
 #define CLOCKID CLOCK_REALTIME
 #define SIG SIGRTMIN
@@ -52,7 +69,9 @@
 
 static void handler(int sig, siginfo_t *si, void *uc)
 {
+    TRUSTM_PAL_EVENT_DBGFN(">"); 
     pal_os_event_trigger_registered_callback();
+    TRUSTM_PAL_EVENT_DBGFN("<");   
 }
 
 
@@ -63,23 +82,31 @@ static     timer_t timerid;
 
 void pal_os_event_start(pal_os_event_t * p_pal_os_event, register_callback callback, void * callback_args)
 {
+    TRUSTM_PAL_EVENT_DBGFN(">");
+
     if(FALSE == p_pal_os_event->is_event_triggered)
     {
         p_pal_os_event->is_event_triggered = TRUE;
         pal_os_event_register_callback_oneshot(p_pal_os_event,callback,callback_args,1000);
     }
+
+    TRUSTM_PAL_EVENT_DBGFN("<"); 
 }
 
 void pal_os_event_stop(pal_os_event_t * p_pal_os_event)
 {
+    TRUSTM_PAL_EVENT_DBGFN(">");
     //lint --e{714} suppress "The API pal_os_event_stop is not exposed in header file but used as extern in optiga_cmd.c"
     p_pal_os_event->is_event_triggered = FALSE;
+    TRUSTM_PAL_EVENT_DBGFN("<"); 
 }
 
 pal_os_event_t * pal_os_event_create(register_callback callback, void * callback_args)
 {
     struct sigevent sev;
     struct sigaction sa;
+    
+    TRUSTM_PAL_EVENT_DBGFN(">");
     
     if(( NULL != callback )&&( NULL != callback_args ))
     {
@@ -107,6 +134,9 @@ pal_os_event_t * pal_os_event_create(register_callback callback, void * callback
 
         pal_os_event_start(&pal_os_event_0,callback,callback_args);
     }
+    
+    TRUSTM_PAL_EVENT_DBGFN("<");
+    
     return (&pal_os_event_0);
 }
 
@@ -115,7 +145,8 @@ void pal_os_event_trigger_registered_callback(void)
     register_callback callback;
     struct itimerspec its;
 
-    TRUSTM_PAL_EVENT_DBGFN(">");    
+    TRUSTM_PAL_EVENT_DBGFN(">");  
+    
     its.it_value.tv_sec = 0;
     its.it_value.tv_nsec = 0;
     its.it_interval.tv_sec = 0;
@@ -127,14 +158,14 @@ void pal_os_event_trigger_registered_callback(void)
         exit(1);
     }
 
-    TRUSTM_PAL_EVENT_DBGFN(">");  
-
     if (pal_os_event_0.callback_registered)
     {
         callback = pal_os_event_0.callback_registered;
         pal_os_event_0.callback_registered = NULL;
         callback((void * )pal_os_event_0.callback_ctx);
     }
+
+    TRUSTM_PAL_EVENT_DBGFN("<"); 
 }
 /// @endcond
 
@@ -147,6 +178,8 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
     long long freq_nanosecs;
     //sigset_t mask;
 
+    TRUSTM_PAL_EVENT_DBGFN(">");
+    
     //uint8_t scheduler_timer;
     p_pal_os_event->callback_registered = callback;
     p_pal_os_event->callback_ctx = callback_args;
@@ -164,12 +197,16 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
         printf("timer_settime\n");
         exit(1);
     }
+    
+    TRUSTM_PAL_EVENT_DBGFN("<"); 
 }
 
 //lint --e{818,715} suppress "As there is no implementation, pal_os_event is not used"
 void pal_os_event_destroy(pal_os_event_t * pal_os_event)
 {
+    TRUSTM_PAL_EVENT_DBGFN(">"); 
     timer_delete(timerid);
+    TRUSTM_PAL_EVENT_DBGFN("<"); 
 }
 
 /**
