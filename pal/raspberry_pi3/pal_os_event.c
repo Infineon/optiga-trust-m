@@ -45,7 +45,7 @@
 
 #include "pal_raspberry.h"
 
-//#define TRUSTM_PAL_EVENT_DEBUG = 1
+#define TRUSTM_PAL_EVENT_DEBUG = 1
 
 #ifdef TRUSTM_PAL_EVENT_DEBUG
 
