@@ -52,14 +52,14 @@
 
 static void handler(int sig, siginfo_t *si, void *uc)
 {
-	pal_os_event_trigger_registered_callback();
+    pal_os_event_trigger_registered_callback();
 }
 
 
 /// @cond hidden
 
 static pal_os_event_t pal_os_event_0 = {0};
-static 	timer_t timerid;
+static     timer_t timerid;
 
 void pal_os_event_start(pal_os_event_t * p_pal_os_event, register_callback callback, void * callback_args)
 {
@@ -78,13 +78,13 @@ void pal_os_event_stop(pal_os_event_t * p_pal_os_event)
 
 pal_os_event_t * pal_os_event_create(register_callback callback, void * callback_args)
 {
-	struct sigevent sev;
-	struct sigaction sa;
-	
+    struct sigevent sev;
+    struct sigaction sa;
+    
     if(( NULL != callback )&&( NULL != callback_args ))
     {
-		/* Establishing handler for signal */
-		
+        /* Establishing handler for signal */
+        
         sa.sa_flags = SA_SIGINFO;
         sa.sa_sigaction = handler;
         sigemptyset(&sa.sa_mask);
@@ -113,10 +113,21 @@ pal_os_event_t * pal_os_event_create(register_callback callback, void * callback
 void pal_os_event_trigger_registered_callback(void)
 {
     register_callback callback;
+    struct itimerspec its;
 
-    // !!!OPTIGA_LIB_PORTING_REQUIRED
-    // The following steps related to TIMER must be taken care while porting to different platform
-    // TBD
+    TRUSTM_PAL_EVENT_DBGFN(">");    
+    its.it_value.tv_sec = 0;
+    its.it_value.tv_nsec = 0;
+    its.it_interval.tv_sec = 0;
+    its.it_interval.tv_nsec = 0;
+    
+    if (timer_settime(timerid, 0, &its, NULL) == -1)
+    {
+        printf("Error in timer_settime\n");
+        exit(1);
+    }
+
+    TRUSTM_PAL_EVENT_DBGFN(">");  
 
     if (pal_os_event_0.callback_registered)
     {
@@ -132,27 +143,27 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
                                              void * callback_args,
                                              uint32_t time_us)
 {
-	struct itimerspec its;
-	long long freq_nanosecs;
-	//sigset_t mask;
+    struct itimerspec its;
+    long long freq_nanosecs;
+    //sigset_t mask;
 
-	//uint8_t scheduler_timer;
+    //uint8_t scheduler_timer;
     p_pal_os_event->callback_registered = callback;
     p_pal_os_event->callback_ctx = callback_args;
-	
-	/* Start the timer */
+    
+    /* Start the timer */
 
-	freq_nanosecs = time_us * 1000;
-	its.it_value.tv_sec = freq_nanosecs / 1000000000;
-	its.it_value.tv_nsec = freq_nanosecs % 1000000000;
-	its.it_interval.tv_sec = its.it_value.tv_sec;
-	its.it_interval.tv_nsec = its.it_value.tv_nsec;
-	
-	if (timer_settime(timerid, 0, &its, NULL) == -1)
-	{
-		printf("timer_settime\n");
-	    exit(1);
-	}
+    freq_nanosecs = time_us * 1000;
+    its.it_value.tv_sec = freq_nanosecs / 1000000000;
+    its.it_value.tv_nsec = freq_nanosecs % 1000000000;
+    its.it_interval.tv_sec = its.it_value.tv_sec;
+    its.it_interval.tv_nsec = its.it_value.tv_nsec;
+    
+    if (timer_settime(timerid, 0, &its, NULL) == -1)
+    {
+        printf("timer_settime\n");
+        exit(1);
+    }
 }
 
 //lint --e{818,715} suppress "As there is no implementation, pal_os_event is not used"
@@ -164,4 +175,3 @@ void pal_os_event_destroy(pal_os_event_t * pal_os_event)
 /**
 * @}
 */
-
