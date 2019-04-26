@@ -237,7 +237,7 @@ optiga_lib_status_t ifx_i2c_prl_close(ifx_i2c_context_t * p_ctx, ifx_i2c_event_h
         {
             break;
         }
-
+        p_ctx->prl.upper_layer_event_handler = handler;
         if (IFX_I2C_SESSION_CONTEXT_NONE == p_ctx->manage_context_operation)
         {
             p_ctx->prl.upper_layer_event_handler(p_ctx, IFX_I2C_STACK_SUCCESS, 0, 0);
@@ -248,7 +248,6 @@ optiga_lib_status_t ifx_i2c_prl_close(ifx_i2c_context_t * p_ctx, ifx_i2c_event_h
         if ((PRL_NEGOTIATION_DONE == p_ctx->prl.negotiation_state) &&
             (IFX_I2C_SESSION_CONTEXT_SAVE == p_ctx->manage_context_operation))
         {
-            p_ctx->prl.upper_layer_event_handler = handler;
             p_ctx->prl.state = PRL_STATE_MANAGE_CONTEXT;
             p_ctx->prl.mc_state = PRL_MANAGE_CONTEXT_TX_STATE;
             ifx_i2c_prl_event_handler(p_ctx, IFX_I2C_STACK_SUCCESS, p_ctx->prl.prl_txrx_buffer, 1);
@@ -808,7 +807,7 @@ _STATIC_H void ifx_i2c_prl_event_handler(ifx_i2c_context_t * p_ctx,
 {
     //if handshake
     uint8_t exit_machine = TRUE;
-    ifx_i2c_prl_manage_context_t prl_saved_ctx = {0};
+    ifx_i2c_prl_manage_context_t prl_saved_ctx;
     optiga_lib_status_t return_status = IFX_I2C_STACK_ERROR;
 
     LOG_PRL("[IFX-PRL]: ifx_i2c_prl_event_handler %d\n", data_len);
@@ -1009,9 +1008,9 @@ _STATIC_H void ifx_i2c_prl_event_handler(ifx_i2c_context_t * p_ctx,
                 {
                     //Check invalid message
                     if (((p_data[PRL_SCTR_OFFSET] != (PRL_ALERT_PROTOCOL | PRL_FATAL_ALERT_MSG)) &&
-                        (p_data[PRL_SCTR_OFFSET] != (PRL_ALERT_PROTOCOL | PRL_INTEGRITY_VIOLATED_ALERT_MSG)) ||
+                        (p_data[PRL_SCTR_OFFSET] != (PRL_ALERT_PROTOCOL | PRL_INTEGRITY_VIOLATED_ALERT_MSG))) ||
                         ((1 != data_len) && (PRL_NEGOTIATION_DONE == p_ctx->prl.negotiation_state)) ||
-                        (PRL_TRANS_REPEAT == p_ctx->prl.data_retransmit_counter)))
+                        (PRL_TRANS_REPEAT == p_ctx->prl.data_retransmit_counter))
                     {
                         p_ctx->prl.return_status = IFX_I2C_SESSION_ERROR;
                         p_ctx->prl.negotiation_state = PRL_NEGOTIATION_NOT_DONE;

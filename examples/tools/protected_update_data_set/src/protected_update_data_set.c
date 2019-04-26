@@ -40,10 +40,6 @@
 #include "pal\pal_logger.h"
 #include "cbor.h"
 
-
-
-
-#define PROTECT_UPDATE_SHA256_LENGTH				(0x20)
 #define PROTECT_UPDATE_MANIFEST_VERSION				(1U)
 
 // This will be replaced by code
@@ -80,7 +76,6 @@ static int protected_update_decode_ecc_signature(	unsigned char * in_signature,
 
 	return 0;
 }
-
 
 int protected_update_create_manifest(	manifest_d manifest_data, 
 										protected_update_data_set_d * p_cbor_manifest)
@@ -196,9 +191,9 @@ int protected_update_create_manifest(	manifest_d manifest_data,
 		local_manifest_buffer[offset++] = CBOR_ADDITIONAL_TYPE_0x18;
 		//creating digest
 
-		payload_length_for_digest = (manifest_data.payload_length > MAX_PAYLOAD_SIZE) ? MAX_PAYLOAD_SIZE : manifest_data.payload_length;
-		if (0 != pal_crypt_calculate_sha256_hash(	(unsigned char *)manifest_data.payload, 
-													payload_length_for_digest - PROTECT_UPDATE_SHA256_LENGTH, 
+		payload_length_for_digest = (p_cbor_manifest->fragments_length > MAX_PAYLOAD_SIZE) ? MAX_PAYLOAD_SIZE : p_cbor_manifest->fragments_length;
+		if (0 != pal_crypt_calculate_sha256_hash(	(unsigned char *)p_cbor_manifest->fragments,
+													payload_length_for_digest, 
 													digest))
 		{
 			pal_logger_print_message(" FAILED :  protect_update : pal_crypt_calculate_sha256_hash");
@@ -284,69 +279,71 @@ int protected_update_create_fragments(	manifest_d manifest_data,
 	unsigned short remaining_payload_length = manifest_data.payload_length;
 	unsigned short max_memory_required;
 	unsigned char * fragments = NULL;
-	unsigned char count_of_fragments = 0;
+	unsigned char count_of_fragments = 0, index_for_hashing = 0;
 	unsigned char * p_current_fragment = NULL;
 	unsigned short length_to_digest;
+	unsigned short payload_len_to_copy = 0;
 
 	do
 	{
-
 		max_memory_required = (remaining_payload_length / MAX_PAYLOAD_FRAGMENT_SIZE) * MAX_PAYLOAD_SIZE;
 		max_memory_required += (remaining_payload_length % MAX_PAYLOAD_FRAGMENT_SIZE);
 		fragments = malloc(max_memory_required);
 		
 		// DEBUG prints
 		//pal_logger_print_hex_data(manifest_data.payload, manifest_data.payload_length); pal_logger_print_message(""); 
-		//pal_logger_print_message("Total length : %d\n", manifest_data.payload_length);
-		//pal_logger_print_message("max_memory_required : %d\n", max_memory_required);
-		//pal_logger_print_message("expected number of fragments: %d\n", (remaining_payload_length / MAX_PAYLOAD_FRAGMENT_SIZE));
+		//printf("Total length : %d\n", manifest_data.payload_length);
 
+		// Copy all the user data into fragment payloads
 		do
 		{
 			p_current_fragment = fragments + (count_of_fragments * MAX_PAYLOAD_SIZE);
-			if (remaining_payload_length > MAX_PAYLOAD_SIZE)
-			{
-				// copy
-				memcpy(	p_current_fragment, 
-						manifest_data.payload + (MAX_PAYLOAD_FRAGMENT_SIZE * count_of_fragments),
-						MAX_PAYLOAD_FRAGMENT_SIZE);
 
-				remaining_payload_length -= MAX_PAYLOAD_FRAGMENT_SIZE;
+			payload_len_to_copy = (remaining_payload_length > MAX_PAYLOAD_SIZE) ? MAX_PAYLOAD_FRAGMENT_SIZE : remaining_payload_length;
+			memcpy(p_current_fragment,
+				manifest_data.payload + (MAX_PAYLOAD_FRAGMENT_SIZE * count_of_fragments),
+				payload_len_to_copy);
 
-				//calculate hash
-                length_to_digest = (remaining_payload_length > MAX_PAYLOAD_SIZE) ? MAX_PAYLOAD_FRAGMENT_SIZE : remaining_payload_length;
-				count_of_fragments++;
-				pal_crypt_calculate_sha256_hash(	(unsigned char *)manifest_data.payload + (MAX_PAYLOAD_FRAGMENT_SIZE * count_of_fragments),
-										length_to_digest,
-										digest);
-				// copy hash
-				memcpy(	p_current_fragment + MAX_PAYLOAD_FRAGMENT_SIZE,
-						digest,
-						sizeof(digest));
-				//pal_logger_print_hex_data(p_current_fragment, MAX_PAYLOAD_SIZE);
-				p_cbor_manifest->fragments_length += MAX_PAYLOAD_SIZE;
-			}
-			else
-			{
-				memcpy(	p_current_fragment,
-						manifest_data.payload + (MAX_PAYLOAD_FRAGMENT_SIZE * count_of_fragments),
-						remaining_payload_length);
-				p_cbor_manifest->fragments_length += remaining_payload_length;
-				//pal_logger_print_hex_data(p_current_fragment, remaining_payload_length); 
-				remaining_payload_length = 0;
-				status = 0;
-			}
+			remaining_payload_length -= payload_len_to_copy;
+			count_of_fragments++;
+			p_cbor_manifest->fragments_length += payload_len_to_copy;
+			
 		} while (remaining_payload_length != 0);
 
-		if (0 == status)
+		// Index to start hashing last fragment
+		index_for_hashing = count_of_fragments-1;
+		// Start adding hash to fragement
+		do
 		{
-			p_cbor_manifest->fragments = fragments;
-			// below variable can be deleted
-			p_cbor_manifest->actual_memory_allocated = max_memory_required;
+			p_current_fragment = fragments + (index_for_hashing * MAX_PAYLOAD_SIZE);
 
-		}
+			length_to_digest = ((count_of_fragments - index_for_hashing) == 1) ? payload_len_to_copy : MAX_PAYLOAD_SIZE;
+			
+			// Calculate hash on the current fragment and add to previous fragement
+			pal_crypt_calculate_sha256_hash(p_current_fragment,
+											length_to_digest,
+											digest);
+			
+			memcpy(	p_current_fragment - PROTECT_UPDATE_SHA256_LENGTH,
+					digest,
+					sizeof(digest));
+
+			p_cbor_manifest->fragments_length += sizeof(digest);
+			index_for_hashing--;
+			pal_logger_print_hex_data(p_current_fragment, MAX_PAYLOAD_SIZE);
+
+		} while (index_for_hashing != 0);
+
+		p_cbor_manifest->fragments = fragments;
+		// Below variable can be deleted
+		p_cbor_manifest->actual_memory_allocated = max_memory_required;
 
 	} while (0);
+
+	// DEBUG prints
+	//printf("max_memory_required : %d\n", max_memory_required);
+	//printf("Total number of fragments: %d\n", count_of_fragments);
+	status = 0;
 	return status;
 }
 

@@ -40,8 +40,10 @@
 #ifndef _PROTECTED_UPDATE_
 #define _PROTECTED_UPDATE_
 
-#define MAX_PAYLOAD_SIZE            (640)
-#define MAX_PAYLOAD_FRAGMENT_SIZE   (608)
+
+#define PROTECT_UPDATE_SHA256_LENGTH				(0x20)
+#define MAX_PAYLOAD_FRAGMENT_SIZE					(608)
+#define MAX_PAYLOAD_SIZE							(MAX_PAYLOAD_FRAGMENT_SIZE + PROTECT_UPDATE_SHA256_LENGTH)
 
 // Structure to store manifest data
 typedef struct manifest
