@@ -1,7 +1,8 @@
 /**
+* \copyright
 * MIT License
 *
-* Copyright (c) 2018 Infineon Technologies AG
+* Copyright (c) 2019 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -21,55 +22,38 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE
 *
+* \endcopyright
 *
-* \file pal_os_lock.c
+* \author Infineon Technologies AG
 *
-* \brief   This file implements the platform abstraction layer APIs for os locks (e.g. semaphore).
+* \file    pal_logger.c
 *
-* \ingroup  grPAL
+* \brief   This file provides the prototypes declarations for pal logger.
+*
+* \ingroup grPAL
+*
 * @{
 */
 
-#include "optiga/pal/pal_os_lock.h"
-#include "nrf_atomic.h"
-#include "nrf_pwr_mgmt.h"
-#include <assert.h>
+#include "optiga/pal/pal_logger.h"
+#include "optiga/pal/pal_uart.h"
 
-void pal_os_lock_create(pal_os_lock_t * p_lock, uint8_t lock_type)
+///
+#define CONSOLE_PORT        0
+
+pal_status_t pal_logger_write(const uint8_t * p_log_data, uint32_t log_data_length)
 {
-    // TODO(chr): implement
-    assert(false);
+    int32_t return_status = PAL_STATUS_FAILURE;
+    
+    return_status = uart_write_data(CONSOLE_PORT, (uint8_t *)p_log_data, log_data_length);
+    if (0 == return_status)
+    {
+        return_status = PAL_STATUS_SUCCESS;
+    }
+    
+    return ((pal_status_t)return_status);
 }
 
-void pal_os_lock_destroy(pal_os_lock_t * p_lock)
-{
-    // TODO(chr): implement
-    assert(false);
-}
-
-pal_status_t pal_os_lock_acquire(pal_os_lock_t * p_lock)
-{
-    // TODO(chr): implement
-    assert(false);
-}
-
-void pal_os_lock_release(pal_os_lock_t * p_lock)
-{
-    // TODO(chr): implement
-    assert(false);
-}
-
-void pal_os_lock_enter_critical_section(void)
-{
-    // TODO(chr): implement
-    assert(false);
-}
-
-void pal_os_lock_exit_critical_section(void)
-{
-    // TODO(chr): implement
-    assert(false);
-}
 
 /**
 * @}

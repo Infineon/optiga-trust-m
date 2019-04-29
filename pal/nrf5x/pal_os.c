@@ -57,6 +57,8 @@ static void * callback_ctx;
 /// Flag to indicate to the delay function when the timer has elapsed
 static volatile bool timer_elapsed = false;
 
+static pal_os_event_t pal_os_event_0 = {0};
+
 /// Flag to indicate if the the RTC was already initialized, re-init. causes an NRF_ERROR
 static bool m_rtc2_is_initialized = false;
 static const nrf_drv_rtc_t rtc2 = NRF_DRV_RTC_INSTANCE(2);
@@ -162,6 +164,34 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
     APP_ERROR_CHECK(nrf_drv_rtc_cc_set(&rtc2, NRF_DRV_RTC_INT_COMPARE0, future_ticks, true));
 }
 
+void pal_os_event_start(pal_os_event_t * p_pal_os_event, register_callback callback, void * callback_args)
+{
+    // TODO(chr): check this implementation
+    if (FALSE == p_pal_os_event->is_event_triggered)
+    {
+        p_pal_os_event->is_event_triggered = TRUE;
+        pal_os_event_register_callback_oneshot(p_pal_os_event,callback,callback_args,1000);
+    }
+}
+
+void pal_os_event_stop(pal_os_event_t * p_pal_os_event)
+{
+    // TODO(chr): check this implementation
+    //lint --e{714} suppress "The API pal_os_event_stop is not exposed in header file but used as extern in 
+    //optiga_cmd.c"
+    p_pal_os_event->is_event_triggered = FALSE;
+}
+
+pal_os_event_t * pal_os_event_create(register_callback callback, void * callback_args)
+{
+    // TODO(chr): check this implementation
+    if (( NULL != callback )&&( NULL != callback_args ))
+    {
+        pal_os_event_start(&pal_os_event_0,callback,callback_args);
+    }
+    return &pal_os_event_0;
+}
+
 /**
 * Get the current time in milliseconds<br>
 *
@@ -171,6 +201,18 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
 uint32_t pal_os_timer_get_time_in_milliseconds(void)
 {
     return nrf_drv_rtc_counter_get(&rtc2)*1000/RTC_TICK_FREQ;
+}
+
+/**
+* Get the current time in microseconds<br>
+*
+*
+* \retval  uint32_t time in microseconds
+*/
+uint32_t pal_os_timer_get_time_in_microseconds(void)
+{
+    // do multiplications as 64bit to avoid overflow
+    return (uint32_t) ((uint64_t) nrf_drv_rtc_counter_get(&rtc2))*1000*1000/RTC_TICK_FREQ;
 }
 
 /**
