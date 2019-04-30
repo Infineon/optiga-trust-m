@@ -41,7 +41,7 @@ A sample script demonstrating the usage of the tool is available in ..\samples
 * Manifest version number is 1	
     	
 ## Environment
-* The availabel executable is built using microsoft visual studio 2010 in windows 10 (64 bit)
+* The available executable is built using microsoft visual studio 2010 in windows 10 (64 bit)
 * mbedTLS 2.7.0 is used for crypto operation.
 * The following MACRO must be disabled/ enabled when using mbedTLS for this tool.
   * Enable :
