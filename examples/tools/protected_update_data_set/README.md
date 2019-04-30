@@ -19,8 +19,8 @@ Start the `protected_update_data_generator.exe` with following options, in order
 ```console
 C:\optiga-trust-m\examples\tools\protected_update_data_set\bin> protected_update_data_generator.exe ^
 payload_version=3 ^
-trust_anchor=E0E8 ^
-target=E0E1 ^
+trust_anchor_oid=E0E8 ^
+target_oid=E0E1 ^
 offset=01 ^
 write_type=1 ^
 sign_algo=RSA_SSA_PKCS1_V1_5_SHA_256 ^
