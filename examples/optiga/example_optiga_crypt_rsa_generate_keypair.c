@@ -40,6 +40,10 @@
 
 #ifdef OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED
 
+#ifdef OPTIGA_MINI_SHELL
+#include "optiga/common/optiga_lib_logger.h"
+#endif
+
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 /**
@@ -126,6 +130,11 @@ void example_optiga_crypt_rsa_generate_keypair(void)
             break;
         }
         logging_status = 1;
+
+#ifdef OPTIGA_MINI_SHELL
+        optiga_lib_print_string_with_newline("OPTIGA Trust RSA 2048 PubKey");
+        optiga_lib_print_hex_dump(public_key,  public_key_length);
+#endif
 
     } while (FALSE);
 

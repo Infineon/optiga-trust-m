@@ -41,6 +41,10 @@
 
 #ifdef OPTIGA_CRYPT_HASH_ENABLED
 
+#ifdef OPTIGA_MINI_SHELL
+#include "optiga/common/optiga_lib_logger.h"
+#endif
+
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 
@@ -94,6 +98,10 @@ void example_optiga_crypt_hash(void)
 
     do
     {
+#ifdef OPTIGA_MINI_SHELL
+        optiga_lib_print_string_with_newline("Message to be hashed: OPITGA, Infineon Technologies AG");
+        optiga_lib_print_hex_dump(data_to_hash,  sizeof(data_to_hash));
+#endif
         /**
          * 1. Create OPTIGA Crypt Instance
          */
@@ -179,6 +187,11 @@ void example_optiga_crypt_hash(void)
             break;
         }
         logging_status = 1;
+
+#ifdef OPTIGA_MINI_SHELL
+        optiga_lib_print_string_with_newline("Sha256 Digest");
+        optiga_lib_print_hex_dump(digest,  sizeof(digest));
+#endif
 
     } while (FALSE);
 

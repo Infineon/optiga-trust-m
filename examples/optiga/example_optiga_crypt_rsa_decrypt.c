@@ -40,6 +40,10 @@
 
 #ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
 
+#ifdef OPTIGA_MINI_SHELL
+#include "optiga/common/optiga_lib_logger.h"
+#endif
+
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 /**
@@ -86,6 +90,13 @@ void example_optiga_crypt_rsa_decrypt_and_export(void)
          * 1. Create OPTIGA Crypt Instance
          *
          */
+
+#ifdef OPTIGA_MINI_SHELL
+    	optiga_lib_print_string_with_newline("RSA Generate Keypair, Encrypt Message, Decrypt Message");
+        optiga_lib_print_string_with_newline("RSA message to encrypt: RSA PKCS1_v1.5 Encryption of user message");
+        optiga_lib_print_hex_dump(message,  sizeof(message));
+#endif
+
         me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
         if (NULL == me)
         {
@@ -123,6 +134,10 @@ void example_optiga_crypt_rsa_decrypt_and_export(void)
             //Key pair generation failed
             break;
         }
+#ifdef OPTIGA_MINI_SHELL
+        optiga_lib_print_string_with_newline("Generate RSA 2048 Key Pair");
+        optiga_lib_print_hex_dump(public_key,  public_key_length);
+#endif
         /**
          * 3. RSA encryption
          */
@@ -142,6 +157,10 @@ void example_optiga_crypt_rsa_decrypt_and_export(void)
                                                          &public_key_from_host,
                                                          encrypted_message,
                                                          &encrypted_message_length);
+#ifdef OPTIGA_MINI_SHELL
+        optiga_lib_print_string_with_newline("Encrypt Message using RSA Public Key");
+        optiga_lib_print_hex_dump(encrypted_message,  encrypted_message_length);
+#endif
 
         if (OPTIGA_LIB_SUCCESS != return_status)
         {
@@ -193,6 +212,11 @@ void example_optiga_crypt_rsa_decrypt_and_export(void)
             break;
         }
         logging_status = 1;
+
+#ifdef OPTIGA_MINI_SHELL
+        optiga_lib_print_string_with_newline("Decrypt Message using OPTIGA Trust");
+        optiga_lib_print_hex_dump(decrypted_message,  decrypted_message_length);
+#endif
 
     } while (FALSE);
 
