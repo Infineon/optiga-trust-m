@@ -91,6 +91,9 @@ extern "C" {
 
     /** @brief Default reset protection level for OPTIGA CRYPT and UTIL APIs */
     #define OPTIGA_COMMS_DEFAULT_PROTECTION_LEVEL           OPTIGA_COMMS_NO_PROTECTION
+	
+	/** @brief Enables command output for mini-shell*/
+	#define OPTIGA_MINI_SHELL
 #endif
 
 #ifdef __cplusplus
