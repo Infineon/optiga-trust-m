@@ -50,14 +50,10 @@
  * LOCAL DATA
  *********************************************************************************************************************/
 /// @cond hidden 
-/// Callback function when timer elapses
-static volatile register_callback callback_registered = NULL;
-/// Pointer to store upper layer callback context (For example: Ifx i2c context)
-static void * callback_ctx;
 /// Flag to indicate to the delay function when the timer has elapsed
 static volatile bool timer_elapsed = false;
 
-static pal_os_event_t pal_os_event_0 = {0};
+static volatile pal_os_event_t pal_os_event_0 = {0};
 
 /// Flag to indicate if the the RTC was already initialized, re-init. causes an NRF_ERROR
 static bool m_rtc2_is_initialized = false;
@@ -88,11 +84,10 @@ static void ifx_rtc_handler(nrf_drv_rtc_int_type_t int_type)
     {
         case NRF_DRV_RTC_INT_COMPARE0:
             // handler for register_callback_oneshot
-            if (callback_registered != NULL)
+            if (pal_os_event_0.callback_registered)
             {
-                callback = callback_registered;
-                callback_registered = NULL;
-                callback(callback_ctx);
+                callback = pal_os_event_0.callback_registered;
+                callback(pal_os_event_0.callback_ctx);
             }
 
             break;
@@ -143,8 +138,8 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
                                             void* callback_args, 
                                             uint32_t time_us)
 {
-    callback_registered = callback;
-    callback_ctx = callback_args;
+    p_pal_os_event->callback_registered = callback;
+    p_pal_os_event->callback_ctx = callback_args;
 
     // parentheses are set this way to avoid overflow when multiplying time_us with something
     uint32_t future_ticks = (time_us/(1000*1000/RTC_TICK_FREQ));
@@ -152,9 +147,7 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
     // we can't reliably set an interrupt less than two ticks ahead, as per NRF52832 datasheet, p. 245
     // do busy waiting instead
     if(future_ticks < 2) {
-    	nrf_delay_us(time_us);
-    	ifx_rtc_handler(NRF_DRV_RTC_INT_COMPARE0);
-    	return;
+        future_ticks = 2;
     }
 
     // add current tick value
@@ -166,7 +159,6 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
 
 void pal_os_event_start(pal_os_event_t * p_pal_os_event, register_callback callback, void * callback_args)
 {
-    // TODO(chr): check this implementation
     if (FALSE == p_pal_os_event->is_event_triggered)
     {
         p_pal_os_event->is_event_triggered = TRUE;
@@ -176,7 +168,6 @@ void pal_os_event_start(pal_os_event_t * p_pal_os_event, register_callback callb
 
 void pal_os_event_stop(pal_os_event_t * p_pal_os_event)
 {
-    // TODO(chr): check this implementation
     //lint --e{714} suppress "The API pal_os_event_stop is not exposed in header file but used as extern in 
     //optiga_cmd.c"
     p_pal_os_event->is_event_triggered = FALSE;
@@ -184,8 +175,7 @@ void pal_os_event_stop(pal_os_event_t * p_pal_os_event)
 
 pal_os_event_t * pal_os_event_create(register_callback callback, void * callback_args)
 {
-    // TODO(chr): check this implementation
-    if (( NULL != callback )&&( NULL != callback_args ))
+    if (( NULL != callback) && (NULL != callback_args ))
     {
         pal_os_event_start(&pal_os_event_0,callback,callback_args);
     }
