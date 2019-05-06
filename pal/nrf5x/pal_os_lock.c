@@ -59,16 +59,17 @@ void pal_os_lock_release(pal_os_lock_t * p_lock)
     assert(false);
 }
 
+volatile bool pal_os_lock = false;
+
 void pal_os_lock_enter_critical_section(void)
 {
-    // TODO(chr): implement
-    assert(false);
+    while(pal_os_lock) {};
+    pal_os_lock = true;
 }
 
 void pal_os_lock_exit_critical_section(void)
 {
-    // TODO(chr): implement
-    assert(false);
+    pal_os_lock = false;
 }
 
 /**
