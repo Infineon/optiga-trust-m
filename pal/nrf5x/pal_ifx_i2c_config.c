@@ -59,7 +59,8 @@ pal_i2c_t optiga_pal_i2c_context_0 =
 };
 
 /*********************************************************************************************************************
- * PAL GPIO configurations defined for nrf52 development boards PCA10040 and PCA10056 with the Trust X Shield
+ * PAL GPIO configurations defined for nrf52 development boards PCA10040 and PCA10056 with the Trust X Shield and
+ * Trust M 2Go board plugged in.
  *********************************************************************************************************************/
 /**
 * \brief PAL vdd pin configuration for OPTIGA. 
@@ -67,7 +68,7 @@ pal_i2c_t optiga_pal_i2c_context_0 =
 pal_gpio_t optiga_vdd_0 =
 {
     // Platform specific GPIO context for the pin used to toggle Vdd.
-    (void*)ARDUINO_9_PIN  // Power pin for the onboard OPTIGA
+    NULL  // Power pin for the onboard OPTIGA
 };
 
 /**

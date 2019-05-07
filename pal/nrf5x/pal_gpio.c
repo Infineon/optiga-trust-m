@@ -58,11 +58,10 @@
 pal_status_t pal_gpio_init(const pal_gpio_t * p_gpio_context)
 {
     // Init power pins
-    nrf_gpio_cfg_output((uint32_t)optiga_vdd_0.p_gpio_hw);
+    nrf_gpio_cfg_output(ARDUINO_9_PIN);
 
     // Set power pins to enable power
-    nrf_gpio_pin_set((uint32_t)optiga_vdd_0.p_gpio_hw); // Enable power for onboard OPTIGA
-
+    nrf_gpio_pin_clear(ARDUINO_9_PIN); // Enable power for external OPTIGA
 
     // Init reset pin
     nrf_gpio_cfg_output((uint32_t)(optiga_reset_0.p_gpio_hw));

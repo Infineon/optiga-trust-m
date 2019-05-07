@@ -53,7 +53,7 @@
 /// Flag to indicate to the delay function when the timer has elapsed
 static volatile bool timer_elapsed = false;
 
-static volatile pal_os_event_t pal_os_event_0 = {0};
+static pal_os_event_t pal_os_event_0 = {0};
 
 /// Flag to indicate if the the RTC was already initialized, re-init. causes an NRF_ERROR
 static bool m_rtc2_is_initialized = false;
@@ -145,7 +145,6 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
     uint32_t future_ticks = (time_us/(1000*1000/RTC_TICK_FREQ));
 
     // we can't reliably set an interrupt less than two ticks ahead, as per NRF52832 datasheet, p. 245
-    // do busy waiting instead
     if(future_ticks < 2) {
         future_ticks = 2;
     }
