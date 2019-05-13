@@ -35,6 +35,7 @@
  *********************************************************************************************************************/
 #include "optiga/pal/pal_i2c.h"
 #include "optiga/ifx_i2c/ifx_i2c.h"
+#include "nrf_log.h"
 #include "nrf_twi_mngr.h"
 #include "boards.h"
 
@@ -169,7 +170,8 @@ pal_status_t pal_i2c_init(const pal_i2c_t* p_i2c_context)
     // Initialize I2C driver
     if (nrf_twi_mngr_init(&m_app_twi, &config) != NRF_SUCCESS)
     {
-            return PAL_STATUS_FAILURE;
+        NRF_LOG_ERROR("Failed to initialize twi_mngr");
+        return PAL_STATUS_FAILURE;
     }
 
     initialized = true;
@@ -239,8 +241,11 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t* p_i2c_context)
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C write fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy. 
  */
-pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t length)
+pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context, uint8_t* p_data , uint16_t length)
 {
+    if (length > 255) {
+        NRF_LOG_ERROR("Invalid I2C write size");
+    }
     m_transfer.p_data    = p_data;
     m_transfer.length    = length;
     m_transfer.operation = NRF_TWI_MNGR_WRITE_OP(IFX_I2C_BASE_ADDR);
@@ -254,6 +259,7 @@ pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t l
 
     if (nrf_twi_mngr_schedule(&m_app_twi, &m_transaction) != NRF_SUCCESS)
     {
+        NRF_LOG_ERROR("Failed to schedule write transaction");
         app_twi_callback(NRF_ERROR_BUSY, m_transaction.p_user_data);
     }
 
@@ -293,6 +299,9 @@ pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t l
  */
 pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t length)
 {
+    if (length > 255) {
+        NRF_LOG_ERROR("Invalid I2C read size");
+    }
     m_transfer.p_data    = p_data;
     m_transfer.length    = length;
     m_transfer.operation = NRF_TWI_MNGR_READ_OP(IFX_I2C_BASE_ADDR);
@@ -306,6 +315,7 @@ pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t 
 
     if (nrf_twi_mngr_schedule(&m_app_twi, &m_transaction) != NRF_SUCCESS)
     {
+        NRF_LOG_ERROR("Failed to schedule read transaction");
         app_twi_callback(NRF_ERROR_BUSY, m_transaction.p_user_data);
     }
 
