@@ -36,12 +36,8 @@
 */
 
 #include "optiga/pal/pal_crypt.h"
-#include "optiga/pal/pal_memory_mgmt.h"
-#include "mbedtls/ccm.h"
-#include "mbedtls/md.h"
-#include "mbedtls/ssl.h"
-#include "mbedtls/version.h"
 #include "nrf_crypto.h"
+#include <string.h>
 
 #define PAL_CRYPT_MAX_LABEL_SEED_LENGTH     (96U)
 
@@ -64,8 +60,6 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
     uint16_t hmac_result_length;
     uint8_t md_hmac_temp_array[PAL_CRYPT_MAX_LABEL_SEED_LENGTH + PAL_CRYPT_DIGEST_MAX_SIZE];
     uint8_t hmac_checksum_result[PAL_CRYPT_DIGEST_MAX_SIZE];
-    //const mbedtls_md_info_t *message_digest_info;
-    //mbedtls_md_context_t message_digest_context;
     uint16_t final_seed_length = 0;
     nrf_crypto_hmac_context_t hmac_ctx;
     
@@ -84,67 +78,71 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
             break;
         }
 
-        /*
-        message_digest_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
-
-        mbedtls_md_init(&message_digest_context);
-        */
-
         memcpy(md_hmac_temp_array + message_digest_length, p_label, label_length);
         memcpy(md_hmac_temp_array + message_digest_length + label_length, p_seed, seed_length);
         final_seed_length = label_length + seed_length;
 
-        /*
-        if (0 != (mbedtls_md_setup(&message_digest_context,message_digest_info,1)))
-        {
-            return_value = PAL_STATUS_INVALID_INPUT;
-            break;
-        }
-        */
-
         // SHA256-HMAC
         // feed secret key
         // mbedtls_md_hmac_starts(&message_digest_context, p_secret, secret_length);
-        nrf_crypto_hmac_init(&hmac_ctx, &g_nrf_crypto_hmac_sha256_info, p_secret, secret_length);
+        if (nrf_crypto_hmac_init(&hmac_ctx, &g_nrf_crypto_hmac_sha256_info, p_secret, secret_length) != NRF_SUCCESS) {
+          break;
+        }
 
         // feed message digest
         // mbedtls_md_hmac_update(&message_digest_context, md_hmac_temp_array + message_digest_length, final_seed_length);
-        nrf_crypto_hmac_update(&hmac_ctx, md_hmac_temp_array + message_digest_length, final_seed_length);
+        if (nrf_crypto_hmac_update(&hmac_ctx, md_hmac_temp_array + message_digest_length, final_seed_length) != NRF_SUCCESS) {
+          break;
+        }
 
         // finish HMAC
         // mbedtls_md_hmac_finish(&message_digest_context, md_hmac_temp_array);
         size_t digest_len = PAL_CRYPT_DIGEST_MAX_SIZE;
-        nrf_crypto_hmac_finalize(&hmac_ctx, md_hmac_temp_array, &digest_len);
+        if (nrf_crypto_hmac_finalize(&hmac_ctx, md_hmac_temp_array, &digest_len) != NRF_SUCCESS) {
+          break;
+        }
 
         for (derive_key_len_index = 0; derive_key_len_index < derived_key_length; 
              derive_key_len_index += message_digest_length)
         {
             // reset HMAC context, re-use key
             // mbedtls_md_hmac_reset(&message_digest_context);
-            nrf_crypto_hmac_init(&hmac_ctx, &g_nrf_crypto_hmac_sha256_info, p_secret, secret_length);
+            if (nrf_crypto_hmac_init(&hmac_ctx, &g_nrf_crypto_hmac_sha256_info, p_secret, secret_length) != NRF_SUCCESS) {
+              break;
+            }
 
             // feed message
             // mbedtls_md_hmac_update(&message_digest_context, md_hmac_temp_array, 
             //                         message_digest_length + final_seed_length);
-            nrf_crypto_hmac_update(&hmac_ctx, md_hmac_temp_array, message_digest_length + final_seed_length);
+            if (nrf_crypto_hmac_update(&hmac_ctx, md_hmac_temp_array, message_digest_length + final_seed_length) != NRF_SUCCESS) {
+              break;
+            }
 
             // finish
             // mbedtls_md_hmac_finish(&message_digest_context, hmac_checksum_result);
             digest_len = PAL_CRYPT_DIGEST_MAX_SIZE;
-            nrf_crypto_hmac_finalize(&hmac_ctx, md_hmac_temp_array, &digest_len);
+            if (nrf_crypto_hmac_finalize(&hmac_ctx, md_hmac_temp_array, &digest_len) != NRF_SUCCESS) {
+              break;
+            }
 
             // reset HMAC context, re-use key
             // mbedtls_md_hmac_reset(&message_digest_context);
-            nrf_crypto_hmac_init(&hmac_ctx, &g_nrf_crypto_hmac_sha256_info, p_secret, secret_length);
+            if (nrf_crypto_hmac_init(&hmac_ctx, &g_nrf_crypto_hmac_sha256_info, p_secret, secret_length) != NRF_SUCCESS) {
+              break;
+            }
 
             // feed message
             // mbedtls_md_hmac_update(&message_digest_context, md_hmac_temp_array, message_digest_length);
-            nrf_crypto_hmac_update(&hmac_ctx, md_hmac_temp_array, message_digest_length);
+            if (nrf_crypto_hmac_update(&hmac_ctx, md_hmac_temp_array, message_digest_length)  != NRF_SUCCESS) {
+              break;
+            }
 
             // finish
             // mbedtls_md_hmac_finish(&message_digest_context, md_hmac_temp_array);
             digest_len = PAL_CRYPT_DIGEST_MAX_SIZE;
-            nrf_crypto_hmac_finalize(&hmac_ctx, md_hmac_temp_array, &digest_len);
+            if (nrf_crypto_hmac_finalize(&hmac_ctx, md_hmac_temp_array, &digest_len) != NRF_SUCCESS) {
+              break;
+            }
 
             hmac_result_length = ((derive_key_len_index + message_digest_length) > derived_key_length) ? 
                                   (derived_key_length % message_digest_length) : (message_digest_length);
@@ -208,40 +206,27 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
         }
         */
 
-        nrf_crypto_aead_init(&aead_ctx, &g_nrf_crypto_aes_ccm_256_info, p_encrypt_key);
-        
-        nrf_crypto_aead_crypt(&aead_ctx, NRF_CRYPTO_ENCRYPT,
-                              p_nonce,
-                              nonce_length,
-                              p_associated_data,
-                              associated_data_length,
-                              p_plain_text,
-                              plain_text_length,
-                              p_cipher_text,
-                              mac_output,
-                              mac_size);
-
-        /*
-        if (0 != mbedtls_ccm_encrypt_and_tag(&sEncrypt,
-                                              plain_text_length,
-                                              p_nonce,
-                                              nonce_length,
-                                              p_associated_data,
-                                              associated_data_length,
-                                              p_plain_text,
-                                              p_cipher_text,
-                                              mac_output,
-                                              mac_size))
-        
-        {
-            break;
+        // TODO(chr): this fails currently
+        if (nrf_crypto_aead_init(&aead_ctx, &g_nrf_crypto_aes_ccm_256_info, p_encrypt_key) != NRF_SUCCESS) {
+          break;
         }
-        */
+        
+        if (nrf_crypto_aead_crypt(&aead_ctx, NRF_CRYPTO_ENCRYPT,
+                                  p_nonce,
+                                  nonce_length,
+                                  p_associated_data,
+                                  associated_data_length,
+                                  p_plain_text,
+                                  plain_text_length,
+                                  p_cipher_text,
+                                  mac_output,
+                                  mac_size)  != NRF_SUCCESS) {
+          break;
+        }
 
         memcpy((p_cipher_text + plain_text_length), mac_output, mac_size);
         return_status = PAL_STATUS_SUCCESS;
     } while (FALSE);
-    //mbedtls_ccm_free(&sEncrypt);
     #undef AES128_KEY_BITS_SIZE
     #undef MAC_TAG_BUFFER_SIZE    
     return return_status;
@@ -282,7 +267,9 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
         }
         */
 
-        nrf_crypto_aead_init(&aead_ctx, &g_nrf_crypto_aes_ccm_256_info, p_decrypt_key);
+        if (nrf_crypto_aead_init(&aead_ctx, &g_nrf_crypto_aes_ccm_256_info, p_decrypt_key) != NRF_SUCCESS) {
+          break;
+        }
         
        
 /*
@@ -301,16 +288,18 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
         }
         */
 
-        nrf_crypto_aead_crypt(&aead_ctx, NRF_CRYPTO_DECRYPT,
-                              p_nonce,
-                              nonce_length,
-                              p_associated_data,
-                              associated_data_length,
-                              p_cipher_text,
-                              (cipher_text_length - mac_size),
-                              p_plain_text,
-                              &p_cipher_text[cipher_text_length - mac_size],
-                              mac_size);
+        if (nrf_crypto_aead_crypt(&aead_ctx, NRF_CRYPTO_DECRYPT,
+                                  p_nonce,
+                                  nonce_length,
+                                  p_associated_data,
+                                  associated_data_length,
+                                  p_cipher_text,
+                                  (cipher_text_length - mac_size),
+                                  p_plain_text,
+                                  &p_cipher_text[cipher_text_length - mac_size],
+                                  mac_size) != NRF_SUCCESS) {
+          break;
+        }
         return_status = PAL_STATUS_SUCCESS;
     } while (FALSE);
     //mbedtls_ccm_free(&sDecrypt);
@@ -320,23 +309,17 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
 
 pal_status_t pal_crypt_version(uint8_t * p_crypt_lib_version_info, uint16_t * length)
 {
-    pal_status_t return_value  = PAL_STATUS_FAILURE;    
-    uint8_t sizeof_version_number  = (uint8_t)strlen(MBEDTLS_VERSION_STRING);
+    const char version[] = "nrf_crypto";
+    const uint16_t version_len = sizeof(version);
+    
+    if(!length || *length < sizeof(version_len)) {
+        return PAL_STATUS_FAILURE;
+    }
+    
+    memcpy(p_crypt_lib_version_info, version, version_len);
+    *length = version_len;
 
-    do
-    {
-        if (sizeof_version_number > *length)
-        {
-            break;
-        }
-
-        pal_os_memcpy(p_crypt_lib_version_info, MBEDTLS_VERSION_STRING, sizeof_version_number);
-        *length = sizeof_version_number;
-
-        return_value = PAL_STATUS_SUCCESS;
-
-    } while (0);
-    return return_value;
+    return PAL_STATUS_SUCCESS;
 }
 
 /**
