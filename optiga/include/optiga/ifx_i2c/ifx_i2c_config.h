@@ -58,7 +58,7 @@ extern "C" {
 /** @brief Physical Layer: polling interval in microseconds */
 #define PL_POLLING_INVERVAL_US      (1000U)
 /** @brief Physical layer: maximal attempts */
-#define PL_POLLING_MAX_CNT          (200U)
+#define PL_POLLING_MAX_CNT          (10U)
 /** @brief Physical Layer: data register polling interval in microseconds */
 #define PL_DATA_POLLING_INVERVAL_US (5000U)
 /** @brief Physical Layer: guard time interval in microseconds */

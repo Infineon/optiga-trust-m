@@ -35,11 +35,19 @@
  *********************************************************************************************************************/
 #include "optiga/pal/pal_i2c.h"
 #include "optiga/ifx_i2c/ifx_i2c.h"
+
+#define NRF_LOG_MODULE_NAME i2c_pal
+
 #include "nrf_log.h"
+
+NRF_LOG_MODULE_REGISTER();
+
 #include "nrf_twi_mngr.h"
 #include "boards.h"
 
 #include <stdbool.h>
+
+
 
 /// @cond hidden
 
@@ -72,7 +80,6 @@ nrf_twi_mngr_t m_app_twi;
 
 /** @brief Definition of TWI manager transfer instance */
 static nrf_twi_mngr_transfer_t    m_transfer;
-
 /** @brief Definition of TWI manager transaction instance */
 static nrf_twi_mngr_transaction_t m_transaction;
 
@@ -101,13 +108,27 @@ static void app_twi_callback(ret_code_t result, void * p_user_data)
 	const pal_i2c_t* i2c_ctx = (pal_i2c_t*) p_user_data;
 	//lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
 	upper_layer_callback_t upper_layer_handler = (upper_layer_callback_t)i2c_ctx->upper_layer_event_handler;
+    
 
     if (result == NRF_SUCCESS)
     {
+        if (NRF_TWI_MNGR_IS_READ_OP(m_transfer.operation)) {
+            NRF_LOG_INFO("R %d bytes:", m_transfer.length);
+        } else {
+            NRF_LOG_INFO("W %d bytes:", m_transfer.length);
+        }
+
+        NRF_LOG_HEXDUMP_INFO(m_transfer.p_data, m_transfer.length);
     	upper_layer_handler(i2c_ctx->p_upper_layer_ctx, PAL_I2C_EVENT_SUCCESS);
     }
     else
     {
+        if (NRF_TWI_MNGR_IS_READ_OP(m_transfer.operation)) {
+            NRF_LOG_INFO("Read %d bytes failed", m_transfer.length);
+        } else {
+            NRF_LOG_INFO("Write %d bytes failed", m_transfer.length);
+        }
+
     	upper_layer_handler(i2c_ctx->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
     }
 }
@@ -246,6 +267,12 @@ pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context, uint8_t* p_data , uint16_t 
     if (length > 255) {
         NRF_LOG_ERROR("Invalid I2C write size");
     }
+
+    if (length == 0) {
+        NRF_LOG_ERROR("Can't write 0 bytes");
+        return PAL_STATUS_FAILURE;
+    }
+
     m_transfer.p_data    = p_data;
     m_transfer.length    = length;
     m_transfer.operation = NRF_TWI_MNGR_WRITE_OP(IFX_I2C_BASE_ADDR);
@@ -302,6 +329,12 @@ pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t 
     if (length > 255) {
         NRF_LOG_ERROR("Invalid I2C read size");
     }
+
+    if (length == 0) {
+        NRF_LOG_ERROR("Can't read 0 bytes");
+        return PAL_STATUS_FAILURE;
+    }
+
     m_transfer.p_data    = p_data;
     m_transfer.length    = length;
     m_transfer.operation = NRF_TWI_MNGR_READ_OP(IFX_I2C_BASE_ADDR);

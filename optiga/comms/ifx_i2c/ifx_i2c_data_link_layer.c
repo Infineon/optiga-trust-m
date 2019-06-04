@@ -80,11 +80,14 @@
 // Seconds to milliseconds
 #define DL_SEC_TO_MSECS                 (1000U)
 
+#include "sdk_config.h"
+#include "nrf_log.h"
+
 // Setup debug log statements
 #if IFX_I2C_LOG_DL == 1
 #define LOG_DL IFX_I2C_LOG
 #else
-#define LOG_DL(...) //printf(__VA_ARGS__)
+#define LOG_DL NRF_LOG_RAW_INFO
 #endif
 
 

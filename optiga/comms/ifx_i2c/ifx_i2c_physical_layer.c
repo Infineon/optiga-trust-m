@@ -106,11 +106,16 @@
 // Physical Layer Base Address Register mask
 #define PL_REG_I2C_BASE_ADDRESS_MASK    (0x7F)
 
+#include "sdk_config.h"
+#include "nrf_log.h"
+
+#define IFX_I2C_LOG_PL 0
+
 // Setup debug log statements
 #if IFX_I2C_LOG_PL == 1
-#define LOG_PL IFX_I2C_LOG
+#define LOG_PL NRF_LOG_RAW_INFO
 #else
-#define LOG_PL(...) //printf(__VA_ARGS__)
+#define LOG_PL(...)
 #endif
 
 _STATIC_H optiga_lib_status_t g_pal_event_status;
