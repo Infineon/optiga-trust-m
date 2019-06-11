@@ -121,7 +121,7 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
             // finish
             // mbedtls_md_hmac_finish(&message_digest_context, hmac_checksum_result);
             digest_len = PAL_CRYPT_DIGEST_MAX_SIZE;
-            if (nrf_crypto_hmac_finalize(&hmac_ctx, md_hmac_temp_array, &digest_len) != NRF_SUCCESS) {
+            if (nrf_crypto_hmac_finalize(&hmac_ctx, hmac_checksum_result, &digest_len) != NRF_SUCCESS) {
               break;
             }
 
