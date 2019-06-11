@@ -206,8 +206,7 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
         }
         */
 
-        // TODO(chr): this fails currently
-        if (nrf_crypto_aead_init(&aead_ctx, &g_nrf_crypto_aes_ccm_256_info, p_encrypt_key) != NRF_SUCCESS) {
+        if (nrf_crypto_aead_init(&aead_ctx, &g_nrf_crypto_aes_ccm_128_info, p_encrypt_key) != NRF_SUCCESS) {
           break;
         }
         
@@ -267,7 +266,7 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
         }
         */
 
-        if (nrf_crypto_aead_init(&aead_ctx, &g_nrf_crypto_aes_ccm_256_info, p_decrypt_key) != NRF_SUCCESS) {
+        if (nrf_crypto_aead_init(&aead_ctx, &g_nrf_crypto_aes_ccm_128_info, p_decrypt_key) != NRF_SUCCESS) {
           break;
         }
         
