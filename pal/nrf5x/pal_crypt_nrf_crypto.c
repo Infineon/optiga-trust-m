@@ -223,6 +223,10 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
           break;
         }
 
+        if (nrf_crypto_aead_uninit(&aead_ctx) != NRF_SUCCESS) {
+          break;
+        }
+
         memcpy((p_cipher_text + plain_text_length), mac_output, mac_size);
         return_status = PAL_STATUS_SUCCESS;
     } while (FALSE);
@@ -299,6 +303,11 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
                                   mac_size) != NRF_SUCCESS) {
           break;
         }
+
+        if (nrf_crypto_aead_uninit(&aead_ctx) != NRF_SUCCESS) {
+          break;
+        }
+
         return_status = PAL_STATUS_SUCCESS;
     } while (FALSE);
     //mbedtls_ccm_free(&sDecrypt);
