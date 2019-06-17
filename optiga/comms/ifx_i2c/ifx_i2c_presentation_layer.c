@@ -43,14 +43,11 @@
 // include lower layer header
 /// @cond hidden
 
-#include "sdk_config.h"
-#include "nrf_log.h"
-
 // Setup debug log statements
 #if IFX_I2C_LOG_PRL == 1
 #define LOG_PRL IFX_I2C_LOG
 #else
-#define LOG_PRL  NRF_LOG_RAW_INFO
+#define LOG_PRL(...)  //printf(__VA_ARGS__);
 #endif
 
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION        

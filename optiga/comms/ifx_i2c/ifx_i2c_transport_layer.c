@@ -61,15 +61,11 @@
 #define TL_PCTR_CHANNEL_MASK                (0xF8)
 #define TL_PCTR_CHAIN_MASK                  (0x07)
 #define TL_PCTR_INVALID                     (0xFF)
-
-#include "sdk_config.h"
-#include "nrf_log.h"
-
 // Setup debug log statements
 #if IFX_I2C_LOG_TL == 1
 #define LOG_TL IFX_I2C_LOG
 #else
-#define LOG_TL NRF_LOG_RAW_INFO
+#define LOG_TL(...)    //printf(__VA_ARGS__);
 #endif
 
 static uint8_t g_pctr_states_table[8][2] = {
