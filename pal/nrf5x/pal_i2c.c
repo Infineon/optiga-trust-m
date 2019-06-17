@@ -37,6 +37,8 @@
 #include "optiga/ifx_i2c/ifx_i2c.h"
 
 #define NRF_LOG_MODULE_NAME i2c_pal
+// Only log ERROR level (1) to reduce log spam
+#define NRF_LOG_LEVEL 1
 
 #include "nrf_log.h"
 
@@ -46,8 +48,6 @@ NRF_LOG_MODULE_REGISTER();
 #include "boards.h"
 
 #include <stdbool.h>
-
-
 
 /// @cond hidden
 
@@ -124,9 +124,9 @@ static void app_twi_callback(ret_code_t result, void * p_user_data)
     else
     {
         if (NRF_TWI_MNGR_IS_READ_OP(m_transfer.operation)) {
-            NRF_LOG_INFO("Read %d bytes failed", m_transfer.length);
+            NRF_LOG_INFO("R %d bytes failed", m_transfer.length);
         } else {
-            NRF_LOG_INFO("Write %d bytes failed", m_transfer.length);
+            NRF_LOG_INFO("W %d bytes failed", m_transfer.length);
         }
 
     	upper_layer_handler(i2c_ctx->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
@@ -226,6 +226,7 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t* p_i2c_context)
     if(initialized) {
         nrf_twi_mngr_uninit(&m_app_twi);
     }
+
     initialized = false;
     return PAL_STATUS_SUCCESS;
 }
@@ -264,6 +265,7 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t* p_i2c_context)
  */
 pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context, uint8_t* p_data , uint16_t length)
 {
+    // 255 bytes is the limit for the nrf52 platform
     if (length > 255) {
         NRF_LOG_ERROR("Invalid I2C write size");
     }
@@ -326,6 +328,7 @@ pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context, uint8_t* p_data , uint16_t 
  */
 pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t length)
 {
+    // 255 bytes is the limit for the nrf52 platform
     if (length > 255) {
         NRF_LOG_ERROR("Invalid I2C read size");
     }
@@ -342,7 +345,7 @@ pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t 
 
     m_transaction.callback            = app_twi_callback;
     m_transaction.number_of_transfers = 1;
-    m_transaction.p_required_twi_cfg  = 0;
+    m_transaction.p_required_twi_cfg  = NULL;
     m_transaction.p_transfers         = &m_transfer;
     m_transaction.p_user_data         = (void*) p_i2c_context;
 
