@@ -36,7 +36,6 @@
 */
 
 #include "optiga/pal/pal_os_datastore.h"
-#include <assert.h>
 
 /// @endcond
 /// Size of data store buffer
@@ -71,37 +70,32 @@ pal_status_t pal_os_datastore_write(uint16_t datastore_id,
     {
         case OPTIGA_PLATFORM_BINDING_SHARED_SECRET_ID:
         {
-            // !!!OPTIGA_LIB_PORTING_REQUIRED
-            // This has to be enhanced by user only, in case of updating
-            // the platform binding shared secret during the runtime.
-
-            return_status = PAL_STATUS_SUCCESS;
+            // Changing the Platform Binding Shared Secret is not implemented
+            return_status = PAL_STATUS_FAILURE;
             break;
         }
         case OPTIGA_COMMS_MANAGE_CONTEXT_ID:
-        {
-            // !!!OPTIGA_LIB_PORTING_REQUIRED
-            // This has to be enhanced by user only, in case of storing 
-            // the manage context information in non-volatile memory 
-            // to reuse for later during hard reset scenarios where the 
-            // RAM gets flushed out.
-            
+        {           
             // prevent out-of-bounds write
-            assert(length <= DATA_STORE_BUFFERSIZE);
-            memcpy(data_store_buffer,p_buffer,length);
+            if (length > DATA_STORE_BUFFERSIZE)
+            {
+                return_status = PAL_STATUS_FAILURE;
+                break;
+            }
+
+            memcpy(data_store_buffer, p_buffer, length);
             return_status = PAL_STATUS_SUCCESS;
             break;
         }
         case OPTIGA_HIBERNATE_CONTEXT_ID:
         {
-            // !!!OPTIGA_LIB_PORTING_REQUIRED
-            // This has to be enhanced by user only, in case of storing 
-            // the application context information in non-volatile memory 
-            // to reuse for later during hard reset scenarios where the 
-            // RAM gets flushed out.
-
             // prevent out-of-bounds write
-            assert(length <= APP_CONTEXT_SIZE);
+            if (length > APP_CONTEXT_SIZE)
+            {
+                return_status = PAL_STATUS_FAILURE;
+                break;
+            }
+
             memcpy(data_store_app_context_buffer,p_buffer,length);
             return_status = PAL_STATUS_SUCCESS;
             break;
@@ -119,7 +113,12 @@ pal_status_t pal_os_datastore_read(uint16_t datastore_id,
                                    uint8_t * p_buffer, 
                                    uint16_t * p_buffer_length)
 {
-    assert(p_buffer_length != NULL);
+    if (p_buffer_length == NULL)
+    {
+        // need a valid p_buffer_length
+        return PAL_STATUS_FAILURE;
+    }
+
     pal_status_t return_status = PAL_STATUS_FAILURE;
 
     switch(datastore_id)
@@ -149,7 +148,12 @@ pal_status_t pal_os_datastore_read(uint16_t datastore_id,
             // else this is not required to be enhanced.
 
             // prevent out-of-bounds read
-            assert(*p_buffer_length <= DATA_STORE_BUFFERSIZE);
+            if (*p_buffer_length > DATA_STORE_BUFFERSIZE)
+            {
+                return_status = PAL_STATUS_FAILURE;
+                break;
+            }
+
             memcpy(p_buffer,data_store_buffer,*p_buffer_length);
             return_status = PAL_STATUS_SUCCESS;
             break;
@@ -162,7 +166,12 @@ pal_status_t pal_os_datastore_read(uint16_t datastore_id,
             // else this is not required to be enhanced.
 
             // prevent out-of-bounds read
-            assert(*p_buffer_length <= APP_CONTEXT_SIZE);
+            if (*p_buffer_length > APP_CONTEXT_SIZE)
+            {
+                return_status = PAL_STATUS_FAILURE;
+                break;
+            }
+
             memcpy(p_buffer,data_store_app_context_buffer,*p_buffer_length);
             return_status = PAL_STATUS_SUCCESS;
             break;
