@@ -39,10 +39,6 @@
 
 #ifdef OPTIGA_CRYPT_ECDH_ENABLED
 
-#ifdef OPTIGA_MINI_SHELL
-#include "optiga/common/optiga_lib_logger.h"
-#endif
-
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 /**
@@ -104,11 +100,6 @@ void example_optiga_crypt_ecdh(void)
     optiga_crypt_t * me = NULL;
     example_log_function_name(__FUNCTION__);
 
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("Peer public key details for the ECDH operation:");
-        optiga_lib_print_hex_dump(peer_public_key,  sizeof(peer_public_key));
-#endif
-
     do
     {
         /**
@@ -154,11 +145,6 @@ void example_optiga_crypt_ecdh(void)
             break;
         }
 
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("Host public key details for the ECDH operation:");
-        optiga_lib_print_hex_dump(public_key,  public_key_length);
-#endif
-
         /**
          * 3. Perform ECDH using the Peer Public key
          *       - Use ECC NIST P 256 Curve
@@ -188,12 +174,6 @@ void example_optiga_crypt_ecdh(void)
             //ECDH Operation failed.
             break;
         }
-
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("ECDH shared secret:");
-        optiga_lib_print_hex_dump(shared_secret,  sizeof(shared_secret));
-#endif
-
         logging_status = 1;
     } while (FALSE);
 

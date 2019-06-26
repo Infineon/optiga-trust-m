@@ -39,10 +39,6 @@
 
 #ifdef OPTIGA_CRYPT_RSA_VERIFY_ENABLED
 
-#ifdef OPTIGA_MINI_SHELL
-#include "optiga/common/optiga_lib_logger.h"
-#endif
-
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 
@@ -139,18 +135,6 @@ void example_optiga_crypt_rsa_verify(void)
         /**
          * 1. Create OPTIGA Crypt Instance
          */
-
-#ifdef OPTIGA_MINI_SHELL
-    	optiga_lib_print_string_with_newline("Sha-256 Digest (Message):");
-    	optiga_lib_print_hex_dump(digest,  sizeof(digest));
-
-        optiga_lib_print_string_with_newline("RSA 2048 PubKey: PubKey");
-        optiga_lib_print_hex_dump(public_key,  sizeof(public_key));
-
-        optiga_lib_print_string_with_newline("RSA 2048 Signature: PubKey");
-        optiga_lib_print_hex_dump(signature,  sizeof(signature));
-#endif
-
         me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
         if (NULL == me)
         {
@@ -187,9 +171,6 @@ void example_optiga_crypt_rsa_verify(void)
             break;
         }
         logging_status = 1;
-#ifdef OPTIGA_MINI_SHELL
-    	optiga_lib_print_string_with_newline("OPTIGA Trust RSA 2048 Verify:");
-#endif
     } while (FALSE);
 
     if (me)

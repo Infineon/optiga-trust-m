@@ -39,10 +39,6 @@
 
 #ifdef OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
 
-#ifdef OPTIGA_MINI_SHELL
-#include "optiga/common/optiga_lib_logger.h"
-#endif
-
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 /**
@@ -122,15 +118,6 @@ void example_optiga_crypt_rsa_encrypt_message(void)
 
     do
     {
-#ifdef OPTIGA_MINI_SHELL
-    	optiga_lib_print_string_with_newline("RSA user message");
-        optiga_lib_print_string_with_newline("RSA message to encrypt: RSA PKCS1_v1.5 Encryption of user message");
-        optiga_lib_print_hex_dump(message,  sizeof(message));
-
-        optiga_lib_print_string_with_newline("User RSA 2048 PubKey:");
-        optiga_lib_print_hex_dump(public_key,  sizeof(public_key));
-#endif
-
         /**
          * 1. Create OPTIGA Crypt Instance
          *
@@ -176,11 +163,6 @@ void example_optiga_crypt_rsa_encrypt_message(void)
             break;
         }
         logging_status = 1;
-
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("User RSA 2048 Encrypted Message:");
-        optiga_lib_print_hex_dump(encrypted_message,  encrypted_message_length);
-#endif
 
     } while (FALSE);
 

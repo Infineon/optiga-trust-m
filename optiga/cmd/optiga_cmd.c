@@ -298,7 +298,7 @@ struct optiga_context
     /// Optiga context handle buffer
     uint8_t optiga_context_handle_buffer[APP_CONTEXT_SIZE];
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
-    /// Protection leavel status flah
+    /// Protection leavel status flag
     uint8_t protection_level_state;
 #endif //OPTIGA_COMMS_SHIELDED_CONNECTION
 };

@@ -35,7 +35,7 @@
 * @{
 */
 
-#define PROTECTED_UPDATE_VERSION	"1.00.769"
+#define PROTECTED_UPDATE_VERSION	"1.20.802"
 
 /**
 * @}

@@ -41,10 +41,6 @@
 
 #ifdef OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
 
-#ifdef OPTIGA_MINI_SHELL
-#include "optiga/common/optiga_lib_logger.h"
-#endif
-
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 /**
@@ -115,16 +111,6 @@ void example_optiga_crypt_tls_prf_sha256(void)
     example_log_function_name(__FUNCTION__);
     do
     {
-
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("Random Seed");
-        optiga_lib_print_hex_dump(random_seed,  sizeof(random_seed));
-
-        optiga_lib_print_string_with_newline("**NOTE THIS IS ONLY AN EXAMPLE:**");
-        optiga_lib_print_string_with_newline("Secret to be written to data object which will be later used as part of TLS PRF SHA256 key derivation:");
-        optiga_lib_print_hex_dump(secret_to_be_written,  sizeof(secret_to_be_written));
-
-#endif
 
         me_util = optiga_util_create(0, optiga_lib_callback, NULL);
         if (NULL == me_util)
@@ -233,12 +219,6 @@ void example_optiga_crypt_tls_prf_sha256(void)
             //Derive key operation failed.
             break;
         }
-
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("**NOTE THIS IS ONLY AN EXAMPLE:**");
-        optiga_lib_print_string_with_newline("OPTIGA Trust Decryption Key");
-        optiga_lib_print_hex_dump(decryption_key,  sizeof(decryption_key));
-#endif
         /**
          * 5. Change meta data to default value
          *

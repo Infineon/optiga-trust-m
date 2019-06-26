@@ -207,7 +207,7 @@ optiga_lib_status_t optiga_util_open_application(optiga_util_t * me,
  * - Initiate close application command to optiga.
  * - Perform manage context secure session save operations.
  * - De-Initializes the OPTIGA and closes the communication channel.
- * - Power downs the OPTIGA.
+ * - Power downs the OPTIGA after closing the application on optiga.
  *
  *\pre
  * - The application on OPTIGA must be opened using #optiga_util_open_application before using this API.

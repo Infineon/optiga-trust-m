@@ -39,10 +39,6 @@
 
 #ifdef OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED
 
-#ifdef OPTIGA_MINI_SHELL
-#include "optiga/common/optiga_lib_logger.h"
-#endif
-
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 
@@ -131,14 +127,6 @@ void example_optiga_crypt_ecdsa_verify(void)
     example_log_function_name(__FUNCTION__);
     do
     {
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("SHA-256 Digest (The message Digest):");
-        optiga_lib_print_hex_dump(digest,  sizeof(digest));
-
-        optiga_lib_print_string_with_newline("ECDSA (p256) Signature:");
-        optiga_lib_print_hex_dump(signature,  sizeof(signature));
-#endif
-
         /**
          * 1. Create OPTIGA Crypt Instance
          */

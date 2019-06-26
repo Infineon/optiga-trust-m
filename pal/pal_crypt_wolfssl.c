@@ -1,5 +1,5 @@
 /**
-* * \copyright
+* \copyright
 * MIT License
 *
 * Copyright (c) 2019 Infineon Technologies AG

@@ -38,10 +38,6 @@
 
 #include "optiga/optiga_util.h"
 
-#ifdef OPTIGA_MINI_SHELL
-#include "optiga/common/optiga_lib_logger.h"
-#endif
-
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 /**
@@ -121,9 +117,6 @@ void example_optiga_util_read_data(void)
             break;
         }
 
-
-
-
         /**
          * Read metadata of a data object (e.g. certificate data object E0E0)
          * using optiga_util_read_data.
@@ -152,11 +145,6 @@ void example_optiga_util_read_data(void)
             break;
         }
         logging_status = 1;
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("OPTIGA Trust Read OID 0xE0E0:");
-        optiga_lib_print_string_with_newline("Read device end entity certificate from OPTIGA:");
-        optiga_lib_print_hexdump_ascii_(read_data_buffer, bytes_to_read);
-#endif
     } while (FALSE);
 
     if (me)

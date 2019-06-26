@@ -38,10 +38,6 @@
 
 #include "optiga/optiga_util.h"
 
-#ifdef OPTIGA_MINI_SHELL
-#include "optiga/common/optiga_lib_logger.h"
-#endif
-
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 
@@ -136,11 +132,6 @@ void example_optiga_util_update_count(void)
             break;
         }
 
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("Initial Counter Data for OPTIGA Trust Counter OID 0xE120:");
-        optiga_lib_print_hexdump_ascii_(initial_counter_object_data, sizeof(initial_counter_object_data));
-#endif
-
         // In this example, the counter is update by 5 and the final count would be 15
         optiga_lib_status = OPTIGA_LIB_BUSY;
         return_status = optiga_util_update_count(me, 
@@ -164,9 +155,6 @@ void example_optiga_util_update_count(void)
         }
         
         logging_status = 1;
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("Update OPTIGA Trust Counter OID 0xE120 by 5:");
-#endif
 
     } while (FALSE);
 

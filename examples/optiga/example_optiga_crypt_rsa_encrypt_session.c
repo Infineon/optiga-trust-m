@@ -38,10 +38,6 @@
 #include "optiga/optiga_crypt.h"
 
 #ifdef OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
-
-#ifdef OPTIGA_MINI_SHELL
-#include "optiga/common/optiga_lib_logger.h"
-#endif
     
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
@@ -86,11 +82,6 @@ void example_optiga_crypt_rsa_encrypt_session(void)
 
     do
     {
-
-#ifdef OPTIGA_MINI_SHELL
-    	optiga_lib_print_string_with_newline("OPTIGA Trust RSA Encrypt Sessioin");
-#endif
-
         /**
          * 1. Create OPTIGA Crypt Instance
          *
@@ -130,12 +121,6 @@ void example_optiga_crypt_rsa_encrypt_session(void)
             break;
         }
 
-#ifdef OPTIGA_MINI_SHELL
-    	optiga_lib_print_string_with_newline("OPTIGA Trust Generate RSA 2048 Key Pair");
-        optiga_lib_print_string_with_newline("RSA PubKey");
-        optiga_lib_print_hex_dump(public_key,  public_key_length);
-#endif
-
         /**
          * 3. Generate 48 byte RSA Pre master secret in acquired session OID
          */
@@ -162,18 +147,12 @@ void example_optiga_crypt_rsa_encrypt_session(void)
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
 
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("OPTIGA Trust Generate Pre-Master Secret in acquired session OID");
-#endif
-
         /**
          * 4. Encrypt (RSA) the data in session OID
          */
 
         // OPTIGA Comms Shielded connection settings to enable the protection
         OPTIGA_CRYPT_SET_COMMS_PROTOCOL_VERSION(me, OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET);
-
-
 
         encryption_scheme = OPTIGA_RSAES_PKCS1_V15;
         public_key_from_host.public_key = public_key;
@@ -205,11 +184,6 @@ void example_optiga_crypt_rsa_encrypt_session(void)
             break;
         }
         logging_status = 1;
-
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("Encrypt (RSA) the data in session OID");
-        optiga_lib_print_hex_dump(encrypted_message,  encrypted_message_length);
-#endif
 
     } while (FALSE);
 

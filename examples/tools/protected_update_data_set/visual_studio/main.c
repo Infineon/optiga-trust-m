@@ -118,7 +118,7 @@ static void tool_show_final_inputs(manifest_d* manifest_data)
 	printf("\t%-20s %-8X \n", "offset in target :", manifest_data->offset_in_oid);
 	printf("\t%-20s %-8X \n", "write type :", manifest_data->write_type);
 	printf("\t%-20s %-8s \n", "signature algo :", manifest_data->signature_algo);
-	printf("\t%-20s \n\t", "payload length :", manifest_data->payload);
+	printf("\t%-20s %-8X \n\t", "payload length :", manifest_data->payload_length);
     // Uncomment the below line to print payload data
 	//pal_logger_print_hex_data(manifest_data->payload, manifest_data->payload_length);
 	printf("\n\t%-20s %-8s \n", "private key :", manifest_data->private_key);
@@ -235,14 +235,16 @@ int main(int argc, char *argv[])
 		{
 			break;
 		}
-		if (0 != protected_update_create_manifest(manifest, &cbor_manifest))
-		{
-			pal_logger_print_message("Error while creating manifest");
-            break;
-		}
+		// Generate fragements
 		if (0 != protected_update_create_fragments(manifest, &cbor_manifest))
 		{
 			pal_logger_print_message("Error while creating fragments");
+			break;
+		}
+		// Generate Manifest
+		if (0 != protected_update_create_manifest(manifest, &cbor_manifest))
+		{
+			pal_logger_print_message("Error while creating manifest");
             break;
 		}
 		pal_logger_print_manifest(&cbor_manifest);

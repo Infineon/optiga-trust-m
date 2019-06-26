@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 /// OPTIGA Library version information
-#define OPTIGA_LIB_VERSION "Ver 1.00.769"
+#define OPTIGA_LIB_VERSION "Ver 1.20.802"
 
 #ifdef __cplusplus
 }

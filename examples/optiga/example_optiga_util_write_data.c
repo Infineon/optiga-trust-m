@@ -38,10 +38,6 @@
 
 #include "optiga/optiga_util.h"
 
-#ifdef OPTIGA_MINI_SHELL
-#include "optiga/common/optiga_lib_logger.h"
-#endif
-
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 
@@ -137,10 +133,6 @@ void example_optiga_util_write_data(void)
 
     do
     {
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("Sample Trust Anchor:");
-        optiga_lib_print_hexdump_ascii_(trust_anchor, sizeof(trust_anchor));
-#endif
         /**
          * 1. Create OPTIGA Util Instance
          */
@@ -185,9 +177,7 @@ void example_optiga_util_write_data(void)
             //writing data to a data object failed.
             break;
         }
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("Write Trust Anchor to a Trust Anchor object");
-#endif
+
         /**
          *
          * Write metadata to Trust Anchor to a Trust Anchor object (e.g. E0E8)
@@ -218,10 +208,6 @@ void example_optiga_util_write_data(void)
             break;
         }
         logging_status = 1;
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("Write metadata to Trust Anchor to a Trust Anchor object (e.g. E0E8)");
-        optiga_lib_print_hexdump_ascii_(metadata, sizeof(metadata));
-#endif
 
     } while (FALSE);
 

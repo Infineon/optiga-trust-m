@@ -168,8 +168,8 @@ optiga_lib_status_t ifx_i2c_close(ifx_i2c_context_t * p_ctx)
 
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
         p_ctx->close_state = IFX_I2C_STACK_ERROR;
-        api_status = ifx_i2c_prl_close(p_ctx, ifx_i2c_prl_close_event_handler);
         p_ctx->state = IFX_I2C_STATE_UNINIT;
+        api_status = ifx_i2c_prl_close(p_ctx, ifx_i2c_prl_close_event_handler);
         if (IFX_I2C_STACK_ERROR == api_status)
         {
             //lint --e{534} suppress "Error handling is not required so return value is not checked"
@@ -177,7 +177,6 @@ optiga_lib_status_t ifx_i2c_close(ifx_i2c_context_t * p_ctx)
             // Also power off the device
             pal_gpio_set_low(p_ctx->p_slave_vdd_pin);
             pal_gpio_set_low(p_ctx->p_slave_reset_pin);
-            p_ctx->state = IFX_I2C_STATE_UNINIT;
             p_ctx->status = IFX_I2C_STATUS_NOT_BUSY;
         }
 #else
@@ -251,11 +250,6 @@ void ifx_i2c_prl_close_event_handler(ifx_i2c_context_t * p_ctx,
                                      const uint8_t * p_data,
                                      uint16_t data_len)
 {
-    // If there is no upper layer handler, don't do anything and return
-    if (NULL != p_ctx->upper_layer_event_handler)
-    {
-        p_ctx->upper_layer_event_handler(p_ctx->p_upper_layer_ctx, event);
-    }
     p_ctx->status = IFX_I2C_STATUS_NOT_BUSY;
     switch (p_ctx->state)
     {
@@ -266,12 +260,15 @@ void ifx_i2c_prl_close_event_handler(ifx_i2c_context_t * p_ctx,
             // Also power off the device
             pal_gpio_set_low(p_ctx->p_slave_vdd_pin);
             pal_gpio_set_low(p_ctx->p_slave_reset_pin);
-            p_ctx->state = IFX_I2C_STATE_UNINIT;
-            p_ctx->status = IFX_I2C_STATUS_NOT_BUSY;
             break;
         }
         default:
             break;
+    }
+    // If there is no upper layer handler, don't do anything and return
+    if (NULL != p_ctx->upper_layer_event_handler)
+    {
+        p_ctx->upper_layer_event_handler(p_ctx->p_upper_layer_ctx, event);
     }
 }
 

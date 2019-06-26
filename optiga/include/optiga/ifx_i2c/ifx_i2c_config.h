@@ -65,7 +65,9 @@ extern "C" {
 #define PL_GUARD_TIME_INTERVAL_US   (50U)
 
 /** @brief Data link layer: maximum frame size */
+#ifndef DL_MAX_FRAME_SIZE
 #define DL_MAX_FRAME_SIZE           (300U)
+#endif
 
 /** @brief Transport Layer: header size */
 #define TL_HEADER_SIZE              (1U)

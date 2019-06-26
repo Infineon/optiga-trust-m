@@ -40,10 +40,6 @@
 
 #ifdef OPTIGA_CRYPT_RANDOM_ENABLED
 
-#ifdef OPTIGA_MINI_SHELL
-#include "optiga/common/optiga_lib_logger.h"
-#endif
-
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
 
@@ -112,10 +108,6 @@ void example_optiga_crypt_random(void)
             break;
         }
         logging_status = 1;
-#ifdef OPTIGA_MINI_SHELL
-        optiga_lib_print_string_with_newline("Random Number from OPTIGA Trust");
-        optiga_lib_print_hex_dump(random_data_buffer,  sizeof(random_data_buffer));
-#endif
 
     } while (FALSE);
 
