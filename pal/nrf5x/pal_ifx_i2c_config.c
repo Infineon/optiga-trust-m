@@ -38,20 +38,20 @@
 #include "optiga/pal/pal_gpio.h"
 #include "optiga/pal/pal_i2c.h"
 #include "optiga/ifx_i2c/ifx_i2c_config.h"
-#include "boards.h"
+#include "pal_pin_config.h"
 
 /*********************************************************************************************************************
  * pal ifx i2c instance
  *********************************************************************************************************************/
 /**
- * \brief PAL I2C configuration for OPTIGA. 
+ * \brief PAL I2C configuration for OPTIGA.
  */
 pal_i2c_t optiga_pal_i2c_context_0 =
 {
     /// Pointer to I2C master platform specific context
     NULL,
     /// Slave address
-	IFX_I2C_BASE_ADDR,
+    IFX_I2C_BASE_ADDR,
     /// Upper layer context
     NULL,
     /// Callback event handler
@@ -63,12 +63,13 @@ pal_i2c_t optiga_pal_i2c_context_0 =
  * Trust M 2Go board plugged in.
  *********************************************************************************************************************/
 /**
-* \brief PAL vdd pin configuration for OPTIGA. 
+* \brief PAL vdd pin configuration for OPTIGA.
  */
 pal_gpio_t optiga_vdd_0 =
 {
     // Platform specific GPIO context for the pin used to toggle Vdd.
-    NULL  // Power pin for the onboard OPTIGA
+    // Casting the uint32_t to a void* is possible, because nrf52 is a 32Bit platform
+    (void*) OPTIGA_PIN_VDD
 };
 
 /**
@@ -77,7 +78,8 @@ pal_gpio_t optiga_vdd_0 =
 pal_gpio_t optiga_reset_0 =
 {
     // Platform specific GPIO context for the pin used to toggle Reset.
-    (void*)ARDUINO_7_PIN
+    // Casting the uint32_t to a void* is possible, because nrf52 is a 32Bit platform
+    (void*) OPTIGA_PIN_RST
 };
 
 

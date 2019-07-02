@@ -35,6 +35,7 @@
  *********************************************************************************************************************/
 #include "optiga/pal/pal_i2c.h"
 #include "optiga/ifx_i2c/ifx_i2c.h"
+#include "pal_pin_config.h"
 
 #define NRF_LOG_MODULE_NAME i2c_pal
 // Only log ERROR level (1) to reduce log spam
@@ -45,7 +46,6 @@
 NRF_LOG_MODULE_REGISTER();
 
 #include "nrf_twi_mngr.h"
-#include "boards.h"
 
 #include <stdbool.h>
 
@@ -55,11 +55,6 @@ NRF_LOG_MODULE_REGISTER();
  * MACROS
  *********************************************************************************************************************/
 #define PAL_I2C_MASTER_MAX_BITRATE  (400)
-
-/** @brief PIN for I2C SCL to Infineon OPTIGA Trust X device */
-#define OPTIGA_PIN_I2C_SCL   (ARDUINO_SCL_PIN)
-/** @brief PIN for I2C SDA to Infineon OPTIGA Trust X device */
-#define OPTIGA_PIN_I2C_SDA   (ARDUINO_SDA_PIN)
 
 /** @brief I2C driver instance */
 #define TWI_INSTANCE_ID             0
@@ -105,10 +100,10 @@ static bool initialized = false;
  */
 static void app_twi_callback(ret_code_t result, void * p_user_data)
 {
-	const pal_i2c_t* i2c_ctx = (pal_i2c_t*) p_user_data;
-	//lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-	upper_layer_callback_t upper_layer_handler = (upper_layer_callback_t)i2c_ctx->upper_layer_event_handler;
-    
+    const pal_i2c_t* i2c_ctx = (pal_i2c_t*) p_user_data;
+    //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+    upper_layer_callback_t upper_layer_handler = (upper_layer_callback_t)i2c_ctx->upper_layer_event_handler;
+
 
     if (result == NRF_SUCCESS)
     {
@@ -119,7 +114,7 @@ static void app_twi_callback(ret_code_t result, void * p_user_data)
         }
 
         NRF_LOG_HEXDUMP_INFO(m_transfer.p_data, m_transfer.length);
-    	upper_layer_handler(i2c_ctx->p_upper_layer_ctx, PAL_I2C_EVENT_SUCCESS);
+        upper_layer_handler(i2c_ctx->p_upper_layer_ctx, PAL_I2C_EVENT_SUCCESS);
     }
     else
     {
@@ -129,7 +124,7 @@ static void app_twi_callback(ret_code_t result, void * p_user_data)
             NRF_LOG_INFO("W %d bytes failed", m_transfer.length);
         }
 
-    	upper_layer_handler(i2c_ctx->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
+        upper_layer_handler(i2c_ctx->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
     }
 }
 
@@ -151,7 +146,7 @@ static void app_twi_callback(ret_code_t result, void * p_user_data)
  *   - The implementation must handle the acquiring and releasing of the I2C bus before initializing the I2C master to
  *     avoid interrupting the ongoing slave I2C transactions using the same I2C master.
  *   - If the I2C bus is in busy state, the API must not initialize and return #PAL_STATUS_I2C_BUSY status.
- *   - Repeated initialization must be taken care with respect to the platform requirements. (Example: Multiple users/applications  
+ *   - Repeated initialization must be taken care with respect to the platform requirements. (Example: Multiple users/applications
  *     sharing the same I2C master resource)
  *
  *<b>User Input:</b><br>
@@ -211,7 +206,7 @@ pal_status_t pal_i2c_init(const pal_i2c_t* p_i2c_context)
  *   - The implementation must handle the acquiring and releasing of the I2C bus before de-initializing the I2C master to
  *     avoid interrupting the ongoing slave I2C transactions using the same I2C master.
  *   - If the I2C bus is in busy state, the API must not de-initialize and return #PAL_STATUS_I2C_BUSY status.
- *	 - This API must ensure that multiple users/applications sharing the same I2C master resource is not impacted.
+ *   - This API must ensure that multiple users/applications sharing the same I2C master resource is not impacted.
  *
  *<b>User Input:</b><br>
  * - The input #pal_i2c_t p_i2c_context must not be NULL.<br>
@@ -251,7 +246,7 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t* p_i2c_context)
  * - The input #pal_i2c_t p_i2c_context must not be NULL.<br>
  * - The upper_layer_event_handler must be initialized in the p_i2c_context before invoking the API.<br>
  *
- *<b>Notes:</b><br> 
+ *<b>Notes:</b><br>
  *  - Otherwise the below implementation has to be updated to handle different bitrates based on the input context.<br>
  *  - The caller of this API must take care of the guard time based on the slave's requirement.<br>
  *
@@ -261,7 +256,7 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t* p_i2c_context)
  *
  * \retval  #PAL_STATUS_SUCCESS  Returns when the I2C write is invoked successfully
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C write fails.
- * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy. 
+ * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
 pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context, uint8_t* p_data , uint16_t length)
 {
@@ -314,7 +309,7 @@ pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context, uint8_t* p_data , uint16_t 
  * - The input #pal_i2c_t p_i2c_context must not be NULL.<br>
  * - The upper_layer_event_handler must be initialized in the p_i2c_context before invoking the API.<br>
  *
- *<b>Notes:</b><br> 
+ *<b>Notes:</b><br>
  *  - Otherwise the below implementation has to be updated to handle different bitrates based on the input context.<br>
  *  - The caller of this API must take care of the guard time based on the slave's requirement.<br>
  *
@@ -357,7 +352,7 @@ pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t 
 
     return PAL_STATUS_SUCCESS;
 }
-   
+
 /**
  * Platform abstraction layer API to set the bitrate/speed(KHz) of I2C master.
  * <br>
@@ -365,14 +360,14 @@ pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t 
  *<b>API Details:</b>
  * - Sets the bitrate of I2C master if the I2C bus is free, else it returns busy status #PAL_STATUS_I2C_BUSY<br>
  * - The bus is released after the setting the bitrate.<br>
- * - This API must take care of setting the bitrate to I2C master's maximum supported value. 
- * - Eg. In XMC4500, the maximum supported bitrate is 400 KHz. If the supplied bitrate is greater than 400KHz, the API will 
+ * - This API must take care of setting the bitrate to I2C master's maximum supported value.
+ * - Eg. In XMC4500, the maximum supported bitrate is 400 KHz. If the supplied bitrate is greater than 400KHz, the API will
  *   set the I2C master's bitrate to 400KHz.
  * - Use the #PAL_I2C_MASTER_MAX_BITRATE macro to specify the maximum supported bitrate value for the target platform.
- * - If upper_layer_event_handler is initialized, the upper layer handler is invoked with the respective event 
+ * - If upper_layer_event_handler is initialized, the upper layer handler is invoked with the respective event
  *   status listed below.
  *   - #PAL_I2C_EVENT_BUSY when I2C bus in busy state
- *   - #PAL_I2C_EVENT_ERROR when API fails to set the bit rate 
+ *   - #PAL_I2C_EVENT_ERROR when API fails to set the bit rate
  *   - #PAL_I2C_EVENT_SUCCESS when operation is successful
  *<br>
  *
@@ -388,8 +383,8 @@ pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t 
  */
 pal_status_t pal_i2c_set_bitrate(const pal_i2c_t* p_i2c_context , uint16_t bitrate)
 {
-	// Bitrate is fixed to the maximum frequency on this platform (400K)
-	return PAL_STATUS_SUCCESS;
+    // Bitrate is fixed to the maximum frequency on this platform (400K)
+    return PAL_STATUS_SUCCESS;
 }
 
 #ifdef IFX_2GO_SUPPORT
