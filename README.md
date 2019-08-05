@@ -25,7 +25,7 @@ This repository contains a target-agnostic Software Framework for the OPTIGA™ 
 
 ## <a name="summary"></a>Summary
 As embedded systems (e.g. IoT devices) are increasingly gaining the attention of attackers, Infineon offers the OPTIGA™ Trust M1 as a turnkey security solution for industrial automation systems, smart homes, consumer devices and medical devices. This high-end security controller comes with full system integration support for easy and cost-effective deployment of high-end security for your assets.
-The [OPTIGA™ Trust M1](documents/OPTIGA_Trust_M1_Datasheet_v1.50.pdf) is a security solution based on a secure microntroller. Each device is shipped with a unique elliptic-curve or RSA keypair and a corresponding X.509 certificate.
+The [OPTIGA™ Trust M1](documents/OPTIGA_Trust_M1_Datasheet_v1.65.pdf) is a security solution based on a secure microntroller. Each device is shipped with a unique elliptic-curve or RSA keypair and a corresponding X.509 certificate.
 OPTIGA™ Trust M1 enables easy integration into existing PKI infrastructure.
 
 ## <a name="key_features_and_benefits"></a>Key Features and Benefits
