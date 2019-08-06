@@ -50,6 +50,7 @@ derivation), **RSA® 1024/2048** (sign, verify, key generation, encrypt and decr
 
 ## <a name="get_started"></a>Get Started
 1. Get started guide (pending)
+1. [Personalize OPTIGA™ Trust](https://github.com/Infineon/personalize-optiga-trust)
 
 ## <a name="oveview"></a>Overview
 
