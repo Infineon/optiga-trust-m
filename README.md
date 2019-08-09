@@ -1,32 +1,23 @@
 # OPTIGA&trade; Trust M1 Software Framework
 
-[tocstart]: # (toc start)
+<a href="https://github.com/Infineon/optiga-trust-m#description"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_1.jpg" width="256" height="192"></a> <a href="https://github.com/Infineon/optiga-trust-m#examples"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_2.jpg" width="256" height="192"></a>  <a href="https://github.com/Infineon/optiga-trust-m#get-started"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_3.jpg" width="256" height="192"></a>
 
-* [Description](#description)
-* [Summary](#summary)
-* [Key Features and Benefits](#key_features_and_benefits)
-* [Evaluation and developement kits](#evaluation_development_kits)
-* [Get Started](#get_started)
-* [Overview](#oveview)
-* [Documentation](#documentation)
-* [Porting Guide](#porting_guide)
-* [Contributing](#contributing)
-* [License](#license)
+<a href="https://github.com/Infineon/optiga-trust-m#documentation"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_4.jpg" width="256" height="192"></a> <a href="https://github.com/Infineon/optiga-trust-m/wiki/Crypto-Performance"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_5.jpg" width="256" height="192"></a>  <a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M1-Crypt-API"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_6.jpg" width="256" height="192"></a>
 
-[tocend]: # (toc end)
+***
 
-## <a name="description"></a>Description
+## Security Chip
 
-<img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_uson10.png" width="320">
+### <a name="description"></a>Description
 
-This repository contains a target-agnostic Software Framework for the OPTIGA™ Trust M1 security chip.
+<img src="https://github.com/Infineon/Assets/blob/master/Pictures/OPTIGA-Trust-X.png">
 
-## <a name="summary"></a>Summary
-As embedded systems (e.g. IoT devices) are increasingly gaining the attention of attackers, Infineon offers the OPTIGA™ Trust M1 as a turnkey security solution for industrial automation systems, smart homes, consumer devices and medical devices. This high-end security controller comes with full system integration support for easy and cost-effective deployment of high-end security for your assets.
-The [OPTIGA™ Trust M1](documents/OPTIGA_Trust_M1_Datasheet_v1.65.pdf) is a security solution based on a secure microntroller. Each device is shipped with a unique elliptic-curve or RSA keypair and a corresponding X.509 certificate.
-OPTIGA™ Trust M1 enables easy integration into existing PKI infrastructure.
+This repository contains a target-agnostic Software Framework for the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) security chip. It is a base for other application notes.
 
-## <a name="key_features_and_benefits"></a>Key Features and Benefits
+### <a name="summary"></a>Summary
+The OPTIGA™ Trust M is a security solution based on a secure microntroller. Each device is shipped with a unique elliptic-curve keypair and a corresponding X.509 certificate. OPTIGA™ Trust M enables easy integration into existing PKI infrastructure.
+
+### <a name="key_features_and_benefits"></a>Key Features and Benefits
 * High-end security controller
 * Common Criteria Certified EAL6+ (high) hardware
 * Turnkey solution
@@ -35,41 +26,73 @@ OPTIGA™ Trust M1 enables easy integration into existing PKI infrastructure.
 * Temperature range (−25°C to +105°C)
 * I2C interface with Shielded Connection (encrypted communication)
 * Cryptographic support: **ECC NIST P256/P384**, **SHA-256**, **TRNG**, **DRNG**, **RSA® 1024/2048**
-* OPTIGA™ Trust M1 Software Framework on Github (https://github.com/infineon)
+* OPTIGA™ Trust M1 Software Framework on Github
 * Crypto ToolBox commands with **ECC NIST P256/P384**, **SHA-256** (sign, verify, key generation, ECDH(E), key
 derivation), **RSA® 1024/2048** (sign, verify, key generation, encrypt and decrypt)
 * Device Security Monitor
 * Hibernate for zero power consumption
-* Lifetime for Industrial Automation and Infrastructure is 20 years and 15 years for other Application Profiles  
+* Lifetime for Industrial Automation and Infrastructure is 20 years and 15 years for other Application Profiles    
 
-## <a name="evaluation_development_kits"></a>Evaluation and developement kits
-* OPTIGA™ Trust M1 Evaluation kit (pending)
-* OPTIGA™ Trust M1 Security Shield2Go (pending)
+## Get Started
 
-## <a name="get_started"></a>Get Started
-1. Get started guide (pending)
-1. [Personalize OPTIGA™ Trust](https://github.com/Infineon/personalize-optiga-trust)
+  * [Software Framework overview](#software_framework_oveview)
+  * [Evaluation and developement kits](#evaluation_development_kits)
+  * [Examples](#examples)
+  * [Documentation](#documentation)
 
-## <a name="oveview"></a>Overview
+### <a name="software_framework_oveview"></a>Software Framework overview
 
 ![](https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_system_block_diagram.jpg)
 
+1. See [Trust M rev.1 Crypt API](https://github.com/Infineon/optiga-trust-m/wiki/Trust-M1-Crypt-API) and [Trust M rev. 1 Util API](https://github.com/Infineon/optiga-trust-m/wiki/Trust-M1-Util-API)  to know more about CRYPT and UTIL modules
+2. Information about the OPTIGA™ Trust M rev. 1 Command Library (CMD) can be found in the [Solution Reference Manual](documents/https://github.com/Infineon/optiga-trust-m/blob/master/documents/OPTIGA_Trust_M_V1_Solution_Reference_Manual_v1.13.pdf)
+In the same document you can find explanation of all Object IDs (OIDs) available for users as well as detailed technical explanation for all features and envisioned use cases.
+3. Infineon I<sup>2</sup>C Protocol implementation details can be found [here](documents/Infineon_I2C_Protocol_v2.02.pdf)
+4. Platform Abstraction Layer (PAL) overview and Porting Guide are presented in the [Wiki](https://github.com/Infineon/optiga-trust-m/wiki/Porting-Guide)
+
+For more information please refer to the [Wiki page](https://github.com/Infineon/optiga-trust-m/wiki) of this project
+
+### <a name="evaluation_development_kits"></a>Evaluation and developement kits
+* OPTIGA™ Trust M evaluation kit (link is pending)
+* OPTIGA™ Trust M Shield2Go (link is pending)
+
+## <a name="examples"></a>Examples
+
+1. Get started guide (link is pending)
+1. Off-Chip TLS example (mbedTLS) (link is pending)
+1. AWS FreeRTOS example (link is pending)
+1. Secure Firmware Update and Secure Boot (link is pending)
+1. Arduino library (link is pending)
+1. [Personalize OPTIGA™ Trust](https://github.com/Infineon/personalize-optiga-trust)
+1. [OpenSSL Engine and Command Line Interface](https://github.com/Infineon/cli-optiga-trust-x)
+1. [Python package](https://github.com/Infineon/python-optiga-trust)
+1. [I2C Utilities](https://github.com/Infineon/i2c-utils-optiga-trust)
+
 ## <a name="documentation"></a>Documentation
+
+### Usefull articles
+
+  * Initialisation hints (Wiki) (link is pending)
+  * [Porting guide (Wiki)](https://github.com/Infineon/optiga-trust-m/wiki/Porting-Guide)
+  * [Crypto performance (Wiki)](https://github.com/Infineon/optiga-trust-m/wiki/Crypto-Performance)
+  * [Device Error Codes (Wiki)](https://github.com/Infineon/optiga-trust-m/wiki/Device-Error-Codes)
+  * [Shielded Connection (Wiki)](https://github.com/Infineon/optiga-trust-m/wiki/Shielded-Connection-101)
+  * **User API**
+      * [Crypt API (Wiki)](https://github.com/Infineon/optiga-trust-m/wiki/Trust-M1-Crypt-API)
+      * [Util API (Wiki)](https://github.com/Infineon/optiga-trust-m/wiki/Trust-M1-Util-API)
+      
+  * [Hardware-Security: "Einfach (und) Sicher"](https://vimeo.com/279839814) in German, [Slides](https://github.com/Infineon/Assets/blob/master/PDFs/2018-06-04_Building-IoT_HW-Sec_Lesjak_vFinal.pdf) in English
+
+### Datasheet and Co.
+
 For high level description and some important excerpts from the documentation please refer to [Wiki page](https://github.com/Infineon/optiga-trust-m/wiki)
 
 Other downloadable PDF documents can be found below:
-4. [Release Notes v1.30](documents/OPTIGA_Trust_M1_Release_Notes_v1.30.pdf) (PDF)
-1. [Datasheet v1.65](documents/OPTIGA_Trust_M1_Datasheet_v1.65.pdf) (PDF)
-2. [Host Library Documentation](documents/OPTIGA_Trust_M1_Host_Library_Documentation.chm) (CHM)
-3. [Solution Reference Manual v1.12](documents/OPTIGA_Trust_M1_Solution_Reference_Manual_v1.12.pdf) (PDF)
-3. [Keys and Certificates v1.40](documents/OPTIGA_Trust_M1_Keys_And_Certificates_v1.40.pdf) (PDF)
-4. [Infineon I<sup>2</sup>C protocol specification v2.02](documents/Infineon_I2C_Protocol_v2.02.pdf) (PDF)
+1. [OPTIGA™ Trust M rev.1 Datasheet v1.71](documents/OPTIGA_Trust_M_V1_Datasheet_v1.71.pdf) (PDF)
+2. [OPTIGA™ Trust M rev.1 Solution Reference Manual v1.13](documents/OPTIGA_Trust_M_V1_Solution_Reference_Manual_v1.13.pdf) (PDF)
+3. [OPTIGA™ Trust M rev.1 Keys and Certificates v1.50](documents/OPTIGA_Trust_M_V1_Keys_And_Certificates_v1.50.pdf) (PDF)
+4. [Infineon I2C protocol specification v2.02](documents/Infineon_I2C_Protocol_v2.02.pdf) (PDF)
 
-## <a name="porting_guide"></a>Porting Guide
-You might find a list of supported Platforms [here](pal). These are:
-* Infineon XMC4500
-
-For other platform please refer to our porting guide on [Wiki](https://github.com/Infineon/optiga-trust-m/wiki/Porting-Guide) page
 
 ## <a name="contributing"></a>Contributing
 
