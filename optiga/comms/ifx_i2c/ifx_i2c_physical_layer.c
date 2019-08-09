@@ -48,8 +48,8 @@
 #define PL_REG_MAX_SCL_FREQU            (0x84)
 #define PL_REG_SOFT_RESET               (0x88)
 #define PL_REG_I2C_MODE                 (0x89)
-                                        
-// Physical Layer Register lengths      
+
+// Physical Layer Register lengths
 #define PL_REG_LEN_I2C_STATE            (4U)
 #define PL_REG_LEN_MAX_SCL_FREQU        (4U)
 #define PL_REG_LEN_I2C_MODE             (2U)
@@ -76,7 +76,7 @@
 #define PL_STATE_DATA_AVAILABLE         (0x03)
 #define PL_STATE_RXTX                   (0x04)
 #define PL_STATE_SOFT_RESET             (0x05)
-    
+
 //Physical Layer negotiation constants
 #define PL_INIT_SET_DATA_REG_LEN        (0x11)
 #define PL_INIT_GET_DATA_REG_LEN        (0x22)
@@ -119,9 +119,9 @@ _STATIC_H optiga_lib_status_t g_pal_event_status;
 /// Physical Layer low level interface function
 _STATIC_H void ifx_i2c_pl_read_register(ifx_i2c_context_t * p_ctx, uint8_t reg_addr, uint16_t reg_len);
 /// Physical Layer low level interface function
-_STATIC_H void ifx_i2c_pl_write_register(ifx_i2c_context_t * p_ctx, 
-                                         uint8_t reg_addr, 
-                                         uint16_t reg_len, 
+_STATIC_H void ifx_i2c_pl_write_register(ifx_i2c_context_t * p_ctx,
+                                         uint8_t reg_addr,
+                                         uint16_t reg_len,
                                          const uint8_t * p_content);
 /// Physical Layer high level interface timer callback (Status register polling)
 _STATIC_H void ifx_i2c_pl_status_poll_callback(void * p_ctx);
@@ -141,13 +141,13 @@ _STATIC_H void ifx_i2c_pl_guard_time_callback(void * p_ctx);
 _STATIC_H void ifx_i2c_pl_pal_event_handler(void * p_ctx, optiga_lib_status_t event);
 /// Physical layer low level event handler for set slave address
 _STATIC_H void ifx_i2c_pl_pal_slave_addr_event_handler(void * p_input_ctx, optiga_lib_status_t event);
-  
+
 /// @endcond
 
 optiga_lib_status_t ifx_i2c_pl_init(ifx_i2c_context_t * p_ctx, ifx_i2c_event_handler_t handler)
 {
     LOG_PL("[IFX-PL]: Init\n");
-            
+
     p_ctx->pl.upper_layer_event_handler = handler;
     p_ctx->pl.frame_state = PL_STATE_UNINIT;
     p_ctx->pl.negotiate_state = PL_INIT_SET_FREQ_DEFAULT;
@@ -171,11 +171,11 @@ optiga_lib_status_t ifx_i2c_pl_init(ifx_i2c_context_t * p_ctx, ifx_i2c_event_han
     }
     else
     {
-        p_ctx->pl.frame_state = PL_STATE_INIT;       
+        p_ctx->pl.frame_state = PL_STATE_INIT;
     }
-    
+
     ifx_i2c_pl_frame_event_handler(p_ctx, IFX_I2C_STACK_SUCCESS);
-    
+
     return (IFX_I2C_STACK_SUCCESS);
 }
 
@@ -210,7 +210,7 @@ optiga_lib_status_t ifx_i2c_pl_receive_frame(ifx_i2c_context_t * p_ctx)
 }
 
 optiga_lib_status_t ifx_i2c_pl_write_slave_address(ifx_i2c_context_t * p_ctx, uint8_t slave_address, uint8_t persistent)
-{    
+{
     optiga_lib_status_t status = IFX_I2C_STACK_ERROR;
     upper_layer_callback_t * p_temp_upper_layer_event_handler;
 
@@ -267,18 +267,18 @@ optiga_lib_status_t ifx_i2c_pl_write_slave_address(ifx_i2c_context_t * p_ctx, ui
         pal_os_timer_delay_in_milliseconds(DELAY_FOR_COMPLETION);
         status = IFX_I2C_STACK_SUCCESS;
     }
-    //restoring the backed up event handler 
+    //restoring the backed up event handler
     p_ctx->p_pal_i2c_ctx->upper_layer_event_handler = p_temp_upper_layer_event_handler;
-        
+
     /// @cond hidden
     #undef PAL_WRITE_INIT_STATUS
-    #undef ADDRESS_OFFSET 
-    #undef BASE_ADDRESS_REG_OFFSET 
+    #undef ADDRESS_OFFSET
+    #undef BASE_ADDRESS_REG_OFFSET
     #undef MODE_OFFSET
     #undef POLLING_INTERVAL
     #undef DELAY_FOR_COMPLETION
     /// @endcond
-    
+
     return (status);
 }
 
@@ -302,8 +302,8 @@ _STATIC_H void ifx_i2c_pl_read_register(ifx_i2c_context_t * p_ctx, uint8_t reg_a
 
 
 _STATIC_H void ifx_i2c_pl_write_register(ifx_i2c_context_t * p_ctx,
-                                         uint8_t reg_addr, 
-                                         uint16_t reg_len, 
+                                         uint8_t reg_addr,
+                                         uint16_t reg_len,
                                          const uint8_t * p_content)
 {
     LOG_PL("[IFX-PL]: Write register %x len %d\n", reg_addr, reg_len);
@@ -333,10 +333,10 @@ _STATIC_H optiga_lib_status_t ifx_i2c_pl_set_bit_rate(ifx_i2c_context_t * p_ctx,
     optiga_lib_status_t status;
     void* p_pal_ctx_upper_layer_handler;
     // Save upper layer context in pal
-    p_pal_ctx_upper_layer_handler = p_ctx->p_pal_i2c_ctx->upper_layer_event_handler;   
+    p_pal_ctx_upper_layer_handler = p_ctx->p_pal_i2c_ctx->upper_layer_event_handler;
     // Pass context as NULL to avoid callback invocation
     p_ctx->p_pal_i2c_ctx->upper_layer_event_handler  = NULL;
-    status = pal_i2c_set_bitrate(p_ctx->p_pal_i2c_ctx , bitrate);    
+    status = pal_i2c_set_bitrate(p_ctx->p_pal_i2c_ctx , bitrate);
     // Restore callback
     p_ctx->p_pal_i2c_ctx->upper_layer_event_handler  = p_pal_ctx_upper_layer_handler;
     if (PAL_I2C_EVENT_SUCCESS != status)
@@ -359,9 +359,9 @@ _STATIC_H optiga_lib_status_t ifx_i2c_pl_set_bit_rate(ifx_i2c_context_t * p_ctx,
     {
         status = IFX_I2C_STACK_SUCCESS;
     }
-     
+
     return (status);
-    
+
 }
 _STATIC_H void ifx_i2c_pl_negotiation_event_handler(void * p_input_ctx)
 {
@@ -374,7 +374,7 @@ _STATIC_H void ifx_i2c_pl_negotiation_event_handler(void * p_input_ctx)
     uint16_t slave_frequency;
     uint16_t slave_frame_len;
     uint8_t* p_buffer = NULL;
-    
+
     do
     {
         continue_negotiation = FALSE;
@@ -396,10 +396,10 @@ _STATIC_H void ifx_i2c_pl_negotiation_event_handler(void * p_input_ctx)
                     p_ctx->pl.negotiate_state = PL_INIT_DONE;
                     p_buffer = NULL;
                     buffer_len = 0;
-                    pal_os_event_register_callback_oneshot(p_ctx->pal_os_event_ctx,(register_callback)ifx_i2c_pl_negotiation_event_handler, 
-                                                           (void * )p_ctx, 
+                    pal_os_event_register_callback_oneshot(p_ctx->pal_os_event_ctx,(register_callback)ifx_i2c_pl_negotiation_event_handler,
+                                                           (void * )p_ctx,
                                                            STARTUP_TIME_MSEC);
-                }               
+                }
             }
             break;
             // Read the current Max frequency supported by slave
@@ -411,9 +411,9 @@ _STATIC_H void ifx_i2c_pl_negotiation_event_handler(void * p_input_ctx)
             break;
             // Set the I2C mode register
             case PL_INIT_SET_FREQ_REG:
-            {                          
+            {
                 slave_frequency = (p_ctx->pl.buffer[2] << 8) | p_ctx->pl.buffer[3];
-                
+
                 i2c_mode_value[0] = PL_REG_I2C_MODE_PERSISTANT;
                 if ((p_ctx->frequency > PL_SM_FM_MAX_FREQUENCY) && (slave_frequency <= PL_SM_FM_MAX_FREQUENCY))
                 {
@@ -433,7 +433,7 @@ _STATIC_H void ifx_i2c_pl_negotiation_event_handler(void * p_input_ctx)
                 {
                     p_ctx->pl.negotiate_state = PL_INIT_VERIFY_FREQ;
                     continue_negotiation = TRUE;
-                }                         
+                }
             }
             break;
             // After setting I2C mode register, read the slave's supported frequency
@@ -443,7 +443,7 @@ _STATIC_H void ifx_i2c_pl_negotiation_event_handler(void * p_input_ctx)
                 ifx_i2c_pl_read_register(p_ctx, PL_REG_MAX_SCL_FREQU, PL_REG_LEN_MAX_SCL_FREQU);
             }
             break;
-            // Verify the requested frequency and slave's supported frequency    
+            // Verify the requested frequency and slave's supported frequency
             case PL_INIT_VERIFY_FREQ:
             {
                 slave_frequency = (p_ctx->pl.buffer[2] << 8) | p_ctx->pl.buffer[3];
@@ -459,8 +459,8 @@ _STATIC_H void ifx_i2c_pl_negotiation_event_handler(void * p_input_ctx)
                     p_ctx->pl.negotiate_state = PL_INIT_AGREE_FREQ;
                 }
                 continue_negotiation = TRUE;
-            } 
-            break; 
+            }
+            break;
             // Frequency negotiated, Set frequency at master
             case PL_INIT_AGREE_FREQ:
             {
@@ -476,9 +476,9 @@ _STATIC_H void ifx_i2c_pl_negotiation_event_handler(void * p_input_ctx)
                     p_ctx->pl.negotiate_state = PL_INIT_DONE;
                     p_buffer = NULL;
                     buffer_len = 0;
-                }              
+                }
             }
-            break;    
+            break;
             // Start frame length negotiation by writing the requested frame length
             case PL_INIT_SET_DATA_REG_LEN:
             {
@@ -497,7 +497,7 @@ _STATIC_H void ifx_i2c_pl_negotiation_event_handler(void * p_input_ctx)
             case PL_INIT_VERIFY_DATA_REG:
             {
                 p_ctx->pl.negotiate_state = PL_INIT_DONE;
-                slave_frame_len = (p_ctx->pl.buffer[0] << 8) | p_ctx->pl.buffer[1]; 
+                slave_frame_len = (p_ctx->pl.buffer[0] << 8) | p_ctx->pl.buffer[1];
                 // Error if slave's frame length is more than requested frame length
                 if (p_ctx->frame_size >= slave_frame_len)
                 {
@@ -510,9 +510,9 @@ _STATIC_H void ifx_i2c_pl_negotiation_event_handler(void * p_input_ctx)
             }
             break;
             case PL_INIT_DONE:
-            {   
+            {
                 if (IFX_I2C_STACK_SUCCESS == event)
-                {                
+                {
                     p_ctx->pl.frame_state = PL_STATE_READY;
                 }
                 else
@@ -524,8 +524,8 @@ _STATIC_H void ifx_i2c_pl_negotiation_event_handler(void * p_input_ctx)
             }
             break;
             default:
-                break;    
-        }  
+                break;
+        }
     } while (FALSE != continue_negotiation);
 }
 
@@ -542,12 +542,12 @@ _STATIC_H void ifx_i2c_pl_frame_event_handler(ifx_i2c_context_t * p_ctx, optiga_
         p_ctx->pl.upper_layer_event_handler(p_ctx, event, 0, 0);
     }
     else
-    {  
+    {
         switch (p_ctx->pl.frame_state)
         {
             // Perform soft reset
             case PL_STATE_SOFT_RESET:
-            {            
+            {
                 ifx_i2c_pl_soft_reset(p_ctx);
             }
             break;
@@ -566,7 +566,7 @@ _STATIC_H void ifx_i2c_pl_frame_event_handler(ifx_i2c_context_t * p_ctx, optiga_
                 {
                     ifx_i2c_pl_read_register(p_ctx, PL_REG_I2C_STATE, PL_REG_LEN_I2C_STATE);
                     break;
-                }               
+                }
             }
             //lint -fallthrough "For write frame, polling of i2c status register is skipped"
             // Do read/write frame
@@ -588,15 +588,15 @@ _STATIC_H void ifx_i2c_pl_frame_event_handler(ifx_i2c_context_t * p_ctx, optiga_
                         time_stamp_diff = (current_time - p_ctx->dl.frame_start_time);
                         if (p_ctx->dl.frame_start_time > current_time)
                         {
-                            time_stamp_diff = (0xFFFFFFFF + (current_time - 
+                            time_stamp_diff = (0xFFFFFFFF + (current_time -
                                                p_ctx->dl.frame_start_time)) + 0x01;
                         }
                         // Continue polling STATUS register if retry limit is not reached
                         if (time_stamp_diff < p_ctx->dl.data_poll_timeout)
                         {
                             pal_os_event_register_callback_oneshot(p_ctx->pal_os_event_ctx,
-                                                                    ifx_i2c_pl_status_poll_callback, 
-                                                                   (void * )p_ctx, 
+                                                                    ifx_i2c_pl_status_poll_callback,
+                                                                   (void * )p_ctx,
                                                                    PL_DATA_POLLING_INVERVAL_US);
                         }
                         else
@@ -612,8 +612,8 @@ _STATIC_H void ifx_i2c_pl_frame_event_handler(ifx_i2c_context_t * p_ctx, optiga_
                     // Write frame if device is not busy, otherwise wait and poll STATUS again later
                     p_ctx->pl.frame_state = PL_STATE_RXTX;
                     ifx_i2c_pl_write_register(p_ctx,
-                                              PL_REG_DATA, 
-                                              p_ctx->pl.tx_frame_len, 
+                                              PL_REG_DATA,
+                                              p_ctx->pl.tx_frame_len,
                                               (uint8_t * )p_ctx->pl.p_tx_frame);
                 }
                 // Continue checking the slave status register
@@ -623,15 +623,15 @@ _STATIC_H void ifx_i2c_pl_frame_event_handler(ifx_i2c_context_t * p_ctx, optiga_
                     time_stamp_diff = (current_time - p_ctx->dl.frame_start_time);
                     if (p_ctx->dl.frame_start_time > current_time)
                     {
-                        time_stamp_diff = (0xFFFFFFFF + (current_time - 
+                        time_stamp_diff = (0xFFFFFFFF + (current_time -
                                            p_ctx->dl.frame_start_time)) + 0x01;
-                    }                    
+                    }
                     // Continue polling STATUS register if retry limit is not reached
                     if (time_stamp_diff < p_ctx->dl.data_poll_timeout)
                     {
                         pal_os_event_register_callback_oneshot(p_ctx->pal_os_event_ctx,
-                                                               ifx_i2c_pl_status_poll_callback, 
-                                                               (void * )p_ctx, 
+                                                               ifx_i2c_pl_status_poll_callback,
+                                                               (void * )p_ctx,
                                                                PL_DATA_POLLING_INVERVAL_US);
                     }
                     else
@@ -647,8 +647,8 @@ _STATIC_H void ifx_i2c_pl_frame_event_handler(ifx_i2c_context_t * p_ctx, optiga_
             {
                 // Writing/reading of frame to/from DATA register complete
                 p_ctx->pl.frame_state = PL_STATE_READY;
-                p_ctx->pl.upper_layer_event_handler(p_ctx,IFX_I2C_STACK_SUCCESS, 
-                                                    p_ctx->pl.buffer, 
+                p_ctx->pl.upper_layer_event_handler(p_ctx,IFX_I2C_STACK_SUCCESS,
+                                                    p_ctx->pl.buffer,
                                                     p_ctx->pl.buffer_rx_len);
             }
             break;
@@ -658,7 +658,7 @@ _STATIC_H void ifx_i2c_pl_frame_event_handler(ifx_i2c_context_t * p_ctx, optiga_
                 p_ctx->pl.frame_state = PL_STATE_INIT;
                 p_ctx->pl.upper_layer_event_handler(p_ctx, IFX_I2C_STACK_ERROR, 0, 0);
             }
-            break; 
+            break;
         }
     }
 }
@@ -707,11 +707,11 @@ _STATIC_H void ifx_i2c_pl_guard_time_callback(void * p_ctx)
 }
 
 _STATIC_H void ifx_i2c_pl_pal_event_handler(void * p_ctx, optiga_lib_status_t event)
-{   
-    ifx_i2c_context_t * p_local_ctx = (ifx_i2c_context_t * )p_ctx;     
+{
+    ifx_i2c_context_t * p_local_ctx = (ifx_i2c_context_t * )p_ctx;
     switch (event)
     {
-        case PAL_I2C_EVENT_ERROR:            
+        case PAL_I2C_EVENT_ERROR:
         case PAL_I2C_EVENT_BUSY:
             // Error event usually occurs when the device is in sleep mode and needs time to wake up
             if (p_local_ctx->pl.retry_counter--)
@@ -726,7 +726,7 @@ _STATIC_H void ifx_i2c_pl_pal_event_handler(void * p_ctx, optiga_lib_status_t ev
                 ifx_i2c_pl_frame_event_handler(p_local_ctx, IFX_I2C_FATAL_ERROR);
             }
             break;
-            
+
         case PAL_I2C_EVENT_SUCCESS:
             LOG_PL("[IFX-PL]: PAL Success -> Wait Guard Time\n");
             pal_os_event_register_callback_oneshot(p_local_ctx->pal_os_event_ctx, ifx_i2c_pl_guard_time_callback,
@@ -753,7 +753,7 @@ _STATIC_H void ifx_i2c_pl_soft_reset(ifx_i2c_context_t * p_ctx)
         case PL_RESET_WRITE:
         {
             //Mask for soft reset bit(5th bit) from the 1st byte of status register
-            p_ctx->pl.buffer[0] &= PL_REG_I2C_STATE_SOFT_RESET;    
+            p_ctx->pl.buffer[0] &= PL_REG_I2C_STATE_SOFT_RESET;
             if (PL_REG_I2C_STATE_SOFT_RESET == p_ctx->pl.buffer[0])
             {
                 p_ctx->pl.request_soft_reset = PL_RESET_STARTUP;
@@ -771,8 +771,8 @@ _STATIC_H void ifx_i2c_pl_soft_reset(ifx_i2c_context_t * p_ctx)
         case PL_RESET_STARTUP:
         {
             p_ctx->pl.request_soft_reset= PL_RESET_INIT;
-            pal_os_event_register_callback_oneshot(p_ctx->pal_os_event_ctx,(register_callback)ifx_i2c_pl_soft_reset, 
-                                                   (void * )p_ctx, 
+            pal_os_event_register_callback_oneshot(p_ctx->pal_os_event_ctx,(register_callback)ifx_i2c_pl_soft_reset,
+                                                   (void * )p_ctx,
                                                    STARTUP_TIME_MSEC);
             break;
         }
@@ -784,7 +784,7 @@ _STATIC_H void ifx_i2c_pl_soft_reset(ifx_i2c_context_t * p_ctx)
         }
         default:
             break;
-    }    
+    }
 }
 
 //lint --e{715} suppress "This is used for synchromous implementation, hence p_ctx not used"

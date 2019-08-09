@@ -36,11 +36,9 @@
 */
 
 #include "optiga/optiga_crypt.h"
+#include "optiga_example.h"
 
 #ifdef OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED
-
-extern void example_log_execution_status(const char_t* function, uint8_t status);
-extern void example_log_function_name(const char_t* function);
 
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
@@ -56,12 +54,12 @@ static void optiga_crypt_callback(void * context, optiga_lib_status_t return_sta
     }
 }
 
-static uint8_t public_key [] = 
+static uint8_t public_key [] =
 {
     //BitString Format
     0x03,
         //Remaining length
-        0x42, 
+        0x42,
             //unused bits
             0x00,
             //Compression format
@@ -78,14 +76,14 @@ static uint8_t public_key [] =
 };
 
 //SHA-256 Digest
-static uint8_t digest [] = 
+static uint8_t digest [] =
 {
     0xE9,0x5F,0xB3,0xB1,0x9F,0xA4,0xDD,0x27,0xFE,0xAE,0xB3,0x33,0x40,0x80,0xCE,0x35,
     0xDF,0x3E,0x08,0xF1,0x6F,0x36,0xF3,0x24,0x0E,0xB0,0xB3,0x2F,0xAB,0xD0,0x90,0xCA,
 };
 
 // ECDSA Signature
-static uint8_t signature [] = 
+static uint8_t signature [] =
 {
     //DER INTEGER Format
     0x02,
@@ -114,17 +112,16 @@ static uint8_t signature [] =
  */
 void example_optiga_crypt_ecdsa_verify(void)
 {
-    uint8_t logging_status = 0;
     public_key_from_host_t public_key_details = {
                                                  public_key,
                                                  sizeof(public_key),
                                                  (uint8_t)OPTIGA_ECC_CURVE_NIST_P_256
                                                 };
 
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = 0;
 
     optiga_crypt_t * me = NULL;
-    example_log_function_name(__FUNCTION__);
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
     do
     {
         /**
@@ -153,7 +150,7 @@ void example_optiga_crypt_ecdsa_verify(void)
             break;
         }
 
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
+        while (OPTIGA_LIB_BUSY == optiga_lib_status)
         {
             //Wait until the optiga_crypt_ecdsa_verify operation is completed
         }
@@ -161,17 +158,24 @@ void example_optiga_crypt_ecdsa_verify(void)
         if ((OPTIGA_LIB_SUCCESS != optiga_lib_status))
         {
             //Signature verification failed.
+            return_status = optiga_lib_status;
             break;
         }
-        logging_status = 1;
+        return_status = OPTIGA_LIB_SUCCESS;
     } while (FALSE);
-
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
         return_status = optiga_crypt_destroy(me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
     }
-    example_log_execution_status(__FUNCTION__,logging_status);
+    
 }
 
 #endif  //OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED

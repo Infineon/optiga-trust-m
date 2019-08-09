@@ -37,8 +37,9 @@
 
 
 #include "optiga/optiga_crypt.h"
+#include "optiga/common/optiga_lib_logger.h"
 #include "optiga/common/optiga_lib_common_internal.h"
-#include "optiga/pal/pal_memory_mgmt.h"
+#include "optiga/pal/pal_os_memory.h"
 
 /// ECDSA FIPS 186-3 without hash
 #define OPTIGA_CRYPT_ECDSA_FIPS_186_3_WITHOUT_HASH                  (0x11)
@@ -46,12 +47,12 @@
 #define OPTIGA_CRYPT_ECDH_KEY_AGREEMENT_ALGORITHM                   (0x01)
 /// Minimum length of random data
 #define OPTIGA_CRYPT_MINIMUM_RANDOM_DATA_LENGTH                     (0x08)
-/// Param type for optiga pre master secret
+/// Param type for optiga pre-master secret
 #define OPTIGA_CRYTP_RANDOM_PARAM_PRE_MASTER_SECRET                 (0x04)
 /// Minimum optional data length
 #define OPTIGA_CRYTP_MINIMUM_OPTIONAL_DATA_LENGTH                   (0x28)
 
-_STATIC_H void optiga_crypt_generic_event_handler(void * p_ctx, 
+_STATIC_H void optiga_crypt_generic_event_handler(void * p_ctx,
                                                   optiga_lib_status_t event)
 {
     optiga_crypt_t * me = (optiga_crypt_t *)p_ctx;
@@ -103,8 +104,8 @@ _STATIC_H optiga_lib_status_t optiga_crypt_generate_keypair(optiga_crypt_t * me,
         }
 
         me->instance_state = OPTIGA_LIB_INSTANCE_BUSY;
-        pal_os_memset(me->params, 0x00, sizeof(me->params));
-        p_params = (optiga_gen_keypair_params_t *)me->params;
+        p_params = (optiga_gen_keypair_params_t *)&(me->params.optiga_gen_keypair_params);
+        pal_os_memset(&me->params,0x00,sizeof(optiga_crypt_params_t));
 
         p_params->key_usage = key_usage;
         p_params->export_private_key = export_private_key;
@@ -167,8 +168,8 @@ _STATIC_H optiga_lib_status_t optiga_crypt_sign(optiga_crypt_t * me,
 
         me->instance_state = OPTIGA_LIB_INSTANCE_BUSY;
 
-        pal_os_memset(me->params, 0x00, sizeof(me->params));
-        p_params = (optiga_calc_sign_params_t *)me->params;
+        p_params = (optiga_calc_sign_params_t *)&(me->params.optiga_calc_sign_params);
+        pal_os_memset(&me->params,0x00,sizeof(optiga_crypt_params_t));
 
         p_params->p_digest = p_digest;
         p_params->digest_length = digest_length;
@@ -225,8 +226,8 @@ _STATIC_H optiga_lib_status_t optiga_crypt_verify(optiga_crypt_t * me,
         }
 
         me->instance_state = OPTIGA_LIB_INSTANCE_BUSY;
-        pal_os_memset(me->params, 0x00, sizeof(me->params));
-        p_params = (optiga_verify_sign_params_t *)me->params;
+        p_params = (optiga_verify_sign_params_t *)&(me->params.optiga_verify_sign_params);
+        pal_os_memset(&me->params,0x00,sizeof(optiga_crypt_params_t));
 
         OPTIGA_PROTECTION_ENABLE(me->my_cmd, me);
         OPTIGA_PROTECTION_SET_VERSION(me->my_cmd, me);
@@ -285,8 +286,8 @@ _STATIC_H optiga_lib_status_t optiga_crypt_rsa_enc_dec(optiga_crypt_t * me,
         }
         me->instance_state = OPTIGA_LIB_INSTANCE_BUSY;;
 
-        pal_os_memset(me->params, 0x00, sizeof(me->params));
-        p_params = (optiga_encrypt_asym_params_t *)me->params;
+        p_params = (optiga_encrypt_asym_params_t *)&(me->params.optiga_encrypt_asym_params);
+        pal_os_memset(&me->params,0x00,sizeof(optiga_crypt_params_t));
 
         p_params->message = p_message;
         p_params->message_length = message_length;
@@ -301,17 +302,17 @@ _STATIC_H optiga_lib_status_t optiga_crypt_rsa_enc_dec(optiga_crypt_t * me,
         {
             p_params->key = p_key;
             p_params->public_key_source_type = public_key_source_type;
-#ifdef OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED            
-            return_value = optiga_cmd_encrypt_asym(me->my_cmd, (uint8_t)encryption_scheme, 
+#ifdef OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
+            return_value = optiga_cmd_encrypt_asym(me->my_cmd, (uint8_t)encryption_scheme,
                                                    (optiga_encrypt_asym_params_t *)p_params);
-#endif            
+#endif
         }
         else
         {
             p_params->private_key_id = (optiga_key_id_t)*(optiga_key_id_t *)p_key;
             p_params->key = &p_params->private_key_id;
             p_params->public_key_source_type = 0;
-#ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED            
+#ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
             return_value = optiga_cmd_decrypt_asym(me->my_cmd, (uint8_t)encryption_scheme,
                                                    (optiga_encrypt_asym_params_t *)p_params);
 #endif
@@ -336,7 +337,6 @@ _STATIC_H optiga_lib_status_t optiga_crypt_get_random(optiga_crypt_t * me,
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR;
     optiga_get_random_params_t * p_params;
-
     do
     {
         if (OPTIGA_LIB_INSTANCE_BUSY == me->instance_state)
@@ -346,8 +346,8 @@ _STATIC_H optiga_lib_status_t optiga_crypt_get_random(optiga_crypt_t * me,
         }
 
         me->instance_state = OPTIGA_LIB_INSTANCE_BUSY;
-        pal_os_memset(me->params, 0x00, sizeof(me->params));
-        p_params = (optiga_get_random_params_t *)me->params;
+        p_params = (optiga_get_random_params_t *)&(me->params.optiga_get_random_params);
+        pal_os_memset(&me->params,0x00,sizeof(optiga_crypt_params_t));
 
         p_params->optional_data = p_optional_data;
         p_params->optional_data_length = optional_data_length;
@@ -419,6 +419,10 @@ optiga_crypt_t * optiga_crypt_create(uint8_t optiga_instance_id,
         me->handler = handler;
         me->caller_context = caller_context;
         me->instance_state = OPTIGA_LIB_SUCCESS;
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
+        me->protocol_version = OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET;
+        me->protection_level = OPTIGA_COMMS_DEFAULT_PROTECTION_LEVEL;
+#endif
         me->my_cmd = optiga_cmd_create(optiga_instance_id,
                                        optiga_crypt_generic_event_handler,
                                        me);
@@ -465,7 +469,7 @@ optiga_lib_status_t optiga_crypt_random(optiga_crypt_t * me,
                                         uint16_t random_data_length)
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR;
-
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     do
     {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
@@ -493,7 +497,7 @@ optiga_lib_status_t optiga_crypt_hash_start(optiga_crypt_t * me,
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR;
     optiga_calc_hash_params_t * p_params;
-
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     do
     {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
@@ -511,8 +515,8 @@ optiga_lib_status_t optiga_crypt_hash_start(optiga_crypt_t * me,
         }
 
         me->instance_state = OPTIGA_LIB_INSTANCE_BUSY;
-        pal_os_memset(me->params, 0x00, sizeof(me->params));
-        p_params = (optiga_calc_hash_params_t *)me->params;
+        p_params = (optiga_calc_hash_params_t *)&(me->params.optiga_calc_hash_params);
+        pal_os_memset(&me->params,0x00,sizeof(optiga_crypt_params_t));
 
         OPTIGA_PROTECTION_ENABLE(me->my_cmd, me);
         OPTIGA_PROTECTION_SET_VERSION(me->my_cmd, me);
@@ -542,7 +546,7 @@ optiga_lib_status_t optiga_crypt_hash_update(optiga_crypt_t * me,
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR;
     optiga_calc_hash_params_t * p_params;
-
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     do
     {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
@@ -561,8 +565,8 @@ optiga_lib_status_t optiga_crypt_hash_update(optiga_crypt_t * me,
         }
 
         me->instance_state = OPTIGA_LIB_INSTANCE_BUSY;
-        pal_os_memset(me->params, 0x00, sizeof(me->params));
-        p_params = (optiga_calc_hash_params_t *)me->params;
+        p_params = (optiga_calc_hash_params_t *)&(me->params.optiga_calc_hash_params);
+        pal_os_memset(&me->params,0x00,sizeof(optiga_crypt_params_t));
 
         OPTIGA_PROTECTION_ENABLE(me->my_cmd, me);
         OPTIGA_PROTECTION_SET_VERSION(me->my_cmd, me);
@@ -602,7 +606,7 @@ optiga_lib_status_t optiga_crypt_hash_finalize(optiga_crypt_t * me,
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR;
     optiga_calc_hash_params_t * p_params;
-
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     do
     {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
@@ -621,8 +625,8 @@ optiga_lib_status_t optiga_crypt_hash_finalize(optiga_crypt_t * me,
         }
 
         me->instance_state = OPTIGA_LIB_INSTANCE_BUSY;
-        pal_os_memset(me->params, 0x00, sizeof(me->params));
-        p_params = (optiga_calc_hash_params_t *)me->params;
+        p_params = (optiga_calc_hash_params_t *)&(me->params.optiga_calc_hash_params);
+        pal_os_memset(&me->params,0x00,sizeof(optiga_crypt_params_t));
 
         OPTIGA_PROTECTION_ENABLE(me->my_cmd, me);
         OPTIGA_PROTECTION_SET_VERSION(me->my_cmd, me);
@@ -656,7 +660,7 @@ optiga_lib_status_t optiga_crypt_ecc_generate_keypair(optiga_crypt_t * me,
                                                       uint8_t * public_key,
                                                       uint16_t * public_key_length)
 {
-
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     return (optiga_crypt_generate_keypair(me,
                                          (uint8_t)curve_id,
                                          key_usage,
@@ -675,6 +679,7 @@ optiga_lib_status_t optiga_crypt_ecdsa_sign(optiga_crypt_t * me,
                                             uint8_t * signature,
                                             uint16_t * signature_length)
 {
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     return (optiga_crypt_sign(me,
                               OPTIGA_CRYPT_ECDSA_FIPS_186_3_WITHOUT_HASH,
                               digest,
@@ -695,6 +700,7 @@ optiga_lib_status_t optiga_crypt_ecdsa_verify(optiga_crypt_t * me,
                                               uint8_t public_key_source_type,
                                               const void * public_key)
 {
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     return (optiga_crypt_verify(me,
                                 OPTIGA_CRYPT_ECDSA_FIPS_186_3_WITHOUT_HASH,
                                 digest,
@@ -717,6 +723,7 @@ optiga_lib_status_t optiga_crypt_ecdh(optiga_crypt_t * me,
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR;
     optiga_calc_ssec_params_t * p_params;
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
@@ -739,8 +746,8 @@ optiga_lib_status_t optiga_crypt_ecdh(optiga_crypt_t * me,
 
         me->instance_state = OPTIGA_LIB_INSTANCE_BUSY;
 
-        pal_os_memset(me->params, 0x00, sizeof(me->params));
-        p_params = (optiga_calc_ssec_params_t *)me->params;
+        p_params = (optiga_calc_ssec_params_t *)&(me->params.optiga_calc_ssec_params);
+        pal_os_memset(&me->params,0x00,sizeof(optiga_crypt_params_t));
 
         p_params->private_key = private_key;
         p_params->public_key = public_key;
@@ -749,7 +756,7 @@ optiga_lib_status_t optiga_crypt_ecdh(optiga_crypt_t * me,
         OPTIGA_PROTECTION_ENABLE(me->my_cmd, me);
         OPTIGA_PROTECTION_SET_VERSION(me->my_cmd, me);
 
-        return_value = optiga_cmd_calc_ssec(me->my_cmd, OPTIGA_CRYPT_ECDH_KEY_AGREEMENT_ALGORITHM, 
+        return_value = optiga_cmd_calc_ssec(me->my_cmd, OPTIGA_CRYPT_ECDH_KEY_AGREEMENT_ALGORITHM,
                                             (optiga_calc_ssec_params_t *)p_params);
         if (OPTIGA_LIB_SUCCESS != return_value)
         {
@@ -775,6 +782,7 @@ optiga_lib_status_t optiga_crypt_tls_prf_sha256(optiga_crypt_t * me,
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR;
     optiga_derive_key_params_t * p_params;
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
@@ -795,8 +803,8 @@ optiga_lib_status_t optiga_crypt_tls_prf_sha256(optiga_crypt_t * me,
 
         me->instance_state = OPTIGA_LIB_INSTANCE_BUSY;
 
-        pal_os_memset(me->params, 0x00, sizeof(me->params));
-        p_params = (optiga_derive_key_params_t *)me->params;
+        p_params = (optiga_derive_key_params_t *)&(me->params.optiga_derive_key_params);
+        pal_os_memset(&me->params,0x00,sizeof(optiga_crypt_params_t));
 
         p_params->input_shared_secret_oid = secret;
         p_params->label = label;
@@ -838,7 +846,7 @@ optiga_lib_status_t optiga_crypt_rsa_generate_keypair(optiga_crypt_t * me,
                                                       uint8_t * public_key,
                                                       uint16_t * public_key_length)
 {
-
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     return (optiga_crypt_generate_keypair(me,
                                          (uint8_t)key_type,
                                          key_usage,
@@ -860,6 +868,7 @@ optiga_lib_status_t optiga_crypt_rsa_sign(optiga_crypt_t * me,
                                           uint16_t * signature_length,
                                           uint16_t salt_length)
 {
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     return (optiga_crypt_sign(me,
                              (uint8_t)signature_scheme,
                              digest,
@@ -882,6 +891,7 @@ optiga_lib_status_t optiga_crypt_rsa_verify(optiga_crypt_t * me,
                                             const void * public_key,
                                             uint16_t salt_length)
 {
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     return (optiga_crypt_verify(me,
                                 (uint8_t)signature_scheme,
                                 digest,
@@ -908,6 +918,7 @@ optiga_lib_status_t optiga_crypt_rsa_encrypt_message(optiga_crypt_t * me,
 {
 
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR_INVALID_INPUT;
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     do
     {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
@@ -942,10 +953,11 @@ optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_crypt_t * me,
                                                      uint16_t * encrypted_message_length)
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR_INVALID_INPUT;
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     do
     {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
-        if ((NULL == me) || (NULL == me->my_cmd) || (NULL == encrypted_message)|| (NULL == encrypted_message_length) || 
+        if ((NULL == me) || (NULL == me->my_cmd) || (NULL == encrypted_message)|| (NULL == encrypted_message_length) ||
             (NULL == public_key))
         {
             break;
@@ -983,10 +995,11 @@ optiga_lib_status_t optiga_crypt_rsa_decrypt_and_export(optiga_crypt_t * me,
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR_INVALID_INPUT;
     optiga_key_id_t private_key_id;
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
     do
     {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
-        if ((NULL == me) || (NULL == me->my_cmd) || (NULL == message) || (NULL == message_length)|| 
+        if ((NULL == me) || (NULL == me->my_cmd) || (NULL == message) || (NULL == message_length)||
             (NULL == encrypted_message))
         {
             break;
@@ -1022,6 +1035,7 @@ optiga_lib_status_t optiga_crypt_rsa_decrypt_and_store(optiga_crypt_t * me,
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR_INVALID_INPUT;
     optiga_key_id_t private_key_id;
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
@@ -1055,6 +1069,7 @@ optiga_lib_status_t optiga_crypt_rsa_generate_pre_master_secret(optiga_crypt_t *
                                                                 uint16_t pre_master_secret_length)
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR;
+    OPTIGA_CRYPT_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
@@ -1068,8 +1083,8 @@ optiga_lib_status_t optiga_crypt_rsa_generate_pre_master_secret(optiga_crypt_t *
 #endif
 
         /// The minimum difference between shared secret length and optional data length should be 8 bytes,
-        /// since the minimum random length OPTIGA expects is 8 bytes (optional_data_length <= shared_length – 8 bytes).
-        if (((optional_data_length + OPTIGA_CRYPT_MINIMUM_RANDOM_DATA_LENGTH) > pre_master_secret_length) || 
+        /// since the minimum random length OPTIGA expects is 8 bytes (optional_data_length <= shared_length ï¿½ 8 bytes).
+        if (((optional_data_length + OPTIGA_CRYPT_MINIMUM_RANDOM_DATA_LENGTH) > pre_master_secret_length) ||
             (optional_data_length > OPTIGA_CRYTP_MINIMUM_OPTIONAL_DATA_LENGTH))
         {
             return_value = OPTIGA_CRYPT_ERROR_INVALID_INPUT;

@@ -131,7 +131,7 @@
 #define PRL_SEQUENCE_THRESHOLD               (0xFFFFFFF0)
 #define PRL_TRANS_REPEAT                     (DL_TRANS_REPEAT)
 
-#define PRL_LABLE "Platform Binding"
+#define PRL_LABLE                            "Platform Binding"
 #define SHARED_SECRET_LENGTH                 (0x40)
 
 #define FORM_SCTR_HEADER(ctx, protocol, msg, protection){\
@@ -329,7 +329,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_prl_prf(ifx_i2c_context_t * p_ctx)
             return_status = IFX_I2C_HANDSHAKE_ERROR;
             break;
         }
-        if (0 != pal_crypt_tls_prf_sha256(NULL, secret_input,
+        if (PAL_STATUS_SUCCESS != pal_crypt_tls_prf_sha256(NULL, secret_input,
                                           sizeof(secret_input),
                                           label_input,
                                           sizeof(label_input) - 1,

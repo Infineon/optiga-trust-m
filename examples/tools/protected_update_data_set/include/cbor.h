@@ -39,20 +39,32 @@
 #define CBOR_MAJOR_TYPE_2					(0x40)
 #define CBOR_MAJOR_TYPE_3					(0x60)
 #define CBOR_MAJOR_TYPE_4					(0x80)
+#define CBOR_MAJOR_TYPE_5					(0xA0)
 #define CBOR_MAJOR_TYPE_7					(0xF6)
 
 #define CBOR_ADDITIONAL_TYPE_0x17           (0x17)
 #define CBOR_ADDITIONAL_TYPE_0x18           (0x18)
 #define CBOR_ADDITIONAL_TYPE_0x19           (0x19)
+#define CBOR_ADDITIONAL_TYPE_0x1A           (0x1A)
 
-// Encddes cbor NULL
+// Encodes cbor NULL
 int cbor_set_null(unsigned char * buffer, unsigned short * offset);
-// Encddes cbor array
+// Encodes cbor array
 int cbor_set_array_of_data(unsigned char * buffer, unsigned int value, unsigned short * offset);
-// Encddes cbor unsiged integer
+// Encodes cbor unsiged integer
 int cbor_set_unsigned_integer(unsigned char * buffer, unsigned int value, unsigned short * offset);
-// Encddes cbor byte string
+// Encodes cbor unsiged integer
+int cbor_set_signed_integer(unsigned char * buffer, signed int value, unsigned short * offset);
+// Encodes cbor byte string
 int cbor_set_byte_string(unsigned char * buffer, unsigned int value, unsigned short * offset);
+// Set the tag for map
+void cbor_set_map_tag(unsigned char * buffer, unsigned char map_number, unsigned short * offset);
+// Encodes cbor map for unsigned type
+int cbor_set_map_unsigned_type(unsigned char * buffer, unsigned int key_data_item, unsigned int value_data_item, unsigned short * offset);
+// Encodes cbor map for signed type
+int cbor_set_map_signed_type(unsigned char * buffer, unsigned int key_data_item, signed int value_data_item, unsigned short * offset);
+// Encodes cbor map for byte array type
+int cbor_set_map_byte_string_type(unsigned char * buffer, unsigned int key_data_item, unsigned char * value_data_item, unsigned short value_data_item_len, unsigned short * offset);
 
 /**
 * @}

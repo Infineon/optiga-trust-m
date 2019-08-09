@@ -96,7 +96,7 @@ ifx_i2c_context_t ifx_i2c_context_0 =
     /// i2c-master frequency
     400,
     /// IFX-I2C frame size
-    0x0115,
+    IFX_I2C_FRAME_SIZE,
     /// Vdd pin
     &optiga_vdd_0,
     /// Reset pin

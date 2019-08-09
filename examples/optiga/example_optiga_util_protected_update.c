@@ -37,10 +37,7 @@
 */
 
 #include "optiga/optiga_util.h"
-
-
-extern void example_log_execution_status(const char_t* function, uint8_t status);
-extern void example_log_function_name(const char_t* function);
+#include "optiga_example.h"
 
 /**
  * Callback when optiga_util_xxxx operation is completed asynchronously
@@ -274,22 +271,21 @@ static optiga_lib_status_t write_ecc_256_certificate ( optiga_util_t * me);
 
 /**
  * The below example demonstrates the protected update of data using #optiga_util_protected_update_start,
- * optiga_util_protected_update_continue & optiga_util_protected_update_final 
- * 
+ * optiga_util_protected_update_continue & optiga_util_protected_update_final
+ *
  * This example uses OID 0xE0E3 as Trust Anchor and OID 0xE0E1 as Target OID. Signature algorithm used is ECC-256.
  *
- * Example for #optiga_util_protected_update_start,#optiga_util_protected_update_continue 
+ * Example for #optiga_util_protected_update_start,#optiga_util_protected_update_continue
  *              & #optiga_util_protected_update_final.
  *
  */
 void example_optiga_util_protected_update(void)
 {
-    uint8_t logging_status = 0;
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = 0;
 
     optiga_util_t * me = NULL;
-    example_log_function_name(__FUNCTION__);   
-       
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+
     do
     {
         /**
@@ -304,7 +300,7 @@ void example_optiga_util_protected_update(void)
 
         /**
         *  Precondition 1 : Write Metadata for 0xE0E1 and 0xE0E3
-         */        
+         */
         return_status = write_metadata( me);
         if (OPTIGA_LIB_SUCCESS != return_status)
         {
@@ -313,7 +309,7 @@ void example_optiga_util_protected_update(void)
 
         /**
         *  Precondition 2 : Write ECC-256 certificate for 0xE0E3
-         */                
+         */
         return_status = write_ecc_256_certificate( me);
         if (OPTIGA_LIB_SUCCESS != return_status)
         {
@@ -323,8 +319,8 @@ void example_optiga_util_protected_update(void)
         *   Send the manifest using optiga_util_protected_update_start
         */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_util_protected_update_start(me, 
-                                                           0x01, 
+        return_status = optiga_util_protected_update_start(me,
+                                                           0x01,
                                                            manifest,
                                                            sizeof(manifest));
 
@@ -341,14 +337,15 @@ void example_optiga_util_protected_update(void)
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
             //writing data to a data object failed.
+            return_status = optiga_lib_status;
             break;
-        }        
+        }
 
         /**
         *   Send the first fragment using optiga_util_protected_update_continue
         */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_util_protected_update_continue( me, 
+        return_status = optiga_util_protected_update_continue( me,
                                                                continue_fragment_array,
                                                                sizeof(continue_fragment_array));
 
@@ -365,14 +362,15 @@ void example_optiga_util_protected_update(void)
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
             //writing data to a data object failed.
+            return_status = optiga_lib_status;
             break;
-        }        
-        
+        }
+
         /**
         *   Send the last fragment using optiga_util_protected_update_final
         */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_util_protected_update_final(me, 
+        return_status = optiga_util_protected_update_final(me,
                                                            final_fragment_array,
                                                            sizeof(final_fragment_array));
 
@@ -389,33 +387,39 @@ void example_optiga_util_protected_update(void)
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
             //writing data to a data object failed.
+            return_status = optiga_lib_status;
             break;
-        }        
-        
-        logging_status = 1;
-    } while (FALSE);
+        }
 
+        return_status = OPTIGA_LIB_SUCCESS;
+    } while (FALSE);
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
         return_status = optiga_util_destroy(me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
     }
-    example_log_execution_status(__FUNCTION__,logging_status);
 }
 
 static optiga_lib_status_t write_metadata ( optiga_util_t * me)
 {
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = 0;
     uint16_t optiga_oid;
-    
+
     do
     {
         /**
-        *   set meta data "0x20 0x09 0xD0 0x03 0x21 0xE0 0xE8 0xC1 0x02 0x00 0x00" for oids 0xE0E1  
+        *   set meta data "0x20 0x09 0xD0 0x03 0x21 0xE0 0xE8 0xC1 0x02 0x00 0x00" for oids 0xE0E1
         */
         optiga_lib_status = OPTIGA_LIB_BUSY;
         optiga_oid = 0xE0E1;
-        return_status = optiga_util_write_metadata(me, 
+        return_status = optiga_util_write_metadata(me,
                                                    optiga_oid,
                                                    E0E1_metadata,
                                                    sizeof(E0E1_metadata));
@@ -435,13 +439,13 @@ static optiga_lib_status_t write_metadata ( optiga_util_t * me)
             //writing metadata to a data object failed.
             break;
         }
-        
+
         /**
-        *   set meta data "0x20 0x03 0xD3 0x01 0x00" for oid 0xE0E3  
+        *   set meta data "0x20 0x03 0xD3 0x01 0x00" for oid 0xE0E3
         */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        optiga_oid = 0xE0E3;      
-        return_status = optiga_util_write_metadata(me, 
+        optiga_oid = 0xE0E3;
+        return_status = optiga_util_write_metadata(me,
                                                    optiga_oid,
                                                    E0E3_metadata,
                                                    sizeof(E0E3_metadata));
@@ -460,18 +464,18 @@ static optiga_lib_status_t write_metadata ( optiga_util_t * me)
         {
             //writing metadata to a data object failed.
             break;
-        }    
+        }
     } while (FALSE);
-    
+
     return (return_status);
 }
 
 static optiga_lib_status_t write_ecc_256_certificate ( optiga_util_t * me)
 {
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = 0;
     uint16_t optiga_oid;
-    uint16_t offset;    
-    
+    uint16_t offset;
+
     do
     {
         /**
@@ -480,11 +484,11 @@ static optiga_lib_status_t write_ecc_256_certificate ( optiga_util_t * me)
         optiga_lib_status = OPTIGA_LIB_BUSY;
         optiga_oid = 0xE0E3;
         offset = 0x00;
-        return_status = optiga_util_write_data(me, 
-                                               optiga_oid, 
-                                               OPTIGA_UTIL_ERASE_AND_WRITE, 
+        return_status = optiga_util_write_data(me,
+                                               optiga_oid,
+                                               OPTIGA_UTIL_ERASE_AND_WRITE,
                                                offset,
-                                               trust_anchor, 
+                                               trust_anchor,
                                                sizeof(trust_anchor));
 
         if (OPTIGA_LIB_SUCCESS != return_status)
@@ -501,11 +505,11 @@ static optiga_lib_status_t write_ecc_256_certificate ( optiga_util_t * me)
         {
             //writing data to a data object failed.
             break;
-        }                     
+        }
     } while (FALSE);
-    
+
     return (return_status);
-    
+
 }
 
 /**

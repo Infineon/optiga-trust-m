@@ -107,7 +107,7 @@ LIBRARY_EXPORTS pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context);
  * - Sets the bitrate of I2C master if the I2C bus is free, else it returns busy status #PAL_STATUS_I2C_BUSY<br>
  * - The bus is released after the setting the bitrate.<br>
  * - This API must take care of setting the bitrate to I2C master's maximum supported value.
- * - Eg. In XMC4500, the maximum supported bitrate is 400 KHz. If the supplied bitrate is greater than 400KHz, the API will
+ * - Eg. In XMC4800, the maximum supported bitrate is 400 KHz. If the supplied bitrate is greater than 400KHz, the API will
  *   set the I2C master's bitrate to 400KHz.
  * - If upper_layer_event_handler is initialized, the upper layer handler is invoked with the respective event
  *   status listed below.

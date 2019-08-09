@@ -243,6 +243,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_dl_send_frame_internal(ifx_i2c_context_t *
         p_buffer[0] |= (uint8_t)(p_ctx->dl.tx_seq_nr << DL_FCTR_FRNR_OFFSET);
         // Reset resync received
         p_ctx->dl.resynced = 0;
+        OPTIGA_COMMS_LOG_MESSAGE(">>>>");
     }
     else // Control frame
     {
@@ -259,6 +260,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_dl_send_frame_internal(ifx_i2c_context_t *
     p_buffer[4 + frame_len] = (uint8_t)crc;
 
     // Transmit frame
+    OPTIGA_IFXI2C_LOG_TRANSMIT_HEX_DATA(p_buffer,DL_HEADER_SIZE + frame_len,p_ctx)
     return (ifx_i2c_pl_send_frame(p_ctx, p_buffer, DL_HEADER_SIZE + frame_len));
 }
 
@@ -281,7 +283,7 @@ _STATIC_H void ifx_i2c_dl_resend_frame(ifx_i2c_context_t * p_ctx, uint8_t seqctr
     // If exit timeout not violated
     uint32_t current_time_stamp = pal_os_timer_get_time_in_milliseconds();
     uint32_t time_stamp_diff = current_time_stamp - p_ctx->tl.api_start_time;
-    
+
     if (p_ctx->tl.api_start_time > current_time_stamp)
     {
         time_stamp_diff = (0xFFFFFFFF + (current_time_stamp - p_ctx->tl.api_start_time)) + 0x01;
@@ -442,6 +444,9 @@ _STATIC_H void ifx_i2c_pl_event_handler(ifx_i2c_context_t * p_ctx,
                 p_ctx->dl.retransmit_counter = 0;
                 p_ctx->dl.state = DL_STATE_ACK;
                 continue_state_machine = FALSE;
+
+                OPTIGA_COMMS_LOG_MESSAGE("<<<<");\
+                OPTIGA_IFXI2C_LOG_RECEIVE_HEX_DATA(p_data,data_len,p_ctx);
                 //lint --e{534} suppress "Error handling is not required so return value is not checked"
                 ifx_i2c_dl_send_frame_internal(p_ctx, 0, DL_FCTR_SEQCTR_VALUE_ACK, 0);
             }

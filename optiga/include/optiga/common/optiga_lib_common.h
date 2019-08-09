@@ -47,7 +47,7 @@ extern "C" {
 #include "optiga/common/optiga_lib_return_codes.h"
 
 ///Instance id of OPTIGA slave
-#define OPTIGA_INSTANCE_ID_0     (0x00)
+#define OPTIGA_INSTANCE_ID_0                              (0x00)
 
 /** @brief When command data and response data is unprotected */
 #define OPTIGA_COMMS_NO_PROTECTION                        (0x00)
@@ -60,23 +60,23 @@ extern "C" {
 /** @brief Re-establish shielded connection */
 #define OPTIGA_COMMS_RE_ESTABLISH                         (0x80)
 /** @brief Pre shared secret protocol version */
-#define OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET                    (0x01)
+#define OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET   (0x01)
 
 /** @brief Data is provided by host*/
-#define OPTIGA_CRYPT_HOST_DATA        (0x01)
+#define OPTIGA_CRYPT_HOST_DATA                            (0x01)
 /** @brief Data in internal to optiga OID */
-#define OPTIGA_CRYPT_OID_DATA         (0x00)
+#define OPTIGA_CRYPT_OID_DATA                             (0x00)
 
 /** @brief OPTIGA instance is busy */
-#define OPTIGA_LIB_INSTANCE_BUSY      (0x0001)
+#define OPTIGA_LIB_INSTANCE_BUSY                          (0x0001)
 /** @brief OPTIGA instance is free */
-#define OPTIGA_LIB_INSTANCE_FREE      (0x0000)
+#define OPTIGA_LIB_INSTANCE_FREE                          (0x0000)
 
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
 /** @brief Configure shielded connection protection level for instance */
-#define OPTIGA_COMMS_PROTECTION_LEVEL           (0x01)
+#define OPTIGA_COMMS_PROTECTION_LEVEL                     (0x01)
 /** @brief Configure shielded connection protocol version for instance */
-#define OPTIGA_COMMS_PROTOCOL_VERSION           (0x02)
+#define OPTIGA_COMMS_PROTOCOL_VERSION                     (0x02)
 #endif
 
 /**
@@ -260,10 +260,10 @@ typedef struct optiga_get_data_object
     uint16_t accumulated_size;
     /// Contains the data length received in last transceive. Used for chaining purpose
     uint16_t last_read_size;
-    /// Pointer to the read buffer length
-    uint16_t * ref_bytes_to_read;
     /// Read to data or metadata
     uint8_t data_or_metadata;
+    /// Pointer to the read buffer length
+    uint16_t * ref_bytes_to_read;
     /// Read data buffer pointer
     uint8_t * buffer;
 } optiga_get_data_object_params_t;
@@ -308,8 +308,6 @@ typedef struct optiga_calc_hash
     uint8_t source_of_data_to_hash;
     ///Data length has been sent
     uint32_t data_sent;
-    ///Possible data size to send in a fragment
-    uint32_t apparent_comms_size;
     ///Out digest
     uint8_t * p_out_digest;
     ///Chaining status
@@ -435,19 +433,19 @@ typedef struct optiga_derive_key
  */
 typedef struct optiga_enc_dec_asym
 {
-    // Length of message to be encrypted. Set 0 if data from session OID
+    /// Length of message to be encrypted. Set 0 if data from session OID
     uint16_t message_length;
-    // Pointer to the length of the encrypted or decrypted message
+    /// Pointer to the length of the encrypted or decrypted message
     uint16_t * processed_message_length;
-    // Message to be encrypted. Set NULL if data from session OID
+    /// Message to be encrypted. Set NULL if data from session OID
     const uint8_t * message;
     /// Source of provided public key for encryption and Private key for decryption
     uint8_t public_key_source_type;
     /// Public key provided by host
     const void * key;
-    // Pointer to buffer where encrypted or decrypted message is stored
+    /// Pointer to buffer where encrypted or decrypted message is stored
     uint8_t * processed_message;
-    // Store private key OID
+    /// Store private key OID
     optiga_key_id_t private_key_id;
 }optiga_encrypt_asym_params_t,optiga_decrypt_asym_params_t;
 
@@ -469,11 +467,11 @@ typedef struct optiga_set_object_protected_params
 } optiga_set_object_protected_params_t;
 
 /**
- * \brief Prepares uint24 [Big endian] type value from the buffer and store
+ * \brief Prepares uint32 [Big endian] type value from the buffer and store
  *
  * \details
- * Prepares uint24 [Big endian] type value from the buffer and store
- * - Return first 3 bytes from input buffer as uint32_t.<br>
+ * Prepares uint32 [Big endian] type value from the buffer and store
+ * - Return first 4 bytes from input buffer as uint32_t.<br>
  *
  * \pre
  * - None
@@ -481,7 +479,7 @@ typedef struct optiga_set_object_protected_params
  * \note
  * - None
  *
- * \param[in]  input_buffer          Pointer to the buffer
+ * \param[in]  p_input_buffer          Pointer to the buffer
  *
  * \retval     return 32 bit value
  *
@@ -501,8 +499,8 @@ uint32_t optiga_common_get_uint32 (const uint8_t* p_input_buffer);
  * \note
  * - None
  *
- * \param[in,out]  output_buffer         Pointer to the buffer
- * \param[in]      two_byte_value        16 bit value
+ * \param[in,out]  p_output_buffer         Pointer to the buffer
+ * \param[in]      two_byte_value          16 bit value
  *
  */
 void optiga_common_set_uint16 (uint8_t * p_output_buffer,
@@ -521,8 +519,8 @@ void optiga_common_set_uint16 (uint8_t * p_output_buffer,
  * \note
  * - None
  *
- * \param[in,out]  output_buffer          Pointer to the buffer
- * \param[in]      four_byte_value        32 bit value
+ * \param[in,out]  p_output_buffer          Pointer to the buffer
+ * \param[in]      four_byte_value          32 bit value
  *
  */
 void optiga_common_set_uint32 (uint8_t* p_output_buffer,
@@ -541,8 +539,8 @@ void optiga_common_set_uint32 (uint8_t* p_output_buffer,
  * \note
  * - None
  *
- * \param[in]      input_buffer    Pointer to the buffer
- * \param[in,out]  two_byte_value  Pointer to the value tobe assigne
+ * \param[in]      p_input_buffer    Pointer to the buffer
+ * \param[in,out]  p_two_byte_value  Pointer to the value tobe assigne
  *
  */
 void optiga_common_get_uint16 (const uint8_t * p_input_buffer,

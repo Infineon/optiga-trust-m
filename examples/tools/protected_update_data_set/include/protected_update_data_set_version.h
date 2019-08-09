@@ -35,10 +35,11 @@
 * @{
 */
 
-#define PROTECTED_UPDATE_VERSION	"1.30.812"
+#define PROTECTED_UPDATE_VERSION	"1.30.885"
 
 /**
 * @}
 */
+
 
 

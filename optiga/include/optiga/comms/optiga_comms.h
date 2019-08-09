@@ -70,7 +70,7 @@ typedef struct optiga_comms
     uint8_t instance_init_state;
     /// OPTIGA comms state
     uint8_t state;
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION	
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
     /// To provide the encryption and decryption need for command and response
     uint8_t protection_level;
     /// To provide the presentation layer protocol version to be used
@@ -263,7 +263,7 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_reset(optiga_comms_t * p_ctx, u
  *        - #OPTIGA_COMMS_COMMAND_PROTECTION : Command is protected and response is unprotected
  *        - #OPTIGA_COMMS_RESPONSE_PROTECTION : Command is unprotected and response is protected
  *        - #OPTIGA_COMMS_FULL_PROTECTION : Both command and response is protected
- *        - To re-establish secure channel, bitwise-OR protection_level with #OPTIGA_COMMS_RE_ESTABLISH 
+ *        - To re-establish secure channel, bitwise-OR protection_level with #OPTIGA_COMMS_RE_ESTABLISH
  *   - If Presentation Layer is enabled,
  *       - Additional buffer size is required to handle encryption and decryption functionality.
  *   - The total buffer size with the additional presentation layer overhead is explained in the figure below. Please provide the lengths and data buffers as specified below.
@@ -327,6 +327,8 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_transceive(optiga_comms_t * p_c
  * \retval        #OPTIGA_COMMS_ERROR
  */
 LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_close(optiga_comms_t * p_ctx);
+
+
 
 #ifdef __cplusplus
 }

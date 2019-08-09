@@ -77,7 +77,7 @@ static void tool_usage()
 	printf("\t%-20s %-8s %s \n", "sign_algo=%%s", "default:", DEFAULT_SIGN_ALGO);
 	printf("\t%-20s %-8s \n", "", "options : ES_256 , RSA-SSA-PKCS1-V1_5-SHA-256");
 	printf("\t%-20s %-8s %s \n", "priv_key=%%s", "default:", DEFAULT_PAYLOAD);
-	printf("\t%-20s %-8s \n", "", "note : Provide private key file(pem format)");
+	printf("\t%-20s %-8s \n", "", "note : Provide private key file(pem format). Refer the \"samples\" folder in the package");
 	printf("\t%-20s %-8s %s \n", "payload=%%s", "default:", DEFAULT_PRIV_KEY);
 	printf("\t%-20s %-8s \n", "", "note : Provide file with readable content");
 }
@@ -109,7 +109,7 @@ static void tool_show_user_inputs()
 #endif
 }
 
-static void tool_show_final_inputs(manifest_d* manifest_data)
+static void tool_show_final_inputs(manifest_t* manifest_data)
 {
 	pal_logger_print_message("Final inputs");
 	printf("\t%-20s %-8X \n", "payload version :", manifest_data->payload_version);
@@ -193,7 +193,7 @@ static int tool_get_user_inputs(int argc, char *argv[])
 	return status;
 }
 
-static int tool_set_user_inputs(manifest_d* manifest_data )
+static int tool_set_user_inputs(manifest_t * manifest_data )
 {
 	int status = -1;
 	manifest_data->digest_algo = opt.digest_algo;
@@ -218,7 +218,7 @@ static int tool_set_user_inputs(manifest_d* manifest_data )
 int main(int argc, char *argv[])
 {
 	int exit_status = 1;
-	manifest_d manifest = {0};
+	manifest_t manifest = {0};
 	protected_update_data_set_d cbor_manifest = { 0 };
 	cbor_manifest.data = NULL;
 	cbor_manifest.fragments = NULL;
@@ -236,13 +236,13 @@ int main(int argc, char *argv[])
 			break;
 		}
 		// Generate fragements
-		if (0 != protected_update_create_fragments(manifest, &cbor_manifest))
+		if (0 != protected_update_create_fragments(&manifest, &cbor_manifest))
 		{
 			pal_logger_print_message("Error while creating fragments");
 			break;
 		}
 		// Generate Manifest
-		if (0 != protected_update_create_manifest(manifest, &cbor_manifest))
+		if (0 != protected_update_create_manifest(&manifest, &cbor_manifest))
 		{
 			pal_logger_print_message("Error while creating manifest");
             break;

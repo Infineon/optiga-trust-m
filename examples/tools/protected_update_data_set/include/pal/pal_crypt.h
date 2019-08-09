@@ -39,19 +39,31 @@
 #ifndef _PAL_CRYPTO_
 #define _PAL_CRYPTO_
 
-// Generates SHA256 hash
-int pal_crypt_calculate_sha256_hash(unsigned char * message,
-	unsigned short message_len,
-	unsigned char * digest);
+typedef struct pal_crypt_t
+{
+    /// callback
+    void * callback_ctx;
+}pal_crypt_t;
 
-// Calculates RSA/ ECDSA signature
-int pal_crypt_calculate_signature(unsigned char * message,
-	unsigned short message_length,
-	char * private_key,
-	unsigned char * signature,
-	unsigned short * signature_len,
-	unsigned char sign_alg);
+// Generates hash
+int pal_crypt_hash(	pal_crypt_t* p_pal_crypt,
+					unsigned char hash_algorithm,
+					const unsigned char * p_message,
+					unsigned int message_length,
+					unsigned char * p_digest);
 
+// Calculates signature
+int pal_crypt_sign(	pal_crypt_t* p_pal_crypt,
+					unsigned char * p_digest, 
+					unsigned short digest_length,
+					unsigned char * p_signature,
+					unsigned short * signature_length,
+					const unsigned char * p_private_key,
+					unsigned short private_key_length);
+
+// Gets the signature length based on private key
+int pal_crypt_get_signature_length(	unsigned char * p_private_key, 
+									unsigned short * sign_len);
 #endif //_PAL_CRYPTO_
 
 /**

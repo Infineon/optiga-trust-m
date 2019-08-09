@@ -44,33 +44,23 @@
 #include "optiga/pal/pal_os_event.h"
 
 /// @cond hidden
-/**********************************************************************************************************************
- * MACROS
- *********************************************************************************************************************/
+
  /// Optiga comms is in use
  #define OPTIGA_COMMS_INUSE     (0x01)
  /// Optiga comms is free
  #define OPTIGA_COMMS_FREE      (0x00)
-/**********************************************************************************************************************
- * LOCAL DATA
- *********************************************************************************************************************/
-
-
-/**********************************************************************************************************************
- * LOCAL ROUTINES
- *********************************************************************************************************************/
 
 optiga_comms_t optiga_comms = {
                                (void *)&ifx_i2c_context_0,
                                NULL,
-                               NULL, 
-                               0, 
-                               0, 
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION                                   
-                               0, 
-                               0, 
+                               NULL,
                                0,
-#endif                               
+                               0,
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
+                               0,
+                               0,
+                               0,
+#endif
                                NULL};
 
 _STATIC_H optiga_lib_status_t check_optiga_comms_state(optiga_comms_t *p_ctx);
@@ -175,7 +165,7 @@ optiga_lib_status_t optiga_comms_transceive(optiga_comms_t * p_ctx,
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->protection_level = p_ctx->protection_level;
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->protocol_version = p_ctx->protocol_version;
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->manage_context_operation = p_ctx->manage_context_operation;
-#endif            
+#endif
         status = (ifx_i2c_transceive((ifx_i2c_context_t * )(p_ctx->p_comms_ctx),
                                      p_tx_data,
                                      tx_data_length,
@@ -197,9 +187,9 @@ optiga_lib_status_t optiga_comms_close(optiga_comms_t * p_ctx)
     {
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->p_upper_layer_ctx = (void * )p_ctx;
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->upper_layer_event_handler = ifx_i2c_event_handler;
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION            
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->manage_context_operation = p_ctx->manage_context_operation;
-#endif            
+#endif
         status = ifx_i2c_close((ifx_i2c_context_t * )(p_ctx->p_comms_ctx));
         if (IFX_I2C_STACK_SUCCESS != status)
         {

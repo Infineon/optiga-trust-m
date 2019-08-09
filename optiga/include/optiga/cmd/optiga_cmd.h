@@ -43,8 +43,6 @@ extern "C" {
 #endif
 
 #include "optiga/common/optiga_lib_common.h"
-#include "optiga/common/optiga_lib_logger.h"
-#include "optiga/comms/optiga_comms.h"
 
 /** \brief OPTIGA command instance structure type*/
 typedef struct optiga_cmd optiga_cmd_t;
@@ -71,9 +69,9 @@ typedef struct optiga_context optiga_context_t;
  * \param[in] handler             Pointer to callback function, must not be NULL.
  * \param[in] caller_context      Pointer to upper layer context.
  *
- * \retval    #optiga_cmd_t *     On successful instance creation
- * \retval    NULL                Memory allocation failure
- *                                Already, OPTIGA_CMD_MAX_REGISTRATIONS number of instances is created
+ * \retval    #optiga_cmd_t *     On successful instance creation.
+ * \retval    NULL                Memory allocation failure.
+ *                                Already, OPTIGA_CMD_MAX_REGISTRATIONS number of instances is created.
  */
 optiga_cmd_t * optiga_cmd_create(uint8_t optiga_instance_id,
                                  callback_handler_t handler,
@@ -96,7 +94,7 @@ optiga_cmd_t * optiga_cmd_create(uint8_t optiga_instance_id,
  *
  * \param[in] me                      Valid instance of #optiga_cmd_t created using #optiga_cmd_create.
  *
- * \retval    #OPTIGA_LIB_SUCCESS     Successful destruction of instance
+ * \retval    #OPTIGA_LIB_SUCCESS     Successful destruction of instance.
  */
 optiga_lib_status_t optiga_cmd_destroy(optiga_cmd_t * me);
 
@@ -117,7 +115,7 @@ optiga_lib_status_t optiga_cmd_destroy(optiga_cmd_t * me);
  *
  * \param[in] me                      Valid instance of #optiga_cmd_t created using #optiga_cmd_create.
  *
- * \retval    #OPTIGA_CMD_SUCCESS     Successful release of the access layer lock
+ * \retval    #OPTIGA_CMD_SUCCESS     Successful release of the access layer lock.
  */
 optiga_lib_status_t optiga_cmd_release_lock(const optiga_cmd_t * me);
 
@@ -145,9 +143,9 @@ optiga_lib_status_t optiga_cmd_release_lock(const optiga_cmd_t * me);
  *                                                        - Must be valid argument, otherwise OPTIGA returns an error.<br>
  * \param[in] params                                      Secure connection related information, must not be NULL.
  *
- * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation
+ * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation.
  * \retval    #OPTIGA_CMD_ERROR                           Error occurred before invoking OpenApplication command.
- *                                                        Error in the asynchronous state machine
+ *                                                        Error in the asynchronous state machine.
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT       APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
 optiga_lib_status_t optiga_cmd_open_application(optiga_cmd_t * me,
@@ -176,9 +174,9 @@ optiga_lib_status_t optiga_cmd_open_application(optiga_cmd_t * me,
  *                                                        - Must be valid argument, otherwise OPTIGA returns an error.<br>
  * \param[in] params                                      Secure connection related information, must not be NULL.
  *
- * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation
+ * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation.
  * \retval    #OPTIGA_CMD_ERROR                           Error occurred before invoking CloseApplication command.
- *                                                        Error in the asynchronous state machine
+ *                                                        Error in the asynchronous state machine.
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT       APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
 optiga_lib_status_t optiga_cmd_close_application(optiga_cmd_t * me,
@@ -208,12 +206,12 @@ optiga_lib_status_t optiga_cmd_close_application(optiga_cmd_t * me,
  *                                                        - Must be valid argument, otherwise OPTIGA returns an error.<br>
  *\param[in]  params                                      InData of Get Data Command APDU, must not be NULL.
  *
- * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation
+ * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation.
  * \retval    #OPTIGA_CMD_ERROR                           Error occurred before invoking GetDataObject command.
- *                                                        Error in the asynchronous state machine
+ *                                                        Error in the asynchronous state machine.
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT       Error due to insufficient buffer size.
  *                                                        - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
- *                                                        - Data received from OPTIGA is greater than the buffer size provided by user
+ *                                                        - Data received from OPTIGA is greater than the buffer size provided by user.
  */
 optiga_lib_status_t optiga_cmd_get_data_object(optiga_cmd_t * me,
                                                uint8_t cmd_param,
@@ -244,9 +242,9 @@ optiga_lib_status_t optiga_cmd_get_data_object(optiga_cmd_t * me,
  *                                                        - Must be valid argument, otherwise OPTIGA returns an error.<br>
  *\param[in]  params                                      InData of Set Data Command APDU, must not be NULL.
  *
- * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation
+ * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation.
  * \retval    #OPTIGA_CMD_ERROR                           Error occurred before invoking SetDataObject command.
- *                                                        Error in the asynchronous state machine
+ *                                                        Error in the asynchronous state machine.
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT       APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
 optiga_lib_status_t optiga_cmd_set_data_object(optiga_cmd_t * me,
@@ -255,7 +253,7 @@ optiga_lib_status_t optiga_cmd_set_data_object(optiga_cmd_t * me,
 
 #if defined (OPTIGA_CRYPT_RANDOM_ENABLED) || defined (OPTIGA_CRYPT_RSA_PRE_MASTER_SECRET_ENABLED)
 /**
- * \brief Generates random data or pre-master secret for RSA key exchange
+ * \brief Generates random data or pre-master secret for RSA key exchange.
  *
  * \details
  * Generates random data or pre-master secret for RSA key exchange, by issuing the GetRandom command to OPTIGA.
@@ -276,9 +274,9 @@ optiga_lib_status_t optiga_cmd_set_data_object(optiga_cmd_t * me,
  *                                                        - Must be valid argument, otherwise OPTIGA returns an error.<br>
  *\param[in] params                                       InData of Get Random Command APDU, must not be NULL.
  *
- * \retval   #OPTIGA_CMD_SUCCESS                          Successful invocation
+ * \retval   #OPTIGA_CMD_SUCCESS                          Successful invocation.
  * \retval   #OPTIGA_CMD_ERROR                            Error occurred before invoking GetRandom command.
- *                                                        Error in the asynchronous state machine
+ *                                                        Error in the asynchronous state machine.
  * \retval   #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT        APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
 optiga_lib_status_t optiga_cmd_get_random(optiga_cmd_t * me,
@@ -288,7 +286,7 @@ optiga_lib_status_t optiga_cmd_get_random(optiga_cmd_t * me,
 
 #ifdef OPTIGA_CRYPT_HASH_ENABLED
 /**
- * \brief Generates hash on external data or data in OID
+ * \brief Generates hash on external data or data in OID.
  *
  * \details
  * Generates hash on external data or data in OID by issuing Calc Hash command to OPTIGA.
@@ -308,12 +306,12 @@ optiga_lib_status_t optiga_cmd_get_random(optiga_cmd_t * me,
  *                                                        - Must be valid argument, otherwise OPTIGA returns an error.<br>
  *\param[in] params                                       InData of CalcHash Command APDU, must not be NULL.
  *
- * \retval   #OPTIGA_CMD_SUCCESS                          Successful invocation
+ * \retval   #OPTIGA_CMD_SUCCESS                          Successful invocation.
  * \retval   #OPTIGA_CMD_ERROR                            Error occurred before invoking CalcHash command.<br>
- *                                                        Error in the asynchronous state machine
+ *                                                        Error in the asynchronous state machine.
  * \retval   #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT        Error due to insufficient buffer size.
  *                                                        - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
- *                                                        - Data received from OPTIGA is greater than the buffer size provided by user
+ *                                                        - Data received from OPTIGA is greater than the buffer size provided by user.
  */
 optiga_lib_status_t optiga_cmd_calc_hash(optiga_cmd_t * me,
                                          uint8_t cmd_param,
@@ -322,7 +320,7 @@ optiga_lib_status_t optiga_cmd_calc_hash(optiga_cmd_t * me,
 
 #if defined (OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) || defined (OPTIGA_CRYPT_RSA_SIGN_ENABLED)
 /**
- * \brief Calculate signature on digest
+ * \brief Calculate signature on digest.
  *
  * \details
  * Calculate signature on digest by issuing Calc Sign command to OPTIGA.
@@ -342,13 +340,13 @@ optiga_lib_status_t optiga_cmd_calc_hash(optiga_cmd_t * me,
  *                                                    - Must be valid argument, otherwise OPTIGA returns an error.<br>
  *\param[in]  params                                  InData of Calc Sign Command APDU, must not be NULL.
  *
- * \retval    #OPTIGA_CMD_SUCCESS                     Successful invocation
+ * \retval    #OPTIGA_CMD_SUCCESS                     Successful invocation.
  * \retval    #OPTIGA_CMD_ERROR                       Error occurred before invoking Calc Sign command.<br>
- *                                                    Error in the asynchronous state machine
- * \retval    #OPTIGA_CMD_ERROR_INVALID_INPUT         Instance invoked for session oid, without acquiring the session (from #optiga_cmd_gen_keypair)
+ *                                                    Error in the asynchronous state machine.
+ * \retval    #OPTIGA_CMD_ERROR_INVALID_INPUT         Instance invoked for session oid, without acquiring the session (from #optiga_cmd_gen_keypair).
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT   Error due to insufficient buffer size.
  *                                                    - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
- *                                                    - Length of the buffer to copy the signature is less than actual length of signature
+ *                                                    - Length of the buffer to copy the signature is less than actual length of signature.
  */
 optiga_lib_status_t optiga_cmd_calc_sign(optiga_cmd_t * me,
                                          uint8_t cmd_param,
@@ -357,7 +355,7 @@ optiga_lib_status_t optiga_cmd_calc_sign(optiga_cmd_t * me,
 
 #if defined (OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED) || defined (OPTIGA_CRYPT_RSA_VERIFY_ENABLED)
 /**
- * \brief Verifies the signature over the given digest
+ * \brief Verifies the signature over the given digest.
  *
  * \details
  * Verifies the signature over the given digest by issuing VerifySign command.
@@ -376,9 +374,9 @@ optiga_lib_status_t optiga_cmd_calc_sign(optiga_cmd_t * me,
  *                                                        - Must be valid argument, otherwise OPTIGA returns an error.<br>
  *\param[in]  params                                      Parameters for InData of VerifySign Command APDU, must not be NULL.
  *
- * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation
+ * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation.
  * \retval    #OPTIGA_CMD_ERROR                           Error occurred before invoking VerifySign command.<br>
- *                                                        Error in the asynchronous state machine
+ *                                                        Error in the asynchronous state machine.
  * \retval   #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT        APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
 optiga_lib_status_t optiga_cmd_verify_sign(optiga_cmd_t * me,
@@ -388,7 +386,7 @@ optiga_lib_status_t optiga_cmd_verify_sign(optiga_cmd_t * me,
 
 #ifdef OPTIGA_CRYPT_ECDH_ENABLED
 /**
- * \brief Calculates shared secret
+ * \brief Calculates shared secret.
  *
  * \details
  * Calculates shared secret by issuing CalcSSec command to OPTIGA.
@@ -410,11 +408,11 @@ optiga_lib_status_t optiga_cmd_verify_sign(optiga_cmd_t * me,
  *                                                        - Must be valid argument, otherwise OPTIGA returns an error.<br>
  *\param[in] params                                       Pointer to input parameters, must not be NULL.
  *
- * \retval   #OPTIGA_LIB_SUCCESS                          Successful invocation of optiga_comms module
+ * \retval   #OPTIGA_LIB_SUCCESS                          Successful invocation of optiga_comms module.
  * \retval   #OPTIGA_CMD_ERROR                            Error occurred before invoking CalcSSec command <br>
  *                                                        #optiga_comms_transceive returned a failure <br>
- *                                                        Error in the asynchronous state machine
- * \retval   #OPTIGA_CMD_ERROR_INVALID_INPUT              Instance invoked for session oid, without acquiring the session (from #optiga_cmd_gen_keypair)
+ *                                                        Error in the asynchronous state machine.
+ * \retval   #OPTIGA_CMD_ERROR_INVALID_INPUT              Instance invoked for session oid, without acquiring the session (from #optiga_cmd_gen_keypair).
  * \retval   #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT        APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
 optiga_lib_status_t optiga_cmd_calc_ssec(optiga_cmd_t * me,
@@ -424,7 +422,7 @@ optiga_lib_status_t optiga_cmd_calc_ssec(optiga_cmd_t * me,
 
 #ifdef OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
 /**
- * \brief Derives a key
+ * \brief Derives a key.
  *
  * \details
  * Derives a key by issuing DeriveKey command to OPTIGA.
@@ -435,7 +433,7 @@ optiga_lib_status_t optiga_cmd_calc_ssec(optiga_cmd_t * me,
  *
  * \pre
  * - Application on OPTIGA must be opened using #optiga_cmd_open_application before using this API.
- * - A key pair should be generated for the input object ID
+ * - A key pair should be generated for the input object ID.
  *
  * \note
  * - Error codes from lower layers will be returned as it is.
@@ -445,11 +443,11 @@ optiga_lib_status_t optiga_cmd_calc_ssec(optiga_cmd_t * me,
  *                                                        - Must be valid argument, otherwise OPTIGA returns an error.
  *\param[in]  params                                      InData of derive key Command APDU, must not be NULL.
  *
- * \retval    #OPTIGA_LIB_SUCCESS                         Successful invocation
+ * \retval    #OPTIGA_LIB_SUCCESS                         Successful invocation.
  * \retval    #OPTIGA_CMD_ERROR                           Error occurred before invoking derive key command <br>
  *                                                        optiga comms transceive returned a failure <br>
- *                                                        Error in the asynchronous state machine
- * \retval    #OPTIGA_CMD_ERROR_INVALID_INPUT             Instance invoked for session oid, without acquiring the session(from #optiga_cmd_calc_ssec)
+ *                                                        Error in the asynchronous state machine.
+ * \retval    #OPTIGA_CMD_ERROR_INVALID_INPUT             Instance invoked for session oid, without acquiring the session(from #optiga_cmd_calc_ssec).
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT       APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
 optiga_lib_status_t optiga_cmd_derive_key(optiga_cmd_t * me,
@@ -459,7 +457,7 @@ optiga_lib_status_t optiga_cmd_derive_key(optiga_cmd_t * me,
 
 #if defined (OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) || defined (OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED)
 /**
- * \brief Generates ECC or RSA key-pair
+ * \brief Generates ECC or RSA key-pair.
  *
  * \details
  * Generate ECC/RSA key-pair by issuing Generate KeyPair command to OPTIGA.
@@ -479,12 +477,12 @@ optiga_lib_status_t optiga_cmd_derive_key(optiga_cmd_t * me,
  *                                                    - Must be valid argument, otherwise OPTIGA returns an error.
  *\param[in]  params                                  InData of Generate KeyPair Command APDU, must not be NULL.
  *
- * \retval    #OPTIGA_LIB_SUCCESS                     Successful invocation
+ * \retval    #OPTIGA_LIB_SUCCESS                     Successful invocation.
  * \retval    #OPTIGA_CMD_ERROR                       Error occurred before invoking Generate KeyPair command.<br>
- *                                                    Error in the asynchronous state machine
+ *                                                    Error in the asynchronous state machine.
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT   Error due to insufficient buffer size.
  *                                                    - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
- *                                                    - Length of the buffer to copy the key is less than actual length of key
+ *                                                    - Length of the buffer to copy the key is less than actual length of key.
  */
 optiga_lib_status_t optiga_cmd_gen_keypair(optiga_cmd_t * me,
                                            uint8_t cmd_param,
@@ -493,7 +491,7 @@ optiga_lib_status_t optiga_cmd_gen_keypair(optiga_cmd_t * me,
 
 #ifdef OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
 /**
- * \brief Encrypt data using RSA public key
+ * \brief Encrypt data using RSA public key.
  *
  * \details
  * Encrypts data using RSA public key by issuing Encrypt Asym command to OPTIGA.
@@ -513,7 +511,7 @@ optiga_lib_status_t optiga_cmd_gen_keypair(optiga_cmd_t * me,
  *                                                    - Must be valid argument, otherwise OPTIGA returns an error.
  *\param[in]  params                                  InData of Encrypt Asym Command APDU, must not be NULL.
  *
- * \retval    #OPTIGA_LIB_SUCCESS                     Successful invocation
+ * \retval    #OPTIGA_LIB_SUCCESS                     Successful invocation.
  * \retval    #OPTIGA_CMD_ERROR                       Error occurred before invoking Encrypt Asym command.<br>
  *                                                    Error in the asynchronous state machine.
  * \retval    #OPTIGA_CMD_ERROR_INVALID_INPUT         Instance invoked for encrypting session, without acquiring the session
@@ -521,14 +519,14 @@ optiga_lib_status_t optiga_cmd_gen_keypair(optiga_cmd_t * me,
  *                                                    - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  *                                                    - Length of the buffer to copy the encrypted data is less than buffer to copy it into.
  */
-optiga_lib_status_t optiga_cmd_encrypt_asym(optiga_cmd_t * me, 
-                                            uint8_t cmd_param, 
+optiga_lib_status_t optiga_cmd_encrypt_asym(optiga_cmd_t * me,
+                                            uint8_t cmd_param,
                                             optiga_encrypt_asym_params_t * params);
 #endif // OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
 
 #ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
 /**
- * \brief Decrypts data using OPTIGA RSA private key
+ * \brief Decrypts data using OPTIGA RSA private key.
  *
  * \details
  * Decrypts data using OPTIGA RSA private key by issuing Decrypt Asym command to OPTIGA.
@@ -548,27 +546,27 @@ optiga_lib_status_t optiga_cmd_encrypt_asym(optiga_cmd_t * me,
  *                                                    - Must be valid argument, otherwise OPTIGA returns an error.
  *\param[in]  params                                  InData of Decrypt Asym Command APDU, must not be NULL.
  *
- * \retval    #OPTIGA_LIB_SUCCESS                     Successful invocation
+ * \retval    #OPTIGA_LIB_SUCCESS                     Successful invocation.
  * \retval    #OPTIGA_CMD_ERROR                       Error occurred before invoking Decrypt Asym command.<br>
  *                                                    Error in the asynchronous state machine.
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT   Error due to insufficient buffer size.
  *                                                    - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  *                                                    - Length of the buffer to copy the decrypted data is less than buffer to copy it into.
  */
-optiga_lib_status_t optiga_cmd_decrypt_asym(optiga_cmd_t * me, 
-                                            uint8_t cmd_param, 
+optiga_lib_status_t optiga_cmd_decrypt_asym(optiga_cmd_t * me,
+                                            uint8_t cmd_param,
                                             optiga_decrypt_asym_params_t * params);
 #endif // OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
 
 /**
- * \brief Writes protected object fragments to OPTIGA
+ * \brief Writes protected object fragments to OPTIGA.
  *
  * \details
  * Writes manifest or data fragement(s) to the specified data object, by issuing the SetObjectProtected command, in a securely.
  * - Acquires the strict sequence for #optiga_util_protected_update_start.<br>
  * - Forms the SetObjectProtected commands based on inputs.<br>
  * - Issues the SetObjectProtected command through #optiga_comms_transceive.<br>
- * - Releases the strict sequence in case of an error or after #optiga_util_protected_update_final is successfully completed
+ * - Releases the strict sequence in case of an error or after #optiga_util_protected_update_final is successfully completed.
  *
  * \pre
  * - Application on OPTIGA must be opened using #optiga_cmd_open_application before using this API.<br>
@@ -581,15 +579,88 @@ optiga_lib_status_t optiga_cmd_decrypt_asym(optiga_cmd_t * me,
  *                                                        - Must be valid argument, otherwise OPTIGA returns an error.<br>
  *\param[in]  params                                      InData of Set Object Protected APDU, must not be NULL.
  *
- * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation
+ * \retval    #OPTIGA_CMD_SUCCESS                         Successful invocation.
  * \retval    #OPTIGA_CMD_ERROR                           Error occurred before invoking SetObjectProtected command.
- *                                                        Error in the asynchronous state machine
+ *                                                        Error in the asynchronous state machine.
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT       APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
- * \retval    #OPTIGA_CMD_ERROR_INVALID_INPUT             Continue and final APDU command invoked without strict lock acquired for the instance. 
+ * \retval    #OPTIGA_CMD_ERROR_INVALID_INPUT             Continue and final APDU command invoked without strict lock acquired for the instance.
  */
 optiga_lib_status_t optiga_cmd_set_object_protected(optiga_cmd_t * me,
                                                     uint8_t cmd_param,
                                                     optiga_set_object_protected_params_t * params);
+
+#if defined (OPTIGA_LIB_ENABLE_LOGGING) && defined (OPTIGA_LIB_ENABLE_CMD_LOGGING)
+/**
+ * \brief Logs the message provided from Command layer
+ *
+ * \details
+ * Logs the message provided from Command layer
+ *
+ * \pre
+ *
+ * \note
+ * - None
+ *
+ * \param[in]      msg      Valid pointer to string to be logged
+ *
+ */
+#define OPTIGA_CMD_LOG_MESSAGE(msg) \
+{\
+    optiga_lib_print_message(msg,OPTIGA_COMMAND_LAYER,OPTIGA_COMMAND_LAYER_COLOR);\
+}
+
+/**
+ * \brief Logs the byte array buffer provided from Command layer in hexadecimal format
+ *
+ * \details
+ * Logs the byte array buffer provided from Command layer in hexadecimal format
+ *
+ * \pre
+ *
+ * \note
+ * - None
+ *
+ * \param[in]      array      Valid pointer to array to be logged
+ * \param[in]      array_len  Length of array buffer
+ *
+ */
+#define OPTIGA_CMD_LOG_HEX_DATA(array,array_len) \
+{\
+    optiga_lib_print_array_hex_format(array,array_len,OPTIGA_UNPROTECTED_DATA_COLOR);\
+}
+
+/**
+ * \brief Logs the status info provided from Command layer
+ *
+ * \details
+ * Logs the status info provided from Command layer
+ *
+ * \pre
+ *
+ * \note
+ * - None
+ *
+ * \param[in]      return_value      Status information Command service
+ *
+ */
+#define OPTIGA_CMD_LOG_STATUS(return_value) \
+{ \
+    if (OPTIGA_LIB_SUCCESS != return_value) \
+    { \
+        optiga_lib_print_status(OPTIGA_COMMAND_LAYER,OPTIGA_ERROR_COLOR,return_value); \
+    } \
+    else\
+    { \
+        optiga_lib_print_status(OPTIGA_COMMAND_LAYER,OPTIGA_COMMAND_LAYER_COLOR,return_value); \
+    } \
+}
+#else
+
+#define OPTIGA_CMD_LOG_MESSAGE(msg) {}
+#define OPTIGA_CMD_LOG_HEX_DATA(array, array_len) {}
+#define OPTIGA_CMD_LOG_STATUS(return_value) {}
+
+#endif
 
 #ifdef __cplusplus
 }

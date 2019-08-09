@@ -167,7 +167,7 @@ LIBRARY_EXPORTS void pal_os_event_start(pal_os_event_t * p_pal_os_event,
  * \brief Stops an os event.
  *
  * \details
- * Starts an OS event.
+ * Stops an OS event.
  *
  * \pre
  * - None

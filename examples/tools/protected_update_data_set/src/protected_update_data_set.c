@@ -1,4 +1,3 @@
-
 /**
 * \copyright
 * MIT License
@@ -43,41 +42,56 @@
 #define PROTECT_UPDATE_MANIFEST_VERSION				(1U)
 
 // This will be replaced by code
-const unsigned char ecc_signature_header[] = { 0x84, 0x4a, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x31, 0x43, 0xa1, 0x01, 0x26, 0x40 };
-const unsigned char rsa_signature_header[] = { 0x84, 0x4a, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x31, 0x47, 0xa1, 0x01, 0x3a, 0x00, 0x01, 0x00, 0xa3, 0x40 };
+const char signature_string[] = "Signature1";
+unsigned char signature_header[25];
 
-unsigned char local_manifest_buffer[200];
+unsigned char local_manifest_buffer[500];
 
-unsigned char ES_256[] = { 0x26 };
-unsigned char RSA_SSA_PKCS1_V1_5_SHA_256[] = { 0x3A,0x00, 0x01, 0x00, 0xA3};
-
-//Decodes RSA signature compoenents
+//Decodes ECC signature compoenents
 static int protected_update_decode_ecc_signature(	unsigned char * in_signature,
-													unsigned char * out_signature)
+													unsigned char * out_signature,
+													unsigned short sign_len)
 {
 	unsigned char offset = 3;
 	unsigned char round = 0;
 	unsigned char out_index = 0;
-#define PC_ECC_SIGN_LENGTH		(0x20)
+	unsigned short length_to_copy = 0;
+	unsigned short r_s_comp_length = sign_len/2;
+	
 	while (round < 2)
 	{
-		if (*(in_signature + offset++) == 0x21)
+		// if compoenents are negative
+		if (*(in_signature + offset) == (r_s_comp_length + 1))
+		{
+			length_to_copy = r_s_comp_length;
+			offset+=2;
+		}
+		// if compoenents are less than key size
+		else if (*(in_signature + offset) < r_s_comp_length)
+		{
+			length_to_copy = *(in_signature + offset);
+			offset++;
+			out_index += (r_s_comp_length - length_to_copy);
+		}
+		else
 		{
 			offset++;
+			length_to_copy = r_s_comp_length;
 		}
+
 		memcpy(	out_signature + out_index,
 				in_signature + offset,
-				PC_ECC_SIGN_LENGTH);
-		offset += (PC_ECC_SIGN_LENGTH + 1);
-		out_index += PC_ECC_SIGN_LENGTH;
+				length_to_copy);
+
+		offset += (length_to_copy + 1);
+		out_index += length_to_copy;
 		round++;
 	} ;
-#undef PC_ECC_SIGN_LENGTH
 
 	return 0;
 }
 
-int protected_update_create_manifest(	manifest_d manifest_data, 
+int protected_update_create_manifest(	manifest_t * manifest_data, 
 										protected_update_data_set_d * p_cbor_manifest)
 {
 	int status = -1;
@@ -86,62 +100,65 @@ int protected_update_create_manifest(	manifest_d manifest_data,
 	unsigned char signature[256];
 	unsigned short signature_length;
 
-	unsigned char data_to_sign[200];
+	unsigned char data_to_sign[300];
 	unsigned short data_to_sign_length;
 
-	unsigned char extracted_signature[0x50];
+	unsigned char extracted_signature[256];
 	unsigned payload_length_for_digest;
 
-	unsigned char sign_algo_length;
-	unsigned char * sign_algo_ptr = NULL;
+	unsigned short sign_algo_length;
 	unsigned char * sign_header_ptr = NULL;
-	unsigned char sign_header_length = 0;
+	unsigned short sign_header_length = 0;
 	unsigned short offset = 0;
-	unsigned char length_marker = 0;
-	unsigned char sign_info_length;
-	unsigned short hash_algo;
+	unsigned short length_marker = 0;
+	unsigned short byte_string_len_marker = 0;
+	signed int sign_algo_value;
+	unsigned char digest_algo_value;
 	
 	do
 	{
+		cbor_set_array_of_data(signature_header, 4, &sign_header_length);
+		cbor_set_byte_string(signature_header, strlen(signature_string), &sign_header_length);
+		memcpy(signature_header+sign_header_length, signature_string, strlen(signature_string));
+		sign_header_length = sign_header_length + strlen(signature_string);
+
 		// get details of sign algo
-		if (strcmp(manifest_data.signature_algo, "ES_256") == 0)
+		if (strcmp(manifest_data->signature_algo, "ES_256") == 0)
 		{
-			sign_algo_length = sizeof(ES_256);
-			sign_algo_ptr = ES_256;
-			sign_info_length = (2 * PROTECT_UPDATE_SHA256_LENGTH);
-			sign_header_ptr = (unsigned char *)ecc_signature_header;
-			sign_header_length = sizeof(ecc_signature_header);
+			sign_algo_value = (signed int)eES_SHA;
 		}
-		else
+		else if (strcmp(manifest_data->signature_algo, "RSA-SSA-PKCS1-V1_5-SHA-256") == 0)
 		{
-			sign_algo_length = sizeof(RSA_SSA_PKCS1_V1_5_SHA_256);
-			sign_algo_ptr = RSA_SSA_PKCS1_V1_5_SHA_256;
-			sign_info_length = (4 * PROTECT_UPDATE_SHA256_LENGTH);
-			sign_header_ptr = (unsigned char *)rsa_signature_header;
-			sign_header_length = sizeof(rsa_signature_header);
+			sign_algo_value = (signed int)eRSA_SSA_PKCS1_V1_5_SHA_256;
+		}
+		else 
+		{
+			pal_logger_print_message(" FAILED :  protect_update : sign algo assignment");
+			break;
 		}
 
-		if (strcmp(manifest_data.digest_algo, "SHA256") == 0)
-		{
-			hash_algo = 0x29;
-		}
+		sign_header_length++;
+		sign_algo_length = sign_header_length;
+		cbor_set_map_tag(signature_header, 0x01, &sign_header_length);
+		cbor_set_map_signed_type(signature_header, 0x01, sign_algo_value, &sign_header_length);
+		sign_algo_length = (sign_header_length - sign_algo_length);
+		sign_header_length = sign_header_length - sign_algo_length - 1;
+		cbor_set_byte_string(signature_header, sign_algo_length, &sign_header_length);
+		sign_header_length = sign_header_length + sign_algo_length;
+		cbor_set_byte_string(signature_header, 0x00, &sign_header_length);
+		sign_header_ptr = (unsigned char *)signature_header;
 
 		// 1.COSE
 		cbor_set_array_of_data(local_manifest_buffer, 4, &offset);
 
 		// 2.protected signed header trust
-		cbor_set_byte_string(local_manifest_buffer, (sign_algo_length + 2), &offset);
-		local_manifest_buffer[offset++] = 0xA1;
-		local_manifest_buffer[offset++] = 0x01;
-		memcpy(local_manifest_buffer + offset, sign_algo_ptr, sign_algo_length);
-		offset += sign_algo_length;
+		cbor_set_byte_string(local_manifest_buffer, (sign_algo_length), &offset);
+		cbor_set_map_tag(local_manifest_buffer, 0x01, &offset);
+		cbor_set_map_signed_type(local_manifest_buffer, 0x01, sign_algo_value, &offset);
 
 		// 3.unprotected -signed header Trust
-		local_manifest_buffer[offset++] = 0xA1;
-		local_manifest_buffer[offset++] = 0x04;
-		cbor_set_byte_string(local_manifest_buffer, sizeof(manifest_data.trust_anchor_oid), &offset);
-		local_manifest_buffer[offset++] = (unsigned char)((0xFF00 & manifest_data.trust_anchor_oid) >> 8);
-		local_manifest_buffer[offset++] = (unsigned char)manifest_data.trust_anchor_oid;
+		cbor_set_map_tag(local_manifest_buffer, 0x01, &offset);
+		cbor_set_map_byte_string_type(local_manifest_buffer, 0x04, (unsigned char *)&manifest_data->trust_anchor_oid, 0x02, &offset);
 
 		// 4.Payload
 		length_marker = (unsigned char)offset;
@@ -149,7 +166,7 @@ int protected_update_create_manifest(	manifest_d manifest_data,
 		cbor_set_byte_string(local_manifest_buffer, 0x3d, &offset);
 
 		// 4.1 Trust manifest
-		cbor_set_array_of_data(local_manifest_buffer, 6, &offset);
+		cbor_set_array_of_data(local_manifest_buffer, 0x06, &offset);
 
 		// manifest version
 		cbor_set_unsigned_integer(local_manifest_buffer, PROTECT_UPDATE_MANIFEST_VERSION, &offset);
@@ -157,14 +174,16 @@ int protected_update_create_manifest(	manifest_d manifest_data,
 		cbor_set_null(local_manifest_buffer, &offset);
 		cbor_set_array_of_data(local_manifest_buffer, 4, &offset);
 
-		local_manifest_buffer[offset++] = CBOR_MAJOR_TYPE_1;
-		if (0 != cbor_set_unsigned_integer(local_manifest_buffer, manifest_data.payload_length, &offset))
+		//Payload Type
+		cbor_set_signed_integer(local_manifest_buffer, -1, &offset);
+
+		if (0 != cbor_set_unsigned_integer(local_manifest_buffer, manifest_data->payload_length, &offset))
 		{
 			pal_logger_print_message(" FAILED :  protect_update : protected_update_assign_length for payload_length");
 			break;
 		}
 		//payload version
-		if (0 != cbor_set_unsigned_integer(local_manifest_buffer, manifest_data.payload_version, &offset))
+		if (0 != cbor_set_unsigned_integer(local_manifest_buffer, manifest_data->payload_version, &offset))
 		{
 			pal_logger_print_message(" FAILED :  protect_update : protected_update_assign_length for payload_version");
 			break;
@@ -172,53 +191,58 @@ int protected_update_create_manifest(	manifest_d manifest_data,
 
 		cbor_set_array_of_data(local_manifest_buffer, 2, &offset);
 		//offset
-		if (0 != cbor_set_unsigned_integer(local_manifest_buffer, manifest_data.offset_in_oid, &offset))
+		if (0 != cbor_set_unsigned_integer(local_manifest_buffer, manifest_data->offset_in_oid, &offset))
 		{
 			pal_logger_print_message(" FAILED :  protect_update : protected_update_assign_length for offset_in_oid");
 			break;
 		}
 		//write type
-		local_manifest_buffer[offset++] = (unsigned char)manifest_data.write_type;
+		cbor_set_unsigned_integer(local_manifest_buffer, (unsigned char)manifest_data->write_type, &offset);
 
 		cbor_set_array_of_data(local_manifest_buffer, 2, &offset);
 		cbor_set_array_of_data(local_manifest_buffer, 2, &offset);
-		local_manifest_buffer[offset++] = CBOR_MAJOR_TYPE_1;
+		cbor_set_signed_integer(local_manifest_buffer, -1, &offset);
 		cbor_set_byte_string(local_manifest_buffer, PROTECT_UPDATE_SHA256_LENGTH + 5, &offset);
 
 		//digest fields 
 		cbor_set_array_of_data(local_manifest_buffer, 2, &offset);
 
-		local_manifest_buffer[offset++] = CBOR_ADDITIONAL_TYPE_0x18;
+		if (strcmp(manifest_data->digest_algo, "SHA256") == 0)
+		{
+			digest_algo_value = (signed int)eSHA_256;
+		}
+		cbor_set_unsigned_integer(local_manifest_buffer, digest_algo_value, &offset);
+
 		//creating digest
 
 		payload_length_for_digest = (p_cbor_manifest->fragments_length > MAX_PAYLOAD_SIZE) ? MAX_PAYLOAD_SIZE : p_cbor_manifest->fragments_length;
-		if (0 != pal_crypt_calculate_sha256_hash(	(unsigned char *)p_cbor_manifest->fragments,
-													payload_length_for_digest, 
-													digest))
+		if (0 != pal_crypt_hash(	NULL,
+									41,
+									(const unsigned char *)p_cbor_manifest->fragments,
+									payload_length_for_digest, 
+									digest))
 		{
-			pal_logger_print_message(" FAILED :  protect_update : pal_crypt_calculate_sha256_hash");
+			pal_logger_print_message(" FAILED :  protect_update : pal_crypt_hash");
 			break;
 		}
 
-		local_manifest_buffer[offset++] = (unsigned char)hash_algo;
 		cbor_set_byte_string(local_manifest_buffer, sizeof(digest), &offset);
+		//digest: IFX_DigestSize
 		memcpy((local_manifest_buffer+offset), digest, sizeof(digest));
 		offset += sizeof(digest);
+
 		cbor_set_null(local_manifest_buffer, &offset);
 
 		//target oid
 		cbor_set_array_of_data(local_manifest_buffer, 2, &offset);
 		cbor_set_byte_string(local_manifest_buffer, 0, &offset);
 		cbor_set_byte_string(local_manifest_buffer, 2, &offset);
-		local_manifest_buffer[offset++] = (unsigned char)(manifest_data.target_oid >> 8);
-		local_manifest_buffer[offset++] = (unsigned char)manifest_data.target_oid;
+		local_manifest_buffer[offset++] = (unsigned char)(manifest_data->target_oid >> 8);
+		local_manifest_buffer[offset++] = (unsigned char)manifest_data->target_oid;
 
 		//Updating length filed of payload
 		data_to_sign_length = offset - length_marker - 1;
 		local_manifest_buffer[length_marker + 1] = data_to_sign_length - 1;
-
-		//signature
-		cbor_set_byte_string(local_manifest_buffer, sign_info_length, &offset);
 
 		//Generate signature
 		memcpy(data_to_sign, sign_header_ptr, sign_header_length);
@@ -227,42 +251,49 @@ int protected_update_create_manifest(	manifest_d manifest_data,
 		data_to_sign_length += sign_header_length;
 
 		signature_length = sizeof(signature);
-		if(0 != pal_crypt_calculate_signature(	data_to_sign,
-									data_to_sign_length,
-									(unsigned char *)manifest_data.private_key,
-									signature,
-									&signature_length,
-									0))
+		
+		// Does ECDSA / RSA signing based on the key provided
+		if(0 != pal_crypt_sign(	NULL,
+								data_to_sign,
+								data_to_sign_length,
+								signature,
+								&signature_length,
+								(const unsigned char *)manifest_data->private_key,
+								0))
 		{
 			pal_logger_print_message(" FAILED :  protect_update : pal_crypt_calculate_signature");
             break;
         }
-		// DEBUG prints
-		//pal_logger_print_hex_data(signature, signature_length);
-        
-		signature_length = sign_info_length;
-		// do only for EC_256
-		if (1 == sign_algo_length)
-		{ 
-			status = protected_update_decode_ecc_signature(signature, extracted_signature);
+
+		if (sign_algo_value == eES_SHA)
+		{
+			// Get expected signature length
+			status = pal_crypt_get_signature_length((unsigned char *)manifest_data->private_key,&signature_length);
+			if (0 != status)
+			{
+				pal_logger_print_message(" FAILED :  pal_crypt : Error in getting signature length");
+				break;
+			}
+			// Remove encoding
+			memset(extracted_signature, 0, sizeof(extracted_signature));
+			status = protected_update_decode_ecc_signature(signature, extracted_signature, signature_length);
 			if (0 != status)
 			{
 				pal_logger_print_message(" FAILED :  protect_update : protected_update_signature_parser");
 				break;
 			}
-			// DEBUG prints
-			//pal_logger_print_message("\n");
-			//pal_logger_print_hex_data(extracted_signature, sign_info_length);
-			//pal_logger_print_message("\n");
+			cbor_set_byte_string(local_manifest_buffer, signature_length, &offset);
 		    memcpy(&local_manifest_buffer[offset], extracted_signature, signature_length);
 		}
-        else
+        else if (sign_algo_value == eRSA_SSA_PKCS1_V1_5_SHA_256)
         {
+			cbor_set_byte_string(local_manifest_buffer, signature_length, &offset);
             memcpy(&local_manifest_buffer[offset], signature, signature_length);
         }
+
 		offset += signature_length;
 		p_cbor_manifest->data_length = offset;
-		p_cbor_manifest->data = malloc(offset);
+		p_cbor_manifest->data = (unsigned char *)malloc(offset);
 		memcpy(p_cbor_manifest->data, local_manifest_buffer, offset);
 
 		status = 0;
@@ -271,12 +302,12 @@ int protected_update_create_manifest(	manifest_d manifest_data,
 
 }
 
-int protected_update_create_fragments(	manifest_d manifest_data, 
+int protected_update_create_fragments(	manifest_t * manifest_data, 
 										protected_update_data_set_d * p_cbor_manifest)
 {
 	int status = -1;
 	unsigned char digest[PROTECT_UPDATE_SHA256_LENGTH];
-	unsigned short remaining_payload_length = manifest_data.payload_length;
+	unsigned short remaining_payload_length = manifest_data->payload_length;
 	unsigned short max_memory_required;
 	unsigned char * fragments = NULL;
 	unsigned char count_of_fragments = 0, index_for_hashing = 0;
@@ -288,11 +319,11 @@ int protected_update_create_fragments(	manifest_d manifest_data,
 	{
 		max_memory_required = (remaining_payload_length / MAX_PAYLOAD_FRAGMENT_SIZE) * MAX_PAYLOAD_SIZE;
 		max_memory_required += (remaining_payload_length % MAX_PAYLOAD_FRAGMENT_SIZE);
-		fragments = malloc(max_memory_required);
+		fragments = (unsigned char *)malloc(max_memory_required);
 		
 		// DEBUG prints
-		//pal_logger_print_hex_data(manifest_data.payload, manifest_data.payload_length); pal_logger_print_message(""); 
-		//printf("Total length : %d\n", manifest_data.payload_length);
+		//pal_logger_print_hex_data(manifest_data->payload, manifest_data->payload_length); pal_logger_print_message(""); 
+		//printf("Total length : %d\n", manifest_data->payload_length);
 
 		// Copy all the user data into fragment payloads
 		do
@@ -301,7 +332,7 @@ int protected_update_create_fragments(	manifest_d manifest_data,
 
 			payload_len_to_copy = (remaining_payload_length > MAX_PAYLOAD_SIZE) ? MAX_PAYLOAD_FRAGMENT_SIZE : remaining_payload_length;
 			memcpy(p_current_fragment,
-				manifest_data.payload + (MAX_PAYLOAD_FRAGMENT_SIZE * count_of_fragments),
+				manifest_data->payload + (MAX_PAYLOAD_FRAGMENT_SIZE * count_of_fragments),
 				payload_len_to_copy);
 
 			remaining_payload_length -= payload_len_to_copy;
@@ -315,22 +346,27 @@ int protected_update_create_fragments(	manifest_d manifest_data,
 		// Start adding hash to fragement
 		do
 		{
-			p_current_fragment = fragments + (index_for_hashing * MAX_PAYLOAD_SIZE);
+			if (0 != index_for_hashing)
+			{
+				p_current_fragment = fragments + (index_for_hashing * MAX_PAYLOAD_SIZE);
 
-			length_to_digest = ((count_of_fragments - index_for_hashing) == 1) ? payload_len_to_copy : MAX_PAYLOAD_SIZE;
+				length_to_digest = ((count_of_fragments - index_for_hashing) == 1) ? payload_len_to_copy : MAX_PAYLOAD_SIZE;
 			
-			// Calculate hash on the current fragment and add to previous fragement
-			pal_crypt_calculate_sha256_hash(p_current_fragment,
-											length_to_digest,
-											digest);
-			
-			memcpy(	p_current_fragment - PROTECT_UPDATE_SHA256_LENGTH,
-					digest,
-					sizeof(digest));
+				// Calculate hash on the current fragment and add to previous fragment
+				pal_crypt_hash( NULL, 
+								41,
+								(const unsigned char *)p_current_fragment,
+								length_to_digest,
+								digest);		
+				memcpy(	p_current_fragment - PROTECT_UPDATE_SHA256_LENGTH,
+						digest,
+						sizeof(digest));
 
-			p_cbor_manifest->fragments_length += sizeof(digest);
-			index_for_hashing--;
-			pal_logger_print_hex_data(p_current_fragment, MAX_PAYLOAD_SIZE);
+				p_cbor_manifest->fragments_length += sizeof(digest);
+			
+				index_for_hashing--;
+			}
+			//pal_logger_print_hex_data(p_current_fragment, MAX_PAYLOAD_SIZE);
 
 		} while (index_for_hashing != 0);
 
@@ -340,9 +376,6 @@ int protected_update_create_fragments(	manifest_d manifest_data,
 
 	} while (0);
 
-	// DEBUG prints
-	//printf("max_memory_required : %d\n", max_memory_required);
-	//printf("Total number of fragments: %d\n", count_of_fragments);
 	status = 0;
 	return status;
 }

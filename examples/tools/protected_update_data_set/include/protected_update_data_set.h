@@ -1,4 +1,5 @@
 /**
+/**
 * \copyright
 * MIT License
 *
@@ -37,14 +38,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef _PROTECTED_UPDATE_
-#define _PROTECTED_UPDATE_
+#ifndef _PROTECTED_UPDATE_DATA_SET_H_
+#define _PROTECTED_UPDATE_DATA_SET_H_
 
 
 #define PROTECT_UPDATE_SHA256_LENGTH				(0x20)
 #define MAX_PAYLOAD_FRAGMENT_SIZE					(608)
 #define MAX_PAYLOAD_SIZE							(MAX_PAYLOAD_FRAGMENT_SIZE + PROTECT_UPDATE_SHA256_LENGTH)
 
+typedef enum signature_algo
+{
+	eES_SHA					= -7,
+	eRSA_SSA_PKCS1_V1_5_SHA_256 = -65700,
+}signature_algo_t;
+
+typedef enum digest_algo
+{
+	eSHA_256					= 41,
+}digest_algo_t;
 // Structure to store manifest data
 typedef struct manifest
 {
@@ -58,7 +69,7 @@ typedef struct manifest
 	unsigned short payload_length;
 	unsigned short write_type;
 	const char * private_key;
-} manifest_d;
+} manifest_t;
 
 // Structure to store protect update data set
 typedef struct protected_update_data_set
@@ -73,11 +84,11 @@ typedef struct protected_update_data_set
 }protected_update_data_set_d;
 
 // Create protected update manifest
-int protected_update_create_manifest(	manifest_d manifest_data, 
+int protected_update_create_manifest(	manifest_t * manifest_data, 
 										protected_update_data_set_d * p_cbor_manifest);
 
 // Create protected update payload fragments
-int protected_update_create_fragments(	manifest_d manifest_data, 
+int protected_update_create_fragments(	manifest_t * manifest_data, 
 										protected_update_data_set_d * p_cbor_manifest);
 
 #endif //_PROTECTED_UPDATE_

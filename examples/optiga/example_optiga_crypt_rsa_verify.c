@@ -36,11 +36,9 @@
 */
 
 #include "optiga/optiga_crypt.h"
+#include "optiga_example.h"
 
 #ifdef OPTIGA_CRYPT_RSA_VERIFY_ENABLED
-
-extern void example_log_execution_status(const char_t* function, uint8_t status);
-extern void example_log_function_name(const char_t* function);
 
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
@@ -91,14 +89,14 @@ static uint8_t public_key [] = {
 };
 
 //SHA-256 Digest
-static uint8_t digest [] = 
+static uint8_t digest [] =
 {
     0x91, 0x70, 0x02, 0x48, 0x3F, 0xBD, 0x5F, 0xDD, 0xD5, 0x38, 0xEB, 0xDA, 0x9A, 0x5E, 0x1F, 0x46,
     0xFC, 0xAD, 0x8F, 0x1E, 0x2C, 0x75, 0xB0, 0x83, 0xD0, 0x71, 0x2B, 0x80, 0xD4, 0xAA, 0xC6, 0x9B
 };
 
 // RSA 1024 Signature ( no additional encoding needed )
-static uint8_t signature [] = 
+static uint8_t signature [] =
 {
     0x5B, 0xDE, 0x46, 0xE4, 0x35, 0x48, 0xF4, 0x81, 0x45, 0x7C, 0x72, 0x31, 0x54, 0x55, 0xE8, 0x9F,
     0x1D, 0xD0, 0x5D, 0x9D, 0xEC, 0x40, 0xE6, 0x6B, 0x89, 0xF3, 0xBC, 0x52, 0x68, 0xB1, 0xD8, 0x70,
@@ -119,17 +117,16 @@ static uint8_t signature [] =
  */
 void example_optiga_crypt_rsa_verify(void)
 {
-    uint8_t logging_status = 0;
-    public_key_from_host_t public_key_details = 
+    public_key_from_host_t public_key_details =
     {
          public_key,
          sizeof(public_key),
          (uint8_t)OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL
     };
 
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = 0;
     optiga_crypt_t * me = NULL;
-    example_log_function_name(__FUNCTION__);
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
     do
     {
         /**
@@ -168,17 +165,23 @@ void example_optiga_crypt_rsa_verify(void)
         if ((OPTIGA_LIB_SUCCESS != optiga_lib_status))
         {
             //RSA Signature verification failed.
+            return_status = optiga_lib_status;
             break;
         }
-        logging_status = 1;
+        return_status = OPTIGA_LIB_SUCCESS;
     } while (FALSE);
-
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
         return_status = optiga_crypt_destroy(me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
     }
-    example_log_execution_status(__FUNCTION__,logging_status);
 }
 
 #endif  //OPTIGA_CRYPT_RSA_VERIFY_ENABLED

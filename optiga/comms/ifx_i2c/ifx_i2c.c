@@ -36,11 +36,12 @@
 */
 
 #include "optiga/ifx_i2c/ifx_i2c.h"
-#include "optiga/ifx_i2c/ifx_i2c_presentation_layer.h"
 #include "optiga/pal/pal_os_event.h"
 
 #ifndef OPTIGA_COMMS_SHIELDED_CONNECTION
 #include "optiga/ifx_i2c/ifx_i2c_transport_layer.h"
+#else
+#include "optiga/ifx_i2c/ifx_i2c_presentation_layer.h"
 #endif
 
 /// @cond hidden
@@ -81,19 +82,25 @@ optiga_lib_status_t ifx_i2c_open(ifx_i2c_context_t * p_ctx)
     //If api status is not busy, proceed
     if ((IFX_I2C_STATUS_BUSY != p_ctx->status))
     {
-        p_ctx->p_pal_i2c_ctx->p_upper_layer_ctx = p_ctx;
-        p_ctx->reset_type = (uint8_t)IFX_I2C_COLD_RESET;
-        p_ctx->reset_state = IFX_I2C_STATE_RESET_PIN_LOW;
-        p_ctx->do_pal_init = TRUE;
-        p_ctx->state = IFX_I2C_STATE_UNINIT;
-
-        api_status = ifx_i2c_init(p_ctx);
-        if (IFX_I2C_STACK_SUCCESS == api_status)
+        do
         {
-            p_ctx->status = IFX_I2C_STATUS_BUSY;
-        }
-    }
+            p_ctx->p_pal_i2c_ctx->p_upper_layer_ctx = p_ctx;
+            p_ctx->reset_type = OPTIGA_COMMS_DEFAULT_RESET_TYPE;
+            if(p_ctx->reset_type > (uint8_t)IFX_I2C_WARM_RESET)
+            {
+                break;
+            }
+            p_ctx->reset_state = IFX_I2C_STATE_RESET_PIN_LOW;
+            p_ctx->do_pal_init = TRUE;
+            p_ctx->state = IFX_I2C_STATE_UNINIT;
 
+            api_status = ifx_i2c_init(p_ctx);
+            if (IFX_I2C_STACK_SUCCESS == api_status)
+            {
+                p_ctx->status = IFX_I2C_STATUS_BUSY;
+            }
+        }while(FALSE);
+    }
     return (api_status);
 }
 

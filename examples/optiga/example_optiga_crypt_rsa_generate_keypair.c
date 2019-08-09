@@ -28,7 +28,7 @@
 *
 * \file example_optiga_crypt_rsa_generate_keypair.c
 *
-* \brief   This file provides the example for generation of RSA keypair using 
+* \brief   This file provides the example for generation of RSA keypair using
 *          optiga_crypt_rsa_generate_keypair.
 *
 * \ingroup grOptigaExamples
@@ -37,11 +37,10 @@
 */
 
 #include "optiga/optiga_crypt.h"
+#include "optiga_example.h"
 
 #ifdef OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED
 
-extern void example_log_execution_status(const char_t* function, uint8_t status);
-extern void example_log_function_name(const char_t* function);
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
  */
@@ -57,20 +56,20 @@ static void optiga_crypt_callback(void * context, optiga_lib_status_t return_sta
 }
 
 /**
- * The below example demonstrates the generation of 
+ * The below example demonstrates the generation of
  * RSA Key pair using #optiga_crypt_rsa_generate_keypair.
  *
  */
 void example_optiga_crypt_rsa_generate_keypair(void)
 {
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = 0;
     optiga_key_id_t optiga_key_id;
 
     //To store the generated public key as part of Generate key pair
     /*
     *
     * Give a buffer of minimum size required to store the exported public key.
-    * E.g 
+    * E.g
     * For 1024 bit key : modulus(128 bytes) + public expoenent(3 bytes) + Encoding bytes length(approximately 15 bytes)
     * For 2048 bit key : modulus(256 bytes) + public expoenent(3 bytes) + Encoding bytes length(approximately 15 bytes)
     */
@@ -78,8 +77,7 @@ void example_optiga_crypt_rsa_generate_keypair(void)
     uint16_t public_key_length = sizeof(public_key);
 
     optiga_crypt_t * me = NULL;
-    uint8_t logging_status = 0;
-    example_log_function_name(__FUNCTION__);
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
@@ -93,11 +91,11 @@ void example_optiga_crypt_rsa_generate_keypair(void)
         }
 
         /**
-         * 2. Generate RSA Key pair  
+         * 2. Generate RSA Key pair
          *       - Use 1024 or 2048 bit RSA key
          *       - Specify the Key Usage
          *       - Store the Private key in OPTIGA Key store
-         *              (When exporting the private key, provide buffer of sufficient length (key size in bytes + 
+         *              (When exporting the private key, provide buffer of sufficient length (key size in bytes +
          *               encoding length))
          *       - Export Public Key
          */
@@ -115,7 +113,7 @@ void example_optiga_crypt_rsa_generate_keypair(void)
             break;
         }
 
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
+        while (OPTIGA_LIB_BUSY == optiga_lib_status)
         {
             //Wait until the optiga_crypt_rsa_generate_keypair operation is completed
         }
@@ -123,18 +121,23 @@ void example_optiga_crypt_rsa_generate_keypair(void)
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
             //RSA Key pair generation failed
+            return_status = optiga_lib_status;
             break;
         }
-        logging_status = 1;
-
+        return_status = OPTIGA_LIB_SUCCESS;
     } while (FALSE);
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
 
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
         return_status = optiga_crypt_destroy(me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
     }
-    example_log_execution_status(__FUNCTION__,logging_status);
 }
 
 #endif  //OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED

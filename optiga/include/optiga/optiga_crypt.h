@@ -44,11 +44,32 @@ extern "C" {
 
 #include "optiga/cmd/optiga_cmd.h"
 
+/** \brief union for OPTIGA crypt parameters */
+typedef union optiga_crypt_params
+{
+    /// get random params
+    optiga_get_random_params_t optiga_get_random_params;
+    /// get key pair params
+    optiga_gen_keypair_params_t optiga_gen_keypair_params;
+    /// calc sign params
+    optiga_calc_sign_params_t optiga_calc_sign_params;
+    /// verify sign params
+    optiga_verify_sign_params_t optiga_verify_sign_params;
+    /// asymmetric encryption params
+    optiga_encrypt_asym_params_t optiga_encrypt_asym_params;
+    /// calc hash params
+    optiga_calc_hash_params_t optiga_calc_hash_params;
+    /// calc ssec params
+    optiga_calc_ssec_params_t optiga_calc_ssec_params;
+    /// derive key params
+    optiga_derive_key_params_t optiga_derive_key_params;
+}optiga_crypt_params_t;
+
 /** \brief OPTIGA crypt instance structure */
 struct optiga_crypt
 {
-    /// Extra buffer to hold the details/references (pointers) to the Application Inputs
-    uint8_t params [80];
+    /// Details/references (pointers) to the Application Inputs
+    optiga_crypt_params_t params;
     /// Command module instance
     optiga_cmd_t * my_cmd;
     /// Caller context
@@ -76,7 +97,7 @@ typedef struct optiga_crypt optiga_crypt_t;
  *
  *\details
  * Sets/updates the OPTIGA Comms Shielded connection configuration in the respective (optiga_util) instance.
- * - The #OPTIGA_COMMS_PROTECTION_LEVEL configuration settings using this API, will be used in the next immedidate usage of the instance.
+ * - The #OPTIGA_COMMS_PROTECTION_LEVEL configuration settings using this API, will be used in the next immediate usage of the instance.
  * - Once the API is invoked, this level gets reset to the default protection level #OPTIGA_COMMS_DEFAULT_PROTECTION_LEVEL
  *
  *\pre
@@ -113,7 +134,10 @@ void optiga_crypt_set_comms_params(optiga_crypt_t * me,
  * - None
  *
  * \note
- *  - This API is implemented in synchronous mode.
+ * - This API is implemented in synchronous mode.
+ * - For <b>protected I2C communication</b>, 
+ *      - Default protection level for this API is #OPTIGA_COMMS_DEFAULT_PROTECTION_LEVEL.
+ *      - Default protocol version for this API is #OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET.
  *
  * \param[in]   optiga_instance_id  Indicates the OPTIGA instance to be associated with #optiga_crypt_t. Should be defined as below:
  *                                  Use #OPTIGA_INSTANCE_ID_0.
@@ -125,7 +149,7 @@ void optiga_crypt_set_comms_params(optiga_crypt_t * me,
  *                                  Low layer function fails.<br>
  *                                  OPTIGA_CMD_MAX_REGISTRATIONS number of instances are already created.
  */
-optiga_crypt_t * optiga_crypt_create(uint8_t optiga_instance_id,
+LIBRARY_EXPORTS optiga_crypt_t * optiga_crypt_create(uint8_t optiga_instance_id,
                                      callback_handler_t handler,
                                      void * caller_context);
 
@@ -150,7 +174,7 @@ optiga_crypt_t * optiga_crypt_create(uint8_t optiga_instance_id,
  * \retval    #OPTIGA_CRYPT_ERROR_INSTANCE_IN_USE     The previous operation with the same instance is not complete.
  *
  */
-optiga_lib_status_t optiga_crypt_destroy(optiga_crypt_t * me);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_destroy(optiga_crypt_t * me);
 
 #ifdef OPTIGA_CRYPT_RANDOM_ENABLED
 /**
@@ -188,7 +212,7 @@ optiga_lib_status_t optiga_crypt_destroy(optiga_crypt_t * me);
  * example_optiga_crypt_random.c
  *
  */
-optiga_lib_status_t optiga_crypt_random(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_random(optiga_crypt_t * me,
                                         optiga_rng_type_t rng_type,
                                         uint8_t * random_data,
                                         uint16_t random_data_length);
@@ -228,7 +252,7 @@ optiga_lib_status_t optiga_crypt_random(optiga_crypt_t * me,
  * example_optiga_crypt_hash.c
  *
  */
-optiga_lib_status_t optiga_crypt_hash_start(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash_start(optiga_crypt_t * me,
                                             optiga_hash_context_t * hash_ctx);
 
 
@@ -266,7 +290,7 @@ optiga_lib_status_t optiga_crypt_hash_start(optiga_crypt_t * me,
  * example_optiga_crypt_hash.c
  *
  */
-optiga_lib_status_t optiga_crypt_hash_update(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash_update(optiga_crypt_t * me,
                                              optiga_hash_context_t * hash_ctx,
                                              uint8_t source_of_data_to_hash,
                                              const void * data_to_hash);
@@ -304,7 +328,7 @@ optiga_lib_status_t optiga_crypt_hash_update(optiga_crypt_t * me,
  * example_optiga_crypt_hash.c
  *
  */
-optiga_lib_status_t optiga_crypt_hash_finalize(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash_finalize(optiga_crypt_t * me,
                                                optiga_hash_context_t * hash_ctx,
                                                uint8_t * hash_output);
 #endif //OPTIGA_CRYPT_HASH_ENABLED
@@ -352,7 +376,7 @@ optiga_lib_status_t optiga_crypt_hash_finalize(optiga_crypt_t * me,
  * example_optiga_crypt_ecc_generate_keypair.c
  *
  */
-optiga_lib_status_t optiga_crypt_ecc_generate_keypair(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecc_generate_keypair(optiga_crypt_t * me,
                                                       optiga_ecc_curve_t curve_id,
                                                       uint8_t key_usage,
                                                       bool_t export_private_key,
@@ -397,7 +421,7 @@ optiga_lib_status_t optiga_crypt_ecc_generate_keypair(optiga_crypt_t * me,
  * example_optiga_crypt_ecdsa_sign.c
  *
  */
-optiga_lib_status_t optiga_crypt_ecdsa_sign(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdsa_sign(optiga_crypt_t * me,
                                             const uint8_t * digest,
                                             uint8_t digest_length,
                                             optiga_key_id_t private_key,
@@ -443,7 +467,7 @@ optiga_lib_status_t optiga_crypt_ecdsa_sign(optiga_crypt_t * me,
  * example_optiga_crypt_ecdsa_verify.c
  *
  */
-optiga_lib_status_t optiga_crypt_ecdsa_verify(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdsa_verify(optiga_crypt_t * me,
                                               const uint8_t * digest,
                                               uint8_t digest_length,
                                               const uint8_t * signature,
@@ -493,7 +517,7 @@ optiga_lib_status_t optiga_crypt_ecdsa_verify(optiga_crypt_t * me,
  * <b>Example</b><br>
  * example_optiga_crypt_ecdh.c
  */
-optiga_lib_status_t optiga_crypt_ecdh(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdh(optiga_crypt_t * me,
                                       optiga_key_id_t private_key,
                                       public_key_from_host_t * public_key,
                                       bool_t export_to_host,
@@ -546,7 +570,7 @@ optiga_lib_status_t optiga_crypt_ecdh(optiga_crypt_t * me,
  * example_optiga_crypt_tls_prf_sha256.c
  *
  */
-optiga_lib_status_t optiga_crypt_tls_prf_sha256(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha256(optiga_crypt_t * me,
                                                 uint16_t secret,
                                                 const uint8_t * label,
                                                 uint16_t label_length,
@@ -601,7 +625,7 @@ optiga_lib_status_t optiga_crypt_tls_prf_sha256(optiga_crypt_t * me,
  * example_optiga_crypt_rsa_generate_keypair.c
  *
  */
-optiga_lib_status_t optiga_crypt_rsa_generate_keypair(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_generate_keypair(optiga_crypt_t * me,
                                                       optiga_rsa_key_type_t key_type,
                                                       uint8_t key_usage,
                                                       bool_t export_private_key,
@@ -647,7 +671,7 @@ optiga_lib_status_t optiga_crypt_rsa_generate_keypair(optiga_crypt_t * me,
  * example_optiga_crypt_rsa_sign.c
  *
  */
-optiga_lib_status_t optiga_crypt_rsa_sign(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_sign(optiga_crypt_t * me,
                                           optiga_rsa_signature_scheme_t signature_scheme,
                                           const uint8_t * digest,
                                           uint8_t digest_length,
@@ -697,7 +721,7 @@ optiga_lib_status_t optiga_crypt_rsa_sign(optiga_crypt_t * me,
  * example_optiga_crypt_rsa_verify.c
  *
  */
-optiga_lib_status_t optiga_crypt_rsa_verify(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_verify(optiga_crypt_t * me,
                                             optiga_rsa_signature_scheme_t signature_scheme,
                                             const uint8_t * digest,
                                             uint8_t digest_length,
@@ -751,7 +775,7 @@ optiga_lib_status_t optiga_crypt_rsa_verify(optiga_crypt_t * me,
  *
  */
 
-optiga_lib_status_t optiga_crypt_rsa_generate_pre_master_secret(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_generate_pre_master_secret(optiga_crypt_t * me,
                                                                 const uint8_t * optional_data,
                                                                 uint16_t optional_data_length,
                                                                 uint16_t pre_master_secret_length);
@@ -802,7 +826,7 @@ optiga_lib_status_t optiga_crypt_rsa_generate_pre_master_secret(optiga_crypt_t *
  * example_optiga_crypt_encrypt_message.c
  *
  */
-optiga_lib_status_t optiga_crypt_rsa_encrypt_message(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_message(optiga_crypt_t * me,
                                                      optiga_rsa_encryption_scheme_t encryption_scheme,
                                                      const uint8_t * message,
                                                      uint16_t message_length,
@@ -856,7 +880,7 @@ optiga_lib_status_t optiga_crypt_rsa_encrypt_message(optiga_crypt_t * me,
  * example_optiga_crypt_encrypt_session.c
  *
  */
-optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_crypt_t * me,
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_crypt_t * me,
                                                      optiga_rsa_encryption_scheme_t encryption_scheme,
                                                      const uint8_t * label,
                                                      uint16_t label_length,
@@ -908,7 +932,7 @@ optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_crypt_t * me,
  * example_optiga_crypt_decrypt.c
  *
  */
- optiga_lib_status_t optiga_crypt_rsa_decrypt_and_export(optiga_crypt_t * me,
+ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_decrypt_and_export(optiga_crypt_t * me,
                                                          optiga_rsa_encryption_scheme_t encryption_scheme,
                                                          const uint8_t * encrypted_message,
                                                          uint16_t encrypted_message_length,
@@ -954,7 +978,7 @@ optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_crypt_t * me,
  * example_optiga_crypt_decrypt.c
  *
  */
- optiga_lib_status_t optiga_crypt_rsa_decrypt_and_store(optiga_crypt_t * me,
+ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_decrypt_and_store(optiga_crypt_t * me,
                                                         optiga_rsa_encryption_scheme_t encryption_scheme,
                                                         const uint8_t * encrypted_message,
                                                         uint16_t encrypted_message_length,
@@ -976,6 +1000,7 @@ optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_crypt_t * me,
  * - #OPTIGA_COMMS_SHIELDED_CONNECTION macro must be defined.<br>
  * - #OPTIGA_CRYPT_SET_COMMS_PROTOCOL_VERSION function must be called once to set the required protocol version
  *   - Currently only Pre-shared Secret based version is supported.
+ * - The host and OPTIGA must be paired and Pre-Shared secret is available.<br>
  *
  * \note
  * - The protection mode for the instance is reset to #OPTIGA_COMMS_NO_PROTECTION once the service layer API returns synchronously.
@@ -986,9 +1011,9 @@ optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_crypt_t * me,
  *                                      - #OPTIGA_COMMS_COMMAND_PROTECTION : Command is protected and response is unprotected
  *                                      - #OPTIGA_COMMS_RESPONSE_PROTECTION : Command is unprotected and response is protected
  *                                      - #OPTIGA_COMMS_FULL_PROTECTION : Both command and response is protected
- *                                      - To re-establish secure channel, bitwise-OR protection_level with #OPTIGA_COMMS_RE_ESTABLISH 
+ *                                      - To re-establish secure channel, bitwise-OR protection_level with #OPTIGA_COMMS_RE_ESTABLISH
  */
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION 
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
 #define OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL(p_instance, protection_level) \
 { \
     optiga_crypt_set_comms_params(p_instance, \
@@ -998,7 +1023,7 @@ optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_crypt_t * me,
 #else
 #define OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL(p_instance, protection_level) {}
 #endif
-  
+
 /**
  * \brief Select the protocol version required for the I2C protected communication for CRYPT instances
  *
@@ -1025,6 +1050,79 @@ optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_crypt_t * me,
 }
 #else
 #define OPTIGA_CRYPT_SET_COMMS_PROTOCOL_VERSION(p_instance, version) {}
+#endif
+
+#if defined (OPTIGA_LIB_ENABLE_LOGGING) && defined (OPTIGA_LIB_ENABLE_CRYPT_LOGGING)
+/**
+ * \brief Logs the message provided from Crypt layer
+ *
+ * \details
+ * Logs the message provided from Crypt layer
+ *
+ * \pre
+ *
+ * \note
+ * - None
+ *
+ * \param[in]      msg      Valid pointer to string to be logged
+ *
+ */
+#define OPTIGA_CRYPT_LOG_MESSAGE(msg) \
+{\
+    optiga_lib_print_message(msg,OPTIGA_CRYPT_SERVICE,OPTIGA_CRYPT_SERVICE_COLOR);\
+}
+
+/**
+ * \brief Logs the byte array buffer provided from Crypt layer in hexadecimal format
+ *
+ * \details
+ * Logs the byte array buffer provided from Crypt layer in hexadecimal format
+ *
+ * \pre
+ *
+ * \note
+ * - None
+ *
+ * \param[in]      array      Valid pointer to array to be logged
+ * \param[in]      array_len  Length of array buffer
+ *
+ */
+#define OPTIGA_CRYPT_LOG_HEX_DATA(array,array_len) \
+{\
+    optiga_lib_print_array_hex_format(array,array_len,OPTIGA_UNPROTECTED_DATA_COLOR);\
+}
+
+/**
+ * \brief Logs the status info provided from Crypt layer
+ *
+ * \details
+ * Logs the status info provided from Crypt layer
+ *
+ * \pre
+ *
+ * \note
+ * - None
+ *
+ * \param[in]      return_value      Status information Crypt service
+ *
+ */
+#define OPTIGA_CRYPT_LOG_STATUS(return_value) \
+{ \
+    if (OPTIGA_LIB_SUCCESS != return_value) \
+    { \
+        optiga_lib_print_status(OPTIGA_CRYPT_SERVICE,OPTIGA_ERROR_COLOR,return_value); \
+    } \
+    else\
+    { \
+        optiga_lib_print_status(OPTIGA_CRYPT_SERVICE,OPTIGA_CRYPT_SERVICE_COLOR,return_value); \
+    } \
+}
+#else
+
+#define OPTIGA_CRYPT_LOG_MESSAGE(msg) {}
+#define OPTIGA_CRYPT_LOG_HEX_DATA(array, array_len) {}
+#define OPTIGA_CRYPT_LOG_STATUS(return_value) {}
+
 #endif
 
 #ifdef __cplusplus

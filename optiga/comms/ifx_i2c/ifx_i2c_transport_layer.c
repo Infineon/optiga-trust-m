@@ -61,6 +61,8 @@
 #define TL_PCTR_CHANNEL_MASK                (0xF8)
 #define TL_PCTR_CHAIN_MASK                  (0x07)
 #define TL_PCTR_INVALID                     (0xFF)
+#define TL_PREVIOUS_CHAINING_STATUS         (0x02)
+#define TL_CURRENT_CHAINING_STATUS          (0x08)
 // Setup debug log statements
 #if IFX_I2C_LOG_TL == 1
 #define LOG_TL IFX_I2C_LOG
@@ -68,16 +70,16 @@
 #define LOG_TL(...)    //printf(__VA_ARGS__);
 #endif
 
-static uint8_t g_pctr_states_table[8][2] = {
-                                            {TL_CHAINING_NO, TL_CHAINING_LAST},
-                                            {TL_CHAINING_NO, TL_CHAINING_LAST},
-                                            {TL_CHAINING_FIRST, TL_CHAINING_INTERMEDIATE},
-                                            {TL_PCTR_INVALID, TL_PCTR_INVALID},
-                                            {TL_CHAINING_FIRST, TL_CHAINING_INTERMEDIATE},
-                                            {TL_PCTR_INVALID, TL_PCTR_INVALID},
-                                            {TL_PCTR_INVALID, TL_PCTR_INVALID},
-                                            {TL_CHAINING_ERROR, TL_CHAINING_ERROR},
-                                            };
+static uint8_t g_pctr_states_table[TL_CURRENT_CHAINING_STATUS][TL_PREVIOUS_CHAINING_STATUS] = {
+                                                                                              {TL_CHAINING_NO, TL_CHAINING_LAST},
+                                                                                              {TL_CHAINING_NO, TL_CHAINING_LAST},
+                                                                                              {TL_CHAINING_FIRST, TL_CHAINING_INTERMEDIATE},
+                                                                                              {TL_PCTR_INVALID, TL_PCTR_INVALID},
+                                                                                              {TL_CHAINING_FIRST, TL_CHAINING_INTERMEDIATE},
+                                                                                              {TL_PCTR_INVALID, TL_PCTR_INVALID},
+                                                                                              {TL_PCTR_INVALID, TL_PCTR_INVALID},
+                                                                                              {TL_CHAINING_ERROR, TL_CHAINING_ERROR},
+                                                                                              };
 
 _STATIC_H optiga_lib_status_t ifx_i2c_tl_send_next_fragment(ifx_i2c_context_t * p_ctx);
 _STATIC_H void ifx_i2c_dl_event_handler(ifx_i2c_context_t * p_ctx,
