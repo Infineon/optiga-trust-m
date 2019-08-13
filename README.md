@@ -58,7 +58,7 @@ For more information please refer to the [Wiki page](https://github.com/Infineon
 
 ## <a name="examples"></a>Examples
 
-1. Get started guide (link is pending)
+1. [Get started guide](https://github.com/Infineon/getstarted-optiga-trust-m)
 1. Off-Chip TLS example (mbedTLS) (link is pending)
 1. AWS FreeRTOS example (link is pending)
 1. Secure Firmware Update and Secure Boot (link is pending)
