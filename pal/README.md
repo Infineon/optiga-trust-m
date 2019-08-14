@@ -2,7 +2,7 @@
 
 ## Port Platfrom Abstraction Layer
 
-To port the Software Framework on you Host platfrom please follow this [guidance](pal/NEW_PAL_TEMPLATE)
+To port the Software Framework on you Host platfrom please follow this [guidance](NEW_PAL_TEMPLATE)
 
 ## Port Crypto module for Platfrom Abstraction Layer
 
