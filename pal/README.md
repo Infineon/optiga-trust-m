@@ -4,6 +4,8 @@
 
 To port the Software Framework on you Host platfrom please follow this [guidance](NEW_PAL_TEMPLATE)
 
+**Note: If you have a strict requirements on type of memmory allocation, consider changing pal_os_malloc(), pal_os_calloc(), pal_os_free() functions in [pal_os_memory.h](https://github.com/Infineon/optiga-trust-m/blob/master/optiga/include/optiga/pal/pal_os_memory.h) file**
+
 ## Port Crypto module for Platfrom Abstraction Layer
 
 The Crypto PAL helps a Host MCU to perfrom shielded communication (protected Infineon I2C protocol) between the Host and the Trust M
