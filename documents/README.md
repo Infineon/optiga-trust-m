@@ -1,7 +1,7 @@
 # Which document do I need?
 
 * **Infineon_I2C_Protocol_vX.XX.pdf** - Infineon I2C protocol specification. In this document you can find all information related to the communication protocol between a Host MCU and the Secure Element, for instance how shielded connection works.
-* License.pdf - MIT License
+* **License.pdf** - MIT License
 * **OPTIGA_Trust_M_V1_Datasheet_vX.XX.pdf** - Datasheet for the OPTIGA Trust M revision product. This is a high level description of the hardware side of the products. You can find there the following information, though not limited to
     * Electrical Characteristics
     * Crypto Performance
