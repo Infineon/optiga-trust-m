@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2018 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -37,15 +37,15 @@
 
 #include "optiga/pal/pal_gpio.h"
 #include "optiga/pal/pal_i2c.h"
-#include "optiga/pal/pal_os_datastore.h"
 #include "optiga/ifx_i2c/ifx_i2c_config.h"
 
-#include "pal_raspberry.h"
+#include "pal_linux.h"
 
-pal_raspberry_t raspberry_events = {0};
-gpio_pin_t gpio_pin_vdd = 2;	//Pin 13 of RPI Header
-gpio_pin_t gpio_pin_reset = 7;  //Pin 7 of RPI Header
-//gpio_pin_t gpio_pin_reset = 0; //Pin 11 of RPI Header
+pal_linux_t linux_events = {0};
+
+// If you use Raspberry Pi, you can uncomment the following lines
+// gpio_pin_t gpio_pin_vdd = 27;
+// gpio_pin_t gpio_pin_reset = 17;
 
 /**
  * \brief PAL I2C configuration for OPTIGA. 
@@ -53,7 +53,7 @@ gpio_pin_t gpio_pin_reset = 7;  //Pin 7 of RPI Header
 pal_i2c_t optiga_pal_i2c_context_0 =
 {
     /// Pointer to I2C master platform specific context
-    (void*)&raspberry_events,
+    (void*)&linux_events,
     /// Slave address
     0x30,
     /// Upper layer context
@@ -68,7 +68,9 @@ pal_i2c_t optiga_pal_i2c_context_0 =
 pal_gpio_t optiga_vdd_0 =
 {
     // Platform specific GPIO context for the pin used to toggle Vdd.
-    (void*)&gpio_pin_vdd 
+    (void*)NULL 
+    // If you use Raspberry Pi, you can uncomment the following line and comment out the previous
+    //(void*)&gpio_pin_vdd 
 };
 
 /**
@@ -77,7 +79,9 @@ pal_gpio_t optiga_vdd_0 =
 pal_gpio_t optiga_reset_0 =
 {
     // Platform specific GPIO context for the pin used to toggle Reset.
-    (void*)&gpio_pin_reset
+    (void*)NULL
+    // If you use Raspberry Pi, you can uncomment the following line and comment out the previous
+    //(void*)&gpio_pin_reset 
 };
 
 /**

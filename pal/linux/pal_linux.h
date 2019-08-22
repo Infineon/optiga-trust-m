@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2018 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -26,57 +26,38 @@
 *
 * \author Infineon Technologies AG
 *
-* \file pal.c
+* \file pal_linux.h
 *
-* \brief    This file implements the platform abstraction layer APIs.
+* \brief   This file provides the prototype declarations w.r.t Linux.
 *
 * \ingroup  grPAL
 * @{
 */
 
+#ifndef _PAL_LINUX_H_
+#define _PAL_LINUX_H_
+
 #include "optiga/pal/pal.h"
 
-/**
- * @brief Initializes the PAL layer
- *
- * Initializes the PAL layer.
- * <br>
- *
- *<b>API Details:</b>
- * - Initializes the PAL layer<br>
- *
- *<b>User Input:</b><br>
- * - None
- *
- * \retval  #PAL_STATUS_SUCCESS  Returns when the PAL init it successfull
- * \retval  #PAL_STATUS_FAILURE  Returns when the PAL init fails.
- */
-pal_status_t pal_init(void)
+#define false 0
+#define true 1
+
+#define HIGH 1
+#define LOW 0
+typedef uint16_t gpio_pin_t;
+
+/** @brief PAL I2C context structure */
+typedef struct pal_linux
 {
-    return PAL_STATUS_SUCCESS;
-}
+    /// This field consists the handle for I2c device
+    int32_t i2c_handle;
+    /// Pointer to store the callers handler
+    void * upper_layer_event_handler;
+} pal_linux_t;
 
-/**
- * @brief De-Initializes the PAL layer
- *
- * De-Initializes the PAL layer.
- * <br>
- *
- *<b>API Details:</b>
- * - De-Initializes the PAL layer<br>
- *
- *<b>User Input:</b><br>
- * - None
- *
- * \retval  #PAL_STATUS_SUCCESS  Returns when the PAL de-init it successfull
- * \retval  #PAL_STATUS_FAILURE  Returns when the PAL de-init fails.
- */
-pal_status_t pal_deinit(void)
-{
-    return PAL_STATUS_SUCCESS;
-}
+typedef struct pal_linux_gpio {
+    gpio_pin_t pin_nr;
+    int fd;
+} pal_linux_gpio_t;
 
-/**
-* @}
-*/
-
+#endif

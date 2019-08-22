@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2018 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -26,43 +26,63 @@
 *
 * \author Infineon Technologies AG
 *
-* \file pal_raspberry.h
+* \file pal_ifx_i2c_config.c
 *
-* \brief   This file provides the prototype declarations w.r.t raspberry Pi3.
+* \brief   This file implements platform abstraction layer configurations for ifx i2c protocol.
 *
 * \ingroup  grPAL
 * @{
 */
 
-#ifndef _PAL_RASPBERRY_H_
-#define _PAL_RASPBERRY_H_
 
-#include "optiga/pal/pal.h"
-#include <pthread.h>
+#include "optiga/pal/pal_gpio.h"
+#include "optiga/pal/pal_i2c.h"
+#include "optiga/ifx_i2c/ifx_i2c_config.h"
 
-#define false 0
-#define true 1
+#include "pal_linux.h"
 
-#define HIGH 1
-#define LOW 0
-typedef uint32_t gpio_pin_t;
+pal_linux_t linux_events = {0};
 
-/** @brief PAL I2C context structure */
-typedef struct pal_raspberry
+#define GPIO_PIN_VDD 27
+#define GPIO_PIN_RESET 17
+
+/**
+ * \brief PAL I2C configuration for OPTIGA. 
+ */
+pal_i2c_t optiga_pal_i2c_context_0 =
 {
-    /// This field consists the handle for I2c device
-    int32_t i2c_handle;
-    /// Pointer to store the callers handler
-    void * upper_layer_event_handler;
-} pal_raspberry_t;
+    /// Pointer to I2C master platform specific context
+    (void*)&linux_events,
+    /// Slave address
+    0x30,
+    /// Upper layer context
+    NULL,
+    /// Callback event handler
+    NULL
+};
 
+static struct pal_linux_gpio pin_reset = {GPIO_PIN_RESET, -1};
+static struct pal_linux_gpio pin_vdd = {GPIO_PIN_VDD, -1};
 
-typedef void*(*thread_start_routine_t)(void*);
- 
-typedef struct thread_attr
+/**
+* \brief PAL vdd pin configuration for OPTIGA. 
+ */
+pal_gpio_t optiga_vdd_0 =
 {
-	pthread_t thread;
-	void* (*thread_function)(void*);
-}thread_attr_t;
+    // Platform specific GPIO context for the pin used to toggle Vdd.
+    (void*)&pin_vdd
+};
 
-#endif
+/**
+ * \brief PAL reset pin configuration for OPTIGA.
+ */
+pal_gpio_t optiga_reset_0 =
+{
+    // Platform specific GPIO context for the pin used to toggle Reset.
+    (void*)&pin_reset
+};
+
+/**
+* @}
+*/
+
