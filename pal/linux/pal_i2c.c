@@ -50,7 +50,7 @@
 #endif
 
 /// I2C device
-extern char * i2c_if;
+char * i2c_if = "/dev/i2c-1";
 
 // Slave address not initialization
 #define IFXI2C_SLAVE_ADDRESS_INIT 0xFFFF
@@ -93,14 +93,14 @@ static void pal_i2c_release(const void* p_i2c_context)
 
 void invoke_upper_layer_callback (const pal_i2c_t * p_pal_i2c_ctx, optiga_lib_status_t event)
 {
-    app_event_handler_t  upper_layer_handler;
-    //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t  type"
-    upper_layer_handler = (app_event_handler_t )p_pal_i2c_ctx->upper_layer_event_handler;
+    upper_layer_callback_t  upper_layer_handler;
+    //lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t  type"
+    upper_layer_handler = (upper_layer_callback_t )p_pal_i2c_ctx->upper_layer_event_handler;
 
-    upper_layer_handler(p_pal_i2c_ctx->upper_layer_ctx , event);
+    upper_layer_handler(p_pal_i2c_ctx->p_upper_layer_ctx , event);
 
     //Release I2C Bus
-    pal_i2c_release(p_pal_i2c_ctx->upper_layer_ctx );
+    pal_i2c_release(p_pal_i2c_ctx->p_upper_layer_ctx );
 }
 
 /// @cond hidden
@@ -194,8 +194,8 @@ pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t l
 
 	pal_linux = (pal_linux_t*) p_i2c_context->p_i2c_hw_config;
 	LOG_HAL("[IFX-HAL]: I2C TX (%d): ", length);
-#if 0
-    for (i = 0; i < length; i++)
+#if 1
+    for (int i = 0; i < length; i++)
     {
         LOG_HAL("%02X ", p_data[i]);
     }
@@ -212,9 +212,9 @@ pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t l
         {
             //If I2C Master fails to invoke the write operation, invoke upper layer event handler with error.
 
-            //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t  type"
-            ((app_event_handler_t )(p_i2c_context->upper_layer_event_handler))
-                                                       (p_i2c_context->upper_layer_ctx  , PAL_I2C_EVENT_ERROR);
+            //lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t  type"
+            ((upper_layer_callback_t )(p_i2c_context->upper_layer_event_handler))
+                                                       (p_i2c_context->p_upper_layer_ctx  , PAL_I2C_EVENT_ERROR);
             
             //Release I2C Bus
             pal_i2c_release((void *)p_i2c_context);
@@ -229,9 +229,9 @@ pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t l
     else
     {
         status = PAL_STATUS_I2C_BUSY;
-        //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t  type"
-        ((app_event_handler_t )(p_i2c_context->upper_layer_event_handler))
-                                                        (p_i2c_context->upper_layer_ctx  , PAL_I2C_EVENT_BUSY);
+        //lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t  type"
+        ((upper_layer_callback_t )(p_i2c_context->upper_layer_event_handler))
+                                                        (p_i2c_context->p_upper_layer_ctx  , PAL_I2C_EVENT_BUSY);
     }
 
     return status;
@@ -242,7 +242,7 @@ pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t 
 {
     int32_t i2c_read_status = PAL_STATUS_FAILURE;
 	pal_linux_t *pal_linux;
-    LOG_HAL("[IFX-HAL]: I2C RX (%d)\n", length);
+    
 
 	pal_linux = (pal_linux_t*) p_i2c_context->p_i2c_hw_config;
     //Acquire the I2C bus before read/write
@@ -253,15 +253,23 @@ pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t 
 		if (0 > i2c_read_status)
 		{
     		LOG_HAL("[IFX-HAL]: libusb_interrupt_transfer ERROR %d\n.", i2c_read_status);
-            //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t  type"
-            ((app_event_handler_t )(p_i2c_context->upper_layer_event_handler))
-                                                       (p_i2c_context->upper_layer_ctx  , PAL_I2C_EVENT_ERROR);
+            //lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t  type"
+            ((upper_layer_callback_t )(p_i2c_context->upper_layer_event_handler))
+                                                       (p_i2c_context->p_upper_layer_ctx  , PAL_I2C_EVENT_ERROR);
 													   			//Release I2C Bus
 			pal_i2c_release((void *)p_i2c_context);
     		return i2c_read_status;
 		}
 		else
         {
+			LOG_HAL("[IFX-HAL]: I2C RX (%d)\n", length);
+#if 1
+			for (int i = 0; i < length; i++)
+			{
+				LOG_HAL("%02X ", p_data[i]);
+			}
+#endif
+			
 			i2c_master_end_of_receive_callback();
 			i2c_read_status = PAL_STATUS_SUCCESS;
 			//reception_started = true;
@@ -270,9 +278,9 @@ pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t 
     else
     {
         i2c_read_status = PAL_STATUS_I2C_BUSY;
-        //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t  type"
-        ((app_event_handler_t )(p_i2c_context->upper_layer_event_handler))
-                                                        (p_i2c_context->upper_layer_ctx  , PAL_I2C_EVENT_BUSY);
+        //lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t  type"
+        ((upper_layer_callback_t )(p_i2c_context->upper_layer_event_handler))
+                                                        (p_i2c_context->p_upper_layer_ctx  , PAL_I2C_EVENT_BUSY);
     }
     return i2c_read_status;
 }
@@ -303,8 +311,8 @@ pal_status_t pal_i2c_set_bitrate(const pal_i2c_t* p_i2c_context , uint16_t bitra
     }
     if (0 != p_i2c_context->upper_layer_event_handler)
     {
-        //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t  type"
-        ((app_event_handler_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->upper_layer_ctx  , event);
+        //lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t  type"
+        ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx  , event);
     }
     //Release I2C Bus
     pal_i2c_release((void *)p_i2c_context);

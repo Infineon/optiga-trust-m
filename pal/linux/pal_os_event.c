@@ -39,11 +39,10 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <signal.h>
+#include <errno.h>
 #include <time.h>
 #include "optiga/pal/pal_os_timer.h"
 #include "optiga/pal/pal_os_event.h"
-
-#include "pal_raspberry.h"
 
 //#define TRUSTM_PAL_EVENT_DEBUG = 1
 
@@ -111,7 +110,6 @@ pal_os_event_t * pal_os_event_create(register_callback callback, void * callback
     if(( NULL != callback )&&( NULL != callback_args ))
     {
         /* Establishing handler for signal */
-        
         sa.sa_flags = SA_SIGINFO;
         sa.sa_sigaction = handler;
         sigemptyset(&sa.sa_mask);
@@ -128,7 +126,7 @@ pal_os_event_t * pal_os_event_create(register_callback callback, void * callback
         sev.sigev_value.sival_ptr = &timerid;
         if (timer_create(CLOCKID, &sev, &timerid) == -1)
         {
-            printf("timer_create\n");
+            printf("error in timer_create\n");
             exit(1);
         }
 
@@ -154,7 +152,7 @@ void pal_os_event_trigger_registered_callback(void)
     
     if (timer_settime(timerid, 0, &its, NULL) == -1)
     {
-        printf("Error in timer_settime\n");
+        fprintf(stderr, "Error in timer_settime\n");
         exit(1);
     }
 
@@ -176,6 +174,7 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
 {
     struct itimerspec its;
     long long freq_nanosecs;
+    int ret = 0;
     //sigset_t mask;
 
     TRUSTM_PAL_EVENT_DBGFN(">");
@@ -185,16 +184,24 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
     p_pal_os_event->callback_ctx = callback_args;
     
     /* Start the timer */
-
     freq_nanosecs = time_us * 1000;
-    its.it_value.tv_sec = freq_nanosecs / 1000000000;
-    its.it_value.tv_nsec = freq_nanosecs % 1000000000;
-    its.it_interval.tv_sec = its.it_value.tv_sec;
-    its.it_interval.tv_nsec = its.it_value.tv_nsec;
+    its.it_value.tv_sec = (freq_nanosecs / 1000000000);
+    its.it_value.tv_nsec = (freq_nanosecs % 1000000000);
+    its.it_interval.tv_sec = 0;
+    its.it_interval.tv_nsec = 0;
     
-    if (timer_settime(timerid, 0, &its, NULL) == -1)
+    if (( ret = timer_settime(timerid, 0, &its, NULL)) == -1)    
     {
-        printf("timer_settime\n");
+        int errsv = errno;
+        fprintf(stderr,"timer_settime FAILED!!!\n");
+        if(errsv == EINVAL)
+        {
+            fprintf(stderr,"INVALID VALUE!\n");
+        }
+        else
+        {
+            fprintf(stderr,"UNKOWN ERROR: %d\n",errsv);
+        }
         exit(1);
     }
     
@@ -205,10 +212,15 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
 void pal_os_event_destroy(pal_os_event_t * pal_os_event)
 {
     TRUSTM_PAL_EVENT_DBGFN(">"); 
-    timer_delete(timerid);
+    pal_os_event_stop(pal_os_event);
+    if (timerid != 0)
+    {
+        timer_delete(timerid);
+    }
     TRUSTM_PAL_EVENT_DBGFN("<"); 
 }
 
 /**
 * @}
 */
+

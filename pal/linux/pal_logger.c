@@ -36,11 +36,17 @@
 */
 
 #include "optiga/pal/pal_logger.h"
-#include "optiga/pal/pal_uart.h"
 
 ///
 
-pal_status_t pal_logger_write(const uint8_t * p_log_data, uint32_t log_data_length)
+pal_logger_t logger_console =
+{
+        .logger_config_ptr = NULL,
+        .logger_rx_flag = 0,
+        .logger_tx_flag = 1
+};
+
+pal_status_t pal_logger_write(void * p_logger_context, const uint8_t * p_log_data, uint32_t log_data_length)
 {
     int i;
 

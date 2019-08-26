@@ -36,7 +36,7 @@
 */
 
 #include "optiga/pal/pal_crypt.h"
-#include "optiga/pal/pal_memory_mgmt.h"
+#include "optiga/pal/pal_os_memory.h"
 
 #include <openssl/evp.h>
 #include <openssl/sha.h>
