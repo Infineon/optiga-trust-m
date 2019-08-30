@@ -23,10 +23,10 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
 * Turnkey solution
 * Up to 10kB user memory
 * PG-USON-10-2 package (3 x 3 mm)
-* Temperature range (−25°C to +105°C)
+* Temperature range (−40°C to +105°C)
 * I2C interface with Shielded Connection (encrypted communication)
 * Cryptographic support: **ECC NIST P256/P384**, **SHA-256**, **TRNG**, **DRNG**, **RSA® 1024/2048**
-* OPTIGA™ Trust M1 Software Framework on Github
+* OPTIGA™ Trust M Software Framework on Github
 * Crypto ToolBox commands with **ECC NIST P256/P384**, **SHA-256** (sign, verify, key generation, ECDH(E), key
 derivation), **RSA® 1024/2048** (sign, verify, key generation, encrypt and decrypt)
 * Device Security Monitor
