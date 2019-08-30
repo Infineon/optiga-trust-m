@@ -10,7 +10,7 @@
 
 ### <a name="description"></a>Description
 
-<img src="https://github.com/Infineon/Assets/blob/master/Pictures/OPTIGA-Trust-X.png">
+<img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_uson10.png" width="300" >
 
 This repository contains a target-agnostic Software Framework for the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) security chip. It is a base for other application notes.
 
