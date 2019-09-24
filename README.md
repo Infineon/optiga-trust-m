@@ -35,10 +35,21 @@ derivation), **RSA® 1024/2048** (sign, verify, key generation, encrypt and decr
 
 ## Get Started
 
-  * [Software Framework overview](#software_framework_oveview)
-  * [Evaluation and developement kits](#evaluation_development_kits)
-  * [Examples](#examples)
-  * [Documentation](#documentation)
+<img src="https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M_Eval_Kit%2002.jpg" width="600">
+
+The [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/) is a starting point for a lot of application notes mentioned below.
+
+### <a name="examples"></a>Examples
+
+1. [Get started guide](https://github.com/Infineon/getstarted-optiga-trust-m)
+1. Off-Chip TLS example (mbedTLS) (link is pending)
+1. AWS FreeRTOS example (link is pending)
+1. Secure Firmware Update and Secure Boot (link is pending)
+1. Arduino library (link is pending)
+1. [Personalize OPTIGA™ Trust](https://github.com/Infineon/personalize-optiga-trust)
+1. [OpenSSL Engine and Command Line Interface](https://github.com/Infineon/cli-optiga-trust-m)
+1. [Python package](https://github.com/Infineon/python-optiga-trust)
+1. [I2C Utilities](https://github.com/Infineon/i2c-utils-optiga-trust)
 
 ### <a name="software_framework_oveview"></a>Software Framework overview
 
@@ -55,18 +66,6 @@ For more information please refer to the [Wiki page](https://github.com/Infineon
 ### <a name="evaluation_development_kits"></a>Evaluation and developement kits
 * [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/)
 * [OPTIGA™ Trust M Shield2Go](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/)
-
-## <a name="examples"></a>Examples
-
-1. [Get started guide](https://github.com/Infineon/getstarted-optiga-trust-m)
-1. Off-Chip TLS example (mbedTLS) (link is pending)
-1. AWS FreeRTOS example (link is pending)
-1. Secure Firmware Update and Secure Boot (link is pending)
-1. Arduino library (link is pending)
-1. [Personalize OPTIGA™ Trust](https://github.com/Infineon/personalize-optiga-trust)
-1. [OpenSSL Engine and Command Line Interface](https://github.com/Infineon/cli-optiga-trust-m)
-1. [Python package](https://github.com/Infineon/python-optiga-trust)
-1. [I2C Utilities](https://github.com/Infineon/i2c-utils-optiga-trust)
 
 ## <a name="documentation"></a>Documentation
 
