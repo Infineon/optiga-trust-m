@@ -31,6 +31,10 @@
 * @{
 */
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "timers.h"
+
 #include "optiga/optiga_crypt.h"
 #include "optiga/optiga_util.h"
 #include "optiga/common/optiga_lib_common.h"
@@ -245,7 +249,7 @@ optiga_lib_status_t read_chip_cert(uint16_t cert_oid,
 	uint8_t tmp_cert[LENGTH_OPTIGA_CERT];
 	uint8_t* p_tmp_cert_pointer = tmp_cert;
 
-	printf((">read_chip_cert()\r\n"));
+	configPRINTF((">read_chip_cert()\r\n"));
 
 	memset(tmp_cert, 0, LENGTH_OPTIGA_CERT);
 	do
@@ -263,7 +267,7 @@ optiga_lib_status_t read_chip_cert(uint16_t cert_oid,
 		status = optiga_util_read_data((optiga_util_t *)util_handler, cert_oid, 0, p_tmp_cert_pointer, p_cert_size);
 		if(OPTIGA_LIB_SUCCESS != status)
 		{
-			printf("Error: optiga_util_read_data error status=0x%x\r\n", (unsigned int) status);
+			configPRINTF(("Error: optiga_util_read_data error status=0x%x\r\n", status));
 			break;
 		}
 
@@ -310,27 +314,33 @@ optiga_lib_status_t read_chip_cert(uint16_t cert_oid,
 
 
 #if (PRINT_DEVICE_CERT ==1)
-        for(int i=0; i<(*p_cert_size);)
+		int i=0;
+        for(i=0; i<(*p_cert_size);)
         {
+        	if((*p_cert_size)-i < 16)
+        	{
+        		break;
+        	}
         	printf("%.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X\r\n",
-        	        			p_tmp_cert_pointer[i], p_tmp_cert_pointer[i+1],p_tmp_cert_pointer[i+2],p_tmp_cert_pointer[i+3],
-        	        			p_tmp_cert_pointer[i+4], p_tmp_cert_pointer[i+5],p_tmp_cert_pointer[i+6],p_tmp_cert_pointer[i+7],
-        	        			p_tmp_cert_pointer[i+8], p_tmp_cert_pointer[i+9],p_tmp_cert_pointer[i+10],p_tmp_cert_pointer[i+11],
-        	        			p_tmp_cert_pointer[i+12], p_tmp_cert_pointer[i+13],p_tmp_cert_pointer[i+14],p_tmp_cert_pointer[i+15]);
-
+        	     			p_tmp_cert_pointer[i+0], p_tmp_cert_pointer[i+1],p_tmp_cert_pointer[i+2],p_tmp_cert_pointer[i+3],
+        	       			p_tmp_cert_pointer[i+4], p_tmp_cert_pointer[i+5],p_tmp_cert_pointer[i+6],p_tmp_cert_pointer[i+7],
+        	       			p_tmp_cert_pointer[i+8], p_tmp_cert_pointer[i+9],p_tmp_cert_pointer[i+10],p_tmp_cert_pointer[i+11],
+        	       			p_tmp_cert_pointer[i+12], p_tmp_cert_pointer[i+13],p_tmp_cert_pointer[i+14],p_tmp_cert_pointer[i+15]);
         	i+=16;
-        	if((*p_cert_size)-i<16)
-			{
-				int x=(*p_cert_size)-i;
-				while(x)
-				{
-					printf("%.2x ",p_tmp_cert_pointer[i]);
-					i++;
-					x--;
-				}
-				printf(("\r\n"));
-			}
         }
+
+        //FreeRTOS cannot print properly without newline.
+        if((*p_cert_size)-i !=0)
+		{
+			int remainder=(*p_cert_size)-i;
+			while(remainder!=0)
+			{
+				printf("%.2X\r\n",p_tmp_cert_pointer[i]);
+				i++;
+				remainder--;
+			}
+			configPRINTF(("\r\n"));
+		}
 #endif
 	return status;
 }
@@ -356,21 +366,21 @@ static optiga_lib_status_t Send_Challenge_Get_Response(uint8_t* p_pubkey, uint16
     uint16_t signature_size = LENGTH_SIGNATURE;
     uint8_t digest[LENGTH_SHA256];
 
-    printf(">Send_Challenge_Get_Response()\r\n");
+    configPRINTF((">Send_Challenge_Get_Response()\r\n"));
     do
     {
 
-    	printf("Seed the Challenge (len=%d)\r\n",LENGTH_CHALLENGE);
+    	configPRINTF(("Seed the Challenge (len=%d)\r\n",LENGTH_CHALLENGE));
         status = pal_crypt_random(LENGTH_CHALLENGE, random);
         if(OPTIGA_LIB_SUCCESS != status)
         {
-        	printf(("Error: Random number failed\r\n"));
+        	configPRINTF(("Error: Random number failed\r\n"));
             break;
         }
 #if (PRINT_RANDOM_CHALLENGE==1)
         for(int i=0; i<LENGTH_CHALLENGE;)
         {
-        	printf(("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x \r\n",
+        	configPRINTF(("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x \r\n",
         			random[i],random[i+1],random[i+2],random[i+3],
         			random[i+4],random[i+5],random[i+6],random[i+7] ));
         	i+=8;
@@ -379,39 +389,39 @@ static optiga_lib_status_t Send_Challenge_Get_Response(uint8_t* p_pubkey, uint16
 				int x=LENGTH_CHALLENGE-i;
 				while(x)
 				{
-					printf(("%.2x ",random[i]));
+					configPRINTF(("%.2x ",random[i]));
 					i++;
 					x--;
 				}
-				printf(("\r\n"));
+				configPRINTF(("\r\n"));
 			}
         }
 #endif
 
 #if (USE_RANDOM_CHALLENGE==1)
-        printf("Hash the Challenge (len=%d)\r\n",LENGTH_CHALLENGE);
+        configPRINTF(("Hash the Challenge (len=%d)\r\n",LENGTH_CHALLENGE));
         status = pal_crypt_generate_sha256(random, LENGTH_CHALLENGE, digest);
         if(OPTIGA_LIB_SUCCESS != status)
         {
-        	printf(("Error: SHA256 failed\r\n"));
+        	configPRINTF(("Error: SHA256 failed\r\n"));
         	status = (int32_t)CRYPTO_LIB_VERIFY_SIGN_FAIL;
             break;
         }
-        printf("Hash value (len=%d)\r\n",LENGTH_SHA256);
+        configPRINTF(("Hash value (len=%d)\r\n",LENGTH_SHA256));
 #if (PRINT_SHA==1)
         for(int i=0; i<LENGTH_SHA256;)
         {
-        	printf(("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x \r\n", digest[i],digest[i+1],digest[i+2],digest[i+3],
+        	configPRINTF(("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x \r\n", digest[i],digest[i+1],digest[i+2],digest[i+3],
         			                                               digest[i+4],digest[i+5],digest[i+6],digest[i+7] ));
         	i+=8;
         }
 #endif
-        printf(("Sign hash using Private Key\r\n"));
+        configPRINTF(("Sign hash using Private Key\r\n"));
 #else//Fixed Challenge
         memset(digest, 0x0, LENGTH_SHA256);
         for(int i=0; i<LENGTH_SHA256;)
         {
-        	printf(("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x \r\n", digest[i],digest[i+1],digest[i+2],digest[i+3],
+        	configPRINTF(("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x \r\n", digest[i],digest[i+1],digest[i+2],digest[i+3],
         			                                               digest[i+4],digest[i+5],digest[i+6],digest[i+7] ));
         	i+=8;
         }
@@ -425,7 +435,7 @@ static optiga_lib_status_t Send_Challenge_Get_Response(uint8_t* p_pubkey, uint16
 										 signature, &signature_size);
         if (OPTIGA_LIB_SUCCESS != status)
         {
-        	printf("Error: Queue sign cmd failed. status=0x%x\r\n",(unsigned int)status);
+        	configPRINTF(("Error: Queue sign cmd failed. status=0x%x\r\n",status));
             break;
         }
 
@@ -436,16 +446,16 @@ static optiga_lib_status_t Send_Challenge_Get_Response(uint8_t* p_pubkey, uint16
 
         if (OPTIGA_LIB_SUCCESS != optiga_lib_crypt_status)
         {
-        	printf("Error: Signature failed. status=0x%x\r\n",optiga_lib_crypt_status);
+        	configPRINTF(("Error: Signature failed. status=0x%x\r\n",optiga_lib_crypt_status));
         	status=OPTIGA_CRYPT_ERROR;
             break;
         }
 
-        printf("Signature as Response (len=%d)\r\n", signature_size );
+        configPRINTF(("Signature as Response (len=%d)\r\n", signature_size ));
 #if (PRINT_SIGNATURE==1)
         for(int i=0; i<signature_size;)
         {
-        	printf(("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x \r\n", signature[i],signature[i+1],signature[i+2],signature[i+3],
+        	configPRINTF(("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x \r\n", signature[i],signature[i+1],signature[i+2],signature[i+3],
         			                                               signature[i+4],signature[i+5],signature[i+6],signature[i+7] ));
         	i+=8;
         	if(signature_size-i<8)
@@ -453,20 +463,20 @@ static optiga_lib_status_t Send_Challenge_Get_Response(uint8_t* p_pubkey, uint16
 				int x=signature_size-i;
 				while(x)
 				{
-					printf(("%.2x ",signature[i]));
+					configPRINTF(("%.2x ",signature[i]));
 					i++;
 					x--;
 				}
-				printf(("\r\n"));
+				configPRINTF(("\r\n"));
 			}
         }
 #endif
 
-        printf("Public Key (len=%d)\r\n", pubkey_size);
+        configPRINTF(("Public Key (len=%d)\r\n", pubkey_size));
 #if (PRINT_PUBLICKEY==1)
         for(int i=0; i<pubkey_size;)
         {
-        	printf(("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x \r\n", p_pubkey[i],p_pubkey[i+1],p_pubkey[i+2],p_pubkey[i+3],
+        	configPRINTF(("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x \r\n", p_pubkey[i],p_pubkey[i+1],p_pubkey[i+2],p_pubkey[i+3],
         			                                               p_pubkey[i+4],p_pubkey[i+5],p_pubkey[i+6],p_pubkey[i+7] ));
         	i+=8;
         	if(pubkey_size-i<8)
@@ -474,15 +484,15 @@ static optiga_lib_status_t Send_Challenge_Get_Response(uint8_t* p_pubkey, uint16
 				int x=pubkey_size-i;
 				while(x)
 				{
-					printf(("%.2x ",p_pubkey[i]));
+					configPRINTF(("%.2x ",p_pubkey[i]));
 					i++;
 					x--;
 				}
-				printf(("\r\n"));
+				configPRINTF(("\r\n"));
 			}
         }
 #endif
-        printf(("Verify Signature using Public Key\r\n"));
+        configPRINTF(("Verify Signature using Public Key\r\n"));
 
 		//Verify the signature on the random number by Security Chip
 		status = pal_crypt_verify_signature(p_pubkey, pubkey_size,
@@ -490,16 +500,16 @@ static optiga_lib_status_t Send_Challenge_Get_Response(uint8_t* p_pubkey, uint16
 											digest, LENGTH_SHA256);
 		if(OPTIGA_LIB_SUCCESS != status)
 		{
-			printf(("Result: Authentication failed\r\n"));
+			configPRINTF(("Result: Authentication failed\r\n"));
 			status=OPTIGA_CRYPT_ERROR;
 			break;
 		}
 
-		printf(("Result: Authentication Ok\r\n"));
+		configPRINTF(("Result: Authentication Ok\r\n"));
 		status = OPTIGA_LIB_SUCCESS;
 	} while (FALSE);
 
-    printf(("<Send_Challenge_Get_Response()\r\n"));
+    configPRINTF(("<Send_Challenge_Get_Response()\r\n"));
 
     return status;
 }
@@ -521,13 +531,13 @@ optiga_lib_status_t example_authenticate_chip(void)
 	uint16_t chip_privkey_oid = 0xE0F0;
 
 
-	printf((">example_authenticate_chip()\r\n"));
+	configPRINTF((">example_authenticate_chip()\r\n"));
     do
     {
     	me_crypt = optiga_crypt_create(0, optiga_crypt_callback, NULL);
     	if (NULL == me_crypt)
     	{
-    		printf(("Error: Failed to create crypto instance\r\n"));
+    		configPRINTF(("Error: Failed to create crypto instance\r\n"));
     		break;
     	}
 
@@ -536,17 +546,17 @@ optiga_lib_status_t example_authenticate_chip(void)
 
 		if(OPTIGA_LIB_SUCCESS != status)
 		{
-			printf("Error: Crypto init failed (status=0x%x).\r\n", status);
+			configPRINTF(("Error: Crypto init failed (status=0x%x).\r\n", status));
 			break;
 		}
 
-		printf("Read default cert and verify it\r\n");
+		configPRINTF(("Read default cert and verify it\r\n"));
 
 		// Read security chip certificate
     	status = read_chip_cert(chip_cert_oid, chip_cert, &chip_cert_size);
 		if(OPTIGA_LIB_SUCCESS != status)
 		{
-			printf("Error: read chip cert failed (status=0x%x).\r\n", status);
+			configPRINTF(("Error: read chip cert failed (status=0x%x).\r\n", status));
 			break;
 		}
 
@@ -554,29 +564,29 @@ optiga_lib_status_t example_authenticate_chip(void)
 		status = pal_crypt_verify_certificate(optiga_ca_certificate, sizeof(optiga_ca_certificate), chip_cert, chip_cert_size);
 		if(CRYPTO_LIB_OK != status)
 		{
-			printf("Error: verify cert failed. (status=0x%x)\r\n", status);
+			configPRINTF(("Error: verify cert failed. (status=0x%x)\r\n", status));
 			break;
 		}
 
-		printf("Extract Public key from cert.\r\n");
+		configPRINTF(("Extract Public key from cert.\r\n"));
 
 		// Extract Public Key from the certificate
 		status = pal_crypt_get_public_key(chip_cert, chip_cert_size, chip_pubkey, &chip_pubkey_size);
 		if(CRYPTO_LIB_OK != status)
 		{
-			printf("Error: extract public key failed. (status=0x%x)\r\n", status);
+			configPRINTF(("Error: extract public key failed. (status=0x%x)\r\n", status));
 			break;
 		}
 
-		printf(("Generate a Challenge using Private key and verify Response using Public Key.\r\n"));
+		configPRINTF(("Generate a Challenge using Private key and verify Response using Public Key.\r\n"));
     	status = Send_Challenge_Get_Response(chip_pubkey, chip_pubkey_size, chip_privkey_oid);
 		if(OPTIGA_LIB_SUCCESS != status)
 		{
-			printf("Result: One-way Auth failed. (status=0x%x)\r\n", status);
+			configPRINTF(("Result: One-way Auth failed. (status=0x%x)\r\n", status));
 			break;
 		}
 
-		printf(("Result: One-way Auth Ok.\r\n"));
+		configPRINTF(("Result: One-way Auth Ok.\r\n"));
 
     } while(FALSE);
 
@@ -584,7 +594,7 @@ optiga_lib_status_t example_authenticate_chip(void)
     if (me_crypt != NULL)
     		optiga_crypt_destroy(me_crypt);
 
-    printf(("<example_authenticate_chip()\r\n"));
+    configPRINTF(("<example_authenticate_chip()\r\n"));
 
     return status;
 }
