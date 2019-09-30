@@ -93,6 +93,10 @@ Other downloadable PDF documents can be found below:
 3. [OPTIGA™ Trust M rev.1 Keys and Certificates v1.50](documents/OPTIGA_Trust_M_V1_Keys_And_Certificates_v1.50.pdf) (PDF)
 4. [Infineon I2C protocol specification v2.02](documents/Infineon_I2C_Protocol_v2.02.pdf) (PDF)
 
+### Board assembly recommendations
+
+If you are planning to integrate OPTIGA™ Trust M in your PCB design have a look at the recommendations found [here](https://www.infineon.com/dgdl/Infineon-Board+Assembly+Recommendations-Discrete+Leadless-Package-v06_00-EN.pdf?fileId=5546d4626cb27db2016cbda27a9c544d).
+
 
 ## <a name="contributing"></a>Contributing
 
