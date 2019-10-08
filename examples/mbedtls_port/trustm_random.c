@@ -63,7 +63,7 @@ int mbedtls_hardware_poll( void *data,
     optiga_crypt_t * me = NULL;
     optiga_lib_status_t command_queue_status = OPTIGA_CRYPT_ERROR;
 
-    if (len <= *olen)
+    if (olen != NULL)
     {
   	    me = optiga_crypt_create(0, optiga_crypt_event_completed, NULL);
         if (NULL == me)

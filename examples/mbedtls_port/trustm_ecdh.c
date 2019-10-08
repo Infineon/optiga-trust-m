@@ -41,7 +41,7 @@
 #define PRINT_ECDH_PUBLICKEY   0
 
 // We use here Session Context ID 0xE104 (you can choose between 0xE100 - E104)
-#define OPTIGA_TRUSTM_KEYID_TO_STORE_SHARED_SECRET  0xE104
+#define OPTIGA_TRUSTM_KEYID_TO_STORE_SHARED_SECRET  0xE103
 
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously

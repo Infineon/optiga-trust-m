@@ -168,7 +168,7 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
 #if (PRINT_SIGNATURE==1)
 	for(int x=0; x<sizeof(signature);)
 	{
-		printf(("%.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X \r\n",
+		printf(("%.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X \n\r",
 				signature[x],signature[x+1],signature[x+2],signature[x+3],
 				signature[x+4],signature[x+5],signature[x+6],signature[x+7]));
 		x+=8;
