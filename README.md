@@ -47,7 +47,7 @@ The [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/e
 1. Secure Firmware Update and Secure Boot (link is pending)
 1. Arduino library (link is pending)
 1. [Personalize OPTIGA™ Trust](https://github.com/Infineon/personalize-optiga-trust)
-1. [OpenSSL Engine and Command Line Interface](https://github.com/Infineon/cli-optiga-trust-m)
+1. [OpenSSL Engine and Command Line Interface (for RPi3)](https://github.com/Infineon/cli-optiga-trust-m)
 1. [Python package](https://github.com/Infineon/python-optiga-trust)
 1. [I2C Utilities](https://github.com/Infineon/i2c-utils-optiga-trust)
 
