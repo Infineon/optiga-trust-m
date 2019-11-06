@@ -14,6 +14,9 @@ Start the `protected_update_data_generator.exe` with following options, in order
     payload=%%s                 <default: NULL>
                                 <note : Provide file with path with readable content>
 ```
+
+To parse the resulting data on the host side (MCU) you can refer to [this repository](https://github.com/Infineon/optiga-manifest-parser)
+
 ## Example :											
 
 ```console
