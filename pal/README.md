@@ -199,3 +199,194 @@ There are three functions required to be implemented by the Crypto PAL, these ar
 
     </details>
     
+    
+A simple test suite can look like following
+
+<details><summary> Simple Test suite </summary>
+
+```c
+    
+static int32_t testTLSPRF256(void)
+{
+    int32_t ret = 1;
+    static uint8_t example_secret[] = {
+        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+        0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+        0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+        0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
+    };
+
+    static uint8_t example_label[] = {
+        0x42, 0x61, 0x62, 0x79, 0x6c, 0x6f, 0x6e, 0x20,
+        0x50, 0x52, 0x46, 0x20, 0x41, 0x70, 0x70, 0x4e,
+        0x6f, 0x74, 0x65
+    };
+
+    static uint8_t example_seed[] = {
+        0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
+        0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+        0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+        0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f
+    };
+
+    static uint8_t example_result[] = {
+        0xbf, 0x88, 0xeb, 0xde, 0xfa, 0x78, 0x46, 0xa1,
+        0x10, 0x55, 0x91, 0x88, 0xd4, 0x22, 0xf3, 0xf7,
+        0xfa, 0xfe, 0xf4, 0xa5, 0x49, 0xbd, 0xaa, 0xce,
+        0x37, 0x39, 0xc9, 0x44, 0x65, 0x7f, 0x2d, 0xd9,
+        0xbc, 0x30, 0x83, 0x14, 0x47, 0xd0, 0xed, 0x1c,
+        0x89, 0xf6, 0x58, 0x23, 0xb2, 0xec, 0xe0, 0x52,
+        0xf3, 0xb7, 0x95, 0xed, 0xe8, 0x6c, 0xad, 0x59,
+        0xca, 0x47, 0x3b, 0x3a, 0x78, 0x98, 0x63, 0x69,
+        0x44, 0x65, 0x62, 0xc9, 0xa4, 0x0d, 0x6a, 0xac,
+        0x59, 0xa2, 0x04, 0xfa, 0x0e, 0x44, 0xb7, 0xd7
+    };
+    uint8_t p_derived_key[sizeof(example_result)];
+    memset(p_derived_key, 0x00, sizeof(example_result));
+
+    do 
+    {
+        pal_crypt_tls_prf_sha256(NULL,
+                                 example_secret,
+                                 sizeof(example_secret),
+                                 example_label,
+                                 sizeof(example_label),
+                                 example_seed,
+                                 sizeof(example_seed),
+                                 p_derived_key,
+                                 sizeof(example_result));
+                                 
+        if (memcmp(p_derived_key, example_result, sizeof(example_result)) != 0)
+        {
+            output_result("Derived Key: ", p_derived_key, sizeof(p_derived_key));
+            output_result("Expected Key: ", example_result, sizeof(example_result));
+        }
+        
+        ret = 0;
+    }while(0);
+    
+    return ret;
+}
+
+#define NB_TESTS 3
+#define CCM_SELFTEST_PT_MAX_LEN 24
+#define CCM_SELFTEST_CT_MAX_LEN 32
+/*
+ * The data is the same for all tests, only the used length changes
+ */
+static const uint8_t key[] = {
+    0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
+    0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f
+};
+
+static const uint8_t iv[] = {
+    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+    0x18, 0x19, 0x1a, 0x1b
+};
+
+static const uint8_t ad[] = {
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+    0x10, 0x11, 0x12, 0x13
+};
+
+static uint8_t msg[CCM_SELFTEST_PT_MAX_LEN] = {
+    0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
+    0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+    0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+};
+
+static const size_t iv_len [NB_TESTS] = { 7, 8,  12 };
+static const size_t add_len[NB_TESTS] = { 8, 16, 20 };
+static const size_t msg_len[NB_TESTS] = { 4, 16, 24 };
+static const size_t tag_len[NB_TESTS] = { 4, 6,  8  };
+
+static  uint8_t res[NB_TESTS][CCM_SELFTEST_CT_MAX_LEN] = {
+    {   0x71, 0x62, 0x01, 0x5b, 0x4d, 0xac, 0x25, 0x5d },
+    {   0xd2, 0xa1, 0xf0, 0xe0, 0x51, 0xea, 0x5f, 0x62,
+        0x08, 0x1a, 0x77, 0x92, 0x07, 0x3d, 0x59, 0x3d,
+        0x1f, 0xc6, 0x4f, 0xbf, 0xac, 0xcd },
+    {   0xe3, 0xb2, 0x01, 0xa9, 0xf5, 0xb7, 0x1a, 0x7a,
+        0x9b, 0x1c, 0xea, 0xec, 0xcd, 0x97, 0xe7, 0x0b,
+        0x61, 0x76, 0xaa, 0xd9, 0xa4, 0x42, 0x8a, 0xa5,
+        0x48, 0x43, 0x92, 0xfb, 0xc1, 0xb0, 0x99, 0x51 }
+};
+
+
+static int32_t testAES128CCMEncrypt(void)
+{
+    int32_t ret = 1;
+    uint8_t plaintext[CCM_SELFTEST_PT_MAX_LEN];
+    uint8_t ciphertext[CCM_SELFTEST_CT_MAX_LEN];
+
+    do 
+    {
+        for( int i = 0; i < NB_TESTS; i++ )
+        {
+            memset( plaintext, 0, CCM_SELFTEST_PT_MAX_LEN );
+            memset( ciphertext, 0, CCM_SELFTEST_CT_MAX_LEN );
+            memcpy( plaintext, msg, msg_len[i] );
+            
+            pal_crypt_encrypt_aes128_ccm(NULL,
+                                         plaintext,
+                                         CCM_SELFTEST_PT_MAX_LEN,
+                                         key,
+                                         iv,
+                                         iv_len[i],
+                                         ad,
+                                         add_len[i],
+                                         tag_len[i],
+                                         ciphertext);
+            if (memcmp(ciphertext, res[i], msg_len[i] + tag_len[i])!= 0)
+            {
+                output_result("Result Cipher: ", ciphertext, msg_len[i] + tag_len[i]);
+                output_result("Expected Cipher: ", res[i], msg_len[i] + tag_len[i]);
+                break;
+            }
+        }
+        
+        ret = 0;
+    }while(0);
+    
+    return ret;
+}
+
+static int32_t testAES128CCMDecrypt(void)
+{
+    int32_t ret = 1;
+    uint8_t plaintext[CCM_SELFTEST_PT_MAX_LEN];
+    uint8_t ciphertext[CCM_SELFTEST_CT_MAX_LEN];
+
+    do 
+    {
+        for( int i = 0; i < NB_TESTS; i++ )
+        {
+            memset( plaintext, 0, CCM_SELFTEST_PT_MAX_LEN );
+            memset( ciphertext, 0, CCM_SELFTEST_CT_MAX_LEN );
+            memcpy( plaintext, msg, msg_len[i] );
+            
+            pal_crypt_decrypt_aes128_ccm( NULL,
+                                      res[i],
+                                      CCM_SELFTEST_PT_MAX_LEN,
+                                      key,
+                                      iv,
+                                      iv_len[i],
+                                      ad,
+                                      add_len[i],
+                                      tag_len[i],
+                                      plaintext);
+            if (memcmp(plaintext, msg, msg_len[i]) != 0)
+            {
+                output_result("Result Plain Text: ", plaintext, msg_len[i]);
+                output_result("Expected Plain Text: ", msg, msg_len[i]);
+                break;
+            }
+        }
+        
+        ret = 0;
+    }while(0);
+    
+    return ret;
+}
+```
+</details>
