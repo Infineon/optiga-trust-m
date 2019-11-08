@@ -260,6 +260,7 @@ static int32_t testTLSPRF256(void)
         {
             output_result("Derived Key: ", p_derived_key, sizeof(p_derived_key));
             output_result("Expected Key: ", example_result, sizeof(example_result));
+            break;
         }
         
         ret = 0;
