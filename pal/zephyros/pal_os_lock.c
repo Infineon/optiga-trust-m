@@ -35,6 +35,7 @@
 * @{
 */
 
+/* OPTIGA includes */
 #include "optiga/pal/pal_os_lock.h"
 
 /* Zephyr OS includes */

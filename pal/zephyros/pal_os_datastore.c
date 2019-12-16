@@ -106,7 +106,6 @@ pal_status_t pal_os_datastore_write(uint16_t datastore_id,
     return return_status;
 }
 
-
 pal_status_t pal_os_datastore_read(uint16_t datastore_id, 
                                    uint8_t * p_buffer, 
                                    uint16_t * p_buffer_length)

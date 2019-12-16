@@ -50,24 +50,28 @@
 /* Inicialize contexts for device I2C and GPIOs header on board */
 pal_zephyr_i2c_t zephyr_i2c_ctx_0 = {
     NULL,
-    I2C_SCL,
-    I2C_SDA,
+    I2C_SCL_PIN,
+    I2C_SDA_PIN,
     I2C_FREQ_KHZ
 };
 
+#ifdef CONFIG_TRUSTM_GPIO_VDD_SUPPORT
 pal_zephyr_gpio_t vdd_zephyr_gpio_ctx_0 = {
     NULL,
-    VDD_PORT_NAME,
-    VDD_PIN,
+    VDD_GPIO_PORT_NAME,
+    VDD_GPIO_PIN,
     0
 };
+#endif
 
+#ifdef CONFIG_TRUSTM_GPIO_RST_SUPPORT
 pal_zephyr_gpio_t rst_zephyr_gpio_ctx_0 = {
     NULL,
-    RST_PORT_NAME,
-    RST_PIN,
+    RST_GPIO_PORT_NAME,
+    RST_GPIO_PIN,
     0
 };
+#endif
 
 /**
  * \brief PAL I2C configuration for OPTIGA. 
@@ -77,7 +81,7 @@ pal_i2c_t optiga_pal_i2c_context_0 =
     /// Pointer to I2C master platform specific context
     (void*)&zephyr_i2c_ctx_0,
     /// Slave address
-    I2C_OPTIGA_ADDRESS,
+    I2C_OPTIGA_ADDR,
     /// Upper layer context
     NULL,
     /// Callback event handler
@@ -89,11 +93,14 @@ pal_i2c_t optiga_pal_i2c_context_0 =
  */
 pal_gpio_t optiga_vdd_0 =
 {
-	// !!!OPTIGA_LIB_PORTING_REQUIRED
     // Platform specific GPIO context for the pin used to toggle Vdd.
 	// You should have vdd_pin define in your system,
 	// alternativly you can put here raw GPIO number, but without the & sign
+#ifdef CONFIG_TRUSTM_GPIO_VDD_SUPPORT
 	(void*)&vdd_zephyr_gpio_ctx_0
+#else
+    (void*)NULL
+#endif
 };
 
 /**
@@ -101,11 +108,14 @@ pal_gpio_t optiga_vdd_0 =
  */
 pal_gpio_t optiga_reset_0 =
 {
-	// !!!OPTIGA_LIB_PORTING_REQUIRED
     // Platform specific GPIO context for the pin used to toggle Reset.
 	// You should have reset_pin define in your system,
 	// alternativly you can put here raw GPIO number, but without the & sign
+#ifdef CONFIG_TRUSTM_GPIO_RST_SUPPORT
     (void*)&rst_zephyr_gpio_ctx_0
+#else
+    (void*)NULL
+#endif
 };
 
 /**

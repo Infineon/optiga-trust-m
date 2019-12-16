@@ -49,7 +49,7 @@
 LOG_MODULE_DECLARE(TRUST_M, CONFIG_LOG_DEFAULT_LEVEL);
 
 /* Binary semaphore for lock/unlocking access to i2c bus, replaces pal_i2c_acquire/release */
-K_SEM_DEFINE(i2c_bus_lock, BUS_ENTRY_INIT_VALUE , BUS_ENTRY_MAX_VALUE);
+K_SEM_DEFINE(i2c_bus_lock, I2C_BUS_ENTRY_INIT_VALUE , I2C_BUS_ENTRY_MAX_VALUE);
 
 /// @cond hidden
 
@@ -57,7 +57,7 @@ _STATIC_H volatile uint32_t g_entry_count = 0;
 _STATIC_H pal_i2c_t * gp_pal_i2c_current_ctx;
 
 //lint --e{715} suppress "This is implemented for overall completion of API"
-_STATIC_H pal_status_t pal_i2c_acquire(const void * p_i2c_context)
+_STATIC_H pal_status_t __attribute__((unused)) pal_i2c_acquire(const void * p_i2c_context)
 {
     if (0 == g_entry_count)
     {
@@ -151,14 +151,14 @@ pal_status_t pal_i2c_write(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t
 		pal_i2c_init(p_i2c_context);
 	}
 
-    //Acquire the I2C bus before read/write
+    // Acquire the I2C bus before accessing
     lock_result = k_sem_take(&i2c_bus_lock, K_NO_WAIT);
 
-    if (lock_result == BUS_ENTRY_SUCCESS)
+    if (lock_result == I2C_BUS_ENTRY_SUCCESS)
     {
         gp_pal_i2c_current_ctx = p_i2c_context;
 
-        //Invoke the low level i2c master driver API to write to the bus
+        // Invoke the low level i2c master driver API to write to the bus
 
         i2c_write_result = i2c_write(p_i2c_ctx->p_i2c_dev, p_data, (u32_t)length, p_i2c_context->slave_address);
         //printk("[PAL]: I2C write status %d\n", i2c_write_result);
@@ -174,29 +174,12 @@ pal_status_t pal_i2c_write(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t
         }
         else
         {
-			// !!!OPTIGA_LIB_PORTING_REQUIRED
-			/**
-			* Infineon I2C Protocol is a polling based protocol, if foo_i2c_write will fail it will be reported to the 
-			* upper layers by calling 
-			* (p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_ERROR);
-			* If the function foo_i2c_write() will succedd then two options are possible
-			* 1. if foo_i2c_write() is interrupt based, then you need to configure interrupts in the function 
-			*    pal_i2c_init() so that on a succesfull transmit interrupt the callback i2c_master_end_of_transmit_callback(),
-			*    in case of successfull receive i2c_master_end_of_receive_callback() callback 
-			*    in case of not acknowedged, arbitration lost, generic error i2c_master_nack_received_callback() or
-			*    i2c_master_arbitration_lost_callback()
-			* 2. If foo_i2c_write() is a blocking function which will return either ok or failure after transmitting data
-			*    you can handle this case directly here and call 
-			*    invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_SUCCESS);
-			*    
-			*/
-
             ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
                                                        (p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_SUCCESS);
             status = PAL_STATUS_SUCCESS;
         }
 
-        //Release I2C Bus
+        // Release I2C Bus
         k_sem_give(&i2c_bus_lock);
     }
     else
@@ -216,13 +199,14 @@ pal_status_t pal_i2c_read(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t 
     
     pal_zephyr_i2c_t *p_i2c_ctx = (pal_zephyr_i2c_t*)(p_i2c_context->p_i2c_hw_config);
 
-    //Acquire the I2C bus before read/write
+    // Acquire the I2C bus before accessing
     lock_result = k_sem_take(&i2c_bus_lock, K_NO_WAIT);
-    if (lock_result == BUS_ENTRY_SUCCESS)
+
+    if (lock_result == I2C_BUS_ENTRY_SUCCESS)
     {
         gp_pal_i2c_current_ctx = p_i2c_context;
 
-        //Invoke the low level i2c master driver API to read from the bus
+        // Invoke the low level i2c master driver API to read from the bus
         if (i2c_read(p_i2c_ctx->p_i2c_dev, p_data, (u32_t)length, (u16_t)(p_i2c_context->slave_address)))
         {
             //If I2C Master fails to invoke the read operation, invoke upper layer event handler with error.
@@ -234,19 +218,13 @@ pal_status_t pal_i2c_read(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t 
         }
         else
         {
-			// !!!OPTIGA_LIB_PORTING_REQUIRED
-			/**
-			* Similar to the foo_i2c_write() case you can directly call 
-			* invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_SUCCESS);
-			* if you have blocking (non-interrupt) i2c calls
-			*/
             ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
                                                        (p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_SUCCESS);
 
             status = PAL_STATUS_SUCCESS;
         }
 
-        //Release I2C Bus
+        // Release I2C Bus
         k_sem_give(&i2c_bus_lock);
     }
     else
@@ -268,9 +246,10 @@ pal_status_t pal_i2c_set_bitrate(const pal_i2c_t * p_i2c_context, uint16_t bitra
 
     pal_zephyr_i2c_t *p_i2c_ctx = (pal_zephyr_i2c_t*)(p_i2c_context->p_i2c_hw_config);
 
-    //Acquire the I2C bus before setting the bitrate
+    // Acquire the I2C bus before setting the bitrate
     lock_result = k_sem_take(&i2c_bus_lock, K_NO_WAIT);
-    if (lock_result == BUS_ENTRY_SUCCESS)
+
+    if (lock_result == I2C_BUS_ENTRY_SUCCESS)
     {
         // If the user provided bitrate is greater than the I2C master hardware maximum supported value,
         // set the I2C master to its maximum supported value.
@@ -312,7 +291,7 @@ pal_status_t pal_i2c_set_bitrate(const pal_i2c_t * p_i2c_context, uint16_t bitra
             status = PAL_STATUS_FAILURE;
         }
 
-        //Release I2C Bus
+        // Release I2C Bus
         k_sem_give(&i2c_bus_lock);
     }
     else
@@ -325,7 +304,7 @@ pal_status_t pal_i2c_set_bitrate(const pal_i2c_t * p_i2c_context, uint16_t bitra
         //lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t type"
         ((callback_handler_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx, event);
     }
-    //Release I2C Bus if it was acquired 
+    // Release I2C Bus if it was acquired 
     if (PAL_STATUS_I2C_BUSY != status)
     {
         k_sem_give(&i2c_bus_lock);

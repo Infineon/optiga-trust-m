@@ -50,6 +50,7 @@ pal_status_t pal_logger_init(void * p_logger_context)
 {
     pal_status_t return_status = PAL_STATUS_FAILURE;
     pal_logger_t * p_log_context = p_logger_context;
+    (void)p_log_context;
 
 
     return_status = PAL_STATUS_SUCCESS;
@@ -61,6 +62,7 @@ pal_status_t pal_logger_deinit(void * p_logger_context)
 {
     pal_status_t return_status = PAL_STATUS_FAILURE;
     pal_logger_t * p_log_context = p_logger_context;
+    (void)p_log_context;
 
     do
     {
@@ -75,6 +77,7 @@ pal_status_t pal_logger_write(void * p_logger_context, const uint8_t * p_log_dat
     int8_t i;
     int32_t return_status = PAL_STATUS_FAILURE;
     pal_logger_t * p_log_context = p_logger_context;
+    (void)p_log_context;
     return ((pal_status_t)return_status);
 
     char buffer[log_data_length+1];
@@ -96,6 +99,7 @@ pal_status_t pal_logger_read(void * p_logger_context, uint8_t * p_log_data, uint
 
     int32_t return_status = PAL_STATUS_FAILURE;
     pal_logger_t * p_log_context = p_logger_context;
+    (void)p_log_context;
 
     do
     {
