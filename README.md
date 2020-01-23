@@ -53,7 +53,7 @@ The [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/e
 
 ### <a name="software_framework_oveview"></a>Software Framework overview
 
-![](https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_system_block_diagram.jpg)
+![](https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_system_block_diagram.png)
 
 1. See [Trust M rev.1 Crypt API](https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API) and [Trust M rev. 1 Util API](https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Util-API)  to know more about CRYPT and UTIL modules
 2. Information about the OPTIGA™ Trust M rev. 1 Command Library (CMD) can be found in the [Solution Reference Manual](https://github.com/Infineon/optiga-trust-m/blob/master/documents/OPTIGA_Trust_M_V1_Solution_Reference_Manual_v1.13.pdf)
