@@ -64,9 +64,8 @@ In the same document you can find explanation of all Object IDs (OIDs) available
 For more information please refer to the [Wiki page](https://github.com/Infineon/optiga-trust-m/wiki) of this project
 
 ### <a name="evaluation_development_kits"></a>Evaluation and developement kits
-* <p><a href="https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/" target="_blank">OPTIGA™ Trust M evaluation kit</a></p>
-* [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/)
-* [OPTIGA™ Trust M Shield2Go](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/)
+* [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/){:target="_blank"}
+* [OPTIGA™ Trust M Shield2Go](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/){:target="_blank"}
 
 ## <a name="documentation"></a>Documentation
 
