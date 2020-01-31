@@ -64,8 +64,10 @@ In the same document you can find explanation of all Object IDs (OIDs) available
 For more information please refer to the [Wiki page](https://github.com/Infineon/optiga-trust-m/wiki) of this project
 
 ### <a name="evaluation_development_kits"></a>Evaluation and developement kits
-* [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/){:target="_blank"}
-* [OPTIGA™ Trust M Shield2Go](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/){:target="_blank"}
+
+External links, open in the same tab.
+* [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/)
+* [OPTIGA™ Trust M Shield2Go](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/)
 
 ## <a name="documentation"></a>Documentation
 
@@ -83,7 +85,7 @@ For more information please refer to the [Wiki page](https://github.com/Infineon
       * [Crypt API (Wiki)](https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API)
       * [Util API (Wiki)](https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Util-API)
       
-  * [Hardware-Security: "Einfach (und) Sicher"](https://vimeo.com/279839814) in German, [Slides](https://github.com/Infineon/Assets/blob/master/PDFs/2018-06-04_Building-IoT_HW-Sec_Lesjak_vFinal.pdf) in English
+  * [Hardware-Security: "Einfach (und) Sicher" (external link, opens in the same tab)](https://vimeo.com/279839814) in German, [Slides](https://github.com/Infineon/Assets/blob/master/PDFs/2018-06-04_Building-IoT_HW-Sec_Lesjak_vFinal.pdf) in English
 
 ### Datasheet and Co.
 
@@ -97,7 +99,7 @@ Other downloadable PDF documents can be found below:
 
 ### Board assembly recommendations
 
-If you are planning to integrate OPTIGA™ Trust M in your PCB design have a look at the recommendations found [here](https://www.infineon.com/dgdl/Infineon-Board+Assembly+Recommendations-Discrete+Leadless-Package-v06_00-EN.pdf?fileId=5546d4626cb27db2016cbda27a9c544d).
+If you are planning to integrate OPTIGA™ Trust M in your PCB design have a look at the recommendations found [here (external, opens in the same tab)](https://www.infineon.com/dgdl/Infineon-Board+Assembly+Recommendations-Discrete+Leadless-Package-v06_00-EN.pdf).
 
 
 ## <a name="contributing"></a>Contributing
