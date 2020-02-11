@@ -72,8 +72,10 @@ void pal_os_event_trigger_registered_callback(void)
 {
     register_callback callback;
 
-	// !!!OPTIGA_LIB_PORTING_REQUIRED
+    // !!!OPTIGA_LIB_PORTING_REQUIRED
     // User should take care to stop the timer if it sin't stoped automatically
+    // IMPORTANT: Make sure you don't call this callback from the ISR. 
+    // It could work, but not recommended.
 
     if (pal_os_event_0.callback_registered)
     {
