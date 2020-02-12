@@ -99,7 +99,7 @@ Other downloadable PDF documents can be found below:
 
 ### Board assembly recommendations
 
-If you are planning to integrate OPTIGA™ Trust M in your PCB design have a look at the recommendations found [here (external, opens in the same tab)](https://www.infineon.com/dgdl/Infineon-Board+Assembly+Recommendations-Discrete+Leadless-Package-v06_00-EN.pdf).
+If you are planning to integrate OPTIGA™ Trust M in your PCB design have a look at the recommendations found [here (external, opens in the same tab)](https://www.infineon.com/dgdl/Infineon-Recommendations_for_Board_Assembly_xQFN-P-v01_00-EN.pdf?fileId=5546d462580663ef015806ab383a05bf).
 
 
 ## <a name="contributing"></a>Contributing
