@@ -30,7 +30,6 @@
 
 #include "mbedtls/ecdsa.h"
 #include "mbedtls/asn1write.h"
-#include "mbedtls/pk.h"
 
 #include <string.h>
 #include "optiga/optiga_crypt.h"
@@ -47,7 +46,7 @@ optiga_lib_status_t crypt_event_completed_status;
 //lint --e{818} suppress "argument "context" is not used in the sample provided"
 static void optiga_crypt_event_completed(void * context, optiga_lib_status_t return_status)
 {
-    crypt_event_completed_status = return_status;
+	crypt_event_completed_status = return_status;
     if (NULL != context)
     {
         // callback to upper layer here
@@ -60,20 +59,21 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
                 int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
 {
 
-    int ret = 0;
+    int return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
     uint8_t der_signature[110];
     uint16_t dslen = sizeof(der_signature);
-    unsigned char *p = der_signature;
-    const unsigned char *end = der_signature + dslen;
+    uint8_t *p = der_signature;
+    const uint8_t * end = NULL;
     optiga_crypt_t * me = NULL;
-    optiga_lib_status_t command_queue_status = OPTIGA_CRYPT_ERROR;
+    optiga_lib_status_t crypt_sync_status = OPTIGA_CRYPT_ERROR;
 
-    memset(der_signature, 0x0, sizeof(der_signature));
+    end = (der_signature + dslen);
+    memset(der_signature, 0x00, sizeof(der_signature));
 
     me = optiga_crypt_create(0, optiga_crypt_event_completed, NULL);
     if (NULL == me)
     {
-    	ret = MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE;
+    	return_status = MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE;
     	goto cleanup;
     }
 
@@ -90,10 +90,10 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
 	crypt_event_completed_status = OPTIGA_LIB_BUSY;
 
 	// Signing data with the Secure Element
-	command_queue_status = optiga_crypt_ecdsa_sign(me, (unsigned char *)buf, blen, OPTIGA_KEY_ID_E0F0, der_signature, &dslen);
-	if( command_queue_status != OPTIGA_LIB_SUCCESS)
+	crypt_sync_status = optiga_crypt_ecdsa_sign(me, (unsigned char *)buf, blen, OPTIGA_KEY_ID_E0F0, der_signature, &dslen);
+	if(OPTIGA_LIB_SUCCESS != crypt_sync_status)
 	{
-		ret = MBEDTLS_ERR_PK_BAD_INPUT_DATA;
+		return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
 		goto cleanup;
 	}
 
@@ -105,7 +105,7 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
 
 	if(crypt_event_completed_status!= OPTIGA_LIB_SUCCESS)
 	{
-		ret = MBEDTLS_ERR_PK_BAD_INPUT_DATA;
+		return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
 		goto cleanup;
 	}
 
@@ -121,17 +121,27 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
 	}
 #endif
 
-	MBEDTLS_MPI_CHK( mbedtls_asn1_get_mpi( &p, end, r ) );
-	MBEDTLS_MPI_CHK( mbedtls_asn1_get_mpi( &p, end, s ) );
-    
-cleanup:
-	if (me != NULL)
+	return_status = mbedtls_asn1_get_mpi(&p, end, r);
+	if (0 != return_status)
 	{
-		optiga_crypt_destroy(me);
+		goto cleanup;
 	}
 
+	return_status = mbedtls_asn1_get_mpi(&p, end, s);
+	if (0 != return_status)
+	{
+		goto cleanup;
+	}
 
-    return ret;
+	return_status = 0;
+cleanup:
+	// destroy crypt instances
+	if (me != NULL)
+	{
+		(void)optiga_crypt_destroy(me);
+	}
+
+    return return_status;
 
 }
 #endif
@@ -142,25 +152,37 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
                   const mbedtls_ecp_point *Q, const mbedtls_mpi *r, const mbedtls_mpi *s)
 {
 
-    int error = 0;
-    optiga_lib_status_t command_queue_status = OPTIGA_CRYPT_ERROR;
+    int return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
+    optiga_lib_status_t crypt_sync_status = OPTIGA_CRYPT_ERROR;
     public_key_from_host_t public_key;
     uint8_t public_key_out [100];
     uint8_t signature [110];
-    uint8_t *p = signature + sizeof(signature);
+    uint8_t * p = NULL;
     size_t  signature_len = 0;
     size_t public_key_len = 0;
     uint8_t truncated_hash_length;
     
     optiga_crypt_t * me = NULL;
 
-    memset(signature, 0x0, sizeof(signature));
+    p = signature + sizeof(signature);
+    memset(signature, 0x00, sizeof(signature));
+
     me = optiga_crypt_create(0, optiga_crypt_event_completed, NULL);
     if (NULL == me)
     {
-    	error = MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE;
+    	return_status = MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE;
     	goto cleanup;
     }
+
+	if ( ( grp->id !=  MBEDTLS_ECP_DP_SECP256R1 ) &&
+		 ( grp->id  != MBEDTLS_ECP_DP_SECP384R1 ) )
+	{
+		return_status = MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE;
+		goto cleanup;
+	}
+
+	grp->id == MBEDTLS_ECP_DP_SECP256R1 ? ( public_key.key_type = OPTIGA_ECC_CURVE_NIST_P_256 )
+											: ( public_key.key_type = OPTIGA_ECC_CURVE_NIST_P_384 );
 
     signature_len = mbedtls_asn1_write_mpi( &p, signature, s );
 	signature_len += mbedtls_asn1_write_mpi( &p, signature, r );
@@ -176,34 +198,21 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
 #endif
 
 	public_key.public_key = public_key_out;
-	public_key.length     = sizeof( public_key_out );
 
 	if (mbedtls_ecp_point_write_binary( grp, Q,
 										MBEDTLS_ECP_PF_UNCOMPRESSED, &public_key_len,
 										&public_key_out[3], sizeof( public_key_out ) ) != 0 )
 	{
-		command_queue_status = OPTIGA_CRYPT_ERROR;
-		error = MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE;
+		return_status = MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE;
 		goto cleanup;
 	}
-
-	if ( ( grp->id !=  MBEDTLS_ECP_DP_SECP256R1 ) &&
-		 ( grp->id  != MBEDTLS_ECP_DP_SECP384R1 ) )
-	{
-		command_queue_status = OPTIGA_CRYPT_ERROR;
-		error = MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE;
-		goto cleanup;
-	}
-
-	grp->id == MBEDTLS_ECP_DP_SECP256R1 ? ( public_key.key_type = OPTIGA_ECC_CURVE_NIST_P_256 )
-											: ( public_key.key_type = OPTIGA_ECC_CURVE_NIST_P_384 );
 
 	public_key_out [0] = 0x03;
 	public_key_out [1] = public_key_len + 1;
 	public_key_out [2] = 0x00;
 	public_key.length = public_key_len + 3;//including 3 bytes overhead
 
-	if ( public_key.key_type == OPTIGA_ECC_CURVE_NIST_P_256 )
+	if (public_key.key_type == OPTIGA_ECC_CURVE_NIST_P_256)
 	{
 		truncated_hash_length = 32; //maximum bytes of hash length for the curve
 	}
@@ -214,7 +223,7 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
 
 	// If the length of the digest is larger than
 	// key length of the group order, then truncate the digest to key length.
-	if ( blen > truncated_hash_length )
+	if (blen > truncated_hash_length)
 	{
 		blen = truncated_hash_length;
 	}
@@ -243,13 +252,13 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
 #endif
 
 	crypt_event_completed_status = OPTIGA_LIB_BUSY;
-	command_queue_status = optiga_crypt_ecdsa_verify ( me, (uint8_t *) buf, blen,
+	crypt_sync_status = optiga_crypt_ecdsa_verify ( me, (uint8_t *) buf, blen,
 													 (uint8_t *) p, signature_len,
 													  OPTIGA_CRYPT_HOST_DATA, (void *)&public_key );
 
-	if (OPTIGA_LIB_SUCCESS != command_queue_status)
+	if (OPTIGA_LIB_SUCCESS != crypt_sync_status)
 	{
-		error = MBEDTLS_ERR_PK_BAD_INPUT_DATA;
+		return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
 		goto cleanup;
 	}
 
@@ -261,18 +270,17 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
 
 	if ( crypt_event_completed_status != OPTIGA_LIB_SUCCESS )
 	{
-		error = MBEDTLS_ERR_PK_BAD_INPUT_DATA;
+		return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
 		goto cleanup;
 	}
-
+	return_status = 0;
 cleanup:
-    // destroy me_example instances
-    if (me != NULL)
-    {
-        optiga_crypt_destroy(me);
-    }
-
-    return error;
+	// destroy crypt instances
+	if (me != NULL)
+	{
+		(void)optiga_crypt_destroy(me);
+	}
+    return return_status;
 
 }
 #endif
@@ -282,8 +290,8 @@ cleanup:
 int mbedtls_ecdsa_genkey( mbedtls_ecdsa_context *ctx, mbedtls_ecp_group_id gid,
                   int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
 {
-    int ret = 0;
-    optiga_lib_status_t command_queue_status = OPTIGA_CRYPT_ERROR;
+    int return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
+    optiga_lib_status_t crypt_sync_status = OPTIGA_CRYPT_ERROR;
     uint8_t public_key [100];
     size_t public_key_len = sizeof( public_key );
     optiga_ecc_curve_t curve_id;
@@ -294,32 +302,32 @@ int mbedtls_ecdsa_genkey( mbedtls_ecdsa_context *ctx, mbedtls_ecp_group_id gid,
     me = optiga_crypt_create(0, optiga_crypt_event_completed, NULL);
     if (NULL == me)
     {
-        command_queue_status = OPTIGA_CRYPT_ERROR;
-        ret = MBEDTLS_ERR_PK_BAD_INPUT_DATA;
+        return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
         goto cleanup;
     }
  
     mbedtls_ecp_group_load( &ctx->grp, gid );
  
     //checking group against the supported curves of OPTIGA Trust M
-    if ( ( grp->id != MBEDTLS_ECP_DP_SECP256R1 ) &&
-         ( grp->id != MBEDTLS_ECP_DP_SECP384R1 ) )
+    if ((grp->id != MBEDTLS_ECP_DP_SECP256R1) &&
+         (grp->id != MBEDTLS_ECP_DP_SECP384R1))
     {
-        ret = MBEDTLS_ERR_PK_BAD_INPUT_DATA;
+    	return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
         goto cleanup;
     }
     grp->id == MBEDTLS_ECP_DP_SECP256R1 ? ( curve_id = OPTIGA_ECC_CURVE_NIST_P_256 )
                                                 : ( curve_id = OPTIGA_ECC_CURVE_NIST_P_384 );
     //invoke optiga command to generate a key pair.
-    command_queue_status = optiga_crypt_ecc_generate_keypair( me, curve_id,
+    crypt_event_completed_status = OPTIGA_LIB_BUSY;
+    crypt_sync_status = optiga_crypt_ecc_generate_keypair( me, curve_id,
                                                 (optiga_key_usage_t)( OPTIGA_KEY_USAGE_KEY_AGREEMENT | OPTIGA_KEY_USAGE_AUTHENTICATION ),
                                                 FALSE,
                                                 &privkey_oid,
                                                 public_key,
                                                 (uint16_t *)&public_key_len ) ;
-    if ( command_queue_status != OPTIGA_LIB_SUCCESS )
+    if (OPTIGA_LIB_SUCCESS != crypt_sync_status)
     {
-        ret = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
+    	return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
         goto cleanup;
     }
 
@@ -329,19 +337,20 @@ int mbedtls_ecdsa_genkey( mbedtls_ecdsa_context *ctx, mbedtls_ecp_group_id gid,
     }
 
     //store public key generated from optiga into mbedtls structure .
-    if ( mbedtls_ecp_point_read_binary( grp, &ctx->Q,(unsigned char *)&public_key[3],(size_t )public_key_len-3 ) != 0 )
+    if (mbedtls_ecp_point_read_binary( grp, &ctx->Q,(unsigned char *)&public_key[3],(size_t )public_key_len-3 ) != 0)
     {
-        ret = OPTIGA_CRYPT_ERROR;
+    	return_status = OPTIGA_CRYPT_ERROR;
         goto cleanup;
     }
-
+    return_status = 0;
 cleanup:
-    if (me != NULL)
-    {
-        optiga_crypt_destroy(me);
-    }
+	// destroy crypt instances
+	if (me != NULL)
+	{
+		(void)optiga_crypt_destroy(me);
+	}
 
-    return ret;
+    return return_status;
 }                      
 #endif
 
