@@ -34,8 +34,8 @@ derivation), **RSA® 1024/2048** (sign, verify, key generation, encrypt and decr
 * Lifetime for Industrial Automation and Infrastructure is 20 years and 15 years for other Application Profiles    
 
 ## Get Started
-
-<img src="https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M_Eval_Kit%2002.jpg" width="300">
+:-------------------------:|:-------------------------:
+<img src="https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M_Eval_Kit%2002.jpg" width="400">
 
 The [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/) is a starting point for a lot of application notes mentioned below.
 
