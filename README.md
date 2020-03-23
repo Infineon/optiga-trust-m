@@ -68,6 +68,21 @@ For more information please refer to the [Wiki page](https://github.com/Infineon
 External links, open in the same tab.
 * [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/)
 * [OPTIGA™ Trust M Shield2Go](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/)
+  Notes to the S2Go Security OPTIGA M:
+  * Supply voltage VCC is max. 5.5 V, please refer to the OPTIGA™ Trust M datasheet for more details about maximum ratings
+  * Ensure that no voltage applied to any of the pins exceeds the absolute maximum rating of VCC + 0.3 V
+  * Pin out on top (head) is directly connected to the pins of the OPTIGA™ Trust M
+  * If head is broken off, only one capacitor is connected to the OPTIGA™ Trust M
+
+  <details>
+  <summary> S2Go Security OPTIGA M Pinout</summary>
+  <img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_shield2go_pinout.png" alt="drawing"/>
+  </details>
+
+  <details>
+  <summary> S2Go Security OPTIGA M Schematic</summary>
+  <img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_shield2go_schematics.png" alt="drawing"/>
+  </details>
 
 ## <a name="documentation"></a>Documentation
 
