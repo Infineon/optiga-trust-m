@@ -2356,7 +2356,7 @@ int mbedtls_rsa_rsassa_pkcs1_v15_verify( mbedtls_rsa_context *ctx,
     while (OPTIGA_LIB_BUSY == crypt_event_completed_status)
     {
         //Wait until the optiga_crypt_rsa_verify operation is completed
-    	pal_os_timer_delay_in_milliseconds(5);
+    	pal_os_timer_delay_in_milliseconds(10);
     }
     if (crypt_event_completed_status != OPTIGA_LIB_SUCCESS )
     {

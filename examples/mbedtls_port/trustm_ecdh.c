@@ -25,8 +25,6 @@
  */
 
 #include "mbedtls/config.h"
-#include "FreeRTOS.h"
-#include "task.h"
 
 #if defined(MBEDTLS_ECDH_C)
 
@@ -40,8 +38,8 @@
 
 #define PRINT_ECDH_PUBLICKEY   0
 
-// We use here Session Context ID 0xE104 (you can choose between 0xE100 - E104)
-#define OPTIGA_TRUSTM_KEYID_TO_STORE_SHARED_SECRET  0xE103
+// We use here Session Context ID 0xE103 (you can choose between 0xE100 - E104)
+#define OPTIGA_TRUSTM_KEYID_TO_STORE_PRIVATE_KEY  0xE103
 
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
@@ -70,7 +68,7 @@ int mbedtls_ecdh_gen_public(mbedtls_ecp_group *grp, mbedtls_mpi *d,
 	uint8_t public_key[200];
 	size_t public_key_len = sizeof(public_key);
 	optiga_ecc_curve_t curve_id;
-	optiga_key_id_t optiga_key_id = OPTIGA_TRUSTM_KEYID_TO_STORE_SHARED_SECRET;
+	optiga_key_id_t optiga_key_id = OPTIGA_TRUSTM_KEYID_TO_STORE_PRIVATE_KEY;
 	optiga_crypt_t * me = NULL;
     optiga_lib_status_t crypt_sync_status = OPTIGA_CRYPT_ERROR;
 
@@ -106,7 +104,7 @@ int mbedtls_ecdh_gen_public(mbedtls_ecp_group *grp, mbedtls_mpi *d,
 
 	while (OPTIGA_LIB_BUSY == crypt_event_completed_status)
 	{
-		pal_os_timer_delay_in_milliseconds(5);
+		pal_os_timer_delay_in_milliseconds(10);
 	}
 
 	if (crypt_event_completed_status != OPTIGA_LIB_SUCCESS)
@@ -211,7 +209,7 @@ int mbedtls_ecdh_compute_shared(mbedtls_ecp_group *grp, mbedtls_mpi *z,
 
 	crypt_event_completed_status = OPTIGA_LIB_BUSY;
 	//Invoke OPTIGA command to generate shared secret and store in the OID/buffer.
-	crypt_sync_status = optiga_crypt_ecdh(me, OPTIGA_TRUSTM_KEYID_TO_STORE_SHARED_SECRET, &pk, 1, buf);
+	crypt_sync_status = optiga_crypt_ecdh(me, OPTIGA_TRUSTM_KEYID_TO_STORE_PRIVATE_KEY, &pk, 1, buf);
 
 	if (OPTIGA_LIB_SUCCESS != crypt_sync_status)
 	{
@@ -222,7 +220,7 @@ int mbedtls_ecdh_compute_shared(mbedtls_ecp_group *grp, mbedtls_mpi *z,
 	 //Wait until the optiga_crypt_ecdh operation is completed
 	while (OPTIGA_LIB_BUSY == crypt_event_completed_status)
 	{
-		pal_os_timer_delay_in_milliseconds(5);
+		pal_os_timer_delay_in_milliseconds(10);
 	}
 
 	if (crypt_event_completed_status != OPTIGA_LIB_SUCCESS)

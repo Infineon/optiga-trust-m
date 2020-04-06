@@ -1083,7 +1083,7 @@ optiga_lib_status_t optiga_crypt_rsa_generate_pre_master_secret(optiga_crypt_t *
 #endif
 
         /// The minimum difference between shared secret length and optional data length should be 8 bytes,
-        /// since the minimum random length OPTIGA expects is 8 bytes (optional_data_length <= shared_length � 8 bytes).
+        /// since the minimum random length OPTIGA expects is 8 bytes (optional_data_length <= shared_length ? 8 bytes).
         if (((optional_data_length + OPTIGA_CRYPT_MINIMUM_RANDOM_DATA_LENGTH) > pre_master_secret_length) ||
             (optional_data_length > OPTIGA_CRYTP_MINIMUM_OPTIONAL_DATA_LENGTH))
         {

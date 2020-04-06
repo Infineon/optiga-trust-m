@@ -41,6 +41,10 @@
 #define PRINT_HASH        0
 #define PRINT_PUBLICKEY   0
 
+ifndef CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT
+#define CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT OPTIGA_KEY_ID_E0F0
+#endif
+
 optiga_lib_status_t crypt_event_completed_status;
 
 //lint --e{818} suppress "argument "context" is not used in the sample provided"
@@ -90,7 +94,7 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
 	crypt_event_completed_status = OPTIGA_LIB_BUSY;
 
 	// Signing data with the Secure Element
-	crypt_sync_status = optiga_crypt_ecdsa_sign(me, (unsigned char *)buf, blen, OPTIGA_KEY_ID_E0F0, der_signature, &dslen);
+	crypt_sync_status = optiga_crypt_ecdsa_sign(me, (unsigned char *)buf, blen, CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT, der_signature, &dslen);
 	if(OPTIGA_LIB_SUCCESS != crypt_sync_status)
 	{
 		return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
@@ -100,7 +104,7 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
 	//Wait until the optiga_crypt_ecdsa_verify is completed
 	while (OPTIGA_LIB_BUSY == crypt_event_completed_status)
 	{
-		pal_os_timer_delay_in_milliseconds(5);
+		pal_os_timer_delay_in_milliseconds(10);
 	}
 
 	if(crypt_event_completed_status!= OPTIGA_LIB_SUCCESS)
@@ -265,7 +269,7 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
 	//Wait until the optiga_crypt_ecdsa_verify is completed
 	while (OPTIGA_LIB_BUSY == crypt_event_completed_status)
 	{
-		pal_os_timer_delay_in_milliseconds(5);
+		pal_os_timer_delay_in_milliseconds(10);
 	}
 
 	if ( crypt_event_completed_status != OPTIGA_LIB_SUCCESS )
