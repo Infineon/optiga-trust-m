@@ -46,6 +46,7 @@
 #include "stdio.h"
 
 /// @cond hidden
+void pal_os_event_delayms(uint32_t time_ms);
 
 static pal_os_event_t pal_os_event_0 = {0};
 uint32_t timeout = 0;
@@ -104,7 +105,7 @@ void vTimerCallback( TimerHandle_t xTimer )
 
 /// @endcond
 
-void pal_os_event_trigger_registered_callback( void * pvParameters )
+void pal_os_event_trigger_registered_callback(void)
 {
 	register_callback func = NULL;
 	void * func_args = NULL;
@@ -127,6 +128,11 @@ void pal_os_event_trigger_registered_callback( void * pvParameters )
 			}
 		}
 	} while(1);
+}
+
+void _pal_os_event_trigger_registered_callback( void * pvParameters )
+{
+	pal_os_event_trigger_registered_callback();
 }
 
 pal_status_t pal_os_event_init(void)
