@@ -220,8 +220,8 @@ void optiga_lib_print_array_hex_format(const uint8_t * p_log_string,
                                        uint16_t length,
                                        const char_t * p_log_color)
 {
-    uint8_t temp_buffer[350];
-    char_t output_buffer[350];
+    uint8_t temp_buffer[400];
+    char_t output_buffer[400];
     uint16_t index = 0;
     uint16_t temp_length;
     uint8_t new_line_characters[2] = {OPTIGA_LOGGER_NEW_LINE_CHAR};
