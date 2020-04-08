@@ -28,4 +28,4 @@ Which afterwards raises the **0x107 handshake error**. In most of the cases it h
 
 ## Fail to initialise the chip/execute a command
 
-All examples required a common initialisation sequence, for instance like [here](https://github.com/Infineon/getstarted-optiga-trust-m/blob/master/xmc4800_iot_kit/optiga_shell.c#L85). Generic sequence and a code sample is given [here](https://github.com/Infineon/optiga-trust-m/wiki/Initialisation-hints)
+All examples require a common initialisation sequence, for instance like [here](https://github.com/Infineon/getstarted-optiga-trust-m/blob/master/xmc4800_iot_kit/optiga_shell.c#L85). Generic sequence and a code sample is given [here](https://github.com/Infineon/optiga-trust-m/wiki/Initialisation-hints)
