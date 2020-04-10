@@ -38,7 +38,7 @@ derivation), **RSA® 1024/2048** (sign, verify, key generation, encrypt and decr
 ### OPTIGA™ Trust M evaluation kit
 <img src="https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M_Eval_Kit%2002.jpg" title="OPTIGA™ Trust M evaluation kit" width="600"> 
 
-### XCM1400 XTREME Security Connectivity Kit
+### XCM1400 XTREME Connectivity Kit
 <img src="https://github.com/oscarcreativeshop/Assets/blob/master/Pictures/xtreme-connectivity-kit.png" title="XCM1400 XTREME End-to-End Security Connectivity Kit" width="400">
 
 The [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/) and [XCM1400 XTREME End-to-End Security Connectivity Kit]() are a starting point for a lot of application notes mentioned below.
