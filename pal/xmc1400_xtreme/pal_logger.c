@@ -39,29 +39,31 @@
 
 /// @cond hidden
 
+extern uint32_t get_sys_tick_ms(void);
+
 //lint --e{552,714} suppress "Accessed by user of this structure"
 pal_logger_t logger_console =
 {
-        .logger_config_ptr = NULL,
+        .logger_config_ptr = (void*)(&cunit_logger),
         .logger_rx_flag = 1,
         .logger_tx_flag = 1
 };
 //lint --e{552} suppress "Accessed by user of this structure"
 pal_logger_t cunit_console =
 {
-        .logger_config_ptr = (void*)(&cunit_logger),
+        .logger_config_ptr = NULL,
         .logger_rx_flag = 1,
         .logger_tx_flag = 1
 };
 
 void cunit_console_uart_end_of_transmit_callback(void)
 {
-    cunit_console.logger_tx_flag = 0;
+	logger_console.logger_tx_flag = 0;
 }
 
 void cunit_console_uart_end_of_receive_callback(void)
 {
-    cunit_console.logger_rx_flag = 0;
+	logger_console.logger_rx_flag = 0;
 }
 
 /// @endcond
@@ -111,6 +113,13 @@ pal_status_t pal_logger_write(void * p_logger_context, const uint8_t * p_log_dat
 
     int32_t return_status = PAL_STATUS_FAILURE;
     pal_logger_t * p_log_context = p_logger_context;
+    volatile uint32_t time_out = 0;
+    static uint32_t len = 0;
+    len = log_data_length;
+
+    UART_t  * UART;
+
+    UART = p_log_context->logger_config_ptr;
 
     do
     {
@@ -122,20 +131,17 @@ pal_status_t pal_logger_write(void * p_logger_context, const uint8_t * p_log_dat
         }
         else
         {
-            p_log_context->logger_tx_flag = 1U;
-
-            return_status = (int32_t)UART_Transmit(p_log_context->logger_config_ptr, (uint8_t *)p_log_data, log_data_length);
-            if (return_status != PAL_STATUS_SUCCESS)
-            {
-                break;
-            }
-            while (p_log_context->logger_tx_flag)
-            {
-
-            }
-            return_status = PAL_STATUS_SUCCESS;
+			for (size_t i = 0; i < len; ++i)
+			{
+				time_out = 0;
+				XMC_UART_CH_Transmit(UART->channel, *(const uint8_t *)p_log_data);
+				p_log_data++;
+				while(time_out++ < 0x1f5);
+			}
+			return_status = PAL_STATUS_SUCCESS;
         }
     } while(0);
+    time_out = 0;
     return ((pal_status_t)return_status);
 }
 
