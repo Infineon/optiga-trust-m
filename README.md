@@ -72,7 +72,7 @@ For more information please refer to the [Wiki page](https://github.com/Infineon
 External links, open in the same tab.
 * [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/)
 * [OPTIGA™ Trust M Shield2Go](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/)
-* [OPTIGA™ Trust M Connectivity Kit]()
+* [XMC1400 OPTIGA™ Trust M Connectivity Kit]()
 
 ## <a name="documentation"></a>Documentation
 
