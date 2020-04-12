@@ -73,6 +73,7 @@ External links, open in the same tab.
 * [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/)
 * [OPTIGA™ Trust M Shield2Go](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/)
 * [XMC1400 OPTIGA™ Trust M Connectivity Kit](link is pending)
+* [OPTIGA™ Trust M Feather Wing™](link is pending)
 
 ## <a name="documentation"></a>Documentation
 
