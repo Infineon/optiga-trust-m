@@ -37,7 +37,6 @@
 
 #include <DAVE.h>
 #include "optiga/pal/pal_os_timer.h"
-#include "es_wifi_iface.h"
 
 /// @cond hidden
 static volatile uint32_t g_tick_count = 0;
@@ -45,9 +44,6 @@ static volatile uint32_t g_tick_count = 0;
 
 void SysTick_Handler(void)
 {
-	es_WiFi_app_tick++;
-	es_WiFi_app_ms_tick++;
-	es_WiFi_app_time_out_ms++;
 
 }
 
