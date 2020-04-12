@@ -101,6 +101,7 @@ Other downloadable PDF documents can be found below:
 2. [OPTIGA™ Trust M rev.1 Solution Reference Manual v1.13](documents/OPTIGA_Trust_M_V1_Solution_Reference_Manual_v1.13.pdf) (PDF)
 3. [OPTIGA™ Trust M rev.1 Keys and Certificates v1.50](documents/OPTIGA_Trust_M_V1_Keys_And_Certificates_v1.50.pdf) (PDF)
 4. [Infineon I2C protocol specification v2.02](documents/Infineon_I2C_Protocol_v2.02.pdf) (PDF)
+5. [XMC1400_XTREME_Connectivity_Kit_Users_Guide v1.10](documents/XMC1400_XTREME_Connectivity_Kit_Users_Guide_v1.10.pdf) (PDF)
 
 ### Board assembly recommendations
 
