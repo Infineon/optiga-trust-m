@@ -42,6 +42,7 @@
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
 #include <openssl/opensslv.h>
+#include <openssl/kdf.h>
 
 #define PAL_CRYPT_MAX_LABEL_SEED_LENGTH     (96U)
 
@@ -54,20 +55,13 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
                                       uint16_t seed_length,
                                       uint8_t * p_derived_key,
                                       uint16_t derived_key_length)
-{
-    #define PAL_CRYPT_DIGEST_MAX_SIZE    (32U)	
+{	
 	
     pal_status_t return_value = PAL_STATUS_FAILURE;
-    uint8_t message_digest_length = PAL_CRYPT_DIGEST_MAX_SIZE;
-    uint16_t derive_key_len_index, hmac_checksum_result_index;
-    uint16_t hmac_result_length;
-    uint8_t md_hmac_temp_array[PAL_CRYPT_MAX_LABEL_SEED_LENGTH + PAL_CRYPT_DIGEST_MAX_SIZE];
-    uint8_t hmac_checksum_result[PAL_CRYPT_DIGEST_MAX_SIZE];
+    uint8_t md_hmac_temp_array[PAL_CRYPT_MAX_LABEL_SEED_LENGTH];
     uint16_t final_seed_length = 0;
-    
-    unsigned int outlen;
-    HMAC_CTX *ctx = HMAC_CTX_new();
-   
+	EVP_PKEY_CTX *ctx;
+	
     do
     {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
@@ -76,52 +70,38 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
             break;
         }
 #endif  //OPTIGA_LIB_DEBUG_NULL_CHECK
-
-        if (sizeof(md_hmac_temp_array ) < (uint32_t)(message_digest_length + label_length + seed_length))
-        {
-            return_value = PAL_STATUS_INVALID_INPUT;
-            break;
-        }
-
-        memcpy(md_hmac_temp_array + message_digest_length, p_label, label_length);
-        memcpy(md_hmac_temp_array + message_digest_length + label_length, p_seed, seed_length);
-        final_seed_length = label_length + seed_length;
-        
-		HMAC_Init_ex(ctx, p_secret, secret_length, EVP_sha256(), NULL);
 		
-		HMAC_Update(ctx, (md_hmac_temp_array + message_digest_length), final_seed_length);
-		HMAC_Final(ctx, md_hmac_temp_array, &outlen);
-		
-        for (derive_key_len_index = 0; derive_key_len_index < derived_key_length; 
-             derive_key_len_index += message_digest_length)
-        {
-			HMAC_CTX_reset(ctx);
-			HMAC_Update(ctx, md_hmac_temp_array, (message_digest_length + final_seed_length));
-			HMAC_Final(ctx, hmac_checksum_result, &outlen);
-
-			HMAC_CTX_reset(ctx);
-			HMAC_Update(ctx, md_hmac_temp_array, message_digest_length);
-			HMAC_Final(ctx, md_hmac_temp_array, &outlen);
-
-            hmac_result_length = ((derive_key_len_index + message_digest_length) > derived_key_length) ? 
-                                  (derived_key_length % message_digest_length) : (message_digest_length);
-
-            for (hmac_checksum_result_index = 0; hmac_checksum_result_index < hmac_result_length; 
-                 hmac_checksum_result_index++)
-            {
-                p_derived_key[derive_key_len_index + hmac_checksum_result_index] = 
-                                                                    hmac_checksum_result[hmac_checksum_result_index];
-            }			
+		ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_TLS1_PRF, NULL);
+		if (!(EVP_PKEY_derive_init(ctx)))
+		{
+			break;
 		}
 
-        memset(md_hmac_temp_array, 0x00, sizeof(md_hmac_temp_array));
-        memset(hmac_checksum_result, 0x00, sizeof(hmac_checksum_result));
+		memcpy(md_hmac_temp_array, p_label, label_length);
+		memcpy(md_hmac_temp_array + label_length, p_seed, seed_length);
+		final_seed_length = label_length + seed_length;
+		
+		if (!(EVP_PKEY_CTX_set_tls1_prf_md(ctx, EVP_sha256())))
+		{
+			break;
+		}
+		if (!(EVP_PKEY_CTX_set1_tls1_prf_secret(ctx, p_secret, secret_length)))
+		{
+			break;
+		}
+		if (!(EVP_PKEY_CTX_add1_tls1_prf_seed(ctx, md_hmac_temp_array, final_seed_length)))
+		{
+			break;
+		}
+		if (!(EVP_PKEY_derive(ctx, p_derived_key, (size_t *)&derived_key_length)))
+		{
+			break;
+		}
 
         return_value = PAL_STATUS_SUCCESS;
     } while (FALSE);
 
-	HMAC_CTX_free(ctx);
-    #undef PAL_CRYPT_DIGEST_MAX_SIZE	
+	EVP_PKEY_CTX_free(ctx);	
     return return_value;
 }
 
@@ -140,7 +120,6 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
     uint8_t mac_output[16];
 
 	EVP_CIPHER_CTX *ctx;
-	uint8_t outbuf[1024];
 	int outlen;
 	int ciphertextlen;
 	
@@ -155,49 +134,66 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
 #endif
 		
 		if (!(ctx = EVP_CIPHER_CTX_new()))
-			break;
+        {
+            break;
+        }
 			
 		// Set cipher type and mode
 		if (!(EVP_EncryptInit_ex(ctx, EVP_aes_128_ccm(), NULL, NULL, NULL)))
-			break;
+        {
+            break;
+        }
 		
 		// Setting IV length (nonce length)	
 		if(!(EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_CCM_SET_IVLEN, nonce_length, NULL)))
-			break;
+        {
+            break;
+        }
 			
 		// Set tag length
 		EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_CCM_SET_TAG, mac_size, NULL);
 
 		// Initialise key and IV 
 		if(!(EVP_EncryptInit_ex(ctx, NULL, NULL, p_encrypt_key, p_nonce)))
-			break;
+        {
+            break;
+        }
 
 		//Set plaintext length
 		if(!(EVP_EncryptUpdate(ctx, NULL, &outlen, NULL, plain_text_length)))
-			break;
+        {
+            break;
+        }
 
 		// Zero or one call to specify any AAD 
 		if(!(EVP_EncryptUpdate(ctx, NULL, &outlen, p_associated_data, associated_data_length)))
-			break;
+        {
+            break;
+        }
 
 		// Encrypt plaintext: can only be called once
-		if(!(EVP_EncryptUpdate(ctx, outbuf, &outlen, p_plain_text, plain_text_length)))
-			break;
+		if(!(EVP_EncryptUpdate(ctx, p_cipher_text, &outlen, p_plain_text, plain_text_length)))
+        {
+            break;
+        }
 		ciphertextlen = outlen;
-	
 		// Finalise: note get no output for CCM
-		if(!(EVP_EncryptFinal_ex(ctx, (outbuf + outlen), &outlen)))
-			break;
+		if(!(EVP_EncryptFinal_ex(ctx, (p_cipher_text + outlen), &outlen)))
+        {
+            break;
+        }
 		ciphertextlen += outlen;
 
 		// Get MAC tag
 		if(!(EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_CCM_GET_TAG, mac_size, mac_output)))
-			break;
+        {
+            break;
+        }
 
 		memcpy((p_cipher_text+ciphertextlen) , mac_output, mac_size);
+	
         return_status = PAL_STATUS_SUCCESS;
     } while (FALSE);
-
 	EVP_CIPHER_CTX_free(ctx);
     return return_status;
 }
@@ -215,6 +211,7 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
 {
     pal_status_t return_status = PAL_STATUS_FAILURE;
 	EVP_CIPHER_CTX *ctx;
+	uint8_t outbuf[1560];
     int outlen;
 
     do
@@ -228,38 +225,52 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
 #endif
 		
 		if (!(ctx = EVP_CIPHER_CTX_new()))
+		{
 			break;
+		}
 			
 		// Set cipher type and mode
 		if (!(EVP_DecryptInit_ex(ctx, EVP_aes_128_ccm(), NULL, NULL, NULL)))
+		{
 			break;
+		}
 		
 		// Setting IV length (nonce length)	
 		if(!(EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_CCM_SET_IVLEN, nonce_length, NULL)))
+		{
 			break;
+		}
 			
 		// Set expected tag value 
 		EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_CCM_SET_TAG, mac_size, (uint8_t *) &p_cipher_text[cipher_text_length - mac_size]);
 
 		// Initialise key and IV 
 		if(!(EVP_DecryptInit_ex(ctx, NULL, NULL, p_decrypt_key, p_nonce)))
+		{
 			break;
+		}
 			
 		//Set cipher text length
-		if(!(EVP_DecryptUpdate(ctx, NULL, &outlen, NULL, cipher_text_length)))
-			break;			
+		if(!(EVP_DecryptUpdate(ctx, NULL, &outlen, NULL, cipher_text_length - mac_size)))
+		{
+			break;
+		}		
 
 		// Zero or one call to specify any AAD 
 		if(!(EVP_DecryptUpdate(ctx, NULL, &outlen, p_associated_data, associated_data_length)))
+		{
 			break;
-
+		}
 		// Decrypt cipher text: can only be called once
-		if(!(EVP_DecryptUpdate(ctx, p_plain_text, &outlen, p_cipher_text, cipher_text_length)))
+		if(!(EVP_DecryptUpdate(ctx, outbuf, &outlen, p_cipher_text, cipher_text_length - mac_size)))
+		{
 			break;
+		}
+		
+		memcpy(p_plain_text,outbuf, outlen);
 			
         return_status = PAL_STATUS_SUCCESS;
     } while (FALSE);
-
 	EVP_CIPHER_CTX_free(ctx);    
     return return_status;
 }
