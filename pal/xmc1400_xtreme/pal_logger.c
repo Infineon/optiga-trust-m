@@ -41,6 +41,8 @@
 
 extern uint32_t get_sys_tick_ms(void);
 
+uint8_t init_flag = 0;
+
 //lint --e{552,714} suppress "Accessed by user of this structure"
 pal_logger_t logger_console =
 {
@@ -147,7 +149,7 @@ pal_status_t pal_logger_write(void * p_logger_context, const uint8_t * p_log_dat
 
 pal_status_t pal_logger_read(void * p_logger_context, uint8_t * p_log_data, uint32_t log_data_length)
 {
-
+	volatile uint32_t time_out = 0;
     int32_t return_status = PAL_STATUS_FAILURE;
     pal_logger_t * p_log_context = p_logger_context;
 
@@ -169,6 +171,16 @@ pal_status_t pal_logger_read(void * p_logger_context, uint8_t * p_log_data, uint
             }
             while (p_log_context->logger_rx_flag)
             {
+				if(init_flag == 0)
+				{
+					time_out++;
+					if(time_out > 0x1fffff)
+					{
+						p_log_context->logger_rx_flag = 0;
+						UART_AbortReceive(p_log_context->logger_config_ptr);
+						break;
+					}
+				}
             }
             return_status = PAL_STATUS_SUCCESS;
         }
