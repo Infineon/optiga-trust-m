@@ -35,13 +35,17 @@ derivation), **RSA® 1024/2048** (sign, verify, key generation, encrypt and decr
 
 ## Get Started
 
-<img src="https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M_Eval_Kit%2002.jpg" width="600">
+### OPTIGA™ Trust M evaluation kit
+<img src="https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M_Eval_Kit%2002.jpg" title="OPTIGA™ Trust M evaluation kit" width="600"> 
 
-The [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/) is a starting point for a lot of application notes mentioned below.
+### XCM1400 XTREME Connectivity Kit
+<img src="https://github.com/Infineon/Assets/blob/master/Pictures/xtreme-connectivity-kit.png" title="XCM1400 XTREME Connectivity Kit" width="400">
+
+The [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/) and [XCM1400 XTREME Connectivity Kit]() are a starting point for a lot of application notes mentioned below.
 
 ### <a name="examples"></a>Examples
 
-1. [Get started guide](https://github.com/Infineon/getstarted-optiga-trust-m)
+1. [Get started guide](https://github.com/oscarcreativeshop/getstarted-optiga-trust-m)
 1. [Off-Chip TLS example (mbedTLS)](https://github.com/Infineon/mbedtls-optiga-trust-m)
 1. [AWS FreeRTOS example](https://github.com/Infineon/amazon-freertos-optiga-trust)
 1. Secure Firmware Update and Secure Boot (link is pending)
@@ -68,6 +72,8 @@ For more information please refer to the [Wiki page](https://github.com/Infineon
 External links, open in the same tab.
 * [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/)
 * [OPTIGA™ Trust M Shield2Go](https://www.infineon.com/cms/en/product/evaluation-boards/s2go-security-optiga-m/)
+* [XMC1400 OPTIGA™ Trust M Connectivity Kit](link is pending)
+* [OPTIGA™ Trust M Feather Wing™](link is pending)
 
   Notes to the S2Go Security OPTIGA M:
   * Supply voltage VCC is max. 5.5 V, please refer to the OPTIGA™ Trust M datasheet for more details about maximum ratings
@@ -112,6 +118,7 @@ Other downloadable PDF documents can be found below:
 2. [OPTIGA™ Trust M rev.1 Solution Reference Manual v1.13](documents/OPTIGA_Trust_M_V1_Solution_Reference_Manual_v1.13.pdf) (PDF)
 3. [OPTIGA™ Trust M rev.1 Keys and Certificates v1.50](documents/OPTIGA_Trust_M_V1_Keys_And_Certificates_v1.50.pdf) (PDF)
 4. [Infineon I2C protocol specification v2.02](documents/Infineon_I2C_Protocol_v2.02.pdf) (PDF)
+5. [XMC1400_XTREME_Connectivity_Kit_Users_Guide v1.10](documents/XMC1400_XTREME_Connectivity_Kit_Users_Guide_v1.10.pdf) (PDF)
 
 ### Board assembly recommendations
 
