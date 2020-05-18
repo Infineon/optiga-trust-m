@@ -76,7 +76,10 @@
 #define TRUSTM_RSA_PUBLIC_KEY_MAX_SIZE       (300)
 #define TRUSTM_RSA_SIGNATURE_LEN_MAX_SIZE    (300)
 #define TRUSTM_RSA_NEGATIVE_INTEGER          (0x7F)
-#define TRUSTM_RSA_PRIVATE_KEY_OID           (0xE0FC)
+
+#ifndef CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT
+#define CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT 		(0xE0FC)
+#endif
 
 #define TRUSTM_RSA_SET_DER_LENGTH(buffer, index, value) \
                                 {\
@@ -1703,7 +1706,7 @@ int mbedtls_rsa_rsaes_pkcs1_v15_decrypt( mbedtls_rsa_context *ctx,
                                                             ctx->len,
                                                             NULL,
                                                             0,
-                                                            TRUSTM_RSA_PRIVATE_KEY_OID,
+                                                            CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT,
                                                             output,
                                                             (uint16_t *)&olen);
     if (OPTIGA_LIB_SUCCESS != crypt_sync_status)
@@ -1970,7 +1973,7 @@ int mbedtls_rsa_rsassa_pkcs1_v15_sign( mbedtls_rsa_context *ctx,
                                               signature_scheme,
                                               hash,
                                               digest_length,
-                                              TRUSTM_RSA_PRIVATE_KEY_OID,
+                                              CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT,
                                               signature_buffer,
                                               &signature_len,
                                               0);
@@ -1985,7 +1988,7 @@ int mbedtls_rsa_rsassa_pkcs1_v15_sign( mbedtls_rsa_context *ctx,
     while (OPTIGA_LIB_BUSY == crypt_event_completed_status)
     {
         //Wait until the optiga_crypt_rsa_sign operation is completed
-    	pal_os_timer_delay_in_milliseconds(5);
+    	pal_os_timer_delay_in_milliseconds(10);
     }
     if (crypt_event_completed_status != OPTIGA_LIB_SUCCESS )
     {
