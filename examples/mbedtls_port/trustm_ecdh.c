@@ -59,6 +59,7 @@ static void optiga_crypt_event_completed(void * context, optiga_lib_status_t ret
 #ifdef MBEDTLS_ECDH_GEN_PUBLIC_ALT
 /*
  * Generate public key: simple wrapper around mbedtls_ecp_gen_keypair
+ * Parameter d is ignored, use OPTIGA_TRUSTM_KEYID_TO_STORE_PRIVATE_KEY instead to define a right Key Object ID
  */
 int mbedtls_ecdh_gen_public(mbedtls_ecp_group *grp, mbedtls_mpi *d,
 		mbedtls_ecp_point *Q, int (*f_rng)(void *, unsigned char *, size_t),
@@ -137,6 +138,7 @@ cleanup:
 #ifdef MBEDTLS_ECDH_COMPUTE_SHARED_ALT
 /*
  * Compute shared secret (SEC1 3.3.1)
+ * Parameter d is ignored, use OPTIGA_TRUSTM_KEYID_TO_STORE_PRIVATE_KEY instead to define a right Key Object ID
  */
 int mbedtls_ecdh_compute_shared(mbedtls_ecp_group *grp, mbedtls_mpi *z,
 		const mbedtls_ecp_point *Q, const mbedtls_mpi *d,
