@@ -58,6 +58,9 @@ static void optiga_crypt_event_completed(void * context, optiga_lib_status_t ret
 }
 
 #if defined(MBEDTLS_ECDSA_SIGN_ALT)
+/*
+* Parameter d is ignored, use CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT instead to define a right Key Object ID
+*/
 int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
                 const mbedtls_mpi *d, const unsigned char *buf, size_t blen,
                 int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
@@ -290,7 +293,9 @@ cleanup:
 #endif
 
 #if defined(MBEDTLS_ECDSA_GENKEY_ALT)
-
+/*
+* Private Key isn't returned, use CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT instead to define a right Key Object ID
+*/
 int mbedtls_ecdsa_genkey( mbedtls_ecdsa_context *ctx, mbedtls_ecp_group_id gid,
                   int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
 {
@@ -300,7 +305,7 @@ int mbedtls_ecdsa_genkey( mbedtls_ecdsa_context *ctx, mbedtls_ecp_group_id gid,
     size_t public_key_len = sizeof( public_key );
     optiga_ecc_curve_t curve_id;
     mbedtls_ecp_group *grp = &ctx->grp;
-    uint16_t privkey_oid = OPTIGA_KEY_ID_E0F0;
+    uint16_t privkey_oid = CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT;
     optiga_crypt_t * me = NULL;
 
     me = optiga_crypt_create(0, optiga_crypt_event_completed, NULL);
