@@ -1907,6 +1907,7 @@ exit:
 
 /*
  * Do an RSA operation to sign the message digest
+ * User give private key is ignored, use CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT to control the value
  */
 int mbedtls_rsa_rsassa_pkcs1_v15_sign( mbedtls_rsa_context *ctx,
                                int (*f_rng)(void *, unsigned char *, size_t),
