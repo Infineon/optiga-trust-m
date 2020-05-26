@@ -91,33 +91,6 @@ void invoke_upper_layer_callback (const pal_i2c_t * p_pal_i2c_ctx, optiga_lib_st
 
 /// @cond hidden
 
-// !!!OPTIGA_LIB_PORTING_REQUIRED
-// The next 5 functions are required only in case you have interrupt based i2c implementation
-//void i2c_master_end_of_transmit_callback(void)
-//{
-//    invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_SUCCESS);
-//}
-//
-//void i2c_master_end_of_receive_callback(void)
-//{
-//    invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_SUCCESS);
-//}
-//
-//void i2c_master_error_detected_callback(void)
-//{
-//    invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_ERROR);
-//}
-//
-//void i2c_master_nack_received_callback(void)
-//{
-//    i2c_master_error_detected_callback();
-//}
-//
-//void i2c_master_arbitration_lost_callback(void)
-//{
-//    i2c_master_error_detected_callback();
-//}
-/// @endcond
 
 pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context)
 {
@@ -144,21 +117,13 @@ pal_status_t pal_i2c_write(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t
 
 
         //Invoke the low level i2c master driver API to write to the bus
-		// !!!OPTIGA_LIB_PORTING_REQUIRED
         if (HAL_I2C_Master_Transmit(p_i2c, (p_i2c_context->slave_address << 1), p_data, length, 50) != HAL_OK)
         {
-            //If I2C Master fails to invoke the write operation, invoke upper layer event handler with error.
-
-            //lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t type"
-        	((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-        	                                                      (p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_ERROR);
-
+        	((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_ERROR);
         }
         else
         {
-        	//lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-        	            ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-        	                                                       (p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_SUCCESS);
+        	((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_SUCCESS);
             status = PAL_STATUS_SUCCESS;
         }
 
@@ -167,8 +132,6 @@ pal_status_t pal_i2c_write(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t
     }
     else
     {
-//        status = PAL_STATUS_I2C_BUSY;
-//        //lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t type"
         ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_BUSY);
     }
     return status;
@@ -189,16 +152,12 @@ pal_status_t pal_i2c_read(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t 
 		if (HAL_I2C_Master_Receive(p_i2c, (p_i2c_context->slave_address << 1), p_data, length, 50) != HAL_OK)
 		{
 			//If I2C Master fails to invoke the read operation, invoke upper layer event handler with error.
-
-			//lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-			((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-													   (p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_ERROR);
+			((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_ERROR);
 		}
 		else
 		{
 			//lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-			((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-													   (p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_SUCCESS);
+			((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_SUCCESS);
 			status = PAL_STATUS_SUCCESS;
 		}
 
@@ -208,59 +167,16 @@ pal_status_t pal_i2c_read(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t 
 	else
 	{
 		status = PAL_STATUS_I2C_BUSY;
-		//lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-		((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-														(p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_BUSY);
+		((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_BUSY);
 	}
 	return status;
 }
 
 pal_status_t pal_i2c_set_bitrate(const pal_i2c_t * p_i2c_context, uint16_t bitrate)
 {
-	 pal_status_t return_status = PAL_STATUS_SUCCESS;
-//    pal_status_t return_status = PAL_STATUS_FAILURE;
-//    optiga_lib_status_t event = PAL_I2C_EVENT_ERROR;
-//
-//    //Acquire the I2C bus before setting the bitrate
-//    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context))
-//    {
-//        // If the user provided bitrate is greater than the I2C master hardware maximum supported value,
-//        // set the I2C master to its maximum supported value.
-//        if (bitrate > PAL_I2C_MASTER_MAX_BITRATE)
-//        {
-//            bitrate = PAL_I2C_MASTER_MAX_BITRATE;
-//        }
-//		// !!!OPTIGA_LIB_PORTING_REQUIRED
-//		// This function is NOT absolutely required for the correct working of the system, but it's recommended
-//		// to implement it, though
-//        if (foo_i2c_set_baudrate(bitrate)
-//        {
-//            return_status = PAL_STATUS_FAILURE;
-//        }
-//        else
-//        {
-//            return_status = PAL_STATUS_SUCCESS;
-//            event = PAL_I2C_EVENT_SUCCESS;
-//        }
-//    }
-//    else
-//    {
-//        return_status = PAL_STATUS_I2C_BUSY;
-//        event = PAL_I2C_EVENT_BUSY;
-//    }
-//    if (0 != p_i2c_context->upper_layer_event_handler)
-//    {
-//        //lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t type"
-//        ((callback_handler_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx , event);
-//    }
-//    //Release I2C Bus if its acquired
-//
-//
-//
-//    if (PAL_STATUS_I2C_BUSY != return_status)
-//    {
-//        pal_i2c_release((void * )p_i2c_context);
-//    }
+
+	pal_status_t return_status = PAL_STATUS_SUCCESS;
+
     return return_status;
 }
 

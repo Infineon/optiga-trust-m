@@ -80,23 +80,15 @@ pal_status_t pal_logger_write(void * p_logger_context, const uint8_t * p_log_dat
 	HAL_StatusTypeDef return_status = HAL_ERROR;
     pal_logger_t * p_log_context = p_logger_context;
 
-    do{
-    	pal_logger_t * p_log_context = p_logger_context;
-
-		p_log_context->logger_tx_flag = 1U;
 
 		HAL_UART_Transmit(p_log_context->logger_config_ptr, (uint8_t *)p_log_data, log_data_length, 0xffff);
 		if (return_status != PAL_STATUS_SUCCESS)
 		{
-			break;
-		}
-		while (p_log_context->logger_tx_flag)
+			 return return_status;
+		}else
 		{
-
+			 return PAL_STATUS_SUCCESS;
 		}
-		return_status = PAL_STATUS_SUCCESS;
-
-    }while(0);
 
     return ((pal_status_t)return_status);
 }
@@ -104,27 +96,17 @@ pal_status_t pal_logger_write(void * p_logger_context, const uint8_t * p_log_dat
 pal_status_t pal_logger_read(void * p_logger_context, uint8_t * p_log_data, uint32_t log_data_length)
 {
 
-	HAL_StatusTypeDef return_status = HAL_ERROR;
+	volatile HAL_StatusTypeDef return_status = HAL_OK;
 	pal_logger_t * p_log_context = p_logger_context;
 
-	do{
-		int32_t return_status = PAL_STATUS_FAILURE;
-		pal_logger_t * p_log_context = p_logger_context;
-
-		p_log_context->logger_rx_flag = 1U;
-		HAL_UART_Receive(p_log_context->logger_config_ptr, p_log_data, log_data_length, 0xffff);
-		if (return_status != PAL_STATUS_SUCCESS)
-		{
-			break;
-		}
-		while (p_log_context->logger_rx_flag)
-		{
-
-		}
-		return_status = PAL_STATUS_SUCCESS;
-
-	}while(0);
-    return ((pal_status_t)return_status);
+	return_status = HAL_UART_Receive(p_log_context->logger_config_ptr, p_log_data, log_data_length, 0x2ff);
+	if (return_status != PAL_STATUS_SUCCESS)
+	{
+		 return return_status;
+	}else
+	{
+		 return PAL_STATUS_SUCCESS;
+	}
 }
 
 

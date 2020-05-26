@@ -39,7 +39,7 @@
 #include "optiga/pal/pal_i2c.h"
 #include "optiga/ifx_i2c/ifx_i2c_config.h"
 
-extern I2C_HandleTypeDef hi2c3;
+extern I2C_HandleTypeDef hi2c1;
 
 // !!!OPTIGA_LIB_PORTING_REQUIRED
 typedef struct locl_i2c_struct_to_descroibe_master
@@ -56,7 +56,7 @@ local_i2c_struct_to_descroibe_master_t i2c_master_0;
 pal_i2c_t optiga_pal_i2c_context_0 =
 {
     /// Pointer to I2C master platform specific context
-    (void*)&hi2c3,
+    (void*)&hi2c1,
     /// Slave address
     0x30,
     /// Upper layer context
@@ -72,15 +72,20 @@ typedef struct stm_gpio_ctx
 }stm_gpio_ctx_t;
 
 
-//stm_gpio_ctx_t stm_reset_ctx_0 = {
-//		.p_gpio = TrustM_RST_Pin,
-//		.p_port = GPIOE,
-//};
-//
-//stm_gpio_ctx_t stm_vdd_ctx_0 = {
-//		.p_gpio = TrustM_HIB_Pin,
-//		.p_port = GPIOE,
-//};
+/*Enable and configured accordingly if OPTIGA Trust M RESET is manage by Host MCU*/
+/*Default is RESET Controlled by OPTIGA Trust M. Change in optiga_lib_config.h*/
+
+#if OPTIGA_COMMS_DEFAULT_RESET_TYPE == 0
+stm_gpio_ctx_t stm_reset_ctx_0 = {
+		.p_gpio = TrustM_RST_Pin,
+		.p_port = GPIOD,
+};
+
+stm_gpio_ctx_t stm_vdd_ctx_0 = {
+		.p_gpio = TrustM_HIB_Pin,
+		.p_port = GPIOE,
+};
+#endif
 
 /**
 * \brief PAL vdd pin configuration for OPTIGA. 
@@ -91,8 +96,14 @@ pal_gpio_t optiga_vdd_0 =
     // Platform specific GPIO context for the pin used to toggle Vdd.
 	// You should have vdd_pin define in your system,
 	// alternativly you can put here raw GPIO number, but without the & sign
-	//(void*)&stm_vdd_ctx_0
+
+#if OPTIGA_COMMS_DEFAULT_RESET_TYPE == 0
+	/*Enable and configured accordingly if OPTIGA Trust M RESET is manage by Host MCU*/
+	(void*)&stm_vdd_ctx_0
+#elif	OPTIGA_COMMS_DEFAULT_RESET_TYPE == 1
+	/*If VDD Controlled by OPTIGA Trust M. Change in optiga_lib_config.h*/
 	(void*)NULL
+#endif
 };
 
 /**
@@ -104,8 +115,14 @@ pal_gpio_t optiga_reset_0 =
     // Platform specific GPIO context for the pin used to toggle Reset.
 	// You should have reset_pin define in your system,
 	// alternativly you can put here raw GPIO number, but without the & sign
-    //(void*)&stm_reset_ctx_0
+
+#if OPTIGA_COMMS_DEFAULT_RESET_TYPE == 0
+	/*Enable and configured accordingly if OPTIGA Trust M RESET is manage by Host MCU*/
+	(void*)&stm_reset_ctx_0
+#elif OPTIGA_COMMS_DEFAULT_RESET_TYPE == 1
+	/*If RESET Controlled by OPTIGA Trust M. Change in optiga_lib_config.h*/
 	(void*)NULL
+#endif
 };
 
 /**

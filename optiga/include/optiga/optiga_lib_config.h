@@ -118,8 +118,6 @@ extern "C" {
      */
     #define OPTIGA_COMMS_DEFAULT_RESET_TYPE     (0)
 
-
-
 #endif
 
 #ifdef __cplusplus
