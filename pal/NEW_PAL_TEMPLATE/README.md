@@ -98,7 +98,7 @@ result.
 ### Update PAL Timer [pal_os_timer.c] to enable timer
 
 1. `pal_os_timer_get_time_in_milliseconds`
-2 `pal_os_timer_delay_in_milliseconds`
+2. `pal_os_timer_delay_in_milliseconds`
 
 ### Update Event management for the asynchronous interactions for IFX I2C [pal_os_event.c]
 
