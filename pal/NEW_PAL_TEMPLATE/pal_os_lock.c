@@ -43,11 +43,10 @@ void pal_os_lock_create(pal_os_lock_t * p_lock, uint8_t lock_type)
     p_lock->lock = 0;
 }
 
-//lint --e{715} suppress "p_lock is not used here as it is placeholder for future." 
-//lint --e{818} suppress "Not declared as pointer as nothing needs to be updated in the pointer."
+
 void pal_os_lock_destroy(pal_os_lock_t * p_lock)
 {
-    
+    (void) p_lock;
 }
 
 pal_status_t pal_os_lock_acquire(pal_os_lock_t * p_lock)

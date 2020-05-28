@@ -37,7 +37,6 @@
 
 #include "optiga/pal/pal_os_datastore.h"
 
-/// @endcond
 /// Size of data store buffer
 #define DATA_STORE_BUFFERSIZE      (0x42)
 

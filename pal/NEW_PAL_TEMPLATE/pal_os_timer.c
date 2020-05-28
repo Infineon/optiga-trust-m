@@ -37,11 +37,8 @@
 
 #include "optiga/pal/pal_os_timer.h"
 
-/// @cond hidden
+
 static volatile uint32_t g_tick_count = 0;
-
-/// @endcond
-
 
 uint32_t pal_os_timer_get_time_in_microseconds(void)
 {
@@ -79,13 +76,11 @@ void pal_os_timer_delay_in_milliseconds(uint16_t milliseconds)
     }
 }
 
-//lint --e{714} suppress "This is implemented for overall completion of API"
 pal_status_t pal_timer_init(void)
 {
     return PAL_STATUS_SUCCESS;
 }
 
-//lint --e{714} suppress "This is implemented for overall completion of API"
 pal_status_t pal_timer_deinit(void)
 {
     return PAL_STATUS_SUCCESS;

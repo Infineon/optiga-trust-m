@@ -44,7 +44,7 @@ pal_status_t pal_logger_init(void * p_logger_context)
     do
     {
 		// !!!OPTIGA_LIB_PORTING_REQUIRED
-    }while(FALSE);
+    }while(0);
     return return_status;
 }
 
@@ -57,7 +57,7 @@ pal_status_t pal_logger_deinit(void * p_logger_context)
     do
     {
 		// !!!OPTIGA_LIB_PORTING_REQUIRED
-    }while(FALSE);
+    }while(0);
     return return_status;
 }
 
