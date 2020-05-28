@@ -42,8 +42,8 @@
 // !!!OPTIGA_LIB_PORTING_REQUIRED
 typedef struct locl_i2c_struct_to_descroibe_master
 {
-	// you parameters to control the master instance
-	// See other implementation to get intuition on how to implement this part
+    // you parameters to control the master instance
+    // See other implementation to get intuition on how to implement this part
 }local_i2c_struct_to_descroibe_master_t;
 
 local_i2c_struct_to_descroibe_master_t i2c_master_0;
@@ -68,11 +68,11 @@ pal_i2c_t optiga_pal_i2c_context_0 =
  */
 pal_gpio_t optiga_vdd_0 =
 {
-	// !!!OPTIGA_LIB_PORTING_REQUIRED
+    // !!!OPTIGA_LIB_PORTING_REQUIRED
     // Platform specific GPIO context for the pin used to toggle Vdd.
-	// You should have vdd_pin define in your system,
-	// alternativly you can put here raw GPIO number, but without the & sign
-	(void*)&vdd_pin
+    // You should have vdd_pin define in your system,
+    // alternativly you can put here raw GPIO number, but without the & sign
+    (void*)&vdd_pin
 };
 
 /**
@@ -80,10 +80,10 @@ pal_gpio_t optiga_vdd_0 =
  */
 pal_gpio_t optiga_reset_0 =
 {
-	// !!!OPTIGA_LIB_PORTING_REQUIRED
+    // !!!OPTIGA_LIB_PORTING_REQUIRED
     // Platform specific GPIO context for the pin used to toggle Reset.
-	// You should have reset_pin define in your system,
-	// alternativly you can put here raw GPIO number, but without the & sign
+    // You should have reset_pin define in your system,
+    // alternativly you can put here raw GPIO number, but without the & sign
     (void*)&reset_pin
 };
 

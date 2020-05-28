@@ -44,10 +44,10 @@ static pal_i2c_t * gp_pal_i2c_current_ctx;
 
 static pal_status_t pal_i2c_acquire(const void * p_i2c_context)
 {
-	// To avoid compiler errors/warnings. This context might be used by a target 
-	// system to implement a proper mutex handling
-	(void)p_i2c_context;
-	
+    // To avoid compiler errors/warnings. This context might be used by a target 
+    // system to implement a proper mutex handling
+    (void)p_i2c_context;
+    
     if (0 == g_entry_count)
     {
         g_entry_count++;
@@ -61,10 +61,10 @@ static pal_status_t pal_i2c_acquire(const void * p_i2c_context)
 
 static void pal_i2c_release(const void * p_i2c_context)
 {
-	// To avoid compiler errors/warnings. This context might be used by a target 
-	// system to implement a proper mutex handling
-	(void)p_i2c_context;
-	
+    // To avoid compiler errors/warnings. This context might be used by a target 
+    // system to implement a proper mutex handling
+    (void)p_i2c_context;
+    
     g_entry_count = 0;
 }
 
@@ -112,13 +112,13 @@ void i2c_master_arbitration_lost_callback(void)
 
 pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context)
 {
-	(void)p_i2c_context;
+    (void)p_i2c_context;
     return PAL_STATUS_SUCCESS;
 }
 
 pal_status_t pal_i2c_deinit(const pal_i2c_t * p_i2c_context)
 {
-	(void)p_i2c_context;
+    (void)p_i2c_context;
     return PAL_STATUS_SUCCESS;
 }
 
@@ -132,9 +132,9 @@ pal_status_t pal_i2c_write(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t
         gp_pal_i2c_current_ctx = p_i2c_context;
 
         //Invoke the low level i2c master driver API to write to the bus
-		// !!!OPTIGA_LIB_PORTING_REQUIRED
+        // !!!OPTIGA_LIB_PORTING_REQUIRED
         if (!foo_i2c_write(p_i2c_context->p_i2c_hw_config,
-						  (p_i2c_context->slave_address << 1),
+                          (p_i2c_context->slave_address << 1),
                           p_data,
                           length,
                           )
@@ -149,22 +149,22 @@ pal_status_t pal_i2c_write(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t
         }
         else
         {
-			// !!!OPTIGA_LIB_PORTING_REQUIRED
-			/**
-			* Infineon I2C Protocol is a polling based protocol, if foo_i2c_write will fail it will be reported to the 
-			* upper layers by calling 
-			* (p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_ERROR);
-			* If the function foo_i2c_write() will succedd then two options are possible
-			* 1. if foo_i2c_write() is interrupt based, then you need to configure interrupts in the function 
-			*    pal_i2c_init() so that on a succesfull transmit interrupt the callback i2c_master_end_of_transmit_callback(),
-			*    in case of successfull receive i2c_master_end_of_receive_callback() callback 
-			*    in case of not acknowedged, arbitration lost, generic error i2c_master_nack_received_callback() or
-			*    i2c_master_arbitration_lost_callback()
-			* 2. If foo_i2c_write() is a blocking function which will return either ok or failure after transmitting data
-			*    you can handle this case directly here and call 
-			*    invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_SUCCESS);
-			*    
-			*/
+            // !!!OPTIGA_LIB_PORTING_REQUIRED
+            /**
+            * Infineon I2C Protocol is a polling based protocol, if foo_i2c_write will fail it will be reported to the 
+            * upper layers by calling 
+            * (p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_ERROR);
+            * If the function foo_i2c_write() will succedd then two options are possible
+            * 1. if foo_i2c_write() is interrupt based, then you need to configure interrupts in the function 
+            *    pal_i2c_init() so that on a succesfull transmit interrupt the callback i2c_master_end_of_transmit_callback(),
+            *    in case of successfull receive i2c_master_end_of_receive_callback() callback 
+            *    in case of not acknowedged, arbitration lost, generic error i2c_master_nack_received_callback() or
+            *    i2c_master_arbitration_lost_callback()
+            * 2. If foo_i2c_write() is a blocking function which will return either ok or failure after transmitting data
+            *    you can handle this case directly here and call 
+            *    invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_SUCCESS);
+            *    
+            */
             status = PAL_STATUS_SUCCESS;
         }
     }
@@ -188,10 +188,10 @@ pal_status_t pal_i2c_read(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t 
 
         //Invoke the low level i2c master driver API to read from the bus
         if (foo_i2c_read(p_i2c_context->p_i2c_hw_config,
-						  (p_i2c_context->slave_address << 1),
-						  p_data,
-						  length,
-						  )
+                          (p_i2c_context->slave_address << 1),
+                          p_data,
+                          length,
+                          )
         {
             //If I2C Master fails to invoke the read operation, invoke upper layer event handler with error.
             ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
@@ -202,12 +202,12 @@ pal_status_t pal_i2c_read(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t 
         }
         else
         {
-			// !!!OPTIGA_LIB_PORTING_REQUIRED
-			/**
-			* Similar to the foo_i2c_write() case you can directly call 
-			* invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_SUCCESS);
-			* if you have blocking (non-interrupt) i2c calls
-			*/
+            // !!!OPTIGA_LIB_PORTING_REQUIRED
+            /**
+            * Similar to the foo_i2c_write() case you can directly call 
+            * invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_SUCCESS);
+            * if you have blocking (non-interrupt) i2c calls
+            */
             status = PAL_STATUS_SUCCESS;
         }
     }
@@ -234,9 +234,9 @@ pal_status_t pal_i2c_set_bitrate(const pal_i2c_t * p_i2c_context, uint16_t bitra
         {
             bitrate = PAL_I2C_MASTER_MAX_BITRATE;
         }
-		// !!!OPTIGA_LIB_PORTING_REQUIRED
-		// This function is NOT absolutely required for the correct working of the system, but it's recommended
-		// to implement it, though
+        // !!!OPTIGA_LIB_PORTING_REQUIRED
+        // This function is NOT absolutely required for the correct working of the system, but it's recommended
+        // to implement it, though
         if (foo_i2c_set_baudrate(bitrate)
         {
             return_status = PAL_STATUS_FAILURE;

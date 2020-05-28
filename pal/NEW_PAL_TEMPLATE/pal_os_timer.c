@@ -51,8 +51,8 @@ uint32_t pal_os_timer_get_time_in_microseconds(void)
 
 uint32_t pal_os_timer_get_time_in_milliseconds(void)
 {
-	// !!!OPTIGA_LIB_PORTING_REQUIRED
-	// You need to return here a unique value corresponding to the real-time
+    // !!!OPTIGA_LIB_PORTING_REQUIRED
+    // You need to return here a unique value corresponding to the real-time
     return (g_tick_count);
 }
 
