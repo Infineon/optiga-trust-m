@@ -183,7 +183,7 @@ pal_status_t pal_i2c_read(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t 
         gp_pal_i2c_current_ctx = p_i2c_context;
 
         //Invoke the low level i2c master driver API to read from the bus
-        if (foo_i2c_write(p_i2c_context->p_i2c_hw_config,
+        if (foo_i2c_read(p_i2c_context->p_i2c_hw_config,
 						  (p_i2c_context->slave_address << 1),
 						  p_data,
 						  length,
