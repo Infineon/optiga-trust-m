@@ -81,7 +81,7 @@ pal_status_t pal_logger_write(void * p_logger_context, const uint8_t * p_log_dat
     pal_logger_t * p_log_context = p_logger_context;
 
 
-		HAL_UART_Transmit(p_log_context->logger_config_ptr, (uint8_t *)p_log_data, log_data_length, 0xffff);
+		HAL_UART_Transmit(p_log_context->logger_config_ptr, (uint8_t *)p_log_data, log_data_length, 0x3ffff);
 		if (return_status != PAL_STATUS_SUCCESS)
 		{
 			 return return_status;
@@ -99,7 +99,7 @@ pal_status_t pal_logger_read(void * p_logger_context, uint8_t * p_log_data, uint
 	volatile HAL_StatusTypeDef return_status = HAL_OK;
 	pal_logger_t * p_log_context = p_logger_context;
 
-	return_status = HAL_UART_Receive(p_log_context->logger_config_ptr, p_log_data, log_data_length, 0x2ff);
+	return_status = HAL_UART_Receive(p_log_context->logger_config_ptr, p_log_data, log_data_length, 0x3ffff);
 	if (return_status != PAL_STATUS_SUCCESS)
 	{
 		 return return_status;

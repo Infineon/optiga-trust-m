@@ -112,6 +112,8 @@ void pal_os_timer_delay_in_milliseconds(uint16_t milliseconds)
 //lint --e{714} suppress "This is implemented for overall completion of API"
 pal_status_t pal_timer_init(void)
 {
+	//Set tick to 1ms or 1000Hz
+	HAL_SetTickFreq(1000);
     return PAL_STATUS_SUCCESS;
 }
 

@@ -87,6 +87,17 @@ typedef struct {
 	uint8_t signature_size;
 }custom_cert_t;
 
+//Assigning the host a name
+custom_cert_t host_cert = {
+		.name = {"mobile_phone"},
+};
+
+
+//Assigning the client a name
+custom_cert_t client_cert = {
+		.name = {"client_3d_gatjet"},
+};
+
 uint8_t ca_public_key [] =
 {
     //BitString Format
@@ -108,10 +119,7 @@ uint8_t ca_public_key [] =
             0x6a,0xf1,0xac,0x31,0x31,0x1e,0x8c,0x4b
 };
 
-uint8_t sha256_digest[] = {};
 
-optiga_crypt_t * crypt_me = NULL;
-optiga_util_t * util_me = NULL;
 
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
@@ -147,8 +155,16 @@ optiga_lib_status_t generate_sha256_digest(uint8_t * message, uint16_t message_l
 	hash_data_from_host_t hash_data_host;
 	optiga_hash_context_t hash_context;
 
+	optiga_crypt_t * crypt_me = NULL;
 
 	do{
+
+		crypt_me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
+		if (NULL == crypt_me)
+		{
+			break;
+		}
+
 		OPTIGA_HASH_CONTEXT_INIT(hash_context, hash_context_buffer, sizeof(hash_context_buffer), (uint8_t)OPTIGA_HASH_TYPE_SHA_256);
 
 		optiga_lib_status = OPTIGA_LIB_BUSY;
@@ -224,6 +240,17 @@ optiga_lib_status_t generate_sha256_digest(uint8_t * message, uint16_t message_l
 
 	}while(0);
 
+    if (crypt_me)
+    {
+        //Destroy the instance after the completion of usecase if not required.
+        return_status = optiga_crypt_destroy(crypt_me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
+    }
+
 	return return_status;
 }
 
@@ -234,7 +261,25 @@ optiga_lib_status_t generate_random_number(uint8_t * random_num_32)
 {
 	optiga_lib_status_t return_status = 0;
 
-	do{
+	optiga_crypt_t * crypt_me = NULL;
+	do
+	{
+		/**
+		 * 1. Create OPTIGA Crypt Instance
+		 *
+		 */
+		crypt_me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
+		if (NULL == crypt_me)
+		{
+			break;
+		}
+
+		/**
+		 * 2. Generate Random -
+		 *       - Specify the Random type as TRNG
+		 */
+		optiga_lib_status = OPTIGA_LIB_BUSY;
+
 		return_status = optiga_crypt_random(crypt_me,
 											OPTIGA_RNG_TYPE_TRNG,
 											random_num_32,
@@ -256,7 +301,19 @@ optiga_lib_status_t generate_random_number(uint8_t * random_num_32)
 			break;
 		}
 		return_status = OPTIGA_LIB_SUCCESS;
-	}while(0);
+
+	} while (FALSE);
+	OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+	if (crypt_me)
+	{
+		//Destroy the instance after the completion of usecase if not required.
+		return_status = optiga_crypt_destroy(crypt_me);
+		if(OPTIGA_LIB_SUCCESS != return_status)
+		{
+			//lint --e{774} suppress This is a generic macro
+			OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+		}
+	}
 
 	return return_status;
 }
@@ -273,7 +330,14 @@ optiga_lib_status_t challenge_verify(uint8_t * pubkey, uint8_t pubkey_size, uint
 										pubkey_size,
 										(uint8_t)OPTIGA_ECC_CURVE_NIST_P_256
 									};
+	optiga_crypt_t * crypt_me = NULL;
+
 	do{
+		crypt_me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
+		if (NULL == crypt_me)
+		{
+			break;
+		}
 
 		//With OPTIGA Trust M we have two options to verify a certificate, OPTIGA_CRYPT_HOST_DATA, OPTIGA_CRYPT_OID_DATA:
 		// a) OPTIGA_CRYPT_HOST_DATA: If certificate is customized and not an x509 compliant then user would need to use the basic approach and provide all
@@ -308,6 +372,17 @@ optiga_lib_status_t challenge_verify(uint8_t * pubkey, uint8_t pubkey_size, uint
 		return_status = OPTIGA_LIB_SUCCESS;
 	}while(0);
 
+	if (crypt_me)
+	{
+		//Destroy the instance after the completion of usecase if not required.
+		return_status = optiga_crypt_destroy(crypt_me);
+		if(OPTIGA_LIB_SUCCESS != return_status)
+		{
+			//lint --e{774} suppress This is a generic macro
+			OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+		}
+	}
+
 	return return_status;
 }
 
@@ -318,7 +393,17 @@ optiga_lib_status_t challenge_sign(optiga_key_id_t * optiga_key_id, uint8_t * me
 {
 	optiga_lib_status_t return_status = 0;
 
+	optiga_crypt_t * crypt_me = NULL;
+
+
+
 	do{
+		crypt_me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
+		if (NULL == crypt_me)
+		{
+			break;
+		}
+
 		return_status = optiga_crypt_ecdsa_sign(crypt_me,
 				                                message_digest,
 												32,
@@ -345,6 +430,17 @@ optiga_lib_status_t challenge_sign(optiga_key_id_t * optiga_key_id, uint8_t * me
 		return_status = OPTIGA_LIB_SUCCESS;
 	}while(0);
 
+	if (crypt_me)
+	{
+		//Destroy the instance after the completion of usecase if not required.
+		return_status = optiga_crypt_destroy(crypt_me);
+		if(OPTIGA_LIB_SUCCESS != return_status)
+		{
+			//lint --e{774} suppress This is a generic macro
+			OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+		}
+	}
+
 	return return_status;
 }
 
@@ -352,7 +448,7 @@ optiga_lib_status_t challenge_sign(optiga_key_id_t * optiga_key_id, uint8_t * me
 /**
  * Verify customized certificate
  */
-optiga_lib_status_t ca_cert_verify(custom_cert_t * custom_cert, uint8_t * sha256_digest)
+optiga_lib_status_t cert_verify_vs_ca(custom_cert_t * custom_cert, uint8_t * sha256_digest)
 {
 	optiga_lib_status_t return_status = 0;
     uint8_t digest[32] = {};
@@ -362,7 +458,14 @@ optiga_lib_status_t ca_cert_verify(custom_cert_t * custom_cert, uint8_t * sha256
 										sizeof(ca_public_key),
 										(uint8_t)OPTIGA_ECC_CURVE_NIST_P_256
 									};
+	optiga_crypt_t * crypt_me = NULL;
+
 	do{
+		crypt_me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
+		if (NULL == crypt_me)
+		{
+			break;
+		}
 
 		//With OPTIGA Trust M we have two options to verify a certificate, OPTIGA_CRYPT_HOST_DATA, OPTIGA_CRYPT_OID_DATA:
 		// a) OPTIGA_CRYPT_HOST_DATA: If certificate is customized and not an x509 compliant then user would need to use the basic approach and provide all
@@ -397,6 +500,17 @@ optiga_lib_status_t ca_cert_verify(custom_cert_t * custom_cert, uint8_t * sha256
 		return_status = OPTIGA_LIB_SUCCESS;
 	}while(0);
 
+	if (crypt_me)
+	{
+		//Destroy the instance after the completion of usecase if not required.
+		return_status = optiga_crypt_destroy(crypt_me);
+		if(OPTIGA_LIB_SUCCESS != return_status)
+		{
+			//lint --e{774} suppress This is a generic macro
+			OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+		}
+	}
+
 	return return_status;
 }
 
@@ -411,7 +525,18 @@ optiga_lib_status_t cert_sign(custom_cert_t * custom_cert, uint8_t * sha256_dige
     uint8_t digest[32] = {};
 	optiga_lib_status_t return_status = 0;
 
+	optiga_crypt_t * crypt_me = NULL;
+
+	crypt_me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
+
+
 	do{
+
+		if (NULL == crypt_me)
+		{
+			break;
+		}
+
 		return_status = optiga_crypt_ecdsa_sign(crypt_me,
 												digest,
 												sizeof(digest),
@@ -441,6 +566,17 @@ optiga_lib_status_t cert_sign(custom_cert_t * custom_cert, uint8_t * sha256_dige
 		return_status = OPTIGA_LIB_SUCCESS;
 	}while(0);
 
+	if (crypt_me)
+	{
+		//Destroy the instance after the completion of usecase if not required.
+		return_status = optiga_crypt_destroy(crypt_me);
+		if(OPTIGA_LIB_SUCCESS != return_status)
+		{
+			//lint --e{774} suppress This is a generic macro
+			OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+		}
+	}
+
 	return return_status;
 }
 
@@ -457,29 +593,33 @@ optiga_lib_status_t genkey_host(custom_cert_t * custom_cert)
 	uint8_t public_key [100]= {};
 	uint16_t public_key_length = sizeof(public_key);
 
+	optiga_crypt_t * crypt_me = NULL;
+	optiga_util_t * util_me = NULL;
 
 	do{
 
-		//create crypt object
+        //Create OPTIGA Crypt Instance
 		crypt_me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
 		if (NULL == crypt_me)
 		{
 			break;
 		}
 
+		 //Create OPTIGA Util Instance
 		util_me = optiga_util_create(0, optiga_util_callback, NULL);
 		if (NULL == util_me)
 		{
 			break;
 		}
 
+		optiga_lib_status = OPTIGA_LIB_BUSY;
 		return_status = optiga_crypt_ecc_generate_keypair(crypt_me,
-																	OPTIGA_ECC_CURVE_NIST_P_256,
-																	(uint8_t)OPTIGA_KEY_USAGE_SIGN,
-																	FALSE,
-																	&host_key_id,
-																	public_key,
-																	&public_key_length);
+														  OPTIGA_ECC_CURVE_NIST_P_256,
+														  (uint8_t)OPTIGA_KEY_USAGE_SIGN,
+														  FALSE,
+														  &host_key_id,
+														  public_key,
+														  &public_key_length);
 		if (OPTIGA_LIB_SUCCESS != return_status)
 		{
 			break;
@@ -497,11 +637,8 @@ optiga_lib_status_t genkey_host(custom_cert_t * custom_cert)
 			break;
 		}
 
-		//Storing the public key in one of OPTIGA Trust M arbitrary objects
-		offset = 0x00;
-
 		OPTIGA_UTIL_SET_COMMS_PROTECTION_LEVEL(util_me, OPTIGA_COMMS_NO_PROTECTION);
-
+		offset = 0x00;
 		optiga_lib_status = OPTIGA_LIB_BUSY;
 		return_status = optiga_util_write_data(util_me,
 											   OPTIGA_HOST_PUBKEY_OID,
@@ -533,6 +670,28 @@ optiga_lib_status_t genkey_host(custom_cert_t * custom_cert)
 		return_status = OPTIGA_LIB_SUCCESS;
 	}while(0);
 
+	if (crypt_me)
+	{
+		//Destroy the instance after the completion of usecase if not required.
+		return_status = optiga_crypt_destroy(crypt_me);
+		if(OPTIGA_LIB_SUCCESS != return_status)
+		{
+			//lint --e{774} suppress This is a generic macro
+			OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+		}
+	}
+
+    if (util_me)
+    {
+        //Destroy the instance after the completion of usecase if not required.
+        return_status = optiga_util_destroy(util_me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
+    }
+
 	return return_status;
 }
 
@@ -551,28 +710,33 @@ optiga_lib_status_t genkey_client(custom_cert_t * custom_cert)
 	uint8_t public_key [100]= {};
 	uint16_t public_key_length = sizeof(public_key);
 
+	optiga_crypt_t * crypt_me = NULL;
+	optiga_util_t * util_me = NULL;
+
 	do{
-			//create crypt object
+
+        //Create OPTIGA Crypt Instance
 		crypt_me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
 		if (NULL == crypt_me)
 		{
 			break;
 		}
 
+		 //Create OPTIGA Util Instance
 		util_me = optiga_util_create(0, optiga_util_callback, NULL);
 		if (NULL == util_me)
 		{
 			break;
 		}
 
-		//Generate CLIENT Key Pair on ObjectID -OID- E0F1
+		optiga_lib_status = OPTIGA_LIB_BUSY;
 		return_status = optiga_crypt_ecc_generate_keypair(crypt_me,
-															OPTIGA_ECC_CURVE_NIST_P_256,
-															(uint8_t)OPTIGA_KEY_USAGE_SIGN,
-															FALSE,
-															&client_key_id,
-															public_key,
-															&public_key_length);
+														  OPTIGA_ECC_CURVE_NIST_P_256,
+														  (uint8_t)OPTIGA_KEY_USAGE_SIGN,
+														  FALSE,
+														  &client_key_id,
+														  public_key,
+														  &public_key_length);
 		if (OPTIGA_LIB_SUCCESS != return_status)
 		{
 			break;
@@ -590,10 +754,8 @@ optiga_lib_status_t genkey_client(custom_cert_t * custom_cert)
 			break;
 		}
 
-		offset = 0x00;
-
 		OPTIGA_UTIL_SET_COMMS_PROTECTION_LEVEL(util_me, OPTIGA_COMMS_NO_PROTECTION);
-
+		offset = 0x00;
 		optiga_lib_status = OPTIGA_LIB_BUSY;
 		return_status = optiga_util_write_data(util_me,
 											   OPTIGA_CLIENT_PUBKEY_OID,
@@ -621,9 +783,31 @@ optiga_lib_status_t genkey_client(custom_cert_t * custom_cert)
 
 		memcpy(custom_cert->public_key, public_key, public_key_length);
 		custom_cert->pubkey_size = public_key_length;
-		return_status = OPTIGA_LIB_SUCCESS;
 
+		return_status = OPTIGA_LIB_SUCCESS;
 	}while(0);
+
+	if (crypt_me)
+	{
+		//Destroy the instance after the completion of usecase if not required.
+		return_status = optiga_crypt_destroy(crypt_me);
+		if(OPTIGA_LIB_SUCCESS != return_status)
+		{
+			//lint --e{774} suppress This is a generic macro
+			OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+		}
+	}
+
+    if (util_me)
+    {
+        //Destroy the instance after the completion of usecase if not required.
+        return_status = optiga_util_destroy(util_me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
+    }
 
 	return return_status;
 }
@@ -636,26 +820,19 @@ optiga_lib_status_t genkey_client(custom_cert_t * custom_cert)
  */
 void example_optiga_device_authentication(void)
 {
-	optiga_lib_status_t return_status = 0;
+	optiga_lib_status_t return_status = OPTIGA_CRYPT_ERROR;
 	uint8_t digest[32] = {};
-	uint8_t sprintf_buf[1500] = {};
+	uint8_t host_random_challenge[32] = {};
+	uint8_t host_signature_challenge[100] = {};
+	uint16_t host_signature_challenge_len = sizeof(host_signature_challenge);
+	uint8_t client_random_challenge[32] = {};
+	uint8_t client_signature_challenge[100] = {};
+	uint16_t client_signature_challenge_len = sizeof(client_signature_challenge);
+	uint8_t sha256_digest[32] = {};
 
 	OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
 	OPTIGA_EXAMPLE_LOG_MESSAGE("Emulating Provisioning at Infineon");
-
-	//Assigning the host a name
-	custom_cert_t host_cert = {
-			.name = {"mobile_phone"},
-	};
-
-
-	//Assigning the client a name
-	custom_cert_t client_cert = {
-			.name = {"client_3d_gatjet"},
-	};
-	generate_random_number(client_cert.serial_num);
-
 
 	do{
 		return_status = generate_random_number(host_cert.serial_num);
@@ -663,6 +840,7 @@ void example_optiga_device_authentication(void)
 		{
 			break;
 		}
+
 
 		return_status = generate_random_number(client_cert.serial_num);
 		if (OPTIGA_LIB_SUCCESS != return_status)
@@ -685,56 +863,150 @@ void example_optiga_device_authentication(void)
 			break;
 		}
 		//3.- Sign Host customized Cert
+		OPTIGA_EXAMPLE_LOG_MESSAGE("SHA256 Digest of Host Cert");
+		return_status = generate_sha256_digest((uint8_t*)&host_cert, sizeof(host_cert), sha256_digest);
+
 		OPTIGA_EXAMPLE_LOG_MESSAGE("Sign Host Certificate using CA");
 		return_status = cert_sign(&host_cert, sha256_digest);
 		if (OPTIGA_LIB_SUCCESS != return_status)
 		{
 			break;
 		}
-		//4.- Sign Client customized Cert
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Sign Client Certificate using CA");
-		return_status = cert_sign(&client_cert, sha256_digest);
-		if (OPTIGA_LIB_SUCCESS != return_status)
-		{
-			break;
-		}
+//		//4.- Sign Client customized Cert
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("SHA256 Digest of Host Cert");
+//		return_status = generate_sha256_digest((uint8_t*)&client_cert, sizeof(client_cert), sha256_digest);
+//
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Sign Client Certificate using CA");
+//		return_status = cert_sign(&client_cert, sha256_digest);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Host Customized Certificate");
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Host Name:");
+//		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)host_cert.name, sizeof(host_cert.name));
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Host Serial Number:");
+//		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)host_cert.serial_num, sizeof(host_cert.serial_num));
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Host PubKey:");
+//		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)host_cert.public_key, host_cert.pubkey_size);
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Host Signature:");
+//		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)host_cert.signature, host_cert.signature_size);
+//
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Client Customized Certificate");
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Client Customized Certificate");
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Client Name:");
+//		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)client_cert.name, sizeof(client_cert.name));
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Client Serial Number:");
+//		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)client_cert.serial_num, sizeof(client_cert.serial_num));
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Client PubKey:");
+//		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)client_cert.public_key, client_cert.pubkey_size);
+//		OPTIGA_EXAMPLE_LOG_MESSAGE("Client Signature:");
+//		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)client_cert.signature, client_cert.signature_size);
+//
+//		/*
+//		 * START MUTUAL AUTHENTICATION BETWEEN HOST AND CLIENT
+//		 *
+//		 * In a mutual authentication architecture the challenger sends the random challenge
+//		 * */
+//
+//		//5.- Client Sends Certificate to Host and Host Verifies Cert
+//		//    Host gets the certificate and starts the verification process
+//		// 5.a - Host computes certificate digest using OPTIGA Trust M API
+//		return_status = generate_sha256_digest((uint8_t *)&client_cert, sizeof(client_cert), digest);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		// 5.b - Host verifies certificate signature using OPTIGA Trust M API
+//		return_status = cert_verify_vs_ca(&client_cert, digest);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		// 5.c - If Client certificate is successfully verified Host will send a random challenge to validate that
+//		//       Client has possession of private key.
+//		return_status =  generate_random_number(host_random_challenge);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		// 5.d - Client receives random challenge and proceeds to sign it and respond to host
+//		return_status = generate_sha256_digest(host_random_challenge, sizeof(host_random_challenge), digest);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		return_status = challenge_sign(&client_key_id, digest, client_signature_challenge, &client_signature_challenge_len);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		// 5.e - Host Verifies Random Challenge signature using same Public key contained in the Client certificate it just verified
+//		return_status = challenge_verify(client_cert.public_key, client_cert.pubkey_size, digest, client_signature_challenge, client_signature_challenge_len);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		/*
+//		 * NOW CLIENT AUTHENTICATES HOST
+//		 *
+//		 * In a mutual authentication architecture the challenger sends the random challenge
+//		 * */
+//
+//		//6.- Host Sends Certificate to Client and Client Verifies Cert
+//		//    Client gets the certificate and starts the verification process
+//		// 6.a - Client computes certificate digest using OPTIGA Trust M API
+//		return_status = generate_sha256_digest((uint8_t *)&host_cert, sizeof(host_cert), digest);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		// 6.b - Client verifies certificate signature using OPTIGA Trust M API
+//		return_status = cert_verify_vs_ca(&host_cert, digest);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		// 6.c - If Host certificate is successfully verified Client will send a random challenge to validate that
+//		//       Host has possession of private key.
+//		return_status =  generate_random_number(client_random_challenge);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		// 6.d - Host receives random challenge and proceeds to sign it and respond to host
+//		return_status = generate_sha256_digest(client_random_challenge, sizeof(client_random_challenge), digest);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		return_status = challenge_sign(&host_key_id, digest, host_signature_challenge, &host_signature_challenge_len);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
+//
+//		// 6.e - Client Verifies Random Challenge signature using same Public key contained in the Host certificate it just verified
+//		return_status = challenge_verify(host_cert.public_key, host_cert.pubkey_size, digest, host_signature_challenge, host_signature_challenge_len);
+//		if (OPTIGA_LIB_SUCCESS != return_status)
+//		{
+//			break;
+//		}
 
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Host Customized Certificate");
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Host Name:");
-		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)host_cert.name, sizeof(host_cert.name));
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Host Serial Number:");
-		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)host_cert.serial_num, sizeof(host_cert.serial_num));
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Host PubKey:");
-		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)host_cert.public_key, host_cert.pubkey_size);
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Host Signature:");
-		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)host_cert.signature, host_cert.signature_size);
 
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Client Customized Certificate");
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Client Customized Certificate");
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Client Name:");
-		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)client_cert.name, sizeof(client_cert.name));
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Client Serial Number:");
-		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)client_cert.serial_num, sizeof(client_cert.serial_num));
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Client PubKey:");
-		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)client_cert.public_key, client_cert.pubkey_size);
-		OPTIGA_EXAMPLE_LOG_MESSAGE("Client Signature:");
-		OPTIGA_EXAMPLE_LOG_HEX_DATA((uint8_t *)client_cert.signature, client_cert.signature_size);
-
-		/*
-		 * START MUTUAL AUTHENTICATION BETWEEN HOST AND CLIENT
-		 *
-		 * In a mutual authentication architecture the challenger sends the ramdom challenge
-		 * */
-
-		//5.- Client Sends Certificate to Host and Host Verifies Cert
-		// 5.a - Generate message digest
-		return_status = generate_sha256_digest((uint8_t *)&client_cert, sizeof(client_cert), digest);
-		if (OPTIGA_LIB_SUCCESS != return_status)
-		{
-			break;
-		}
 	}while(0);
-	OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+
 }
 
 
