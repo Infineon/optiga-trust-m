@@ -118,6 +118,8 @@ void example_optiga_crypt_ecdsa_sign(void)
         return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
+
+
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
     
     if (me)

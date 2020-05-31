@@ -114,6 +114,7 @@ void example_optiga_util_read_data(void)
             return_status = optiga_lib_status;
             break;
         }
+
         /**
          * Read metadata of a data object (e.g. certificate data object E0E0)
          * using optiga_util_read_data.
