@@ -41,12 +41,6 @@
 /// @cond hidden
 static volatile uint32_t g_tick_count = 0;
 
-
-void SysTick_Handler(void)
-{
-
-}
-
 void delay_timer_isr(void)
 {
     TIMER_ClearEvent(&tick_timer);
