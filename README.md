@@ -35,6 +35,105 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
 * Hibernate for zero power consumption
 * Lifetime for Industrial Automation and Infrastructure is 20 years and 15 years for other Application Profiles  
 
+### OPTIGA&trade; Trust M v.1 and v.3 differences
+
+<table class="tg">
+  <tr>
+    <th class="tg-fymr">Features</th>
+    <th class="tg-fymr">Supported Curve/Algorithm</th>
+    <th class="tg-fymr">API Command</th>
+    <th class="tg-fymr">V1</th>
+    <th class="tg-fymr">V3</th>
+  </tr>
+  <tr>
+    <td class="tg-c3ow" rowspan="2">ECC</td>
+    <td class="tg-0pky">ECC NIST P256/384 </td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky">✓</td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">ECC NIST P521, ECC Brainpool P256/384/512 r1</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"> </td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">RSA</td>
+    <td class="tg-0pky">RSA® 1024/2048 </td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky">✓</td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow" rowspan="3">Key Derivation</td>
+    <td class="tg-0pky">TLS v1.2 PRF SHA 256 </td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky">✓</td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">TLS v1.2 PRF SHA 384/512 </td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"> </td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">HKDF SHA-256/384/512  </td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"> </td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">AES</td>
+    <td class="tg-0pky">Key size - 128/192/256 (ECB, CBC, CBC-MAC, CMAC)</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"> </td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">Random Generation</td>
+    <td class="tg-0pky">TRNG, DRNG, Pre-Master secret for RSA® Key exchange</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky">✓</td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">HMAC</td>
+    <td class="tg-0pky">HMAC with SHA256/384/512 </td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"> </td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">Hash </td>
+    <td class="tg-0pky">SHA256 </td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky">✓</td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow" rowspan="2">Protected data (object) update (Integrity)</td>
+    <td class="tg-0pky">ECC NIST P256/384</br>RSA® 1024/2048 </br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing </td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky">✓</td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">ECC NIST P521,</br>ECC Brainpool P256/384/512 r1</br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"> </td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">Protected Data/key/metadata update (Integrity and/or confidentiality)</td>
+    <td class="tg-0pky">ECC NIST P256/384/521</br>ECC Brainpool P256/384/512 r1</br>RSA® 1024/2048</br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"> </td>
+    <td class="tg-0pky">✓</td>
+  </tr>
+</table>
+
 ## Get Started
 
 ### OPTIGA™ Trust M evaluation kit
@@ -60,7 +159,7 @@ The [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/e
 
 ### <a name="software_framework_oveview"></a>Software Framework overview
 
-![](https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_system_block_diagram.png)
+![](https://github.com/Infineon/Assets/raw/master/Pictures/optiga_trust_m_system_block_diagram_v3.png)
 
 1. See [Trust M Crypt API](https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API) and [Trust M Util API](https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Util-API)  to know more about CRYPT and UTIL modules
 2. Information about the OPTIGA™ Trust M Command Library (CMD) can be found in the [Solution Reference Manual](documents/OPTIGA_Trust_M_Solution_Reference_Manual_v3.00.pdf)
