@@ -30,7 +30,6 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
   * RSA® up to 2048
   * AES key up to 256 , HMAC up to SHA512
   * TLS v1.2 PRF and HKDF up to SHA512
-* OPTIGA™ Trust M Software Framework on Github (https://github.com/infineon)
 * Crypto ToolBox commands for SHA-256, ECC and RSA® Feature, AES, HMAC and Key derivation
 * Configurable device security monitor, 4 Monotonic up counters
 * Hibernate for zero power consumption
