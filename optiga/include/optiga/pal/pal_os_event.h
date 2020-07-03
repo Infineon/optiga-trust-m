@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -167,7 +167,7 @@ LIBRARY_EXPORTS void pal_os_event_start(pal_os_event_t * p_pal_os_event,
  * \brief Stops an os event.
  *
  * \details
- * Starts an OS event.
+ * Stops an OS event.
  *
  * \pre
  * - None

@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -28,20 +28,19 @@
 *
 * \file example_optiga_crypt_ecc_generate_keypair.c
 *
-* \brief   This file provides the example for generation of ecc keypair using 
+* \brief   This file provides the example for generation of ecc keypair using
 *          optiga_crypt_ecc_generate_keypair.
 *
 * \ingroup grOptigaExamples
 *
 * @{
 */
-
+#include "optiga/optiga_util.h"
 #include "optiga/optiga_crypt.h"
+#include "optiga_example.h"
 
 #ifdef OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED
 
-extern void example_log_execution_status(const char_t* function, uint8_t status);
-extern void example_log_function_name(const char_t* function);
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
  */
@@ -55,79 +54,108 @@ static void optiga_crypt_callback(void * context, optiga_lib_status_t return_sta
         // callback to upper layer here
     }
 }
+//lint --e{818} suppress "argument "context" is not used in the sample provided"
+static void optiga_util_callback(void * context, optiga_lib_status_t return_status)
+{
+    optiga_lib_status = return_status;
+    if (NULL != context)
+    {
+        // callback to upper layer here
+    }
+}
+/**
+ * Sample metadata of 0xE0F1 
+ */
+const uint8_t E0F1_metadata[] = { 0x20, 0x06, 0xD0, 0x01, 0x00, 0xD3, 0x01, 0x00 };
 
 /**
- * The below example demonstrates the generation of 
+ * The below example demonstrates the generation of
  * ECC Key pair using #optiga_crypt_ecc_generate_keypair.
  *
  */
 void example_optiga_crypt_ecc_generate_keypair(void)
 {
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     optiga_key_id_t optiga_key_id;
 
     //To store the generated public key as part of Generate key pair
     uint8_t public_key [100];
     uint16_t public_key_length = sizeof(public_key);
-
-    optiga_crypt_t * me = NULL;
-    uint8_t logging_status = 0;
-    example_log_function_name(__FUNCTION__);
+    uint16_t optiga_oid;
+    
+    optiga_crypt_t * crypt_me = NULL;
+    optiga_util_t * util_me = NULL;    
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
         /**
          * 1. Create OPTIGA Crypt Instance
          */
-        me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
-        if (NULL == me)
+        crypt_me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
+        if (NULL == crypt_me)
         {
             break;
         }
 
+        util_me = optiga_util_create(0, optiga_util_callback, NULL);
+        if (NULL == util_me)
+        {
+            break;
+        }
+        
+        optiga_lib_status = OPTIGA_LIB_BUSY;
+        optiga_oid = 0xE0F1;
+        return_status = optiga_util_write_metadata(util_me,
+                                                   optiga_oid,
+                                                   E0F1_metadata,
+                                                   sizeof(E0F1_metadata));
+
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
         /**
-         * 2. Generate ECC Key pair  
+         * 2. Generate ECC Key pair
          *       - Use ECC NIST P 256 Curve
          *       - Specify the Key Usage (Key Agreement or Sign based on requirement)
          *       - Store the Private key in OPTIGA Key store
          *       - Export Public Key
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        optiga_key_id = OPTIGA_KEY_ID_E0F1; 
+        optiga_key_id = OPTIGA_KEY_ID_E0F1;
         //for Session based, use OPTIGA_KEY_ID_SESSION_BASED as key id as shown below.
         //optiga_key_id = OPTIGA_KEY_ID_SESSION_BASED;
-        return_status = optiga_crypt_ecc_generate_keypair(me,
+        return_status = optiga_crypt_ecc_generate_keypair(crypt_me,
                                                           OPTIGA_ECC_CURVE_NIST_P_256,
                                                           (uint8_t)OPTIGA_KEY_USAGE_SIGN,
                                                           FALSE,
                                                           &optiga_key_id,
                                                           public_key,
                                                           &public_key_length);
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_crypt_ecc_generate_keypair operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //Key pair generation failed
-            break;
-        }
-        logging_status = 1;
-
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        return_status = OPTIGA_LIB_SUCCESS;
     } while (FALSE);
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
 
-    if (me)
+    if (crypt_me)
     {
         //Destroy the instance after the completion of usecase if not required.
-        return_status = optiga_crypt_destroy(me);
+        return_status = optiga_crypt_destroy(crypt_me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
     }
-    example_log_execution_status(__FUNCTION__,logging_status);
+    if (util_me)
+    {
+        //Destroy the instance after the completion of usecase if not required.
+        return_status = optiga_util_destroy(util_me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
+    }    
 }
 
 #endif  //OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED

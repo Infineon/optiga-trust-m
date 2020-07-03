@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ extern "C" {
 #include "optiga/common/optiga_lib_return_codes.h"
 
 ///Instance id of OPTIGA slave
-#define OPTIGA_INSTANCE_ID_0     (0x00)
+#define OPTIGA_INSTANCE_ID_0                              (0x00)
 
 /** @brief When command data and response data is unprotected */
 #define OPTIGA_COMMS_NO_PROTECTION                        (0x00)
@@ -60,23 +60,23 @@ extern "C" {
 /** @brief Re-establish shielded connection */
 #define OPTIGA_COMMS_RE_ESTABLISH                         (0x80)
 /** @brief Pre shared secret protocol version */
-#define OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET                    (0x01)
+#define OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET   (0x01)
 
 /** @brief Data is provided by host*/
-#define OPTIGA_CRYPT_HOST_DATA        (0x01)
+#define OPTIGA_CRYPT_HOST_DATA                            (0x01)
 /** @brief Data in internal to optiga OID */
-#define OPTIGA_CRYPT_OID_DATA         (0x00)
+#define OPTIGA_CRYPT_OID_DATA                             (0x00)
 
 /** @brief OPTIGA instance is busy */
-#define OPTIGA_LIB_INSTANCE_BUSY      (0x0001)
+#define OPTIGA_LIB_INSTANCE_BUSY                          (0x0001)
 /** @brief OPTIGA instance is free */
-#define OPTIGA_LIB_INSTANCE_FREE      (0x0000)
+#define OPTIGA_LIB_INSTANCE_FREE                          (0x0000)
 
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
 /** @brief Configure shielded connection protection level for instance */
-#define OPTIGA_COMMS_PROTECTION_LEVEL           (0x01)
+#define OPTIGA_COMMS_PROTECTION_LEVEL                     (0x01)
 /** @brief Configure shielded connection protocol version for instance */
-#define OPTIGA_COMMS_PROTOCOL_VERSION           (0x02)
+#define OPTIGA_COMMS_PROTOCOL_VERSION                     (0x02)
 #endif
 
 /**
@@ -97,7 +97,11 @@ typedef enum optiga_key_id
     /// Key from key store for RSA (non-volatile)
     OPTIGA_KEY_ID_E0FD = 0xE0FD,
     /// Key from session (volatile)
-    OPTIGA_KEY_ID_SESSION_BASED = 0x0000
+    OPTIGA_KEY_ID_SESSION_BASED = 0x0000,
+#ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
+    /// Key from key store for symmetric operations
+    OPTIGA_KEY_ID_SECRET_BASED = 0xE200
+#endif    
 } optiga_key_id_t;
 
 /**
@@ -136,7 +140,19 @@ typedef enum optiga_ecc_curve
     /// Generate elliptic curve key based on NIST P256
     OPTIGA_ECC_CURVE_NIST_P_256 = 0x03,
     /// Generate elliptic curve key based on NIST P384
-    OPTIGA_ECC_CURVE_NIST_P_384 = 0x04
+    OPTIGA_ECC_CURVE_NIST_P_384 = 0x04,
+#ifdef OPTIGA_CRYPT_ECC_NIST_P_521_ENABLED    
+    /// Generate elliptic curve key based on ECC NIST P521
+    OPTIGA_ECC_CURVE_NIST_P_521 = 0x05,
+#endif
+#ifdef OPTIGA_CRYPT_ECC_BRAINPOOL_P_R1_ENABLED    
+    /// Generate elliptic curve key based on ECC Brainpool 256R1
+    OPTIGA_ECC_CURVE_BRAIN_POOL_P_256R1 = 0x13,
+    /// Generate elliptic curve key based on ECC Brainpool 384R1
+    OPTIGA_ECC_CURVE_BRAIN_POOL_P_384R1 = 0x15,
+    /// Generate elliptic curve key based on ECC Brainpool 512R1
+    OPTIGA_ECC_CURVE_BRAIN_POOL_P_512R1 = 0x16
+#endif    
 } optiga_ecc_curve_t;
 
 /**
@@ -168,8 +184,30 @@ typedef enum optiga_rsa_signature_scheme
     /// Signature schemes RSA SSA PKCS1-v1.5 with SHA256 digest
     OPTIGA_RSASSA_PKCS1_V15_SHA256 = 0x01,
     /// Signature schemes RSA SSA PKCS1-v1.5 with SHA384 digest
-    OPTIGA_RSASSA_PKCS1_V15_SHA384 = 0x02
+    OPTIGA_RSASSA_PKCS1_V15_SHA384 = 0x02,
+#ifdef OPTIGA_CRYPT_RSA_SSA_SHA512_ENABLED
+    /// Signature schemes RSA SSA PKCS1-v1.5 with SHA512 digest
+    OPTIGA_RSASSA_PKCS1_V15_SHA512 = 0x03
+#endif    
 }optiga_rsa_signature_scheme_t;
+
+#if defined (OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) || defined (OPTIGA_CRYPT_SYM_DECRYPT_ENABLED) || \
+defined (OPTIGA_CRYPT_HMAC_ENABLED) || defined (OPTIGA_CRYPT_HMAC_VERIFY_ENABLED)
+/**
+ * \brief Specifies the symmetric encryption schemes type in OPTIGA.
+ */
+typedef enum optiga_symmetric_encryption_mode
+{
+    /// Symmetric encryption mode with ECB mode
+    OPTIGA_SYMMETRIC_ECB = 0x08,
+    /// Symmetric encryption mode with CBC mode
+    OPTIGA_SYMMETRIC_CBC = 0x09,
+    /// Symmetric encryption mode with CBC_MAC mode
+    OPTIGA_SYMMETRIC_CBC_MAC = 0x0A,
+    /// Symmetric encryption mode with CMAC mode
+    OPTIGA_SYMMETRIC_CMAC = 0x0B
+}optiga_symmetric_encryption_mode_t;
+#endif
 
 /**
  * \brief Specifies the hashing algorithm type in OPTIGA.
@@ -179,6 +217,15 @@ typedef enum optiga_hash_type
     /// Hash algorithm type SHA256
     OPTIGA_HASH_TYPE_SHA_256 = 0xE2
 } optiga_hash_type_t;
+
+/**
+ * \brief Specifies the hash context length in bytes.
+ */
+typedef enum optiga_hash_context_length
+{
+    /// Hash context length (in bytes) in case of SHA256.
+    OPTIGA_HASH_CONTEXT_LENGTH_SHA_256 = 209 
+} optiga_hash_context_length_t; 
 
 /**
  * \brief Specifies the random generation types
@@ -191,10 +238,69 @@ typedef enum optiga_rng_type
     OPTIGA_RNG_TYPE_DRNG = 0x01
 } optiga_rng_type_t;
 
+#ifdef OPTIGA_CRYPT_HMAC_ENABLED
+/**
+ * \brief Specifies the HMAC generation types in OPTIGA.
+ */
+typedef enum optiga_hmac_type
+{
+    /// Generated MAC using HMAC-SHA256
+    OPTIGA_HMAC_SHA_256 = 0x20,
+    /// Generated MAC using HMAC-SHA384
+    OPTIGA_HMAC_SHA_384 = 0x21,
+    /// Generated MAC using HMAC-SHA512
+    OPTIGA_HMAC_SHA_512 = 0x22
+}optiga_hmac_type_t;
+#endif
+
+#ifdef OPTIGA_CRYPT_HKDF_ENABLED
+/**
+ * \brief Specifies the HKDF key derivation types in OPTIGA.
+ */
+typedef enum optiga_hkdf_type
+{
+    /// Key derivation using HKDF-SHA256
+    OPTIGA_HKDF_SHA_256 = 0x08,
+    /// Key derivation using HKDF-SHA384
+    OPTIGA_HKDF_SHA_384 = 0x09,
+    /// Key derivation using HKDF-SHA512
+    OPTIGA_HKDF_SHA_512 = 0x0A
+}optiga_hkdf_type_t;
+#endif
+
+/**
+ * \brief Specifies the key derivation types.
+ */
+typedef enum optiga_tls_prf_type
+{
+    /// Key derivation using TLSv1.2 PRF SHA256
+    OPTIGA_TLS12_PRF_SHA_256 = 0x01,
+#ifdef OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED    
+    /// Key derivation using TLSv1.2 PRF SHA384
+    OPTIGA_TLS12_PRF_SHA_384 = 0x02,
+#endif
+#ifdef OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED
+    /// Key derivation using TLSv1.2 PRF SHA512
+    OPTIGA_TLS12_PRF_SHA_512 = 0x03
+#endif    
+}optiga_tls_prf_type_t;
+
+#ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
+/**
+ * \brief Specifies the symmetric key types supported by OPTIGA.
+ */
+typedef enum optiga_symmetric_key_type
+{
+    /// Symmetric key type of AES-128
+    OPTIGA_SYMMETRIC_AES_128 = 0x81,
+    /// Symmetric key type of AES-192
+    OPTIGA_SYMMETRIC_AES_192 = 0x82,
+    /// Symmetric key type of AES-256
+    OPTIGA_SYMMETRIC_AES_256 = 0x83
+}optiga_symmetric_key_type_t;
+#endif
 /**
  * \brief Specifies the structure to the Hash context details managed by OPTIGA.
-
-
  */
 typedef struct optiga_hash_context
 {
@@ -243,8 +349,6 @@ typedef struct public_key_from_host
     uint8_t key_type;
 } public_key_from_host_t;
 
-
-
 /**
  * \brief Specifies the data structure for data to be read from OPTIGA
  */
@@ -260,10 +364,10 @@ typedef struct optiga_get_data_object
     uint16_t accumulated_size;
     /// Contains the data length received in last transceive. Used for chaining purpose
     uint16_t last_read_size;
-    /// Pointer to the read buffer length
-    uint16_t * ref_bytes_to_read;
     /// Read to data or metadata
     uint8_t data_or_metadata;
+    /// Pointer to the read buffer length
+    uint16_t * ref_bytes_to_read;
     /// Read data buffer pointer
     uint8_t * buffer;
 } optiga_get_data_object_params_t;
@@ -304,16 +408,14 @@ typedef struct optiga_calc_hash
     optiga_hash_context_t * p_hash_context;
     ///Type of hash operation
     uint8_t hash_sequence;
-    /// Type of data to be hash
-    uint8_t source_of_data_to_hash;
+    ///Current type of hash operation
+    uint8_t current_hash_sequence;    
     ///Data length has been sent
     uint32_t data_sent;
-    ///Possible data size to send in a fragment
-    uint32_t apparent_comms_size;
     ///Out digest
     uint8_t * p_out_digest;
-    ///Chaining status
-    bool_t chaining_status;
+    ///export hash ctx
+    bool_t export_hash_ctx;
     ///Possible context size to send in a fragment
     uint32_t apparent_context_size;
 } optiga_calc_hash_params_t;
@@ -328,10 +430,12 @@ typedef struct optiga_get_random
     uint16_t random_data_length;
     /// Optional data length
     uint16_t optional_data_length; 
-    ///user buffer for storing random data
+    /// User buffer for storing random data
     uint8_t * random_data;
-    ///user buffer which holds the optional data
+    /// User buffer which holds the optional data
     const uint8_t * optional_data;
+    /// Use to indicate to acquire session
+    bool_t store_in_session;
 } optiga_get_random_params_t;
 
 
@@ -414,44 +518,48 @@ typedef struct optiga_calc_ssec
  */
 typedef struct optiga_derive_key
 {
-    /// Session based (#optiga_key_id_t) or Data object which has the pre-shared secret
-    uint16_t input_shared_secret_oid;
-    /// Label length
-    uint16_t label_length;
-    /// Random Seed length
-    uint16_t seed_length;
-    /// Derived Key length
-    uint16_t derived_key_length;
-    /// Random Seed
-    const uint8_t * seed;
+    /// Random Seed/Salt
+    const uint8_t * random_data;
     /// Label input as a constant string
     const uint8_t * label;
+    /// Application specific info
+    const uint8_t * info;    
     /// Pointer to a buffer where the exported key to be stored.
     uint8_t * derived_key;
+    /// Session based (#optiga_key_id_t) or Data object which has the pre-shared secret
+    uint16_t input_shared_secret_oid;
+    /// Random Seed/Salt length
+    uint16_t random_data_length;
+    /// Label length
+    uint16_t label_length;
+    /// Info length
+    uint16_t info_length;
+    /// Derived Key length
+    uint16_t derived_key_length;
 }optiga_derive_key_params_t;
 
+#if defined (OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED) || defined (OPTIGA_CRYPT_RSA_DECRYPT_ENABLED)
 /**
  * \brief Specifies the structure for asymmetric encryption and decryption
  */
 typedef struct optiga_enc_dec_asym
 {
-    // Length of message to be encrypted. Set 0 if data from session OID
+    /// Length of message to be encrypted. Set 0 if data from session OID
     uint16_t message_length;
-    // Pointer to the length of the encrypted or decrypted message
+    /// Pointer to the length of the encrypted or decrypted message
     uint16_t * processed_message_length;
-    // Message to be encrypted. Set NULL if data from session OID
+    /// Message to be encrypted. Set NULL if data from session OID
     const uint8_t * message;
     /// Source of provided public key for encryption and Private key for decryption
     uint8_t public_key_source_type;
     /// Public key provided by host
     const void * key;
-    // Pointer to buffer where encrypted or decrypted message is stored
+    /// Pointer to buffer where encrypted or decrypted message is stored
     uint8_t * processed_message;
-    // Store private key OID
+    /// Store private key OID
     optiga_key_id_t private_key_id;
 }optiga_encrypt_asym_params_t,optiga_decrypt_asym_params_t;
-
-
+#endif
 
 /**
  * \brief Specifies the data structure for protected update
@@ -468,12 +576,70 @@ typedef struct optiga_set_object_protected_params
     uint8_t manifest_version;
 } optiga_set_object_protected_params_t;
 
+#if defined (OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) || defined (OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)
 /**
- * \brief Prepares uint24 [Big endian] type value from the buffer and store
+ * \brief Specifies the data structure for symmetric encrypt and decrypt
+ */
+typedef struct optiga_symmetric_enc_dec_params
+{
+    /// Symmetric key OID
+    uint16_t symmetric_key_oid;
+    /// Pointer to plain text
+    const uint8_t * in_data;
+    /// Length of plain text
+    uint32_t in_data_length;
+    /// Pointer to initialization vector
+    const uint8_t * iv;
+    /// Length of initialization vector
+    uint16_t iv_length;
+    /// Pointer to associated data
+    const uint8_t * associated_data;
+    /// Length of associated data
+    uint16_t associated_data_length;
+    /// Pointer to output data
+    uint8_t * out_data;
+    /// Length of output data
+    uint32_t * out_data_length;
+    /// Pointer to generated hmac
+    const uint8_t * generated_hmac;
+    /// Requested sequence
+    uint8_t  original_sequence;
+    /// Variable to store current encrypt decrypt sequence
+    uint8_t  current_sequence;
+    /// Length of sent data
+    uint32_t sent_data_length;
+    /// Length of received data
+    uint32_t received_data_length;
+    /// Variable to indicate complete input data length required for CCM
+    uint16_t total_input_data_length;
+    /// Length of generated hmac
+    uint32_t generated_hmac_length;
+    /// Encryption or hmac mode
+    uint8_t mode;
+    /// Symmetric mode of operation
+    uint8_t operation_mode;
+} optiga_encrypt_sym_params_t,optiga_decrypt_sym_params_t;
+#endif
+#ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
+/**
+ * \brief Specifies the data structure for symmetric generate key 
+ */
+typedef struct optiga_gen_symkey_params
+{
+    /// Key usage type
+    uint8_t key_usage;
+    /// Symmetric key export option
+    bool_t export_symmetric_key;
+    /// Symmetric key buffer pointer or oid pointer
+    void * symmetric_key;
+} optiga_gen_symkey_params_t;
+#endif
+/**
+ * \brief Prepares uint32 [Big endian] type value from the buffer and store
  *
  * \details
- * Prepares uint24 [Big endian] type value from the buffer and store
- * - Return first 3 bytes from input buffer as uint32_t.<br>
+ * Prepares uint32 [Big endian] type value from the buffer and store
+ * - Return first 4 bytes from input buffer as uint32_t.<br>
  *
  * \pre
  * - None
@@ -481,12 +647,12 @@ typedef struct optiga_set_object_protected_params
  * \note
  * - None
  *
- * \param[in]  input_buffer          Pointer to the buffer
+ * \param[in]  p_input_buffer          Pointer to the buffer
  *
  * \retval     return 32 bit value
  *
  */
-uint32_t optiga_common_get_uint32 (const uint8_t* p_input_buffer);
+uint32_t optiga_common_get_uint32(const uint8_t* p_input_buffer);
 
 /**
  * \brief Copies 2 bytes of uint16 type value to the buffer
@@ -501,12 +667,12 @@ uint32_t optiga_common_get_uint32 (const uint8_t* p_input_buffer);
  * \note
  * - None
  *
- * \param[in,out]  output_buffer         Pointer to the buffer
- * \param[in]      two_byte_value        16 bit value
+ * \param[in,out]  p_output_buffer         Pointer to the buffer
+ * \param[in]      two_byte_value          16 bit value
  *
  */
-void optiga_common_set_uint16 (uint8_t * p_output_buffer,
-                               uint16_t two_byte_value);
+void optiga_common_set_uint16(uint8_t * p_output_buffer,
+                              uint16_t two_byte_value);
 
 /**
  * \brief Copies 4 bytes of uint32 [Big endian] type value to the buffer and stores in the output pointer
@@ -521,12 +687,12 @@ void optiga_common_set_uint16 (uint8_t * p_output_buffer,
  * \note
  * - None
  *
- * \param[in,out]  output_buffer          Pointer to the buffer
- * \param[in]      four_byte_value        32 bit value
+ * \param[in,out]  p_output_buffer          Pointer to the buffer
+ * \param[in]      four_byte_value          32 bit value
  *
  */
-void optiga_common_set_uint32 (uint8_t* p_output_buffer,
-                               uint32_t four_byte_value);
+void optiga_common_set_uint32(uint8_t* p_output_buffer,
+                              uint32_t four_byte_value);
 
 /**
  * \brief Prepares uint16 [Big endian] type value from the buffer and stores in the output pointer
@@ -541,12 +707,12 @@ void optiga_common_set_uint32 (uint8_t* p_output_buffer,
  * \note
  * - None
  *
- * \param[in]      input_buffer    Pointer to the buffer
- * \param[in,out]  two_byte_value  Pointer to the value tobe assigne
+ * \param[in]      p_input_buffer    Pointer to the buffer
+ * \param[in,out]  p_two_byte_value  Pointer to the value tobe assigne
  *
  */
-void optiga_common_get_uint16 (const uint8_t * p_input_buffer,
-                               uint16_t* p_two_byte_value);
+void optiga_common_get_uint16(const uint8_t * p_input_buffer,
+                              uint16_t* p_two_byte_value);
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -35,16 +35,25 @@
 * @{
 */
 
-#include <stdio.h>
-#ifndef _PAL_FILE_SYSTEM_
-#define _PAL_FILE_SYSTEM_
+
+#ifndef _PROTECTED_UPDATE_PAL_FILE_SYSTEM_
+#define _PROTECTED_UPDATE_PAL_FILE_SYSTEM_
+
+#include <stdint.h>
 
 // Read file to a byte array
-int pal_file_system_read_file_to_array(const unsigned char * file_name,
-	unsigned char ** byte_array,
-	unsigned short * byte_array_length);
+int32_t pal_file_system_read_file_to_array( const int8_t * file_name,
+                                        uint8_t ** byte_array,
+                                        uint16_t * byte_array_length);
 
-#endif //_PAL_FILE_SYSTEM_
+int32_t pal_file_system_read_file_to_array_in_hex(  const int8_t * file_name, 
+                                                uint8_t ** byte_array, 
+                                                uint16_t * byte_array_length);
+
+int32_t pal_file_system_write_to_file( const int8_t * file_name, 
+                                                int8_t * byte_array, 
+                                                uint16_t byte_array_length);
+#endif //_PROTECTED_UPDATE_PAL_FILE_SYSTEM_
 
 /**
 * @}

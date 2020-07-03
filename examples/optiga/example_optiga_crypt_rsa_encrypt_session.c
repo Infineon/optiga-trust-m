@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -36,11 +36,9 @@
 */
 
 #include "optiga/optiga_crypt.h"
+#include "optiga_example.h"
 
 #ifdef OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
-    
-extern void example_log_execution_status(const char_t* function, uint8_t status);
-extern void example_log_function_name(const char_t* function);
 
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
@@ -64,7 +62,7 @@ static void optiga_crypt_callback(void * context, optiga_lib_status_t return_sta
  */
 void example_optiga_crypt_rsa_encrypt_session(void)
 {
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     optiga_key_id_t optiga_key_id;
     optiga_rsa_encryption_scheme_t encryption_scheme;
 
@@ -77,8 +75,7 @@ void example_optiga_crypt_rsa_encrypt_session(void)
     uint16_t optional_data_length = sizeof(optional_data);
 
     optiga_crypt_t * me = NULL;
-    uint8_t logging_status = 0;
-    example_log_function_name(__FUNCTION__);
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
@@ -105,21 +102,7 @@ void example_optiga_crypt_rsa_encrypt_session(void)
                                                           &optiga_key_id,
                                                           public_key,
                                                           &public_key_length);
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_crypt_rsa_generate_keypair operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //Key pair generation failed
-            break;
-        }
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
 
         /**
          * 3. Generate 48 byte RSA Pre master secret in acquired session OID
@@ -130,20 +113,7 @@ void example_optiga_crypt_rsa_encrypt_session(void)
                                                                     optional_data_length,
                                                                     48);
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_crypt_rsa_generate_pre_master_secret operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            break;
-        }
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
 
@@ -168,35 +138,26 @@ void example_optiga_crypt_rsa_encrypt_session(void)
                                                          encrypted_message,
                                                          &encrypted_message_length);
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_crypt_rsa_encrypt_session operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //RSA Encryption failed
-            break;
-        }
-        logging_status = 1;
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
-
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
         return_status = optiga_crypt_destroy(me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
     }
-    example_log_execution_status(__FUNCTION__,logging_status);
 }
 
 #endif  // OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
-       
+
 /**
 * @}
 */

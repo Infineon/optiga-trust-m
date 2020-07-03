@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,8 @@ extern "C" {
 /// Identifier to store and read OPTIGA Platform Binding Shared secret on host platform
 #define OPTIGA_PLATFORM_BINDING_SHARED_SECRET_ID        (0x11)
 
+/// Maximum shared secret length this value is bind with OPTIGA_PLATFORM_BINDING_SHARED_SECRET_ID
+#define OPTIGA_SHARED_SECRET_MAX_LENGTH                 (0x40)
 
 // Persistant data store is not configured
 #define OPTIGA_LIB_PAL_DATA_STORE_NOT_CONFIGURED        (0x00)
@@ -84,7 +86,7 @@ extern "C" {
  *
  * \param[in]     datastore_id          Datastore id from where the data should be read.
  * \param[out]    p_buffer              Valid Pointer to output buffer
- * \param[in,out] p_buffer_length       Valid Pointer to the data buffer length to store the read data length. The input value must be the data length to be read.
+ * \param[in,out] p_buffer_length       Valid Pointer to the data buffer length to store the read data length. The input value gets updated with the actual length read from the data store.
  *
  * \retval        #PAL_STATUS_SUCCESS   On successful execution
  * \retval        #PAL_STATUS_FAILURE   On failure

@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -57,8 +57,8 @@ ifx_i2c_datastore_config_t ifx_i2c_datastore_config =
     OPTIGA_PLATFORM_BINDING_SHARED_SECRET_ID,
     /// Manage context Pal datastore ID
     OPTIGA_COMMS_MANAGE_CONTEXT_ID,
-    /// Shared secret size
-    0x40,
+    /// Max shared secret length
+    OPTIGA_SHARED_SECRET_MAX_LENGTH,
 };
 #endif
 /** @brief This is IFX I2C context. Only one context is supported per slave.
@@ -92,11 +92,11 @@ ifx_i2c_datastore_config_t ifx_i2c_datastore_config =
 ifx_i2c_context_t ifx_i2c_context_0 =
 {
     /// Slave address
-    0x30,
+    IFX_I2C_BASE_ADDR,
     /// i2c-master frequency
     400,
     /// IFX-I2C frame size
-    0x0115,
+    IFX_I2C_FRAME_SIZE,
     /// Vdd pin
     &optiga_vdd_0,
     /// Reset pin

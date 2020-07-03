@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -35,11 +35,9 @@
 *
 * @{
 */
-
+#include "optiga_example.h"
 #include "optiga/optiga_util.h"
 
-extern void example_log_execution_status(const char_t* function, uint8_t status);
-extern void example_log_function_name(const char_t* function);
 /**
  * Callback when optiga_util_xxxx operation is completed asynchronously
  */
@@ -65,10 +63,9 @@ void example_optiga_util_read_data(void)
     uint16_t offset, bytes_to_read;
     uint16_t optiga_oid;
     uint8_t read_data_buffer[1024];
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     optiga_util_t * me = NULL;
-    uint8_t logging_status = 0;
-    example_log_function_name(__FUNCTION__);
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
@@ -101,22 +98,7 @@ void example_optiga_util_read_data(void)
                                               read_data_buffer,
                                               &bytes_to_read);
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_util_read_data operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //Reading the data object failed.
-            break;
-        }
-
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
         /**
          * Read metadata of a data object (e.g. certificate data object E0E0)
          * using optiga_util_read_data.
@@ -129,30 +111,22 @@ void example_optiga_util_read_data(void)
                                                   read_data_buffer,
                                                   &bytes_to_read);
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_util_read_metadata operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //Reading metadata data object failed.
-            break;
-        }
-        logging_status = 1;
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        return_status = OPTIGA_LIB_SUCCESS;
     } while (FALSE);
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
 
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
         return_status = optiga_util_destroy(me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
     }
-    example_log_execution_status(__FUNCTION__,logging_status);
+
 }
 
 /**

@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -35,15 +35,16 @@
 * @{
 */
 
+#include "optiga/common/optiga_lib_common.h"
 #include "optiga/pal/pal_crypt.h"
-#include "optiga/pal/pal_memory_mgmt.h"
+#include "optiga/pal/pal_os_memory.h"
 #include "mbedtls/ccm.h"
 #include "mbedtls/md.h"
 #include "mbedtls/ssl.h"
 #include "mbedtls/version.h"
 
 #define PAL_CRYPT_MAX_LABEL_SEED_LENGTH     (96U)
-
+//lint --e{818, 715, 830} suppress "argument "p_pal_crypt" is not used in the implementation but kept for future use"
 pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
                                       const uint8_t * p_secret,
                                       uint16_t secret_length,
@@ -65,6 +66,8 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
     const mbedtls_md_info_t *message_digest_info;
     mbedtls_md_context_t message_digest_context;
     uint16_t final_seed_length = 0;
+       
+    mbedtls_md_init(&message_digest_context);
     
     do
     {
@@ -83,8 +86,6 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
 
         message_digest_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
 
-        mbedtls_md_init(&message_digest_context);
-
         memcpy(md_hmac_temp_array + message_digest_length, p_label, label_length);
         memcpy(md_hmac_temp_array + message_digest_length + label_length, p_seed, seed_length);
         final_seed_length = label_length + seed_length;
@@ -95,21 +96,50 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
             break;
         }
 
-        mbedtls_md_hmac_starts(&message_digest_context, p_secret, secret_length);
-        mbedtls_md_hmac_update(&message_digest_context, md_hmac_temp_array + message_digest_length, final_seed_length);
-        mbedtls_md_hmac_finish(&message_digest_context, md_hmac_temp_array);
+        if (0 != mbedtls_md_hmac_starts(&message_digest_context, p_secret, secret_length))
+        {
+            break;
+        }
+       
+        if (0 != mbedtls_md_hmac_update(&message_digest_context, md_hmac_temp_array + message_digest_length, final_seed_length))
+        {
+            break;
+        }
+        
+        if (0 != mbedtls_md_hmac_finish(&message_digest_context, md_hmac_temp_array))
+        {
+            break;
+        }
 
         for (derive_key_len_index = 0; derive_key_len_index < derived_key_length; 
              derive_key_len_index += message_digest_length)
         {
-            mbedtls_md_hmac_reset(&message_digest_context);
-            mbedtls_md_hmac_update(&message_digest_context, md_hmac_temp_array, 
-                                    message_digest_length + final_seed_length);
-            mbedtls_md_hmac_finish(&message_digest_context, hmac_checksum_result);
+            if (0 != mbedtls_md_hmac_reset(&message_digest_context))
+            {
+                break;
+            }
+            if (0 != mbedtls_md_hmac_update(&message_digest_context, md_hmac_temp_array, 
+                            message_digest_length + final_seed_length))
+            {
+                break;                
+            }
+            if (0 != mbedtls_md_hmac_finish(&message_digest_context, hmac_checksum_result))
+            {
+                break;                                
+            }
 
-            mbedtls_md_hmac_reset(&message_digest_context);
-            mbedtls_md_hmac_update(&message_digest_context, md_hmac_temp_array, message_digest_length);
-            mbedtls_md_hmac_finish(&message_digest_context, md_hmac_temp_array);
+            if (0 != mbedtls_md_hmac_reset(&message_digest_context))
+            {
+                break;                
+            }
+            if (0 != mbedtls_md_hmac_update(&message_digest_context, md_hmac_temp_array, message_digest_length))
+            {
+                break;                                
+            }
+            if (0 != mbedtls_md_hmac_finish(&message_digest_context, md_hmac_temp_array))
+            {
+                break;                                
+            }
 
             hmac_result_length = ((derive_key_len_index + message_digest_length) > derived_key_length) ? 
                                   (derived_key_length % message_digest_length) : (message_digest_length);
@@ -121,18 +151,21 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
                                                                     hmac_checksum_result[hmac_checksum_result_index];
             }
         }
-
-        mbedtls_md_free(&message_digest_context);
-
-        memset(md_hmac_temp_array, 0x00, sizeof(md_hmac_temp_array));
-        memset(hmac_checksum_result, 0x00, sizeof(hmac_checksum_result));
-
-        return_value = PAL_STATUS_SUCCESS;
+        if (derive_key_len_index >= derived_key_length)
+        {
+            return_value = PAL_STATUS_SUCCESS;
+        }
     } while (FALSE);
+    
+    mbedtls_md_free(&message_digest_context);
+
+    memset(md_hmac_temp_array, 0x00, sizeof(md_hmac_temp_array));
+    memset(hmac_checksum_result, 0x00, sizeof(hmac_checksum_result));    
     #undef PAL_CRYPT_DIGEST_MAX_SIZE
     return return_value;
 }
 
+//lint --e{818, 715, 830} suppress "argument "p_pal_crypt" is not used in the implementation but kept for future use"
 pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
                                           const uint8_t * p_plain_text,
                                           uint16_t plain_text_length,
@@ -192,6 +225,7 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
     return return_status;
 }
 
+//lint --e{818, 715, 830} suppress "argument "p_pal_crypt" is not used in the implementation but kept for future use"
 pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
                                           const uint8_t * p_cipher_text,
                                           uint16_t cipher_text_length,
@@ -264,6 +298,7 @@ pal_status_t pal_crypt_version(uint8_t * p_crypt_lib_version_info, uint16_t * le
     } while (0);
     return return_value;
 }
+
 
 /**
 * @}

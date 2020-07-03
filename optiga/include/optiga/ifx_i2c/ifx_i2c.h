@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +79,7 @@ typedef enum ifx_i2c_reset_type
  * - At present, only single instance of #ifx_i2c_context_t is supported.
  * - The following parameters in #ifx_i2c_context_t must be initialized with appropriate values <br>
  *   - <b>slave address</b> : Address of I2C slave
- *   - <b>frame_size</b> : Frame size in bytes. Minimum supported value is 16 bytes.<br>
+ *   - <b>frame_size</b> : Frame size in bytes. Refer #IFX_I2C_FRAME_SIZE for more details.<br>
  *              - It is recommended not to use a value greater than the slave's frame size.
  *              - The user specified frame size is written to I2C slave's frame size register.
  *                The frame size register is read back from I2C slave.

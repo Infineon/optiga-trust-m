@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>payload_version=3 trust_anchor_oid=e0e3 target_oid=e0e1 offset=01 write_type=1 sign_algo=RSA_SSA_PKCS1_V1_5_SHA_256 priv_key=C:\Users\cskancha\Desktop\test\ec_256_prv.pem payload=C:\Users\cskancha\Desktop\test\data_to_format.txt</LocalDebuggerCommandArguments>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-  </PropertyGroup>
-</Project>

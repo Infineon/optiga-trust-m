@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -48,23 +48,16 @@ extern "C" {
 #include <stdint.h>
 
 /// @cond hidden
-#ifndef _OPTIGA_EXPORTS_DLLEXPORT_H_
-#define _OPTIGA_EXPORTS_DLLEXPORT_H_
-
-#if defined(WIN32) || defined(_WIN32)
+#ifdef _OPTIGA_EXPORTS_DLLEXPORT_H_
 
 #ifdef OPTIGA_LIB_EXPORTS
 #define LIBRARY_EXPORTS __declspec(dllexport)
-#elif defined(OPTIGA_LIB_EXCLUDE_IMPORT)
-#define LIBRARY_EXPORTS
 #else
 #define LIBRARY_EXPORTS __declspec(dllimport)
 #endif  // OPTIGA_LIB_EXPORTS
 
 #else
-#define LIBRARY_EXPORTS
-#endif //WIN32
-
+#define LIBRARY_EXPORTS 
 #endif /*_OPTIGA_EXPORTS_DLLEXPORT_H_*/
 /// @endcond
 
@@ -121,6 +114,10 @@ typedef struct data_blob
 #define _STATIC_H static
 #else
 #define _STATIC_H
+#endif
+
+#ifndef _STATIC_INLINE
+#define _STATIC_INLINE              static inline
 #endif
 
 #ifdef __cplusplus

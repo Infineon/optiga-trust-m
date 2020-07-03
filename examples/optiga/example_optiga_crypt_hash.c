@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,8 @@
 *
 * \file example_optiga_crypt_hash.c
 *
-* \brief    This file provides the example for hashing operations using 
-*           #optiga_crypt_hash_start, #optiga_crypt_hash_update and 
+* \brief    This file provides the example for hashing operations using
+*           #optiga_crypt_hash_start, #optiga_crypt_hash_update and
 *           #optiga_crypt_hash_finalize.
 *
 * \ingroup grOptigaExamples
@@ -38,11 +38,9 @@
 */
 
 #include "optiga/optiga_crypt.h"
+#include "optiga_example.h"
 
 #ifdef OPTIGA_CRYPT_HASH_ENABLED
-
-extern void example_log_execution_status(const char_t* function, uint8_t status);
-extern void example_log_function_name(const char_t* function);
 
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
@@ -72,25 +70,25 @@ static void optiga_crypt_callback(void * context, optiga_lib_status_t return_sta
  * The below example demonstrates the generation of digest using
  * optiga_crypt_hash_xxxx operations.
  *
- * Example for #optiga_crypt_hash_start, #optiga_crypt_hash_update, 
+ * Example for #optiga_crypt_hash_start, #optiga_crypt_hash_update,
  * #optiga_crypt_hash_finalize
  *
  */
 void example_optiga_crypt_hash(void)
 {
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
 
-    uint8_t hash_context_buffer [130];
+    // Note : The size of the hash context provided by OPTIGA is 209 bytes for SHA-256
+    uint8_t hash_context_buffer [OPTIGA_HASH_CONTEXT_LENGTH_SHA_256];
     optiga_hash_context_t hash_context;
 
-    uint8_t data_to_hash [] = {"OPITGA, Infineon Technologies AG"};
+    uint8_t data_to_hash [] = {"OPTIGA, Infineon Technologies AG"};
     hash_data_from_host_t hash_data_host;
 
     uint8_t digest [32];
 
     optiga_crypt_t * me = NULL;
-    uint8_t logging_status = 0;
-    example_log_function_name(__FUNCTION__);
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
@@ -110,25 +108,12 @@ void example_optiga_crypt_hash(void)
                                  sizeof(hash_context_buffer),(uint8_t)OPTIGA_HASH_TYPE_SHA_256);
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        
+
         /**
          * 3. Initialize the hashing context at OPTIGA
          */
         return_status = optiga_crypt_hash_start(me, &hash_context);
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {            
-            //Wait until the optiga_crypt_hash_start operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            break;
-        }
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
 
         /**
          * 4. Continue hashing the data
@@ -137,24 +122,11 @@ void example_optiga_crypt_hash(void)
         hash_data_host.length = sizeof(data_to_hash);
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_crypt_hash_update(me, 
+        return_status = optiga_crypt_hash_update(me,
                                                  &hash_context,
                                                  OPTIGA_CRYPT_HOST_DATA,
                                                  &hash_data_host);
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_crypt_hash_update operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            break;
-        }
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
 
         /**
          * 5. Finalize the hash
@@ -164,31 +136,77 @@ void example_optiga_crypt_hash(void)
                                                    &hash_context,
                                                    digest);
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_crypt_hash_finalize operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            break;
-        }
-        logging_status = 1;
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
-
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
         return_status = optiga_crypt_destroy(me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
     }
-    example_log_execution_status(__FUNCTION__,logging_status);
+}
 
+/**
+ * The below example demonstrates the generation of digest using
+ * optiga_crypt_hash operations.
+ *
+ * Example for #optiga_crypt_hash
+ *
+ */
+void example_optiga_crypt_hash_data(void)
+{
+    optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
+
+    uint8_t data_to_hash [] = {"OPTIGA, Infineon Technologies AG"};
+    hash_data_from_host_t hash_data_host;
+
+    uint8_t digest [32];
+
+    optiga_crypt_t * me = NULL;
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+
+    do
+    {
+        /**
+         * 1. Create OPTIGA Crypt Instance
+         */
+        me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
+        if (NULL == me)
+        {
+            break;
+        }
+
+        /**
+         * 2. Initialize the hashing context at OPTIGA
+         */
+        hash_data_host.buffer = data_to_hash;
+        hash_data_host.length = sizeof(data_to_hash);
+        optiga_lib_status = OPTIGA_LIB_BUSY;
+        return_status = optiga_crypt_hash(me, OPTIGA_HASH_TYPE_SHA_256, OPTIGA_CRYPT_HOST_DATA, &hash_data_host, digest);
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        return_status = OPTIGA_LIB_SUCCESS;
+
+    } while (FALSE);
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    
+    if (me)
+    {
+        //Destroy the instance after the completion of usecase if not required.
+        return_status = optiga_crypt_destroy(me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
+    }
 }
 
 #endif  //OPTIGA_CRYPT_HASH_ENABLED

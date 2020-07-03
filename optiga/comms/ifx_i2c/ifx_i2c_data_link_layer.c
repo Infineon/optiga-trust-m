@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -80,6 +80,87 @@
 // Seconds to milliseconds
 #define DL_SEC_TO_MSECS                 (1000U)
 
+#if defined (OPTIGA_LIB_ENABLE_LOGGING) && defined (OPTIGA_LIB_ENABLE_COMMS_LOGGING)
+
+// Logs the message provided from OPTIGA Comms layer
+#define OPTIGA_COMMS_LOG_MESSAGE(msg) \
+{\
+    optiga_lib_print_message(msg,OPTIGA_COMMUNICATION_LAYER,OPTIGA_COMMUNICATION_LAYER_COLOR);\
+}
+
+// Logs the status info provided from OPTIGA Comms layer
+//lint --e{750} suppress "The unused OPTIGA_COMMS_LOG_STATUS macro is kept for future enhancements"
+#define OPTIGA_COMMS_LOG_STATUS(return_value)                                 \
+{                                                       \
+    if (OPTIGA_LIB_SUCCESS != return_value)                                 \
+    {                                                     \
+        optiga_lib_print_status(OPTIGA_COMMUNICATION_LAYER,OPTIGA_ERROR_COLOR,return_value);        \
+    }                                                     \
+    else                                                  \
+    {                                                     \
+        optiga_lib_print_status(OPTIGA_COMMUNICATION_LAYER,OPTIGA_COMMUNICATION_LAYER_COLOR,return_value);  \
+    }                                                     \
+}
+
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
+
+// Logs the transmitted data to OPTIGA from IFXI2C layer in hexadecimal format
+#define OPTIGA_IFXI2C_LOG_TRANSMIT_HEX_DATA(array,array_len,p_ifx_i2c_ctx)              \
+{                                                 \
+  if (0 != frame_len)                                       \
+  {                                               \
+    if (((((ifx_i2c_context_t * )p_ifx_i2c_ctx)->protection_level & 0x0F) == 0x01) ||       \
+      ((((ifx_i2c_context_t * )p_ifx_i2c_ctx)->protection_level & 0x0F) == 0x03))       \
+      {                                             \
+        optiga_lib_print_array_hex_format(array,array_len,OPTIGA_PROTECTED_DATA_COLOR);  \
+      }                                             \
+      else                                          \
+      {                                             \
+        optiga_lib_print_array_hex_format(array,array_len,OPTIGA_UNPROTECTED_DATA_COLOR);\
+      }                                             \
+  }                                               \
+}
+
+// Logs the received data from OPTIGA in hexadecimal format
+#define OPTIGA_IFXI2C_LOG_RECEIVE_HEX_DATA(array,array_len,p_ifx_i2c_ctx) \
+{\
+    if (((((ifx_i2c_context_t * )p_ifx_i2c_ctx)->protection_level & 0x0F) == 0x02) || \
+        ((((ifx_i2c_context_t * )p_ifx_i2c_ctx)->protection_level & 0x0F) == 0x03)) \
+        { \
+            optiga_lib_print_array_hex_format(array,array_len,OPTIGA_PROTECTED_DATA_COLOR); \
+        } \
+        else \
+        { \
+            optiga_lib_print_array_hex_format(array,array_len,OPTIGA_UNPROTECTED_DATA_COLOR); \
+        } \
+}
+#else
+
+// Logs the transmitted data to OPTIGA from IFXI2C layer in hexadecimal format
+#define OPTIGA_IFXI2C_LOG_TRANSMIT_HEX_DATA(array,array_len,p_ifx_i2c_ctx) \
+{\
+    OPTIGA_COMMS_LOG_MESSAGE("");\
+    optiga_lib_print_array_hex_format(array,array_len,OPTIGA_UNPROTECTED_DATA_COLOR);\
+}
+
+// Logs the received data from OPTIGA in hexadecimal format
+#define OPTIGA_IFXI2C_LOG_RECEIVE_HEX_DATA(array,array_len,p_ifx_i2c_ctx) \
+{\
+    OPTIGA_COMMS_LOG_MESSAGE("");\
+    optiga_lib_print_array_hex_format(array,array_len,OPTIGA_UNPROTECTED_DATA_COLOR);\
+}
+
+#endif
+
+#else
+
+#define OPTIGA_IFXI2C_LOG_TRANSMIT_HEX_DATA(array,array_len,p_ifx_i2c_ctx) {}
+#define OPTIGA_IFXI2C_LOG_RECEIVE_HEX_DATA(array,array_len,p_ifx_i2c_ctx) {}
+#define OPTIGA_COMMS_LOG_MESSAGE(msg) {}
+//lint --e{750} suppress "The unused OPTIGA_COMMS_LOG_STATUS macro is kept for future enhancements"
+#define OPTIGA_COMMS_LOG_STATUS(return_value) {}
+#endif
+
 // Setup debug log statements
 #if IFX_I2C_LOG_DL == 1
 #define LOG_DL IFX_I2C_LOG
@@ -87,12 +168,11 @@
 #define LOG_DL(...) //printf(__VA_ARGS__)
 #endif
 
-
 /// Helper function to calculate CRC of a byte
-_STATIC_H optiga_lib_status_t ifx_i2c_dl_calc_crc_byte(uint16_t seed,
+_STATIC_H uint16_t ifx_i2c_dl_calc_crc_byte(uint16_t seed,
                                                        uint8_t byte);
 /// Helper function to calculate CRC of a frame
-_STATIC_H optiga_lib_status_t ifx_i2c_dl_calc_crc(const uint8_t * p_data,
+_STATIC_H uint16_t ifx_i2c_dl_calc_crc(const uint8_t * p_data,
                                                   uint16_t data_len);
 /// Internal function to send frame
 _STATIC_H optiga_lib_status_t ifx_i2c_dl_send_frame_internal(ifx_i2c_context_t * p_ctx,
@@ -173,7 +253,7 @@ optiga_lib_status_t ifx_i2c_dl_receive_frame(ifx_i2c_context_t * p_ctx)
     return (ifx_i2c_pl_receive_frame(p_ctx));
 }
 
-_STATIC_H optiga_lib_status_t ifx_i2c_dl_calc_crc_byte(uint16_t seed, uint8_t byte)
+_STATIC_H uint16_t ifx_i2c_dl_calc_crc_byte(uint16_t seed, uint8_t byte)
 {
     uint16_t h1;
     uint16_t h2;
@@ -188,7 +268,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_dl_calc_crc_byte(uint16_t seed, uint8_t by
     return ((uint16_t)((((uint16_t)((((uint16_t)(h3 << 1)) ^ h4) << 4)) ^ h2) << 3)) ^ h4 ^ (seed >> 8);
 }
 
-_STATIC_H optiga_lib_status_t ifx_i2c_dl_calc_crc(const uint8_t * p_data, uint16_t data_len)
+_STATIC_H uint16_t ifx_i2c_dl_calc_crc(const uint8_t * p_data, uint16_t data_len)
 {
     uint16_t i;
     uint16_t crc = 0;
@@ -230,6 +310,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_dl_send_frame_internal(ifx_i2c_context_t *
     }
 
     // Set sequence control value (ACK or NACK) and referenced frame number
+    //lint --e{835} suppress "DL_FCTR_ACKNR_OFFSET macro is defined as 0x00 and is kept for future enhancements"
     p_buffer[0] = (uint8_t)(ack_nr << DL_FCTR_ACKNR_OFFSET);
     p_buffer[0] |= (uint8_t)(seqctr_value << DL_FCTR_SEQCTR_OFFSET);
 
@@ -243,6 +324,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_dl_send_frame_internal(ifx_i2c_context_t *
         p_buffer[0] |= (uint8_t)(p_ctx->dl.tx_seq_nr << DL_FCTR_FRNR_OFFSET);
         // Reset resync received
         p_ctx->dl.resynced = 0;
+        OPTIGA_COMMS_LOG_MESSAGE(">>>>");
     }
     else // Control frame
     {
@@ -259,12 +341,13 @@ _STATIC_H optiga_lib_status_t ifx_i2c_dl_send_frame_internal(ifx_i2c_context_t *
     p_buffer[4 + frame_len] = (uint8_t)crc;
 
     // Transmit frame
+    OPTIGA_IFXI2C_LOG_TRANSMIT_HEX_DATA(p_buffer,DL_HEADER_SIZE + frame_len,p_ctx)
     return (ifx_i2c_pl_send_frame(p_ctx, p_buffer, DL_HEADER_SIZE + frame_len));
 }
 
 _STATIC_H optiga_lib_status_t ifx_i2c_dl_resync(ifx_i2c_context_t * p_ctx)
 {
-    optiga_lib_status_t api_status = IFX_I2C_STACK_SUCCESS;
+    optiga_lib_status_t api_status;
     // Reset tx and rx counters
     p_ctx->dl.tx_seq_nr = DL_MAX_FRAME_NUM;
     p_ctx->dl.rx_seq_nr = DL_MAX_FRAME_NUM;
@@ -281,7 +364,7 @@ _STATIC_H void ifx_i2c_dl_resend_frame(ifx_i2c_context_t * p_ctx, uint8_t seqctr
     // If exit timeout not violated
     uint32_t current_time_stamp = pal_os_timer_get_time_in_milliseconds();
     uint32_t time_stamp_diff = current_time_stamp - p_ctx->tl.api_start_time;
-    
+
     if (p_ctx->tl.api_start_time > current_time_stamp)
     {
         time_stamp_diff = (0xFFFFFFFF + (current_time_stamp - p_ctx->tl.api_start_time)) + 0x01;
@@ -323,7 +406,7 @@ _STATIC_H void ifx_i2c_pl_event_handler(ifx_i2c_context_t * p_ctx,
     uint8_t ack_nr = 0;
     uint8_t seqctr = 0;
     uint8_t current_event;
-    uint8_t ftype;
+    uint8_t ftype = 0;
     uint8_t continue_state_machine = TRUE;
     uint16_t packet_len = 0;
     uint16_t crc_received = 0;
@@ -387,6 +470,7 @@ _STATIC_H void ifx_i2c_pl_event_handler(ifx_i2c_context_t * p_ctx,
                 fctr = p_data[0];
                 ftype = (fctr & DL_FCTR_FTYPE_MASK) >> DL_FCTR_FTYPE_OFFSET;
                 seqctr = (fctr & DL_FCTR_SEQCTR_MASK) >> DL_FCTR_SEQCTR_OFFSET;
+                //lint --e{835} suppress "DL_FCTR_ACKNR_OFFSET is defined as 0x00 and is kept for future enhancements"
                 ack_nr = (fctr & DL_FCTR_ACKNR_MASK) >> DL_FCTR_ACKNR_OFFSET;
                 fr_nr = (fctr & DL_FCTR_FRNR_MASK) >> DL_FCTR_FRNR_OFFSET;
                 packet_len = (p_data[1] << 8) | p_data[2];
@@ -442,6 +526,9 @@ _STATIC_H void ifx_i2c_pl_event_handler(ifx_i2c_context_t * p_ctx,
                 p_ctx->dl.retransmit_counter = 0;
                 p_ctx->dl.state = DL_STATE_ACK;
                 continue_state_machine = FALSE;
+
+                OPTIGA_COMMS_LOG_MESSAGE("<<<<");\
+                OPTIGA_IFXI2C_LOG_RECEIVE_HEX_DATA(p_data,data_len,p_ctx);
                 //lint --e{534} suppress "Error handling is not required so return value is not checked"
                 ifx_i2c_dl_send_frame_internal(p_ctx, 0, DL_FCTR_SEQCTR_VALUE_ACK, 0);
             }

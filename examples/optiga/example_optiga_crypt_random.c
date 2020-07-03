@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 *
 * \file example_optiga_crypt_random.c
 *
-* \brief   This file provides the example for generation of random using 
+* \brief   This file provides the example for generation of random using
 *          #optiga_crypt_random.
 *
 * \ingroup grOptigaExamples
@@ -37,11 +37,9 @@
 */
 
 #include "optiga/optiga_crypt.h"
+#include "optiga_example.h"
 
 #ifdef OPTIGA_CRYPT_RANDOM_ENABLED
-
-extern void example_log_execution_status(const char_t* function, uint8_t status);
-extern void example_log_function_name(const char_t* function);
 
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
@@ -66,10 +64,9 @@ static void optiga_crypt_callback(void * context, optiga_lib_status_t return_sta
 void example_optiga_crypt_random(void)
 {
     uint8_t random_data_buffer [32];
-    uint8_t logging_status = 0;
     optiga_crypt_t * me = NULL;
-    optiga_lib_status_t return_status;
-    example_log_function_name(__FUNCTION__);
+    optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
@@ -88,35 +85,27 @@ void example_optiga_crypt_random(void)
          *       - Specify the Random type as TRNG
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_crypt_random(me, 
-                                            OPTIGA_RNG_TYPE_TRNG, 
+
+        return_status = optiga_crypt_random(me,
+                                            OPTIGA_RNG_TYPE_TRNG,
                                             random_data_buffer,
                                             sizeof(random_data_buffer));
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_crypt_random operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            break;
-        }
-        logging_status = 1;
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
-
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
         return_status = optiga_crypt_destroy(me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
     }
-    example_log_execution_status(__FUNCTION__,logging_status);
 }
 
 #endif  //OPTIGA_CRYPT_RANDOM_ENABLED

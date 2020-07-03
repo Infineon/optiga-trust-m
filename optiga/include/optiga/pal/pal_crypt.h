@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -46,6 +46,7 @@ extern "C" {
 #include "optiga/common/optiga_lib_types.h"
 #include "optiga/pal/pal.h"
 
+/** \brief PAL crypt context structure */
 typedef struct pal_crypt_t
 {
     /// callback
@@ -168,18 +169,17 @@ LIBRARY_EXPORTS pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_cry
                                                           uint8_t * p_plain_text);
 
 /**
- * \brief Gets the external crypto library version number along with build number.
+ * \brief Gets the external crypto library version number.
  *
  * \details
- * Gets the external crypto library version number along with build number. <br>
+ * Gets the external crypto library version number. <br>
  *
  * \pre
  * - None
  *
  * \note
- * - Format of version information : vX.Y.Z.ABC
- * - WolfSSl Version: vX.Y.Z
- * - Build number: ABC is binary coded decimal value of build number
+ * - Format of version information : vX.Y.Z
+ * - mbedTLS Version: vX.Y.Z
  *
  * \param[inout]     p_crypt_lib_version_info               Valid pointer to store the version number.
  * \param[inout]     length                                 version number size.
@@ -188,28 +188,6 @@ LIBRARY_EXPORTS pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_cry
  * \retval           PAL_STATUS_FAILURE                     In case of failure
  */
 pal_status_t pal_crypt_version(uint8_t * p_crypt_lib_version_info, uint16_t * length);
-
-/// @cond hidden
-/**
- * \brief This API is used to generate the seed required for the random number generation from Wolfssl.
- *
- * \details
- * This API is used to generate the seed required for the random number generation from Wolfssl
- *
- * \pre
- * - None
- *
- * \note
- * - None
- *
- * \param[in,out]   PpbSeed               Valid pointer to the buffer to store the seed.
- * \param[in]       PdwSeedLength         Seed length.
- *
- * \retval          PAL_STATUS_SUCCESS    In case of success
- * \retval          PAL_STATUS_FAILURE    In case of failure
- */
-int32_t CryptoLib_GenerateSeed(uint8_t * PpbSeed, uint32_t PdwSeedLength);
-/// @endcond
 
 #ifdef __cplusplus
 }

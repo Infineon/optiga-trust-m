@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -131,8 +131,7 @@
 #define PRL_SEQUENCE_THRESHOLD               (0xFFFFFFF0)
 #define PRL_TRANS_REPEAT                     (DL_TRANS_REPEAT)
 
-#define PRL_LABLE "Platform Binding"
-#define SHARED_SECRET_LENGTH                 (0x40)
+#define PRL_LABEL                            "Platform Binding"
 
 #define FORM_SCTR_HEADER(ctx, protocol, msg, protection){\
                          p_ctx->prl.sctr = (protocol | msg | protection);}\
@@ -316,31 +315,32 @@ optiga_lib_status_t ifx_i2c_prl_transceive(ifx_i2c_context_t * p_ctx,
 _STATIC_H optiga_lib_status_t ifx_i2c_prl_prf(ifx_i2c_context_t * p_ctx)
 {
     optiga_lib_status_t return_status = IFX_I2C_HANDSHAKE_ERROR;
-    uint8_t label_input[] = PRL_LABLE;
-    uint8_t secret_input[SHARED_SECRET_LENGTH];
+    uint8_t label_input[] = PRL_LABEL;
+    uint8_t secret_input[OPTIGA_SHARED_SECRET_MAX_LENGTH];
+    uint16_t shared_secret_length;
     do
     {
         //Reading pre-shared secret from datastore
         return_status = pal_os_datastore_read(p_ctx->ifx_i2c_datastore_config->datastore_shared_secret_id,
                                               secret_input,
-                                              &p_ctx->ifx_i2c_datastore_config->shared_secret_length);
+                                              &shared_secret_length);
         if (PAL_STATUS_SUCCESS != return_status)
         {
             return_status = IFX_I2C_HANDSHAKE_ERROR;
             break;
         }
-        if (0 != pal_crypt_tls_prf_sha256(NULL, secret_input,
-                                          sizeof(secret_input),
-                                          label_input,
-                                          sizeof(label_input) - 1,
-                                          p_ctx->prl.random,
-                                          sizeof(p_ctx->prl.random),
-                                          p_ctx->prl.session_key,
-                                          sizeof(p_ctx->prl.session_key)))
+        if (PAL_STATUS_SUCCESS != pal_crypt_tls_prf_sha256(NULL, secret_input,
+                                                           shared_secret_length,
+                                                           label_input,
+                                                           sizeof(label_input) - 1,
+                                                           p_ctx->prl.random,
+                                                           sizeof(p_ctx->prl.random),
+                                                           p_ctx->prl.session_key,
+                                                           sizeof(p_ctx->prl.session_key)))
         {
             return_status = IFX_I2C_HANDSHAKE_ERROR;
         }
-        memset(secret_input, 0, p_ctx->ifx_i2c_datastore_config->shared_secret_length);
+        memset(secret_input, 0, shared_secret_length);
 
     } while (FALSE);
     return (return_status);
@@ -440,6 +440,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_prl_send_alert(ifx_i2c_context_t * p_ctx)
             p_ctx->prl.decryption_failure_counter++;
             p_ctx->prl.state = PRL_STATE_VERIFY;
             p_ctx->prl.return_status = IFX_I2C_STACK_SUCCESS;
+            //lint --e{835} suppress "Protection bits in SCTR is set to 0 for alert message"
             FORM_SCTR_HEADER(p_ctx, PRL_ALERT_PROTOCOL, p_ctx->prl.alert_type, 0);
             p_ctx->prl.prl_txrx_buffer[0] = p_ctx->prl.sctr;
             return_status = ifx_i2c_tl_transceive(p_ctx,
@@ -475,6 +476,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_prl_do_handshake(ifx_i2c_context_t * p_ctx
             case PRL_HS_SEND_HELLO:
             {
                 //Preparing hello message
+                //lint --e{835} suppress "Protection bits in SCTR is set to 0 for hello message"
                 FORM_SCTR_HEADER(p_ctx,PRL_HANDSHAKE_PROTOCOL, PRL_MASTER_HELLO_MSG, 0);
                 p_ctx->prl.prl_txrx_buffer[PRL_SCTR_OFFSET] = p_ctx->prl.sctr;
                 p_ctx->prl.prl_txrx_buffer[PRL_PROTOCOL_VERSION_OFFSET] = p_ctx->protocol_version;
@@ -497,6 +499,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_prl_do_handshake(ifx_i2c_context_t * p_ctx
             case PRL_HS_VERIFY_HELLO:
             {
                 exit_machine = TRUE;
+                 //lint --e{835} suppress "Macros are defined as 0x00 and is kept for future enhancements"
                 if ((((p_data[PRL_SCTR_OFFSET] & (PRL_ALERT_PROTOCOL | PRL_FATAL_ALERT_MSG)) ||
                     (p_data[PRL_SCTR_OFFSET] & (PRL_ALERT_PROTOCOL | PRL_INTEGRITY_VIOLATED_ALERT_MSG))) &&
                     (1 == p_ctx->prl.prl_receive_length)))
@@ -531,6 +534,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_prl_do_handshake(ifx_i2c_context_t * p_ctx
             break;
             case PRL_HS_SEND_FINISHED:
             {
+                //lint --e{835} suppress "Protection bits in SCTR is set to 0 for hello finished message"
                 FORM_SCTR_HEADER(p_ctx, PRL_HANDSHAKE_PROTOCOL, PRL_MASTER_FINISHED_MSG,0);
                 exit_machine = FALSE;
                 //Creating payload for encryption
@@ -784,6 +788,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_prl_do_manage_context(ifx_i2c_context_t * 
                                                            (uint8_t * )&p_ctx->prl.prl_saved_ctx,
                                                            sizeof(p_ctx->prl.prl_saved_ctx));
                 }
+                //lint --e{838} suppress "return_status is ignored for pal_os_datastore_write as it's an error scenario"
                 return_status = IFX_I2C_STACK_ERROR;
                 break;
             }
@@ -905,6 +910,7 @@ _STATIC_H void ifx_i2c_prl_event_handler(ifx_i2c_context_t * p_ctx,
             break;
             case PRL_STATE_TXRX:
             {
+                //lint --e{835} suppress "Message bits in SCTR is set to 0 for record transaction"
                 FORM_SCTR_HEADER(p_ctx,
                                  PRL_RECORD_EXCHANGE_PROTOCOL,
                                  0,
@@ -1007,6 +1013,7 @@ _STATIC_H void ifx_i2c_prl_event_handler(ifx_i2c_context_t * p_ctx,
                 else if (0 != (p_data[PRL_SCTR_OFFSET] & PRL_ALERT_PROTOCOL))
                 {
                     //Check invalid message
+                    //lint --e{835} suppress "Macros are defined as 0x00 and is kept for future enhancements"
                     if (((p_data[PRL_SCTR_OFFSET] != (PRL_ALERT_PROTOCOL | PRL_FATAL_ALERT_MSG)) &&
                         (p_data[PRL_SCTR_OFFSET] != (PRL_ALERT_PROTOCOL | PRL_INTEGRITY_VIOLATED_ALERT_MSG))) ||
                         ((1 != data_len) && (PRL_NEGOTIATION_DONE == p_ctx->prl.negotiation_state)) ||

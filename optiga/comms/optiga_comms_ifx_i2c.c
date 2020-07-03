@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -35,42 +35,29 @@
 * @{
 */
 
-/**********************************************************************************************************************
- * HEADER FILES
- *********************************************************************************************************************/
 #include "optiga/comms/optiga_comms.h"
 #include "optiga/common/optiga_lib_logger.h"
 #include "optiga/ifx_i2c/ifx_i2c.h"
 #include "optiga/pal/pal_os_event.h"
 
 /// @cond hidden
-/**********************************************************************************************************************
- * MACROS
- *********************************************************************************************************************/
+
  /// Optiga comms is in use
  #define OPTIGA_COMMS_INUSE     (0x01)
  /// Optiga comms is free
  #define OPTIGA_COMMS_FREE      (0x00)
-/**********************************************************************************************************************
- * LOCAL DATA
- *********************************************************************************************************************/
-
-
-/**********************************************************************************************************************
- * LOCAL ROUTINES
- *********************************************************************************************************************/
 
 optiga_comms_t optiga_comms = {
                                (void *)&ifx_i2c_context_0,
                                NULL,
-                               NULL, 
-                               0, 
-                               0, 
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION                                   
-                               0, 
-                               0, 
+                               NULL,
                                0,
-#endif                               
+                               0,
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
+                               0,
+                               0,
+                               0,
+#endif
                                NULL};
 
 _STATIC_H optiga_lib_status_t check_optiga_comms_state(optiga_comms_t *p_ctx);
@@ -86,6 +73,13 @@ optiga_comms_t * optiga_comms_create(callback_handler_t callback, void * context
 
         if (FALSE == p_optiga_comms->instance_init_state)
         {
+#ifdef OPTIGA_PAL_INIT_ENABLED
+            if (PAL_STATUS_SUCCESS != pal_init())
+            {
+                p_optiga_comms = NULL;
+                break;
+            }
+#endif
             p_optiga_comms->upper_layer_handler = callback;
             p_optiga_comms->p_upper_layer_ctx = context;
             p_optiga_comms->instance_init_state = TRUE;
@@ -114,30 +108,23 @@ optiga_lib_status_t optiga_comms_set_callback_context(optiga_comms_t * p_optiga_
 
 
 /// @endcond
-/**********************************************************************************************************************
- * API IMPLEMENTATION
- *********************************************************************************************************************/
-
 
 optiga_lib_status_t optiga_comms_open(optiga_comms_t * p_ctx)
 {
     optiga_lib_status_t status = OPTIGA_COMMS_ERROR;
     if (OPTIGA_COMMS_SUCCESS == check_optiga_comms_state(p_ctx))
     {
-        if (PAL_STATUS_SUCCESS == pal_init())
-        {
-            ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->p_upper_layer_ctx = (void * )p_ctx;
-            ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->upper_layer_event_handler = ifx_i2c_event_handler;
+        ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->p_upper_layer_ctx = (void * )p_ctx;
+        ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->upper_layer_event_handler = ifx_i2c_event_handler;
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
-            ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->manage_context_operation = p_ctx->manage_context_operation;
+        ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->manage_context_operation = p_ctx->manage_context_operation;
 #endif
-            ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->pal_os_event_ctx = p_ctx->p_pal_os_event_ctx;
+        ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->pal_os_event_ctx = p_ctx->p_pal_os_event_ctx;
 
-            status = ifx_i2c_open((ifx_i2c_context_t * )(p_ctx->p_comms_ctx));
-            if (IFX_I2C_STACK_SUCCESS != status)
-            {
-                p_ctx->state = OPTIGA_COMMS_FREE;
-            }
+        status = ifx_i2c_open((ifx_i2c_context_t * )(p_ctx->p_comms_ctx));
+        if (IFX_I2C_STACK_SUCCESS != status)
+        {
+            p_ctx->state = OPTIGA_COMMS_FREE;
         }
     }
     return (status);
@@ -175,7 +162,7 @@ optiga_lib_status_t optiga_comms_transceive(optiga_comms_t * p_ctx,
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->protection_level = p_ctx->protection_level;
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->protocol_version = p_ctx->protocol_version;
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->manage_context_operation = p_ctx->manage_context_operation;
-#endif            
+#endif
         status = (ifx_i2c_transceive((ifx_i2c_context_t * )(p_ctx->p_comms_ctx),
                                      p_tx_data,
                                      tx_data_length,
@@ -197,9 +184,9 @@ optiga_lib_status_t optiga_comms_close(optiga_comms_t * p_ctx)
     {
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->p_upper_layer_ctx = (void * )p_ctx;
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->upper_layer_event_handler = ifx_i2c_event_handler;
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION            
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
         ((ifx_i2c_context_t * )(p_ctx->p_comms_ctx))->manage_context_operation = p_ctx->manage_context_operation;
-#endif            
+#endif
         status = ifx_i2c_close((ifx_i2c_context_t * )(p_ctx->p_comms_ctx));
         if (IFX_I2C_STACK_SUCCESS != status)
         {

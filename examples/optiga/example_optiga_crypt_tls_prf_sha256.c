@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -38,15 +38,14 @@
 
 #include "optiga/optiga_crypt.h"
 #include "optiga/optiga_util.h"
+#include "optiga_example.h"
 
-#ifdef OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
+#if defined (OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED)
 
-extern void example_log_execution_status(const char_t* function, uint8_t status);
-extern void example_log_function_name(const char_t* function);
 /**
  * Sample metadata
  */
-static uint8_t metadata [] = {
+static const uint8_t metadata [] = {
     //Metadata tag in the data object
     0x20, 0x06,
         //Data object type set to PRESSEC
@@ -57,7 +56,7 @@ static uint8_t metadata [] = {
 /**
  * Default metadata
  */
-static uint8_t default_metadata [] = {
+static const uint8_t default_metadata [] = {
     //Metadata tag in the data object
     0x20, 0x06,
         //Data object type set to BSTR
@@ -77,9 +76,9 @@ static void optiga_lib_callback(void * context, optiga_lib_status_t return_statu
         // callback to upper layer here
     }
 }
-static uint8_t label [] = "Firmware update";
+static const uint8_t label [] = "Firmware update";
 
-static uint8_t random_seed [] = {
+static const uint8_t random_seed [] = {
     0x61, 0xC7, 0xDE, 0xF9, 0x0F, 0xD5, 0xCD, 0x7A,
     0x8B, 0x7A, 0x36, 0x41, 0x04, 0xE0, 0x0D, 0x82,
     0x38, 0x46, 0xBF, 0xB7, 0x70, 0xEE, 0xBF, 0x8F,
@@ -88,13 +87,13 @@ static uint8_t random_seed [] = {
 
 // Secret to be written to data object which will be
 // later used as part of TLS PRF SHA256 key derivation
-static uint8_t secret_to_be_written [] = {
+static const uint8_t secret_to_be_written [] = {
     0xBF, 0xB7, 0x70, 0xEE, 0xBF, 0x8F, 0x61, 0xC7,
     0x04, 0xE0, 0x0D, 0x82, 0x8B, 0x7A, 0x36, 0x41,
     0xD5, 0xCD, 0x7A, 0x38, 0x46, 0xDE, 0xF9, 0x0F,
     0x21, 0x42, 0x40, 0x25, 0x0A, 0xAF, 0x9C, 0x2E,
 };
-    
+
 /**
  * The below example demonstrates the key derivation using #optiga_crypt_tls_prf_sha256.
  *
@@ -103,12 +102,11 @@ void example_optiga_crypt_tls_prf_sha256(void)
 {
     uint8_t decryption_key [16] = {0};
 
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
 
     optiga_crypt_t * me = NULL;
     optiga_util_t * me_util = NULL;
-    uint8_t logging_status = 0;
-    example_log_function_name(__FUNCTION__);
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
     do
     {
 
@@ -117,7 +115,7 @@ void example_optiga_crypt_tls_prf_sha256(void)
         {
             break;
         }
-        
+
         /**
          * 1. Write the shared secret to the Arbitrary data object F1D0
          *       - This is typically a one time activity and
@@ -133,21 +131,7 @@ void example_optiga_crypt_tls_prf_sha256(void)
                                                secret_to_be_written,
                                                sizeof(secret_to_be_written));
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_util_write_data operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //Write to data object is failed.
-            break;
-        }
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
 
         /**
          * 2. Change data object type to PRESSEC
@@ -160,21 +144,7 @@ void example_optiga_crypt_tls_prf_sha256(void)
                                                    metadata,
                                                    sizeof(metadata));
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_util_write_metadata operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //writing metadata to a data object failed.
-            break;
-        }
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
 
         /**
          * 3. Create OPTIGA Crypt Instance
@@ -191,9 +161,9 @@ void example_optiga_crypt_tls_prf_sha256(void)
          *       - Use shared secret from F1D0 data object
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        
+
+        OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL(me, OPTIGA_COMMS_COMMAND_PROTECTION);
         OPTIGA_CRYPT_SET_COMMS_PROTOCOL_VERSION(me, OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET);
-        // Default protecition for this API is OPTIGA_COMMS_COMMAND_PROTECTION
         return_status = optiga_crypt_tls_prf_sha256(me,
                                                     0xF1D0, /* Input secret OID */
                                                     label,
@@ -204,25 +174,12 @@ void example_optiga_crypt_tls_prf_sha256(void)
                                                     TRUE,
                                                     decryption_key);
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_crypt_tls_prf_sha256 operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //Derive key operation failed.
-            break;
-        }
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
         /**
          * 5. Change meta data to default value
          *
          */
+
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
         return_status = optiga_util_write_metadata(me_util,
@@ -230,41 +187,36 @@ void example_optiga_crypt_tls_prf_sha256(void)
                                                    default_metadata,
                                                    sizeof(default_metadata));
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status) 
-        {
-            //Wait until the optiga_util_write_metadata operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //writing metadata to a data object failed.
-            break;
-        }
-        logging_status = 1;
+        WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
-
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
         return_status = optiga_crypt_destroy(me);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
     }
 
     if (me_util)
     {
         //Destroy the instance after the completion of usecase if not required.
         return_status = optiga_util_destroy(me_util);
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
     }
-    example_log_execution_status(__FUNCTION__,logging_status);
-
 }
 
-#endif //OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
+#endif //OPTIGA_CRYPT_TLS_PRF_ENABLED
 /**
 * @}
 */

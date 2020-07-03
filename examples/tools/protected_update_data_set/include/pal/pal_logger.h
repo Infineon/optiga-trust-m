@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -34,20 +34,29 @@
 *
 * @{
 */
+#ifndef _PROTECTED_UPDATE_PAL_LOGGER_H_
+#define _PROTECTED_UPDATE_PAL_LOGGER_H_
+
 #include <stdio.h>
-#include "protected_update_data_set.h"
+#include <stdlib.h>
+#include <stdint.h>
+
+// Prints byte of data
+void pal_logger_print_byte(uint8_t datam);
 
 // Prints messge
-void pal_logger_print_message(const char * str);
+void pal_logger_print_message(const int8_t * str);
 
 // Prints hex data
-void pal_logger_print_hex_data(unsigned char * data, unsigned short data_len);
+void pal_logger_print_hex_data(const uint8_t * data, uint16_t data_len);
 
-// Prints protected update manifest
-void pal_logger_print_manifest(protected_update_data_set_d * p_cbor_manifest);
+// Prints varibale name
+void pal_logger_print_variable_name(uint8_t * var_name, uint8_t value);
 
-//Prints protected update fragments
-void pal_logger_print_fragments(protected_update_data_set_d * p_cbor_manifest);
+// Prints data in file
+void pal_logger_print_to_file(int8_t * byte_array, uint16_t size);
+
+#endif //_PROTECTED_UPDATE_PAL_LOGGER_H_
 
 /**
 * @}

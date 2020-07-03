@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -35,107 +35,82 @@
 * @{
 */
 #include <stdio.h>
-#include "protected_update_data_set.h"
+#include "pal\pal_logger.h"
+#include "pal\pal_file_system.h"
 
-#define PRINT_C_CODE_FORMAT_ENABLED	1
+#define PRINT_C_CODE_FORMAT_ENABLED    1
 
-void pal_logger_print_byte(unsigned char datam)
+const uint8_t * dataset_file_path = NULL;
+
+void pal_logger_print_byte(uint8_t datam)
 {
 #if PRINT_C_CODE_FORMAT_ENABLED
-	printf("0x%02X, ", datam);
+    printf("0x%02X, ", datam);
 #else
 
-	printf("%02X ", datam);
+    printf("%02X ", datam);
 #endif
 
 }
 
-void pal_logger_print_message(const char * str)
+void pal_logger_print_message(const int8_t * str)
 {
-	printf("%s\n", str);
+    printf("%s", str);
 }
 
-void pal_logger_print_hex_data(unsigned char * data, 
-								unsigned int data_len)
+void pal_logger_print_format_message(const int8_t * str, ...)
 {
-	unsigned int count = data_len;
-	unsigned int index = 0;
-	for (index = 0; index < count; index++)
-	{
-		pal_logger_print_byte(data[index]);
-		if (0 == ((index + 1)) % 16)
-		{
-			printf("\n\t");
-		}
-	}
+    printf("%s\n", str);
 }
 
-void pal_logger_print_variable_name(unsigned char * var_name, 
-									unsigned char value)
+void pal_logger_print_hex_data( const uint8_t * data, 
+                                uint16_t  data_len)
+{
+    uint32_t  count = data_len;
+    uint32_t  index;
+    for (index = 0; index < count; index++)
+    {
+        pal_logger_print_byte(data[index]);
+        if (0 == ((index + 1)) % 16)
+        {
+            printf("\n\t");
+        }
+    }
+    printf("\b");
+}
+
+void pal_logger_print_variable_name(uint8_t * var_name, 
+                                    uint8_t value)
 {
 #if PRINT_C_CODE_FORMAT_ENABLED
-	if (NULL != var_name)
-	{
-		if (0 == value)
-		{
-			printf("%s %s%s", "unsigned char", var_name, "[] = \n");
-		}
-		else
-		{
-			printf("%s %s%s%02d%s", "unsigned char", var_name,"_", value,"[] = \n");
-		}
-		printf("\t%s", "{\n\t");
-	}
-	else
-	{
-		printf("\n\t%s", "};");
-	}
+    if (NULL != var_name)
+    {
+        if (0 == value)
+        {
+            printf("%s %s%s", "uint8_t", var_name, "[] = \n");
+        }
+        else
+        {
+            printf("%s %s%s%02d%s", "uint8_t", var_name,"_", value,"[] = \n");
+        }
+        printf("\t%s", "{\n\t");
+    }
+    else
+    {
+        printf("\n\t%s", "};");
+    }
 #endif
 }
 
-
-void pal_logger_print_manifest(protected_update_data_set_d * p_cbor_manifest)
+void pal_logger_print_to_file(int8_t * byte_array, uint16_t size)
 {
-	unsigned short count = p_cbor_manifest->data_length;
-	unsigned short index = 0;
-	printf("Manifest Data , size : [%03d]\n\t", p_cbor_manifest->data_length);
-	pal_logger_print_variable_name("manifest_data", 0);
-	for (index = 0; index < count; index++)
-	{
-		pal_logger_print_byte(p_cbor_manifest->data[index]);
-		if (0 == ((index + 1)) % 16)
-		{
-			printf("\n\t");
-		}
-	}
-	pal_logger_print_variable_name(NULL,0);
-	pal_logger_print_message("");
-}
-
-void pal_logger_print_fragments(protected_update_data_set_d * p_cbor_manifest)
-{
-	unsigned short count = p_cbor_manifest->fragments_length;
-	unsigned short index = 0;
-	unsigned short fragment_length;
-
-	for (index = 0; index < count; index++)
-	{
-		if ((index % MAX_PAYLOAD_SIZE) == 0)
-		{
-			fragment_length = (p_cbor_manifest->fragments_length - index );
-			fragment_length = (fragment_length > MAX_PAYLOAD_SIZE) ? MAX_PAYLOAD_SIZE : fragment_length;
-
-			if (0 != index)	{ pal_logger_print_variable_name(NULL, 0); }
-			printf("\n\nFragment number:[%02d], size:[%03d]\n\t", (index / MAX_PAYLOAD_SIZE)+1, fragment_length);
-			pal_logger_print_variable_name("fragment", (index / MAX_PAYLOAD_SIZE) + 1);
-		}
-		pal_logger_print_byte(p_cbor_manifest->fragments[index]);
-		if (0 == ((index + 1)) % 16)
-		{
-			printf("\n\t");
-		}
-	}
-	if (count == index)	{ pal_logger_print_variable_name(NULL, 0); }
+    if(NULL != dataset_file_path)
+    {
+        if (0 != pal_file_system_write_to_file((const int8_t *)dataset_file_path, byte_array, size))
+        {
+            pal_logger_print_message("Error : Unable to write to file\n");
+        }
+    } 
 }
 
 /**

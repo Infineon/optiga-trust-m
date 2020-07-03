@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 #ifdef IFX_I2C_CONFIG_EXTERNAL
-    #include "ifx_i2c_config_external.h"   
+    #include "ifx_i2c_config_external.h"
 #else
 // Protocol Stack Includes
 #include "optiga/pal/pal_i2c.h"
@@ -51,6 +51,7 @@ extern "C" {
 #include "optiga/pal/pal_os_timer.h"
 #include "optiga/pal/pal_os_datastore.h"
 #include "optiga/optiga_lib_config.h"
+#include "optiga/common/optiga_lib_logger.h"
 
 /** @brief I2C slave address of the Infineon device */
 #define IFX_I2C_BASE_ADDR           (0x30)
@@ -64,9 +65,16 @@ extern "C" {
 /** @brief Physical Layer: guard time interval in microseconds */
 #define PL_GUARD_TIME_INTERVAL_US   (50U)
 
-/** @brief Data link layer: maximum frame size */
-#ifndef DL_MAX_FRAME_SIZE
-#define DL_MAX_FRAME_SIZE           (300U)
+/** @brief Data link layer: frame size (max supported is 277 in OPTIGA ).
+*          - Note: This can be configured externally to a lesser value due to platform restrictions.<br>
+*            Externally means through command line argument or project configuration or optiga_lib_config.h*/
+#ifdef IFX_I2C_FRAME_SIZE
+    #if (IFX_I2C_FRAME_SIZE > 277) || (IFX_I2C_FRAME_SIZE < 16)
+        #error "Unsupported value for IFX_I2C_FRAME_SIZE"
+    #endif
+#else
+    //Setting of frame size more than 277 and less than 16 bytes cause unexpected behaviour.
+    #define IFX_I2C_FRAME_SIZE          (277U)
 #endif
 
 /** @brief Transport Layer: header size */
@@ -125,23 +133,9 @@ extern "C" {
 /** @brief Log ID number for platform abstraction layer */
 #define IFX_I2C_LOG_ID_PAL          (0x04)
 
-
-#if defined IFX_I2C_PRESENTATION_LAYER_TRANSPARENT
-    #define IFX_I2C_TL_ENABLE              (1U)
-
-    #define IFX_I2C_PRESENCE_BIT           (0x08)
-    #define IFX_I2C_PRL_MAC_SIZE           (0x08)
-    #define IFX_I2C_PRL_HEADER_SIZE        (0x05)
-    /// Overhead buffer size for user buffer
-    #define IFX_I2C_PRL_OVERHEAD_SIZE      (IFX_I2C_PRL_HEADER_SIZE + IFX_I2C_PRL_MAC_SIZE)
-    /// Offset for data
-    #define IFX_I2C_DATA_OFFSET            (IFX_I2C_PRL_HEADER_SIZE)
-    #define IFX_I2C_PRESENCE_BIT_CHECK     (0x08)
-#endif
-
 #if defined OPTIGA_COMMS_SHIELDED_CONNECTION
-    #define IFX_I2C_PRL_ENABLED            (1U)
     #define IFX_I2C_TL_ENABLE              (1U)
+    #define IFX_I2C_PRL_ENABLED            (1U)
 
     #define IFX_I2C_PRESENCE_BIT           (0x08)
     #define IFX_I2C_PRL_MAC_SIZE           (0x08)
@@ -182,6 +176,9 @@ extern "C" {
 /** @brief To re-establish secure channel */
 #define RE_ESTABLISH                (0x80)
 
+/** @brief Session key buffer size */
+#define IFX_I2C_SESSION_KEY_BUFFER_SIZE    (0x28)
+
 
 typedef struct ifx_i2c_context ifx_i2c_context_t;
 
@@ -197,7 +194,7 @@ typedef struct ifx_i2c_pl
     // Physical Layer low level interface variables
 
     /// Physical layer buffer
-    uint8_t buffer[DL_MAX_FRAME_SIZE + 1];
+    uint8_t buffer[IFX_I2C_FRAME_SIZE + 1];
     /// Tx length
     uint16_t buffer_tx_len;
     /// Rx length
@@ -288,7 +285,7 @@ typedef struct ifx_i2c_tl
     uint16_t * p_recv_packet_buffer_length;
     /// Start time of the transport layer API
     uint32_t api_start_time;
-    ///Chaining error coutn from slave
+    ///Chaining error count from slave
     uint8_t chaining_error_count;
     ///Chaining error count for master
     uint8_t master_chaining_error_count;
@@ -315,7 +312,7 @@ typedef struct ifx_i2c_tl
 typedef struct ifx_i2c_prl_manage_context
 {
     ///Buffer to store session key
-    uint8_t session_key[40];
+    uint8_t session_key[IFX_I2C_SESSION_KEY_BUFFER_SIZE];
     /// Master retransmit counter
     uint8_t decryption_failure_counter;
     /// Slave retransmit counter
@@ -378,8 +375,8 @@ typedef struct ifx_i2c_prl
     ///Presentation header offset
     uint8_t prl_header_offset;
     ///Buffer to store prf
-    uint8_t session_key[40];
-    /// Randon data
+    uint8_t session_key[IFX_I2C_SESSION_KEY_BUFFER_SIZE];
+    /// Random data
     uint8_t random[32];
     /// Receive buffer
     uint8_t prl_txrx_buffer[58];
@@ -401,7 +398,7 @@ typedef struct ifx_i2c_prl
     ifx_i2c_prl_manage_context_t prl_saved_ctx;
     // Upper layer Event handler
     ifx_i2c_event_handler_t upper_layer_event_handler;
-    // Trans repeat status 
+    // Trans repeat status
     uint8_t trans_repeat_status;
 }ifx_i2c_prl_t;
 #endif
@@ -421,10 +418,10 @@ typedef struct ifx_i2c_context
     pal_gpio_t * p_slave_reset_pin;
     /// Pointer to pal i2c context
     pal_i2c_t * p_pal_i2c_ctx;
-#if defined OPTIGA_COMMS_SHIELDED_CONNECTION    
+#if defined OPTIGA_COMMS_SHIELDED_CONNECTION
     /// Datastore configuration instance for prl
     ifx_i2c_datastore_config_t * ifx_i2c_datastore_config;
-#endif    
+#endif
     /// Upper layer event handler
     upper_layer_callback_t upper_layer_event_handler;
     /// Upper layer context
@@ -469,9 +466,9 @@ typedef struct ifx_i2c_context
     ifx_i2c_prl_t prl;
 #endif
     /// IFX I2C tx frame of max length
-    uint8_t tx_frame_buffer[DL_MAX_FRAME_SIZE];
+    uint8_t tx_frame_buffer[IFX_I2C_FRAME_SIZE+1];
     /// IFX I2C rx frame of max length
-    uint8_t rx_frame_buffer[DL_MAX_FRAME_SIZE];
+    uint8_t rx_frame_buffer[IFX_I2C_FRAME_SIZE+1];
     void * pal_os_event_ctx;
 
 } ifx_i2c_context_t;

@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,8 @@
 #define TL_PCTR_CHANNEL_MASK                (0xF8)
 #define TL_PCTR_CHAIN_MASK                  (0x07)
 #define TL_PCTR_INVALID                     (0xFF)
+#define TL_PREVIOUS_CHAINING_STATUS         (0x02)
+#define TL_CURRENT_CHAINING_STATUS          (0x08)
 // Setup debug log statements
 #if IFX_I2C_LOG_TL == 1
 #define LOG_TL IFX_I2C_LOG
@@ -68,16 +70,16 @@
 #define LOG_TL(...)    //printf(__VA_ARGS__);
 #endif
 
-static uint8_t g_pctr_states_table[8][2] = {
-                                            {TL_CHAINING_NO, TL_CHAINING_LAST},
-                                            {TL_CHAINING_NO, TL_CHAINING_LAST},
-                                            {TL_CHAINING_FIRST, TL_CHAINING_INTERMEDIATE},
-                                            {TL_PCTR_INVALID, TL_PCTR_INVALID},
-                                            {TL_CHAINING_FIRST, TL_CHAINING_INTERMEDIATE},
-                                            {TL_PCTR_INVALID, TL_PCTR_INVALID},
-                                            {TL_PCTR_INVALID, TL_PCTR_INVALID},
-                                            {TL_CHAINING_ERROR, TL_CHAINING_ERROR},
-                                            };
+static const uint8_t g_pctr_states_table[TL_CURRENT_CHAINING_STATUS][TL_PREVIOUS_CHAINING_STATUS] = {
+                                                                                              {TL_CHAINING_NO, TL_CHAINING_LAST},
+                                                                                              {TL_CHAINING_NO, TL_CHAINING_LAST},
+                                                                                              {TL_CHAINING_FIRST, TL_CHAINING_INTERMEDIATE},
+                                                                                              {TL_PCTR_INVALID, TL_PCTR_INVALID},
+                                                                                              {TL_CHAINING_FIRST, TL_CHAINING_INTERMEDIATE},
+                                                                                              {TL_PCTR_INVALID, TL_PCTR_INVALID},
+                                                                                              {TL_PCTR_INVALID, TL_PCTR_INVALID},
+                                                                                              {TL_CHAINING_ERROR, TL_CHAINING_ERROR},
+                                                                                              };
 
 _STATIC_H optiga_lib_status_t ifx_i2c_tl_send_next_fragment(ifx_i2c_context_t * p_ctx);
 _STATIC_H void ifx_i2c_dl_event_handler(ifx_i2c_context_t * p_ctx,
@@ -193,7 +195,7 @@ _STATIC_H uint8_t ifx_i2c_tl_calculate_pctr(const ifx_i2c_context_t * p_ctx)
 }
 _STATIC_H optiga_lib_status_t ifx_i2c_tl_send_next_fragment(ifx_i2c_context_t * p_ctx)
 {
-    uint8_t pctr = 0;
+    uint8_t pctr;
     // Calculate size of fragment (last one might be shorter)
     uint16_t tl_fragment_size = p_ctx->tl.max_packet_length;
     pctr = ifx_i2c_tl_calculate_pctr(p_ctx);
@@ -202,8 +204,10 @@ _STATIC_H optiga_lib_status_t ifx_i2c_tl_send_next_fragment(ifx_i2c_context_t * 
         tl_fragment_size = p_ctx->tl.actual_packet_length - p_ctx->tl.packet_offset;
     }
     // Assign the pctr
+    //lint --e{835} suppress "IFX_I2C_DL_HEADER_OFFSET macro is defined as 0x00 and is kept for future enhancements"
     p_ctx->tx_frame_buffer[IFX_I2C_TL_HEADER_OFFSET] = (pctr | IFX_I2C_PRESENCE_BIT);
     //copy the data
+    //lint --e{835} suppress "IFX_I2C_DL_HEADER_OFFSET macro is defined as 0x00 and is kept for future enhancements"
     memcpy(p_ctx->tx_frame_buffer+IFX_I2C_TL_HEADER_OFFSET + 1,
            p_ctx->tl.p_actual_packet + p_ctx->tl.packet_offset,
            tl_fragment_size);
@@ -215,6 +219,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_tl_send_next_fragment(ifx_i2c_context_t * 
 _STATIC_H optiga_lib_status_t ifx_i2c_tl_send_chaining_error(ifx_i2c_context_t * p_ctx)
 {
     uint16_t tl_fragment_size = 1;
+    //lint --e{835} suppress "IFX_I2C_DL_HEADER_OFFSET macro is defined as 0x00 and is kept for future enhancements"
     p_ctx->tx_frame_buffer[IFX_I2C_TL_HEADER_OFFSET] = 0x07;
     p_ctx->tl.total_recv_length = 0;
     //send the fragment to dl layer

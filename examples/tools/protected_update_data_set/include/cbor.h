@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -34,26 +34,32 @@
 *
 * @{
 */
-#define CBOR_MAJOR_TYPE_0					(0x00)
-#define CBOR_MAJOR_TYPE_1					(0x20)
-#define CBOR_MAJOR_TYPE_2					(0x40)
-#define CBOR_MAJOR_TYPE_3					(0x60)
-#define CBOR_MAJOR_TYPE_4					(0x80)
-#define CBOR_MAJOR_TYPE_7					(0xF6)
 
-#define CBOR_ADDITIONAL_TYPE_0x17           (0x17)
-#define CBOR_ADDITIONAL_TYPE_0x18           (0x18)
-#define CBOR_ADDITIONAL_TYPE_0x19           (0x19)
+#ifndef _PROTECTED_UPDATE_CBOR_H_
+#define _PROTECTED_UPDATE_CBOR_H_
 
-// Encddes cbor NULL
-int cbor_set_null(unsigned char * buffer, unsigned short * offset);
-// Encddes cbor array
-int cbor_set_array_of_data(unsigned char * buffer, unsigned int value, unsigned short * offset);
-// Encddes cbor unsiged integer
-int cbor_set_unsigned_integer(unsigned char * buffer, unsigned int value, unsigned short * offset);
-// Encddes cbor byte string
-int cbor_set_byte_string(unsigned char * buffer, unsigned int value, unsigned short * offset);
+#include <stdint.h>
 
+// Encodes cbor NULL
+int32_t cbor_set_null(uint8_t * buffer, uint16_t * offset);
+// Encodes cbor array
+int32_t cbor_set_array_of_data(uint8_t * buffer, uint32_t value, uint16_t * offset);
+// Encodes cbor unsiged integer
+int32_t cbor_set_unsigned_integer(uint8_t * buffer, uint32_t value, uint16_t * offset);
+// Encodes cbor unsiged integer
+int32_t cbor_set_signed_integer(uint8_t * buffer, int32_t value, uint16_t * offset);
+// Encodes cbor byte string
+int32_t cbor_set_byte_string(uint8_t * buffer, uint32_t value, uint16_t * offset);
+// Set the tag for map
+void cbor_set_map_tag(uint8_t * buffer, uint8_t map_number, uint16_t * offset);
+// Encodes cbor map for unsigned type
+int32_t cbor_set_map_unsigned_type(uint8_t * buffer, uint32_t key_data_item, uint32_t value_data_item, uint16_t * offset);
+// Encodes cbor map for signed type
+int32_t cbor_set_map_signed_type(uint8_t * buffer, uint32_t key_data_item, int32_t value_data_item, uint16_t * offset);
+// Encodes cbor map for byte array type
+int32_t cbor_set_map_byte_string_type(uint8_t * buffer, uint32_t key_data_item, const uint8_t * value_data_item, uint16_t value_data_item_len, uint16_t * offset);
+
+#endif //_PROTECTED_UPDATE_CBOR_H_
 /**
 * @}
 */

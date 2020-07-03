@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -107,7 +107,7 @@ LIBRARY_EXPORTS pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context);
  * - Sets the bitrate of I2C master if the I2C bus is free, else it returns busy status #PAL_STATUS_I2C_BUSY<br>
  * - The bus is released after the setting the bitrate.<br>
  * - This API must take care of setting the bitrate to I2C master's maximum supported value.
- * - Eg. In XMC4500, the maximum supported bitrate is 400 KHz. If the supplied bitrate is greater than 400KHz, the API will
+ * - Eg. In XMC4800, the maximum supported bitrate is 400 KHz. If the supplied bitrate is greater than 400KHz, the API will
  *   set the I2C master's bitrate to 400KHz.
  * - If upper_layer_event_handler is initialized, the upper layer handler is invoked with the respective event
  *   status listed below.
@@ -167,7 +167,7 @@ LIBRARY_EXPORTS pal_status_t pal_i2c_set_bitrate(const pal_i2c_t * p_i2c_context
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C write fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
-LIBRARY_EXPORTS pal_status_t pal_i2c_write(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length);
+LIBRARY_EXPORTS pal_status_t pal_i2c_write(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length);
 
 /**
  * @brief Reads from I2C bus.
@@ -201,7 +201,7 @@ LIBRARY_EXPORTS pal_status_t pal_i2c_write(pal_i2c_t * p_i2c_context, uint8_t * 
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C read fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
-LIBRARY_EXPORTS pal_status_t pal_i2c_read(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length);
+LIBRARY_EXPORTS pal_status_t pal_i2c_read(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length);
 
 /**
  * @brief De-initializes the I2C master.

@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -38,27 +38,27 @@
 #include "optiga/common/optiga_lib_types.h"
 #include "optiga/common/optiga_lib_common.h"
 
-uint32_t optiga_common_get_uint32 (const uint8_t* p_input_buffer)
-{
-    uint32_t four_byte_value;
-    four_byte_value = ((uint32_t)(*p_input_buffer))<< 24 | ((uint32_t)(*(p_input_buffer + 1))<< 16 | 
-                      ((uint32_t)(*(p_input_buffer + 2)))<< 8 | (uint32_t)(*(p_input_buffer + 3)));
-
-    return (four_byte_value);
-}
-
 void optiga_common_set_uint16 (uint8_t * p_output_buffer,uint16_t two_byte_value)
 {
     *p_output_buffer = (uint8_t)(two_byte_value>>8);
-    *(p_output_buffer+1) = (uint8_t)(two_byte_value);
+    *(p_output_buffer + 1) = (uint8_t)(two_byte_value);
 }
 
 void optiga_common_set_uint32 (uint8_t* p_output_buffer,uint32_t four_byte_value)
 {
     *(p_output_buffer) = (uint8_t)(four_byte_value>>24);
     *(p_output_buffer + 1) = (uint8_t)(four_byte_value>>16);
-    *(p_output_buffer+2) = (uint8_t)(four_byte_value>>8);
-    *(p_output_buffer+3) = (uint8_t)(four_byte_value);
+    *(p_output_buffer + 2) = (uint8_t)(four_byte_value>>8);
+    *(p_output_buffer + 3) = (uint8_t)(four_byte_value);
+}
+
+uint32_t optiga_common_get_uint32 (const uint8_t* p_input_buffer)
+{
+    uint32_t four_byte_value;
+    four_byte_value = ((uint32_t)(*p_input_buffer))<< 24 | ((uint32_t)(*(p_input_buffer + 1))<< 16 |
+                      ((uint32_t)(*(p_input_buffer + 2)))<< 8 | (uint32_t)(*(p_input_buffer + 3)));
+
+    return (four_byte_value);
 }
 
 void optiga_common_get_uint16 (const uint8_t * p_input_buffer,uint16_t* p_two_byte_value)

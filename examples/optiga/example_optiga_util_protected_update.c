@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2019 Infineon Technologies AG
+* Copyright (c) 2020 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -37,10 +37,8 @@
 */
 
 #include "optiga/optiga_util.h"
-
-
-extern void example_log_execution_status(const char_t* function, uint8_t status);
-extern void example_log_function_name(const char_t* function);
+#include "optiga_example.h"
+#include "protected_update_data_set/example_optiga_util_protected_update.h"
 
 /**
  * Callback when optiga_util_xxxx operation is completed asynchronously
@@ -57,9 +55,9 @@ static void optiga_util_callback(void * context, optiga_lib_status_t return_stat
 }
 
 /**
- * Sample Trust Anchor with ECC-256 based certificate
+ * ECC-256 Trust Anchor
  */
-static uint8_t trust_anchor [] = 
+const uint8_t trust_anchor [] = 
 {
     0x30, 0x82, 0x02, 0x58, 0x30, 0x82, 0x01, 0xFF, 0xA0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x01, 0x2F,
     0x30, 0x0A, 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x04, 0x03, 0x02, 0x30, 0x56, 0x31, 0x0B,
@@ -102,232 +100,168 @@ static uint8_t trust_anchor [] =
 };
 
 /**
- * Manifest for ECC-256
+ * Metadata for reset version tag :
+ * Version Tag = 00.
  */
-static uint8_t manifest[] = 
+const uint8_t reset_version_tag_metadata[] = 
 {
-    // COSE Sign1 Trust
-    0x84,
-        // Protected signed header trust
-        0x43,
-            // Trust Sign Alogorithm
-            0xA1, 
-            // ECDSA
-            0x01, 0x26, 
-        // Unprotected signed header trust
-        0xA1, 
-            // Root of trust
-            0x04, 0x42, 
-            // Trust Anchor OID
-            0xE0, 0xE3, 
-        // Payload info Byte string of single byte length
-        0x58, 
-            // Byte string length of manifest            
-            0x3D, 
-            // Trust manifest, array of 6 entries
-            0x86, 
-            // Version(Major Type 0)
-            0x01,
-            // NULL
-            0xF6,
-            // NULL
-            0xF6,
-            // Resources, array of 4 entries
-            0x84, 
-                // Trust Payload Type
-                0x20,
-                // 2 byte length
-                0x19,
-                // Payload Length
-                0x02, 0x92, 
-                // Trust Payload version
-                0x03, 
-                // Trust Add info data 
-                0x82, 
-                    // Offset( Major Type 0)
-                    0x00, 
-                    // Trust add info write type
-                    0x01, 
-                // Trust Processors, array of 2 entries 
-                0x82, 
-                    // Processing step integrity, array of 2 entries
-                    0x82, 
-                        // Process( Major Type 1)
-                        0x20, 
-                        // Parameters, byte string with single byte length
-                        0x58, 
-                        // Byte string length 
-                        0x25, 
-                        // IFX Digest info, array of 2 entries
-                        0x82, 
-                        // Digest Algorithm
-                        0x18,
-                        // SHA-256
-                        0x29, 
-                        // Digest
-                        0x58, 
-                        // Byte string length
-                        0x20, 
-                        // Digest data
-                        0xA0, 0xAE, 0xD2, 0x75, 0x75, 0xB8, 0x77, 0xED, 
-                        0x0F, 0xEA, 0xB6, 0x3C, 0x74, 0x35, 0x58, 0xEA,
-                        0xE3, 0xA2, 0x26, 0x4C, 0x8C, 0xEC, 0xD5, 0x8F,
-                        0x8F, 0x4E, 0x12, 0xAD, 0xA0, 0xDB, 0x73, 0x9A, 
-                    // NULL
-                    0xF6, 
-                // Trsust Target
-                0x82, 
-                    // Component identifier
-                    0x40, 
-                    // Storage identifier
-                    0x42, 
-                    // Optiga target OID
-                    0xE0, 0xE1, 
-        // Signature info, byte string of single byte length
-        0x58, 
-            // Byte string length for ECC 256
-            0x40, 
-            // Signature data
-            0x8B, 0x87, 0xAE, 0x23, 0x11, 0x4D, 0x44, 0xC4, 0xE8, 0x93, 0xFA, 0x70, 0x99, 0xD0, 0x32, 0xFE,
-            0x70, 0x9D, 0xF9, 0x7C, 0x81, 0x98, 0x05, 0x73, 0xA9, 0x61, 0x8A, 0x3D, 0xD7, 0xCE, 0x8B, 0xA4,
-            0xC8, 0xC2, 0x70, 0x19, 0x8E, 0x74, 0xE8, 0x58, 0xDC, 0x22, 0x63, 0x9E, 0x38, 0x52, 0x8C, 0x7D,
-            0x95, 0xE2, 0x5E, 0x28, 0xC7, 0x71, 0xED, 0xDF, 0xFE, 0x79, 0xC4, 0x62, 0x77, 0xB8, 0xC6, 0x5C                     
-
+  0x20, 0x04,
+        0xC1, 0x02, 0x00, 0x00
 };
 
 /**
- * Fragment array for continue with 608 bytes of payload and 32 bytes of digest of next fragment
+ * Metadata for target OID :
+ * Change access condition = Integrity protected using 0xE0E3.
  */
-static uint8_t continue_fragment_array[] = 
+const uint8_t target_oid_metadata[] = 
 {
-    // Payload of 608 bytes
-    0x21, 0x40, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F,
-    0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F,
-    0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50,
-    0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, 0x3B,
-    0x0D, 0x0A, 0x21, 0x40, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D,
-    0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D,
-    0x3E, 0x3F, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
-    0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E,
-    0x5F, 0x3B, 0x0D, 0x0A, 0x21, 0x40, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B,
-    0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B,
-    0x3C, 0x3D, 0x3E, 0x3F, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C,
-    0x4D, 0x4E, 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C,
-    0x5D, 0x5E, 0x5F, 0x3B, 0x0D, 0x0A, 0x21, 0x40, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29,
-    0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39,
-    0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A,
-    0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5A,
-    0x5B, 0x5C, 0x5D, 0x5E, 0x5F, 0x3B, 0x0D, 0x0A, 0x21, 0x40, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-    0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-    0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48,
-    0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
-    0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, 0x3B, 0x0D, 0x0A, 0x21, 0x40, 0x22, 0x23, 0x24, 0x25,
-    0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35,
-    0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
-    0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56,
-    0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, 0x3B, 0x0D, 0x0A, 0x21, 0x40, 0x22, 0x23,
-    0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33,
-    0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x41, 0x42, 0x43, 0x44,
-    0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54,
-    0x55, 0x56, 0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, 0x3B, 0x0D, 0x0A, 0x21, 0x40,
-    0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31,
-    0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x41, 0x42,
-    0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50, 0x51, 0x52,
-    0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, 0x3B, 0x0D, 0x0A,
-    0x21, 0x40, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F,
-    0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F,
-    0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50,
-    0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, 0x3B,
-    0x0D, 0x0A, 0x21, 0x40, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D,
-    // Digest of final fragment data    
-    0xDF, 0x34, 0x57, 0x42, 0xB8, 0xB8, 0xB3, 0xC1, 0x21, 0xCC, 0x4D, 0x06, 0x88, 0x6F, 0xFE, 0x09,
-    0x1F, 0xBC, 0xA0, 0x07, 0xD5, 0xDA, 0x81, 0xB4, 0x2D, 0xDC, 0xE0, 0x50, 0xCE, 0xBA, 0x1E, 0x13
+  0x20, 0x05,
+        0xD0, 0x03, 0x21, 0xE0, 0xE3,
+}; 
+
+
+/**
+ * Metadata for target OID with confidentiality :
+ * Change access condition = Integrity protected using 0xE0E3 & Confidentiality using 0xF1D1
+ */
+const uint8_t target_oid_metadata_with_confidentiality[] = 
+{
+    0x20, 0x09,
+          //0xC1, 0x02, 0x00, 0x00,
+          0xD0, 0x07, 0x21, 0xE0, 0xE3, 0xFD, 0x20, 0xF1, 0xD1
 };
 
 /**
- * Fragment array for final with 50 bytes of payload
+ * Metadata for secure update of target OID metadata with confidentiality :
+ * Change access condition = Integrity protected using 0xE0E3 & Confidentiality using 0xF1D1
  */
-static uint8_t final_fragment_array[] = 
+const uint8_t target_oid_metadata_for_secure_metadata_update[] =
 {
-    // Payload of 50 bytes  
-    0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D,
-    0x3E, 0x3F, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E,
-    0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E,
-    0x5F, 0x3B    
+    0x20, 0x0C,
+        0xD8, 0x07, 0x21, 0xE0, 0xE3, 0xFD, 0x20, 0xF1, 0xD1, 0xF0, 0x01, 0x01
 };
 
 /**
- * Sample metadata of 0xE0E1 to change access condition to integrity protected and reseting the version tag
+ * Metadata for Trust Anchor :
+ * Execute access condition = Always
+ * Data object type  =  Trust Anchor
  */
-static uint8_t E0E1_metadata[] = { 0x20, 0x09, 0xD0, 0x03, 0x21, 0xE0, 0xE3, 0xC1, 0x02, 0x00, 0x00 };
+uint8_t trust_anchor_metadata[] = 
+{
+    0x20, 0x06,
+          0xD3, 0x01, 0x00,
+          0xE8, 0x01, 0x11
+};
 
 /**
- * Sample metadata of 0xE0E3 for execute access condition
+ * Metadata for target key OID :
+ * Change access condition = Integrity protected using 0xE0E3
+ * Execute access condition = Always
  */
-static uint8_t E0E3_metadata[] = { 0x20, 0x06, 0xD3, 0x01, 0x00, 0xe8, 0x01, 0x11 };
+const uint8_t target_key_oid_metadata[] = 
+{
+    0x20, 0x0C,
+            0xC1, 0x02, 0x00, 0x00,
+            0xD0, 0x03, 0x21, 0xE0, 0xE3,
+            0xD3, 0x01, 0x00
+};
+
+/**
+ * Metadata for shared secret OID :
+ * Execute access condition = Always
+ * Data object type  =  Protected updated secret
+ */
+uint8_t confidentiality_oid_metadata[] = 
+{
+    0x20, 0x06,
+            0xD3, 0x01, 0x00,
+            0xE8, 0x01, 0x23
+};
+
+
+/**
+ * Shared secret data
+ */
+const unsigned char shared_secret[] = 
+{
+    0x49, 0xC9, 0xF4, 0x92, 0xA9, 0x92, 0xF6, 0xD4, 0xC5, 0x4F, 0x5B, 0x12, 0xC5, 0x7E, 0xDB, 0x27, 
+    0xCE, 0xD2, 0x24, 0x04, 0x8F, 0x25, 0x48, 0x2A, 0xA1, 0x49, 0xC9, 0xF4, 0x92, 0xA9, 0x92, 0xF6, 
+    0x49, 0xC9, 0xF4, 0x92, 0xA9, 0x92, 0xF6, 0xD4, 0xC5, 0x4F, 0x5B, 0x12, 0xC5, 0x7E, 0xDB, 0x27, 
+    0xCE, 0xD2, 0x24, 0x04, 0x8F, 0x25, 0x48, 0x2A, 0xA1, 0x49, 0xC9, 0xF4, 0x92, 0xA9, 0x92, 0xF6
+};
+
+
+const optiga_protected_update_data_configuration_t  optiga_protected_update_data_set[] =
+{
+#ifdef INTEGRITY_PROTECTED
+    {
+        0xE0E1,
+        target_oid_metadata,
+        sizeof(target_oid_metadata),
+        &data_integrity_configuration
+    },
+#endif
+
+#ifdef CONFIDENTIALITY_PROTECTED
+    {
+        0xE0E1,
+        target_oid_metadata_with_confidentiality,
+        sizeof(target_oid_metadata_with_confidentiality),
+        &data_confidentiality_configuration
+    },
+#endif
+
+#ifdef AES_KEY_UPDATE
+    {
+        0xE200,
+        target_oid_metadata,
+        sizeof(target_oid_metadata),
+        &data_aes_key_configuration
+    },
+#endif
+
+#ifdef ECC_KEY_UPDATE
+    {
+        0xE0F1,
+        target_key_oid_metadata,
+        sizeof(target_key_oid_metadata),
+        &data_ecc_key_configuration
+    },
+#endif
+
+#ifdef METADATA_UPDATE
+    {
+        0xE0E2,
+        target_oid_metadata_for_secure_metadata_update,
+        sizeof(target_oid_metadata_for_secure_metadata_update),
+        &metadata_update_configuration
+    },
+#endif
+    
+#ifdef RSA_KEY_UPDATE
+    {
+        0xE0FC,
+        target_key_oid_metadata,
+        sizeof(target_key_oid_metadata),
+        &data_rsa_key_configuration
+    },
+#endif
+};
 
 /**
  * Local functions prototype
  */
-static optiga_lib_status_t write_metadata ( optiga_util_t * me);
-static optiga_lib_status_t write_ecc_256_certificate ( optiga_util_t * me);
-
-/**
- * The below example demonstrates the protected update of data using #optiga_util_protected_update_start,
- * optiga_util_protected_update_continue & optiga_util_protected_update_final 
- * 
- * This example uses OID 0xE0E3 as Trust Anchor and OID 0xE0E1 as Target OID. Signature algorithm used is ECC-256.
- *
- * Example for #optiga_util_protected_update_start,#optiga_util_protected_update_continue 
- *              & #optiga_util_protected_update_final.
- *
- */
-void example_optiga_util_protected_update(void)
+static optiga_lib_status_t write_metadata(optiga_util_t * me, uint16_t oid, uint8_t * metadata, uint8_t metadata_length)
 {
-    uint8_t logging_status = 0;
-    optiga_lib_status_t return_status;
+    optiga_lib_status_t return_status = OPTIGA_LIB_SUCCESS;
 
-    optiga_util_t * me = NULL;
-    example_log_function_name(__FUNCTION__);   
-       
     do
     {
-        /**
-         *  Create OPTIGA util Instance
-         *
-         */
-        me = optiga_util_create(0, optiga_util_callback, NULL);
-        if (NULL == me)
-        {
-            break;
-        }
-
-        /**
-        *  Precondition 1 : Write Metadata for 0xE0E1 and 0xE0E3
-         */        
-        return_status = write_metadata( me);
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        /**
-        *  Precondition 2 : Write ECC-256 certificate for 0xE0E3
-         */                
-        return_status = write_ecc_256_certificate( me);
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-        /**
-        *   Send the manifest using optiga_util_protected_update_start
-        */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_util_protected_update_start(me, 
-                                                           0x01, 
-                                                           manifest,
-                                                           sizeof(manifest));
-
+        return_status = optiga_util_write_metadata(me,
+                                                   oid,
+                                                   metadata,
+                                                   metadata_length);
         if (OPTIGA_LIB_SUCCESS != return_status)
         {
             break;
@@ -335,116 +269,54 @@ void example_optiga_util_protected_update(void)
 
         while (OPTIGA_LIB_BUSY == optiga_lib_status)
         {
-            //Wait until the optiga_util_write_data operation is completed
+            //Wait until the optiga_util_write_metadata operation is completed
         }
 
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
-            //writing data to a data object failed.
-            break;
-        }        
-
-        /**
-        *   Send the first fragment using optiga_util_protected_update_continue
-        */
-        optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_util_protected_update_continue( me, 
-                                                               continue_fragment_array,
-                                                               sizeof(continue_fragment_array));
-
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
+            //writing metadata to a data object failed.
+            return_status = optiga_lib_status;
             break;
         }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status)
-        {
-            //Wait until the optiga_util_write_data operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //writing data to a data object failed.
-            break;
-        }        
-        
-        /**
-        *   Send the last fragment using optiga_util_protected_update_final
-        */
-        optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_util_protected_update_final(me, 
-                                                           final_fragment_array,
-                                                           sizeof(final_fragment_array));
-
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            break;
-        }
-
-        while (OPTIGA_LIB_BUSY == optiga_lib_status)
-        {
-            //Wait until the optiga_util_write_data operation is completed
-        }
-
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //writing data to a data object failed.
-            break;
-        }        
-        
-        logging_status = 1;
     } while (FALSE);
 
-    if (me)
-    {
-        //Destroy the instance after the completion of usecase if not required.
-        return_status = optiga_util_destroy(me);
-    }
-    example_log_execution_status(__FUNCTION__,logging_status);
+    return(return_status);
 }
 
-static optiga_lib_status_t write_metadata ( optiga_util_t * me)
+// Precondition 2
+static optiga_lib_status_t write_confidentiality_oid(optiga_util_t * me, uint16_t confidentiality_oid)
 {
-    optiga_lib_status_t return_status;
-    uint16_t optiga_oid;
-    
+    optiga_lib_status_t return_status = OPTIGA_UTIL_ERROR;
+
     do
     {
         /**
-        *   set meta data "0x20 0x09 0xD0 0x03 0x21 0xE0 0xE8 0xC1 0x02 0x00 0x00" for oids 0xE0E1  
-        */
-        optiga_lib_status = OPTIGA_LIB_BUSY;
-        optiga_oid = 0xE0E1;
-        return_status = optiga_util_write_metadata(me, 
-                                                   optiga_oid,
-                                                   E0E1_metadata,
-                                                   sizeof(E0E1_metadata));
-
+         * Precondition :
+         * Metadata for 0xF1D1 :
+         * Execute access condition = Always
+         * Data object type  =  Protected updated secret
+         */
+        return_status = write_metadata(me,
+                                       confidentiality_oid, 
+                                       confidentiality_oid_metadata,
+                                       sizeof(confidentiality_oid_metadata));
         if (OPTIGA_LIB_SUCCESS != return_status)
         {
             break;
         }
 
-        while (OPTIGA_LIB_BUSY == optiga_lib_status)
-        {
-            //Wait until the optiga_util_write_metadata operation is completed
-        }
 
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //writing metadata to a data object failed.
-            break;
-        }
-        
         /**
-        *   set meta data "0x20 0x03 0xD3 0x01 0x00" for oid 0xE0E3  
+        *  Precondition :
+        *  Write shared secret in OID 0xF1D1
         */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        optiga_oid = 0xE0E3;      
-        return_status = optiga_util_write_metadata(me, 
-                                                   optiga_oid,
-                                                   E0E3_metadata,
-                                                   sizeof(E0E3_metadata));
+        return_status = optiga_util_write_data(me,
+                                                confidentiality_oid,
+                                                OPTIGA_UTIL_ERASE_AND_WRITE,
+                                                0,
+                                                shared_secret,
+                                                sizeof(shared_secret));
 
         if (OPTIGA_LIB_SUCCESS != return_status)
         {
@@ -453,38 +325,45 @@ static optiga_lib_status_t write_metadata ( optiga_util_t * me)
 
         while (OPTIGA_LIB_BUSY == optiga_lib_status)
         {
-            //Wait until the optiga_util_write_metadata operation is completed
+            //Wait until the optiga_util_write_data operation is completed
         }
 
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
-            //writing metadata to a data object failed.
+            //writing data to a data object failed.
+            return_status = optiga_lib_status;            
             break;
-        }    
+        }
     } while (FALSE);
-    
     return (return_status);
 }
 
-static optiga_lib_status_t write_ecc_256_certificate ( optiga_util_t * me)
+
+// Precondition 1
+static optiga_lib_status_t write_trust_anchor(optiga_util_t * me, uint16_t trust_anchor_oid)
 {
-    optiga_lib_status_t return_status;
-    uint16_t optiga_oid;
-    uint16_t offset;    
-    
+    optiga_lib_status_t return_status = OPTIGA_LIB_SUCCESS;
+
     do
     {
         /**
-        *   valid ECC-256 with sha256 certificate is available in oid 0xE0E3
-        */
+         * Precondition :
+         * Update Metadata for 0xE0E3 :
+         * Execute access condition = Always
+         * Data object type  =  Trust Anchor
+         */
+        return_status = write_metadata(me, trust_anchor_oid, trust_anchor_metadata, sizeof(trust_anchor_metadata));
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            break;
+        }
+        
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        optiga_oid = 0xE0E3;
-        offset = 0x00;
-        return_status = optiga_util_write_data(me, 
-                                               optiga_oid, 
-                                               OPTIGA_UTIL_ERASE_AND_WRITE, 
-                                               offset,
-                                               trust_anchor, 
+        return_status = optiga_util_write_data(me,
+                                               trust_anchor_oid,
+                                               OPTIGA_UTIL_ERASE_AND_WRITE,
+                                               0,
+                                               trust_anchor,
                                                sizeof(trust_anchor));
 
         if (OPTIGA_LIB_SUCCESS != return_status)
@@ -500,12 +379,133 @@ static optiga_lib_status_t write_ecc_256_certificate ( optiga_util_t * me)
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
             //writing data to a data object failed.
+            return_status = optiga_lib_status;
             break;
-        }                     
+        }
     } while (FALSE);
+    return(return_status);
+}
+
+void example_optiga_util_protected_update(void)
+{
+    optiga_lib_status_t return_status = OPTIGA_LIB_SUCCESS;
+    optiga_util_t * me = NULL;
+    uint16_t trust_anchor_oid = 0xE0E3;
+    uint16_t confidentiality_oid = 0xF1D1;
+    uint16_t data_config = 0;
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+
+    do
+    {
+        /**
+         *  Create OPTIGA util Instance
+         *
+         */
+        me = optiga_util_create(0, optiga_util_callback, NULL);
+        if (NULL == me)
+        {
+            break;
+        }
+
+        /**
+        *  Precondition 1 :
+        *  Update the metadata and trust anchor in OID 0xE0E3
+        */
+        return_status = write_trust_anchor(me, trust_anchor_oid);
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            break;
+        }
+        /**
+        *  Precondition 2 :
+        *  Update the metadata and secret for confidentiality in OID 0xF1D1
+        */
+        return_status = write_confidentiality_oid(me, confidentiality_oid);
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            break;
+        }
+        for (data_config = 0; 
+            data_config < \
+            sizeof(optiga_protected_update_data_set)/sizeof(optiga_protected_update_data_configuration_t); data_config++)
+        
+        {
+            /**
+            *  Precondition 3 :
+            *  Update the metadata of target OID
+            */
+            return_status = write_metadata(me,
+                                       optiga_protected_update_data_set[data_config].target_oid,
+                                       (uint8_t * )optiga_protected_update_data_set[data_config].target_oid_metadata,
+                                       (uint8_t)optiga_protected_update_data_set[data_config].target_oid_metadata_length);
+            if (OPTIGA_LIB_SUCCESS != return_status)
+                
+            {
+                break;
+            }
+            
+
+            /**
+            *   Send the manifest using optiga_util_protected_update_start
+            */
+            
+            optiga_lib_status = OPTIGA_LIB_BUSY;
+            return_status = optiga_util_protected_update_start(me,
+                                                               optiga_protected_update_data_set[data_config].data_config->manifest_version,
+                                                               optiga_protected_update_data_set[data_config].data_config->manifest_data,
+                                                               optiga_protected_update_data_set[data_config].data_config->manifest_length);
+
+            WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+
+            if (NULL != optiga_protected_update_data_set[data_config].data_config->continue_fragment_data)
+            {
+                /**
+                *   Send the first fragment using optiga_util_protected_update_continue
+                */
+                optiga_lib_status = OPTIGA_LIB_BUSY;
+                return_status = optiga_util_protected_update_continue(me,
+                                                                      optiga_protected_update_data_set[data_config].data_config->continue_fragment_data,
+                                                                      optiga_protected_update_data_set[data_config].data_config->continue_fragment_length);
+
+                WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+            }
+
+            /**
+            *   Send the last fragment using optiga_util_protected_update_final
+            */
+            optiga_lib_status = OPTIGA_LIB_BUSY;
+            return_status = optiga_util_protected_update_final(me,
+                                                               optiga_protected_update_data_set[data_config].data_config->final_fragment_data,
+                                                               optiga_protected_update_data_set[data_config].data_config->final_fragment_length);
+
+            WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+            /**
+            *  Revert the version tag of metadata configuration to re-run the protected update examples
+            *  Update the metadata of target OID for version tag to be 00
+            */
+            return_status = write_metadata(me,
+                                           optiga_protected_update_data_set[data_config].target_oid,
+                                           (uint8_t * )reset_version_tag_metadata,
+                                           (uint8_t)sizeof(reset_version_tag_metadata));
+            if (OPTIGA_LIB_SUCCESS != return_status)
+            {
+                break;
+            }
+            
+        }
+    } while (FALSE);
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
     
-    return (return_status);
-    
+    if (me)
+    {
+        //Destroy the instance after the completion of usecase if not required.
+        return_status = optiga_util_destroy(me);
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //lint --e{774} suppress This is a generic macro
+            OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+        }
+    }
 }
 
 /**
