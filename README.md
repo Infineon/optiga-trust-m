@@ -14,9 +14,6 @@
 
 This repository contains a target-agnostic Software Framework for the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) security chip. It is a base for other application notes.
 
-### <a name="summary"></a>Summary
-The OPTIGA™ Trust M is a security solution based on a secure microntroller. Each device is shipped with a unique elliptic-curve keypair and a corresponding X.509 certificate. OPTIGA™ Trust M enables easy integration into existing PKI infrastructure.
-
 ### <a name="key_features_and_benefits"></a>Key Features and Benefits
 * High-end security controller
 * Common Criteria Certified EAL6+ (high) hardware
@@ -35,7 +32,7 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
 * Hibernate for zero power consumption
 * Lifetime for Industrial Automation and Infrastructure is 20 years and 15 years for other Application Profiles  
 
-### OPTIGA&trade; Trust M v.1 and v.3 differences
+### OPTIGA&trade; Trust M features table
 
 <table class="tg">
   <tr>
@@ -43,6 +40,7 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
     <th class="tg-fymr">Supported Curve/Algorithm</th>
     <th class="tg-fymr">API Command</th>
     <th class="tg-fymr">V1</th>
+    <th class="tg-fymr">M2 ID2</th>
     <th class="tg-fymr">V3</th>
   </tr>
   <tr>
@@ -50,11 +48,13 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
     <td class="tg-0pky">ECC NIST P256/384 </td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
+    <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-0pky">ECC NIST P521, ECC Brainpool P256/384/512 r1</td>
     <td class="tg-0pky"></td>
+    <td class="tg-0pky"> </td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
@@ -63,6 +63,7 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
     <td class="tg-0pky">RSA® 1024/2048 </td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
+    <th class="tg-0pky">✓</th>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
@@ -70,18 +71,21 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
     <td class="tg-0pky">TLS v1.2 PRF SHA 256 </td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
+    <th class="tg-0pky">✓</th>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-0pky">TLS v1.2 PRF SHA 384/512 </td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
+    <th class="tg-0pky">✓</th>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-0pky">HKDF SHA-256/384/512  </td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
+    <th class="tg-0pky">✓</th>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
@@ -89,6 +93,7 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
     <td class="tg-0pky">Key size - 128/192/256 (ECB, CBC, CBC-MAC, CMAC)</td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
+    <th class="tg-0pky">✓</th>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
@@ -96,6 +101,7 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
     <td class="tg-0pky">TRNG, DRNG, Pre-Master secret for RSA® Key exchange</td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
+    <th class="tg-0pky">✓</th>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
@@ -103,6 +109,7 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
     <td class="tg-0pky">HMAC with SHA256/384/512 </td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
+    <th class="tg-0pky">✓</th>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
@@ -110,6 +117,7 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
     <td class="tg-0pky">SHA256 </td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
+    <th class="tg-0pky">✓</th>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
@@ -117,12 +125,14 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
     <td class="tg-0pky">ECC NIST P256/384</br>RSA® 1024/2048 </br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing </td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
+    <th class="tg-0pky">✓</th> 
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">ECC NIST P521,</br>ECC Brainpool P256/384/512 r1</br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing</td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
+    <th class="tg-0pky">✓</th> 
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
@@ -130,6 +140,7 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
     <td class="tg-0pky">ECC NIST P256/384/521</br>ECC Brainpool P256/384/512 r1</br>RSA® 1024/2048</br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing</td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
+    <th class="tg-0pky">✓</th>
     <td class="tg-0pky">✓</td>
   </tr>
 </table>
