@@ -29,6 +29,7 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
   * TLS v1.2 PRF and HKDF up to SHA512
 * Crypto ToolBox commands for SHA-256, ECC and RSA® Feature, AES, HMAC and Key derivation
 * Configurable device security monitor, 4 Monotonic up counters
+* Protected(integrity and confidentiality) update of data, key and metadata objects
 * Hibernate for zero power consumption
 * Lifetime for Industrial Automation and Infrastructure is 20 years and 15 years for other Application Profiles  
 
