@@ -14,9 +14,6 @@
 
 This repository contains a target-agnostic Software Framework for the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) security chip. It is a base for other application notes.
 
-### <a name="summary"></a>Summary
-The OPTIGA™ Trust M is a security solution based on a secure microntroller. Each device is shipped with a unique elliptic-curve keypair and a corresponding X.509 certificate. OPTIGA™ Trust M enables easy integration into existing PKI infrastructure.
-
 ### <a name="key_features_and_benefits"></a>Key Features and Benefits
 * High-end security controller
 * Common Criteria Certified EAL6+ (high) hardware
