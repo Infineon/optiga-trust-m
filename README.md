@@ -139,10 +139,7 @@ The OPTIGA™ Trust M is a security solution based on a secure microntroller. Ea
 ### OPTIGA™ Trust M evaluation kit
 <img src="https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M_Eval_Kit%2002.jpg" title="OPTIGA™ Trust M evaluation kit" width="600"> 
 
-### XCM1400 XTREME Connectivity Kit
-<img src="https://github.com/Infineon/Assets/blob/master/Pictures/xtreme-connectivity-kit.png" title="XCM1400 XTREME Connectivity Kit" width="400">
-
-The [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/) and [XCM1400 XTREME Connectivity Kit]() are a starting point for a lot of application notes mentioned below.
+Get started with the [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/) using [this](https://github.com/Infineon/getstarted-optiga-trust-m) Application Note, or the [FreeRTOS example](https://github.com/Infineon/amazon-freertos-optiga-trust)
 
 ### <a name="examples"></a>Examples
 
