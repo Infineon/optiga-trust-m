@@ -40,7 +40,6 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
     <th class="tg-fymr">Supported Curve/Algorithm</th>
     <th class="tg-fymr">API Command</th>
     <th class="tg-fymr">V1</th>
-    <th class="tg-fymr">M2 ID2</th>
     <th class="tg-fymr">V3</th>
   </tr>
   <tr>
@@ -48,13 +47,11 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
     <td class="tg-0pky">ECC NIST P256/384 </td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
-    <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-0pky">ECC NIST P521, ECC Brainpool P256/384/512 r1</td>
     <td class="tg-0pky"></td>
-    <td class="tg-0pky"> </td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
@@ -64,13 +61,11 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
     <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
-    <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow" rowspan="3">Key Derivation</td>
     <td class="tg-0pky">TLS v1.2 PRF SHA 256 </td>
     <td class="tg-0pky"></td>
-    <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
@@ -79,13 +74,11 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
-    <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-0pky">HKDF SHA-256/384/512  </td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
-    <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
@@ -94,13 +87,11 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
-    <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">Random Generation</td>
     <td class="tg-0pky">TRNG, DRNG, Pre-Master secret for RSA® Key exchange</td>
     <td class="tg-0pky"></td>
-    <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
@@ -110,13 +101,11 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
-    <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">Hash </td>
     <td class="tg-0pky">SHA256 </td>
     <td class="tg-0pky"></td>
-    <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
@@ -125,14 +114,12 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
     <td class="tg-0pky">ECC NIST P256/384</br>RSA® 1024/2048 </br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing </td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
-    <td class="tg-0pky">✓</td> 
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">ECC NIST P521,</br>ECC Brainpool P256/384/512 r1</br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing</td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
-    <td class="tg-0pky">✓</td> 
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
@@ -140,7 +127,6 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
     <td class="tg-0pky">ECC NIST P256/384/521</br>ECC Brainpool P256/384/512 r1</br>RSA® 1024/2048</br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing</td>
     <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
-    <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
 </table>
