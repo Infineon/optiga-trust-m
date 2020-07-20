@@ -46,7 +46,7 @@ A sample script demonstrating the usage of the tool is available [here](https://
 	
 ## Limitations
 * Only SHA-256 digest algorithm is supported for hash calculation
-* Manifest version number is 1	
+* Support for manifest format 1 (CDDL CBOR) only
     	
 ## Environment
 * The available executable is built using microsoft visual studio 2010 in windows 10 (64 bit)
