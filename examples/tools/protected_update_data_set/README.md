@@ -42,7 +42,7 @@ payload=<text file with readable data>
 	
 ## Sample :
 
-A sample script demonstrating the usage of the tool is available in ..\samples
+A sample script demonstrating the usage of the tool is available [here|https://github.com/Infineon/optiga-trust-m/tree/master/examples/tools/protected_update_data_set/samples]
 	
 ## Limitations
 * Only SHA-256 digest algorithm is supported for hash calculation
