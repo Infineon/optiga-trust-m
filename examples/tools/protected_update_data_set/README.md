@@ -36,7 +36,7 @@ priv_key=<pem private key> ^
 payload=<text file with readable data>
 ```
 
-* Generate a manifest data with payload version 3, trust anchor 0xE0E3. The manifest is signed using "priv_key" and RSA_SSA_PKCS1_V1_5_SHA_256 is the signing algorithm
+* Generate a manifest data with payload version 3, trust anchor 0xE0E8. The manifest is signed using "priv_key" and RSA_SSA_PKCS1_V1_5_SHA_256 is the signing algorithm
 * Fragments of data is generated from text file provided in option "payload"
 * The generated fragments is written at target OID 0xE0E1 from offset 1
 	
