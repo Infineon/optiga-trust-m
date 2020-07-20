@@ -2,15 +2,20 @@
 Start the `protected_update_data_generator.exe` with following options, in order to generate the data set for protected update data set.
 ```
     payload_version=%%d         <default: 0>
-    trust_anchor_oid=%%s        <default: E0E8>
-    target_oid=%%s              <default: E0E2>						
-    offset=%%d                  <default: 0>								
-    write_type=%%d              <default: 1>			
+    trust_anchor_oid=%%s        <default: E0E8> 
+                                <note : Reference to the object which holds the public key to validate the protected update>
+    target_oid=%%s              <default: E0E2> 
+                                <note : Reference to the object which shall be updated>						
+    offset=%%d                  <default: 0> 
+                                <note : Update object at certain offset>
+    write_type=%%d              <default: 1> 
                                 <options : Write (1), EraseAndWrite (2)>
-    sign_algo=%%s               <default: ES_256>							
-                                <options : ES_256 , RSA-SSA-PKCS1-V1_5-SHA-256>
-    priv_key=%%s                <default: NULL>		
-                                <note : Provide key file(pem format). Corresponding certificate containing public key should be written to trust_anchor>		
+				<note : Write or EraseandWrite data object>			
+    sign_algo=%%s               <default: ES_256> 							
+                                <options : ES_256 , RSA-SSA-PKCS1-V1_5-SHA-256> 
+				<note : What is the signature algorithm used to sign the update payload>
+    priv_key=%%s                <default: NULL> 		
+                                <note : Private key file (pem format)used to sign the payload. Corresponding certificate containing public key should be written to trust_anchor>
     payload=%%s                 <default: NULL>
                                 <note : Provide file with path with readable content>
 ```
