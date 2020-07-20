@@ -17,7 +17,7 @@ Start the `protected_update_data_generator.exe` with following options, in order
     priv_key=%%s                <default: NULL> 		
                                 <note : Private key file (pem format)used to sign the payload. Corresponding certificate containing public key should be written to trust_anchor>
     payload=%%s                 <default: NULL>
-                                <note : Provide file with path with readable content>
+                                <note : Path to file containing readable content>
 ```
 
 To parse the resulting data on the host side (MCU) you can refer to [this repository](https://github.com/Infineon/optiga-manifest-parser)
