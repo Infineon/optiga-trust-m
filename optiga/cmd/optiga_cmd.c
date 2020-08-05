@@ -2576,6 +2576,14 @@ _STATIC_H optiga_lib_status_t optiga_cmd_gen_keypair_handler(optiga_cmd_t * me)
                     optiga_common_get_uint16(&me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET + header_offset
                                              + OPTIGA_CMD_NO_OF_BYTES_IN_TAG], &private_key_length);
 
+					// check if the returned length of the key isn't longer than a corresponding public key length
+					if (private_key_length > *p_optiga_ecc_gen_keypair->public_key_length)
+                    {
+                        OPTIGA_CMD_LOG_MESSAGE("Error in processing generate keypair response...");
+                        return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
+                        *p_optiga_ecc_gen_keypair->public_key_length = 0;
+                        break;
+                    }
                     pal_os_memcpy(p_optiga_ecc_gen_keypair->private_key,
                                   &me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET + header_offset +
                                   OPTIGA_CMD_UINT16_SIZE_IN_BYTES+ OPTIGA_CMD_NO_OF_BYTES_IN_TAG], private_key_length);
