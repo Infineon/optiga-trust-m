@@ -233,7 +233,7 @@
 #define     OPTIGA_CMD_QUEUE_REQUEST_LOCK           (0x21)
 #define     OPTIGA_CMD_QUEUE_REQUEST_STRICT_LOCK    (0x23)
 #define     OPTIGA_CMD_QUEUE_REQUEST_SESSION        (0x22)
-#define     OPTIGA_CMD_QUEUE_NO_REQUEST		        (0x00)
+#define     OPTIGA_CMD_QUEUE_NO_REQUEST             (0x00)
 
 // Type of slot, Do not change the values
 #define     OPTIGA_CMD_QUEUE_SLOT_STATE             (0x09)
@@ -3067,7 +3067,11 @@ _STATIC_H optiga_lib_status_t optiga_cmd_calc_hash_handler(optiga_cmd_t * me)
                 }
                 optiga_common_get_uint16(&me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET +
                                          OPTIGA_CMD_NO_OF_BYTES_IN_TAG], &out_data_size);
-
+                //There is only one supported hash algorithm
+                if(0x20 != out_data_size)
+                {
+                    break;
+                }
                 pal_os_memcpy(p_optiga_calc_hash->p_out_digest,
                               &me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET + OPTIGA_CMD_UINT16_SIZE_IN_BYTES +
                               OPTIGA_CMD_NO_OF_BYTES_IN_TAG], out_data_size);
