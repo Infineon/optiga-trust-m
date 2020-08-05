@@ -2488,7 +2488,7 @@ _STATIC_H void optiga_cmd_get_private_key_length(uint8_t algorithm, uint16_t * p
         *private_key_length = 0;
         for (i = 0; i < ALGORITHM_PRIVATE_KEY_LOOKUP_TABLE_SIZE); i++)
         {
-            if (key_lookup_table[i][0] == algorithm)
+            if (key_lookup_table[i][0] == ((uint16_t)algorithm))
             {
                 *private_key_length = key_lookup_table[i][1];
                 break;
