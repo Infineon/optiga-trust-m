@@ -2460,6 +2460,43 @@ optiga_lib_status_t optiga_cmd_derive_key(optiga_cmd_t * me, uint8_t cmd_param, 
 #endif //OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
 
 #if defined (OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) || defined (OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED)
+
+#define ALGORITHM_PRIVATE_KEY_LOOKUP_TABLE_SIZE 4
+_STATIC_H uint16_t algorithm_private_key_lookup_table[ALGORITHM_PRIVATE_KEY_LOOKUP_TABLE_SIZE][2] = 
+{
+    // ECC Keys
+    {OPTIGA_ECC_CURVE_NIST_P_256,         0x22},
+    {OPTIGA_ECC_CURVE_NIST_P_384,         0x32},
+    // RSA Keys
+    {OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL, 0x83},
+    {OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL, 0x104},
+    
+};    
+
+_STATIC_H void optiga_cmd_get_private_key_length(uint8_t algorithm, uint16_t * private_key_length)
+{
+    uint16_t loop;
+
+    do
+    {
+        if (NULL == private_key_length)
+        {
+            break;
+        }
+        //if there is no such algorithm, set length to 0
+        *private_key_length = 0;
+        for (loop = 0; loop < ALGORITHM_PRIVATE_KEY_LOOKUP_TABLE_SIZE; loop++)
+        {
+            if (algorithm_private_key_lookup_table[loop][0] == ((uint16_t)algorithm))
+            {
+                *private_key_length = algorithm_private_key_lookup_table[loop][1];
+                break;
+            }
+        }
+    } while (FALSE);
+    return ;
+}
+
 /*
 * GenKeyPair handler
 */
@@ -2468,6 +2505,7 @@ _STATIC_H optiga_lib_status_t optiga_cmd_gen_keypair_handler(optiga_cmd_t * me)
     uint16_t total_apdu_length;
     optiga_gen_keypair_params_t * p_optiga_ecc_gen_keypair = (optiga_gen_keypair_params_t *)me->p_input;
     uint16_t header_offset;
+    uint16_t golden_private_key_length;
     uint16_t private_key_length;
     uint16_t index_for_data = OPTIGA_CMD_APDU_INDATA_OFFSET;
     uint16_t out_data_size;
@@ -2575,6 +2613,15 @@ _STATIC_H optiga_lib_status_t optiga_cmd_gen_keypair_handler(optiga_cmd_t * me)
                 {
                     optiga_common_get_uint16(&me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET + header_offset
                                              + OPTIGA_CMD_NO_OF_BYTES_IN_TAG], &private_key_length);
+
+                    // check if the returned length of the key isn't longer than expected
+                    optiga_cmd_get_private_key_length(me->cmd_param, &golden_private_key_length);
+                    if ((golden_private_key_length != private_key_length) || (FALSE == p_optiga_ecc_gen_keypair->export_private_key))
+                    {
+                        OPTIGA_CMD_LOG_MESSAGE("Error in processing generate keypair response...");
+                        return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
+                        break;
+                    }
 
                     pal_os_memcpy(p_optiga_ecc_gen_keypair->private_key,
                                   &me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET + header_offset +
