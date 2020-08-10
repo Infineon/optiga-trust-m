@@ -46,20 +46,19 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
   <tr>
     <td class="tg-c3ow" rowspan="2">ECC</td>
     <td class="tg-0pky">ECC NIST P256/384 </td>
-    <td class="tg-0pky"></td>
+    <td class="tg-0pky"  rowspan="2" ><a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_ecc_generate_keypair">optiga_crypt_ecc_generate_keypair</a>, <a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_ecdsa_sign">optiga_crypt_ecdsa_sign</a>, <a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_ecdsa_verify">optiga_crypt_ecdsa_verify</a> </td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-0pky">ECC NIST P521, ECC Brainpool P256/384/512 r1</td>
-    <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">RSA</td>
     <td class="tg-0pky">RSA® 1024/2048 </td>
-    <td class="tg-0pky"></td>
+    <td class="tg-0pky" ><a href="github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_rsa_generate_keypair">optiga_crypt_rsa_generate_keypair</a>, <a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_rsa_sign">optiga_crypt_rsa_sign</a>, <a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_rsa_verify">optiga_crypt_rsa_verify</a></td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
