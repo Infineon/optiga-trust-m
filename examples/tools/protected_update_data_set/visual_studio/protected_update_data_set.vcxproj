@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="10.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{54690D97-3F9D-4348-A9EE-E4879B35DBE4}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>protected_update_data_set</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;MBEDTLS_FS_IO;MBEDTLS_PEM_PARSE_C;MBEDTLS_BASE64_C;MBEDTLS_ECDSA_DETERMINISTIC;MBEDTLS_HMAC_DRBG_C;MBEDTLS_ECDSA_DETERMINISTIC_DEBUG;MBEDTLS_RSA_C;MBEDTLS_PKCS1_V15;MBEDTLS_PK_RSA_ALT_SUPPORT;MBEDTLS_TIMING_C;MBEDTLS_ENTROPY_C;MBEDTLS_CTR_DRBG_C;MBEDTLS_ECDSA_C;MBEDTLS_ASN1_WRITE_C;MBEDTLS_ECP_DP_SECP384R1_ENABLED;MBEDTLS_ECP_DP_SECP521R1_ENABLED;MBEDTLS_ECP_DP_BP256R1_ENABLED;MBEDTLS_ECP_DP_BP384R1_ENABLED;MBEDTLS_ECP_DP_BP512R1_ENABLED;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\include\pal;..\include;..\..\..\..\externals\mbedtls\include</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;MBEDTLS_FS_IO;MBEDTLS_PEM_PARSE_C;MBEDTLS_BASE64_C;MBEDTLS_ECDSA_DETERMINISTIC;MBEDTLS_HMAC_DRBG_C;MBEDTLS_ECDSA_DETERMINISTIC_DEBUG;MBEDTLS_RSA_C;MBEDTLS_PKCS1_V15;MBEDTLS_PK_RSA_ALT_SUPPORT;MBEDTLS_TIMING_C;MBEDTLS_ENTROPY_C;MBEDTLS_CTR_DRBG_C;MBEDTLS_ECDSA_C;MBEDTLS_ASN1_WRITE_C;MBEDTLS_ECP_DP_SECP384R1_ENABLED;MBEDTLS_ECP_DP_SECP521R1_ENABLED;MBEDTLS_ECP_DP_BP256R1_ENABLED;MBEDTLS_ECP_DP_BP384R1_ENABLED;MBEDTLS_ECP_DP_BP512R1_ENABLED;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\include\pal;..\include;..\..\..\..\externals\mbedtls\include</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\aes.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\aesni.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\arc4.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\aria.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\asn1parse.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\asn1write.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\base64.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\bignum.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\blowfish.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\camellia.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ccm.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\certs.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\chacha20.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\chachapoly.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\cipher.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\cipher_wrap.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\cmac.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ctr_drbg.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\debug.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\des.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\dhm.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ecdh.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ecdsa.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ecjpake.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ecp.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ecp_curves.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\entropy.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\entropy_poll.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\error.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\gcm.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\havege.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\hkdf.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\hmac_drbg.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\md.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\md2.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\md4.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\md5.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\md_wrap.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\memory_buffer_alloc.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\net_sockets.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\nist_kw.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\oid.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\padlock.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\pem.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\pk.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\pkcs11.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\pkcs12.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\pkcs5.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\pkparse.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\pkwrite.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\pk_wrap.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\platform.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\platform_util.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\poly1305.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ripemd160.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\rsa.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\rsa_internal.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\sha1.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\sha256.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\sha512.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ssl_cache.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ssl_ciphersuites.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ssl_cli.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ssl_cookie.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ssl_srv.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ssl_ticket.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\ssl_tls.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\threading.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\timing.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\version.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\version_features.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\x509.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\x509write_crt.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\x509write_csr.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\x509_create.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\x509_crl.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\x509_crt.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\x509_csr.c" />
+    <ClCompile Include="..\..\..\..\externals\mbedtls\library\xtea.c" />
+    <ClCompile Include="..\pal\pal_crypt_mbedtls.c" />
+    <ClCompile Include="..\pal\pal_file_system.c" />
+    <ClCompile Include="..\pal\pal_logger.c" />
+    <ClCompile Include="..\pal\pal_os_memory.c" />
+    <ClCompile Include="..\src\cbor.c" />
+    <ClCompile Include="..\src\common_utilities.c" />
+    <ClCompile Include="..\src\protected_update_data_set.c" />
+    <ClCompile Include="..\src\user_input_parser.c" />
+    <ClCompile Include="main.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\cbor.h" />
+    <ClInclude Include="..\include\common_utilites.h" />
+    <ClInclude Include="..\include\pal\pal_crypt.h" />
+    <ClInclude Include="..\include\pal\pal_file_system.h" />
+    <ClInclude Include="..\include\pal\pal_logger.h" />
+    <ClInclude Include="..\include\pal\pal_os_memory.h" />
+    <ClInclude Include="..\include\protected_update_data_set.h" />
+    <ClInclude Include="..\include\protected_update_data_set_version.h" />
+    <ClInclude Include="..\include\user_input_parser.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
