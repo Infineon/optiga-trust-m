@@ -12,7 +12,7 @@
 
 <img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_uson10.png" width="300" >
 
-This repository contains a target-agnostic Software Framework for the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) security chip. It is a base for other application notes. Be aware that this software comes without any security claims and shall be used for evaluation purpose.
+This repository contains a target-agnostic Software Framework for the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) security chip. It is a base for other application notes.
 
 ### <a name="key_features_and_benefits"></a>Key Features and Benefits
 * High-end security controller
@@ -129,3 +129,6 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## <a name="license"></a>License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+
+## <a name="disclaimer"></a>Disclaimer
+Be aware that this software comes without any security claims and shall be used for evaluation purpose.
