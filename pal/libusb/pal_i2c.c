@@ -284,7 +284,7 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t * p_i2c_context)
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
 
-pal_status_t pal_i2c_write(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length)
+pal_status_t pal_i2c_write(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length)
 {
     pal_status_t status = PAL_STATUS_FAILURE;
     int32_t usb_lib_status;
@@ -376,7 +376,7 @@ pal_status_t pal_i2c_write(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C read fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
-pal_status_t pal_i2c_read(pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length)
+pal_status_t pal_i2c_read(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length)
 {
     int32_t usb_lib_status = PAL_STATUS_FAILURE;
     int32_t transfered;

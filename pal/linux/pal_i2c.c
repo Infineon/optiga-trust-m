@@ -186,7 +186,7 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t* p_i2c_context)
 }
 
 
-pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t length)
+pal_status_t pal_i2c_write(const pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t length)
 {
     pal_status_t status = PAL_STATUS_FAILURE;
     int32_t i2c_write_status;
@@ -238,7 +238,7 @@ pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t l
 }
 
 
-pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t length)
+pal_status_t pal_i2c_read(const pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t length)
 {
     int32_t i2c_read_status = PAL_STATUS_FAILURE;
 	pal_linux_t *pal_linux;
