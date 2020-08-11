@@ -1,2 +1,0 @@
-# General
-This platform abstaction layer (PAL) is meant for porting the OPTIGA Trust M library to the [Zephyr Project](https://github.com/zephyrproject-rtos). The complete port will be available as an external Zephyr module and will be placed in Zephyr's own [optiga-trust](https://github.com/zephyrproject-rtos/optiga-trust) reopository.
