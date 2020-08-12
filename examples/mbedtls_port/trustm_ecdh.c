@@ -175,6 +175,12 @@ int mbedtls_ecdh_compute_shared(mbedtls_ecp_group *grp, mbedtls_mpi *z,
 	optiga_crypt_t * me = NULL;
     optiga_lib_status_t crypt_sync_status = OPTIGA_CRYPT_ERROR;
 
+#ifdef OPTIGA_TRUSTM_EXTRACT_OID_FROM_PRIVKEY
+    uint8_t private_key_in[32];
+    size_t private_key_in_len=sizeof(private_key_in);
+#endif
+    uint16_t optiga_key_id = OPTIGA_TRUSTM_KEYID_TO_STORE_PRIVATE_KEY;
+
 	//Step1: Prepare the public key material as expected by security chip
 	//checking group against the supported curves of OPTIGA Trust M
 	if ((grp->id <  MBEDTLS_ECP_DP_SECP256R1) ||
@@ -245,6 +251,16 @@ int mbedtls_ecdh_compute_shared(mbedtls_ecp_group *grp, mbedtls_mpi *z,
 	}
 #endif
 
+#ifdef OPTIGA_TRUSTM_EXTRACT_OID_FROM_PRIVKEY
+	//Get the private key location and range check
+	mbedtls_mpi_write_binary(d, private_key_in, private_key_in_len);
+	optiga_key_id  = ((private_key_in[0]<<8) + private_key_in[1]) & 0xffff;
+	if((optiga_key_id < 0xe100) || (optiga_key_id > 0xe103)) {
+	   return_status = MBEDTLS_ERR_ECP_ALLOC_FAILED;
+        goto cleanup;
+    }
+#endif
+
 	me = optiga_crypt_create(0, optiga_crypt_event_completed, NULL);
 	if (NULL == me)
 	{
@@ -254,7 +270,7 @@ int mbedtls_ecdh_compute_shared(mbedtls_ecp_group *grp, mbedtls_mpi *z,
 
 	crypt_event_completed_status = OPTIGA_LIB_BUSY;
 	//Invoke OPTIGA command to generate shared secret and store in the OID/buffer.
-	crypt_sync_status = optiga_crypt_ecdh(me, OPTIGA_TRUSTM_KEYID_TO_STORE_PRIVATE_KEY, &pk, 1, buf);
+	crypt_sync_status = optiga_crypt_ecdh(me, (optiga_key_id_t *)&optiga_key_id , &pk, 1, buf);
 
 	if (OPTIGA_LIB_SUCCESS != crypt_sync_status)
 	{
