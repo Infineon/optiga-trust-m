@@ -1,4 +1,4 @@
-# OPTIGA&trade; Trust M Software Framework
+# OPTIGA&trade; Trust M V3 Software Framework
 
 ## Quick navigation
 
