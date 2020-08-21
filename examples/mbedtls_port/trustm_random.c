@@ -65,43 +65,45 @@ int mbedtls_hardware_poll( void *data,
 
     if (olen != NULL)
     {
-  	    me = optiga_crypt_create(0, optiga_crypt_event_completed, NULL);
+        me = optiga_crypt_create(0, optiga_crypt_event_completed, NULL);
         if (NULL == me)
         {
-        	// MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE
-        	error = -0x0034;
+            // MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE
+            error = -0x0034;
         }
         else
         {
-        	crypt_event_completed_status = OPTIGA_LIB_BUSY;
-			command_queue_status = optiga_crypt_random(me, OPTIGA_RNG_TYPE_TRNG, output, len);
-			if( command_queue_status != OPTIGA_LIB_SUCCESS)
-			{
-				// MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE
-				error = -0x0034;
-			}
+            crypt_event_completed_status = OPTIGA_LIB_BUSY;
+            command_queue_status = optiga_crypt_random(me, OPTIGA_RNG_TYPE_TRNG, output, len);
+            if( command_queue_status != OPTIGA_LIB_SUCCESS)
+            {
+                // MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE
+                error = -0x0034;
+            }
 
-			if (!error)
-			{
-				while (OPTIGA_LIB_BUSY == crypt_event_completed_status)
-				{
-					pal_os_timer_delay_in_milliseconds(5);
-				}
+            if (!error)
+            {
+                while (OPTIGA_LIB_BUSY == crypt_event_completed_status)
+                {
+                    pal_os_timer_delay_in_milliseconds(5);
+                }
 
-				if(crypt_event_completed_status!= OPTIGA_LIB_SUCCESS)
-				{
-					// MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE
-					error = -0x0034;
-				}
-				else
-				{
-					*olen = len;
-				}
-			}
+                if(crypt_event_completed_status!= OPTIGA_LIB_SUCCESS)
+                {
+                    // MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE
+                    error = -0x0034;
+                }
+                else
+                {
+                    *olen = len;
+                }
+            }
         }
+      optiga_crypt_destroy(me); //CCW => Seems to be missing?
     }
 
     return error;
+    
 }
 
 #endif
