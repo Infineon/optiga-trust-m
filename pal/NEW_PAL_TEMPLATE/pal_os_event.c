@@ -35,17 +35,13 @@
 * @{
 */
 
-#include <DAVE.h>
 #include "optiga/pal/pal_os_event.h"
-
-
-/// @cond hidden
 
 static pal_os_event_t pal_os_event_0 = {0};
 
 void pal_os_event_start(pal_os_event_t * p_pal_os_event, register_callback callback, void * callback_args)
 {
-    if (FALSE == p_pal_os_event->is_event_triggered)
+    if (0 == p_pal_os_event->is_event_triggered)
     {
         p_pal_os_event->is_event_triggered = TRUE;
         pal_os_event_register_callback_oneshot(p_pal_os_event,callback,callback_args,1000);
@@ -54,9 +50,7 @@ void pal_os_event_start(pal_os_event_t * p_pal_os_event, register_callback callb
 
 void pal_os_event_stop(pal_os_event_t * p_pal_os_event)
 {
-    //lint --e{714} suppress "The API pal_os_event_stop is not exposed in header file but used as extern in 
-    //optiga_cmd.c"
-    p_pal_os_event->is_event_triggered = FALSE;
+    p_pal_os_event->is_event_triggered = 0;
 }
 
 pal_os_event_t * pal_os_event_create(register_callback callback, void * callback_args)
@@ -83,7 +77,7 @@ void pal_os_event_trigger_registered_callback(void)
         callback((void * )pal_os_event_0.callback_ctx);
     }
 }
-/// @endcond
+
 
 void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
                                              register_callback callback,
@@ -93,14 +87,14 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
     p_pal_os_event->callback_registered = callback;
     p_pal_os_event->callback_ctx = callback_args;
 
-	// !!!OPTIGA_LIB_PORTING_REQUIRED
+    // !!!OPTIGA_LIB_PORTING_REQUIRED
     // User should start the timer here with the 
-	// pal_os_event_trigger_registered_callback() function as a callback
+    // pal_os_event_trigger_registered_callback() function as a callback
 }
 
-//lint --e{818,715} suppress "As there is no implementation, pal_os_event is not used"
 void pal_os_event_destroy(pal_os_event_t * pal_os_event)
 {
+    (void)pal_os_event;
     // User should take care to destroy the event if it's not required
 }
 

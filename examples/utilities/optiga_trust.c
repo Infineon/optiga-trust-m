@@ -228,7 +228,7 @@ void read_trust_anchor_from_optiga(uint16_t oid, char * cert_pem, uint16_t * cer
     }
 }
 
-static void write_data_object (uint16_t oid, const uint8_t * p_data, uint16_t length)
+void write_data_object (uint16_t oid, const uint8_t * p_data, uint16_t length)
 {
     optiga_util_t * me_util = NULL;
     optiga_lib_status_t return_status;

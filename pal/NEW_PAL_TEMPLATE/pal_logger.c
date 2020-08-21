@@ -43,8 +43,8 @@ pal_status_t pal_logger_init(void * p_logger_context)
 
     do
     {
-		// !!!OPTIGA_LIB_PORTING_REQUIRED
-    }while(FALSE);
+        // !!!OPTIGA_LIB_PORTING_REQUIRED
+    }while(0);
     return return_status;
 }
 
@@ -56,8 +56,8 @@ pal_status_t pal_logger_deinit(void * p_logger_context)
 
     do
     {
-		// !!!OPTIGA_LIB_PORTING_REQUIRED
-    }while(FALSE);
+        // !!!OPTIGA_LIB_PORTING_REQUIRED
+    }while(0);
     return return_status;
 }
 
@@ -70,7 +70,7 @@ pal_status_t pal_logger_write(void * p_logger_context, const uint8_t * p_log_dat
 
     do
     {
-		// !!!OPTIGA_LIB_PORTING_REQUIRED
+        // !!!OPTIGA_LIB_PORTING_REQUIRED
     } while(0);
     return ((pal_status_t)return_status);
 }
@@ -83,7 +83,7 @@ pal_status_t pal_logger_read(void * p_logger_context, uint8_t * p_log_data, uint
 
     do
     {
-		// !!!OPTIGA_LIB_PORTING_REQUIRED
+        // !!!OPTIGA_LIB_PORTING_REQUIRED
     } while(0);
     return ((pal_status_t)return_status);
 }
