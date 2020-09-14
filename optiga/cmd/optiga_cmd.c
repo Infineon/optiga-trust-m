@@ -759,19 +759,19 @@ _STATIC_H void optiga_cmd_queue_reset_slot(const optiga_cmd_t * me)
     pal_os_event_start(me->p_optiga->p_pal_os_event_ctx, optiga_cmd_queue_scheduler, me->p_optiga);
 }
 
-optiga_lib_status_t optiga_cmd_request_session(optiga_cmd_t * me)
+_STATIC_H optiga_lib_status_t optiga_cmd_request_session(optiga_cmd_t * me)
 {
     optiga_cmd_queue_update_slot(me , OPTIGA_CMD_QUEUE_REQUEST_SESSION);
     return (OPTIGA_CMD_SUCCESS);
 }
 
-optiga_lib_status_t optiga_cmd_release_session(optiga_cmd_t * me)
+_STATIC_H optiga_lib_status_t optiga_cmd_release_session(optiga_cmd_t * me)
 {
     optiga_cmd_session_free(me);
     return (OPTIGA_CMD_SUCCESS);
 }
 
-optiga_lib_status_t optiga_cmd_request_lock(optiga_cmd_t * me, uint8_t lock_type)
+_STATIC_H optiga_lib_status_t optiga_cmd_request_lock(optiga_cmd_t * me, uint8_t lock_type)
 {
     optiga_cmd_queue_update_slot(me , lock_type);
     return (OPTIGA_CMD_SUCCESS);

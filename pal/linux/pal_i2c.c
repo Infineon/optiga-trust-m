@@ -50,7 +50,7 @@
 #endif
 
 /// I2C device
-char * i2c_if = "/dev/i2c-1";
+const char * i2c_if = "/dev/i2c-1";
 
 // Slave address not initialization
 #define IFXI2C_SLAVE_ADDRESS_INIT 0xFFFF
@@ -72,6 +72,8 @@ static pal_i2c_t * gp_pal_i2c_current_ctx;
 //lint --e{715} suppress the unused p_i2c_context variable lint error , since this is kept for future enhancements
 static pal_status_t pal_i2c_acquire(const void * p_i2c_context)
 {
+    (void)p_i2c_context;
+
     if (0 == g_entry_count)
     {
         g_entry_count++;
@@ -87,6 +89,7 @@ static pal_status_t pal_i2c_acquire(const void * p_i2c_context)
 //lint --e{715} suppress the unused p_i2c_context variable lint, since this is kept for future enhancements
 static void pal_i2c_release(const void* p_i2c_context)
 {
+    (void)p_i2c_context;
     g_entry_count = 0;
 }
 /// @endcond
@@ -117,41 +120,6 @@ void i2c_master_end_of_receive_callback(void)
 	invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_SUCCESS);
 }
 
-// I2C error callback function
-void i2c_master_error_detected_callback(void)
-{
-    //I2C_MASTER_t *p_i2c_master;
-    //
-    //p_i2c_master = gp_pal_i2c_current_ctx->p_i2c_hw_config;
-    //if (I2C_MASTER_IsTxBusy(p_i2c_master))
-    //{
-    //    //lint --e{534} suppress "Return value is not required to be checked"
-    //    I2C_MASTER_AbortTransmit(p_i2c_master);
-    //    while (I2C_MASTER_IsTxBusy(p_i2c_master)){}
-    //}  
-
-    //if (I2C_MASTER_IsRxBusy(p_i2c_master)) 
-    //{
-    //    //lint --e{534} suppress "Return value is not required to be checked"
-    //    I2C_MASTER_AbortReceive(p_i2c_master);
-    //    while (I2C_MASTER_IsRxBusy(p_i2c_master)){}
-    //}
-
-    invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_ERROR);
-}
-
-
-void i2c_master_nack_received_callback(void)
-{
-    i2c_master_error_detected_callback();
-}
-
-void i2c_master_arbitration_lost_callback(void)
-{
-    i2c_master_error_detected_callback();
-}
-
-
 /// @endcond
 
 pal_status_t pal_i2c_init(const pal_i2c_t* p_i2c_context)
@@ -181,6 +149,8 @@ pal_status_t pal_i2c_init(const pal_i2c_t* p_i2c_context)
 pal_status_t pal_i2c_deinit(const pal_i2c_t* p_i2c_context)
 {
 	LOG_HAL("pal_i2c_deinit\n. ");
+
+    (void)p_i2c_context;
 	
     return PAL_STATUS_SUCCESS;
 }

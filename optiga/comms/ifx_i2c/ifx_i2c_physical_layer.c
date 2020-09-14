@@ -567,7 +567,8 @@ _STATIC_H void ifx_i2c_pl_frame_event_handler(ifx_i2c_context_t * p_ctx, optiga_
                     ifx_i2c_pl_read_register(p_ctx, PL_REG_I2C_STATE, PL_REG_LEN_I2C_STATE);
                     break;
                 }
-            }
+            };
+            __attribute__((fallthrough));
             //lint -fallthrough "For write frame, polling of i2c status register is skipped"
             // Do read/write frame
             case PL_STATE_DATA_AVAILABLE:
@@ -791,6 +792,7 @@ _STATIC_H void ifx_i2c_pl_soft_reset(ifx_i2c_context_t * p_ctx)
 //lint --e{818} suppress "This is ignored as upper layer handler function prototype requires this argument"
 _STATIC_H void ifx_i2c_pl_pal_slave_addr_event_handler(void * p_ctx, optiga_lib_status_t event)
 {
+    (void)p_ctx;
     g_pal_event_status = event;
 }
 

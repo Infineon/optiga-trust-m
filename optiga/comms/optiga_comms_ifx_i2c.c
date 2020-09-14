@@ -88,6 +88,7 @@ optiga_comms_t * optiga_comms_create(callback_handler_t callback, void * context
 //lint --e{818} suppress "Not declared as pointer as nothing needs to be updated in the pointer."
 void optiga_comms_destroy(optiga_comms_t * p_optiga_cmd)
 {
+    (void)p_optiga_cmd;
 }
 
 optiga_lib_status_t optiga_comms_set_callback_handler(optiga_comms_t * p_optiga_comms, callback_handler_t handler)

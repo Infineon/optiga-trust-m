@@ -79,6 +79,11 @@ extern "C" {
 #define OPTIGA_SET_PROTECTION_VERSION                   (0x01)
 /// To set manage context in cmd instance
 #define OPTIGA_SET_MANAGE_CONTEXT                       (0x02)
+
+extern void optiga_cmd_set_shielded_connection_option(optiga_cmd_t * me,
+                                                      uint8_t value,
+                                                      uint8_t shielded_connection_option);
+
     /** @brief Enables the protected I2C communication with OPTIGA for command instances */
     #define OPTIGA_PROTECTION_ENABLE(p_mycmd, p_protection_mode)  { optiga_cmd_set_shielded_connection_option(p_mycmd, p_protection_mode->protection_level,OPTIGA_SET_PROTECTION_LEVEL) ;}
     /** @brief Select the protocol version required for the I2C protected communication for command instances */
