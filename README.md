@@ -19,7 +19,7 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
 * Common Criteria Certified EAL6+ (high) hardware
 * Turnkey solution
 * Up to 10kB user memory
-* PG-USON-10-2 package (3 x 3 mm)
+* PG-USON-10 package (3 x 3 mm)
 * Temperature range (−40°C to +105°C)
 * I2C interface with Shielded Connection (encrypted communication)
 * Cryptographic support: 
