@@ -40,6 +40,14 @@
 #include "optiga_example.h"
 
 #ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
+
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
+uint32_t time_taken_to_generate_key = 0;
+
 #define METADATA_TAG_KEY_ALGO_ID     (0xE0)
 extern optiga_lib_status_t example_check_tag_in_metadata(const uint8_t * buffer, 
                                                          const uint8_t tag);
@@ -74,11 +82,10 @@ static void optiga_util_callback(void * context, optiga_lib_status_t return_stat
 const uint8_t E200_metadata[] = { 0x20, 0x06, 0xD0, 0x01, 0x00, 0xD3, 0x01, 0x00 };
 
 /**
- * The below example demonstrates the generation of
- * symmetric Key using optiga_crypt_symmetric_generate_key.
+ * The below generates symmetric Key using optiga_crypt_symmetric_generate_key.
  *
  */
-void example_optiga_crypt_symmetric_generate_key(void)
+optiga_lib_status_t generate_symmetric_key(void)
 {
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     optiga_key_id_t symmetric_key;
@@ -87,11 +94,10 @@ void example_optiga_crypt_symmetric_generate_key(void)
 
     optiga_crypt_t * crypt_me = NULL;
     optiga_util_t * util_me = NULL;    
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
-        /**
+       /**
          * 1. Create OPTIGA Crypt Instance
          */
         crypt_me = optiga_crypt_create(0, optiga_crypt_callback, NULL);
@@ -144,13 +150,19 @@ void example_optiga_crypt_symmetric_generate_key(void)
          *       - Store the Symmetric key in OPTIGA Key store OID(E200)
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        symmetric_key = OPTIGA_KEY_ID_SECRET_BASED;        
+        symmetric_key = OPTIGA_KEY_ID_SECRET_BASED;
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken_to_generate_key);
+        
         return_status = optiga_crypt_symmetric_generate_key(crypt_me,
                                                             OPTIGA_SYMMETRIC_AES_128,
                                                             (uint8_t)OPTIGA_KEY_USAGE_ENCRYPTION,
                                                             FALSE,
                                                             &symmetric_key);
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken_to_generate_key);
+        
         return_status = OPTIGA_LIB_SUCCESS;
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
@@ -174,7 +186,39 @@ void example_optiga_crypt_symmetric_generate_key(void)
             //lint --e{774} suppress This is a generic macro
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
-    }      
+    }
+    return return_status;
+}
+
+/**
+ * The below example demonstrates the generation of
+ * symmetric Key using optiga_crypt_symmetric_generate_key.
+ *
+ */
+void example_optiga_crypt_symmetric_generate_key(void)
+{
+    optiga_lib_status_t return_status;
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+        
+    return_status = generate_symmetric_key();
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken_to_generate_key, return_status);
 }
 
 #endif  //OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED

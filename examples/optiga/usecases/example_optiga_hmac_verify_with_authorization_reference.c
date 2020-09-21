@@ -45,6 +45,12 @@
 #include "mbedtls/md.h"
 #include "mbedtls/ssl.h"
 #if defined (OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined (OPTIGA_CRYPT_HMAC_VERIFY_ENABLED)
+
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
 /**
  * Metadata for Secret OID :
  * Execute access condition = Always
@@ -266,10 +272,18 @@ void example_optiga_hmac_verify_with_authorization_reference(void)
     optiga_util_t * me_util = NULL;
     optiga_crypt_t * me_crypt = NULL;
 
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
-
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
         /**
          * Create OPTIGA util and crypt Instances
          */
@@ -457,6 +471,14 @@ void example_optiga_hmac_verify_with_authorization_reference(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     
 }
 #endif

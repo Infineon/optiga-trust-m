@@ -45,6 +45,13 @@ extern "C" {
 #include "optiga/optiga_lib_config.h"
 #include "optiga/common/optiga_lib_logger.h"
 
+extern char performance_buffer_string[30];
+extern void example_performance_measurement(uint32_t* time_value, uint8_t time_reset_flag);
+
+#define START_TIMER                 (TRUE)
+
+#define STOPTIMER_AND_CALCULATE     (FALSE)
+
 // Macro to enable logger for Application
 #define OPTIGA_LIB_ENABLE_EXAMPLE_LOGGING
 
@@ -53,6 +60,12 @@ extern "C" {
 
 // Logger color for different layers and data
 #define OPTIGA_EXAMPLE_COLOR               OPTIGA_LIB_LOGGER_COLOR_DEFAULT
+
+//Start timer for performance measurement
+#define START_PERFORMANCE_MEASUREMENT(time_taken) example_performance_measurement(&time_taken, START_TIMER)
+
+//Stop timer and calculate performance measurement
+#define READ_PERFORMANCE_MEASUREMENT(time_taken) example_performance_measurement(&time_taken, STOPTIMER_AND_CALCULATE)
 
 // Check return status
 #define WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status)\
@@ -141,6 +154,14 @@ extern "C" {
 
 #endif
 
+#define OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken,return_value) \
+{   \
+    if(OPTIGA_LIB_SUCCESS == return_value)  \
+    {   \
+        sprintf(performance_buffer_string, "Example takes %d msec", (int)time_taken);    \
+        OPTIGA_EXAMPLE_LOG_MESSAGE(performance_buffer_string);  \
+    }   \
+}
 #ifdef __cplusplus
 }
 #endif

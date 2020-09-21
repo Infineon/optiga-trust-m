@@ -40,6 +40,11 @@
 #include "optiga_example.h"
 #include "protected_update_data_set/example_optiga_util_protected_update.h"
 
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
 /**
  * Callback when optiga_util_xxxx operation is completed asynchronously
  */
@@ -390,13 +395,23 @@ void example_optiga_util_protected_update(void)
 {
     optiga_lib_status_t return_status = OPTIGA_LIB_SUCCESS;
     optiga_util_t * me = NULL;
+    uint32_t time_taken = 0;
     uint16_t trust_anchor_oid = 0xE0E3;
     uint16_t confidentiality_oid = 0xF1D1;
     uint16_t data_config = 0;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
         /**
          *  Create OPTIGA util Instance
          *
@@ -425,6 +440,9 @@ void example_optiga_util_protected_update(void)
         {
             break;
         }
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         for (data_config = 0; 
             data_config < \
             sizeof(optiga_protected_update_data_set)/sizeof(optiga_protected_update_data_configuration_t); data_config++)
@@ -444,7 +462,8 @@ void example_optiga_util_protected_update(void)
                 break;
             }
             
-
+            
+            
             /**
             *   Send the manifest using optiga_util_protected_update_start
             */
@@ -479,6 +498,8 @@ void example_optiga_util_protected_update(void)
                                                                optiga_protected_update_data_set[data_config].data_config->final_fragment_length);
 
             WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+            
+            
             /**
             *  Revert the version tag of metadata configuration to re-run the protected update examples
             *  Update the metadata of target OID for version tag to be 00
@@ -493,6 +514,7 @@ void example_optiga_util_protected_update(void)
             }
             
         }
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
     
@@ -506,6 +528,15 @@ void example_optiga_util_protected_update(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY 
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
 }
 
 /**

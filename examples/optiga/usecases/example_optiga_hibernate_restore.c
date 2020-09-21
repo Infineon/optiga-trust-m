@@ -44,7 +44,7 @@
 
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION 
 //lint --e{526} suppress "the function is defined in example_pair_host_and_optiga_using_pre_shared_secret source file"
-void example_pair_host_and_optiga_using_pre_shared_secret(void);
+extern optiga_lib_status_t pair_host_and_optiga_using_pre_shared_secret(void);
 #endif
 /**
  * Callback when optiga_util_xxxx operation is completed asynchronously
@@ -120,7 +120,13 @@ void example_optiga_util_hibernate_restore(void)
         /**
          * 2. Pairing the Host and OPTIGA using a pre-shared secret
          */
-        example_pair_host_and_optiga_using_pre_shared_secret();
+        return_status = pair_host_and_optiga_using_pre_shared_secret();
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            //pairing of host and optiga failed
+            break;
+        }
+        
 #endif        
 
         /**

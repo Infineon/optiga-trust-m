@@ -42,6 +42,11 @@
 
 #ifdef OPTIGA_CRYPT_HASH_ENABLED
 
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
  */
@@ -86,12 +91,22 @@ void example_optiga_crypt_hash(void)
     hash_data_from_host_t hash_data_host;
 
     uint8_t digest [32];
+    uint32_t time_taken = 0;
 
     optiga_crypt_t * me = NULL;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
+
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
         /**
          * 1. Create OPTIGA Crypt Instance
          */
@@ -104,6 +119,7 @@ void example_optiga_crypt_hash(void)
         /**
          * 2. Initialize the Hash context
          */
+        
         OPTIGA_HASH_CONTEXT_INIT(hash_context,hash_context_buffer,  \
                                  sizeof(hash_context_buffer),(uint8_t)OPTIGA_HASH_TYPE_SHA_256);
 
@@ -112,6 +128,8 @@ void example_optiga_crypt_hash(void)
         /**
          * 3. Initialize the hashing context at OPTIGA
          */
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_crypt_hash_start(me, &hash_context);
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
 
@@ -137,6 +155,9 @@ void example_optiga_crypt_hash(void)
                                                    digest);
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
@@ -152,6 +173,15 @@ void example_optiga_crypt_hash(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
 }
 
 /**
@@ -169,12 +199,23 @@ void example_optiga_crypt_hash_data(void)
     hash_data_from_host_t hash_data_host;
 
     uint8_t digest [32];
+    uint32_t time_taken = 0;
 
     optiga_crypt_t * me = NULL;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+
         /**
          * 1. Create OPTIGA Crypt Instance
          */
@@ -190,8 +231,14 @@ void example_optiga_crypt_hash_data(void)
         hash_data_host.buffer = data_to_hash;
         hash_data_host.length = sizeof(data_to_hash);
         optiga_lib_status = OPTIGA_LIB_BUSY;
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_crypt_hash(me, OPTIGA_HASH_TYPE_SHA_256, OPTIGA_CRYPT_HOST_DATA, &hash_data_host, digest);
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
@@ -207,6 +254,16 @@ void example_optiga_crypt_hash_data(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY 
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
+    
 }
 
 #endif  //OPTIGA_CRYPT_HASH_ENABLED

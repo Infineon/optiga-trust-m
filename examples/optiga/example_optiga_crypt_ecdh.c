@@ -40,6 +40,11 @@
 
 #ifdef OPTIGA_CRYPT_ECDH_ENABLED
 
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
  */
@@ -87,7 +92,7 @@ void example_optiga_crypt_ecdh(void)
 {
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     optiga_key_id_t optiga_key_id;
-
+    uint32_t time_taken = 0;
     //To store the generated public key as part of Generate key pair
     uint8_t public_key [100];
     uint16_t public_key_length = sizeof(public_key);
@@ -96,10 +101,19 @@ void example_optiga_crypt_ecdh(void)
     uint8_t shared_secret [32];
 
     optiga_crypt_t * me = NULL;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
         /**
          * 1. Create OPTIGA Crypt Instance
          */
@@ -130,6 +144,8 @@ void example_optiga_crypt_ecdh(void)
                                                           &public_key_length);
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
 
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         /**
          * 3. Perform ECDH using the Peer Public key
          *       - Use ECC NIST P 256 Curve
@@ -145,6 +161,9 @@ void example_optiga_crypt_ecdh(void)
                                           TRUE,
                                           shared_secret);
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = OPTIGA_LIB_SUCCESS;
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
@@ -159,6 +178,15 @@ void example_optiga_crypt_ecdh(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);    
 }
 
 #endif  //OPTIGA_CRYPT_ECDH_ENABLED

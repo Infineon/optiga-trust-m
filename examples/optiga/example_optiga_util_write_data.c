@@ -39,6 +39,11 @@
 #include "optiga/optiga_util.h"
 #include "optiga_example.h"
 
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
 /**
  * Sample Trust Anchor
  */
@@ -121,15 +126,26 @@ static void optiga_util_callback(void * context, optiga_lib_status_t return_stat
  */
 void example_optiga_util_write_data(void)
 {
+    uint32_t time_taken = 0;
     uint16_t optiga_oid;
     uint16_t offset;
 
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     optiga_util_t * me = NULL;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+        
         /**
          * 1. Create OPTIGA Util Instance
          */
@@ -138,7 +154,7 @@ void example_optiga_util_write_data(void)
         {
             break;
         }
-
+        
         /**
          * Write Trust Anchor to a Trust Anchor object (e.g. E0E8)
          * using optiga_util_write_data with no shielded connection protection.
@@ -152,6 +168,9 @@ void example_optiga_util_write_data(void)
         OPTIGA_UTIL_SET_COMMS_PROTECTION_LEVEL(me, OPTIGA_COMMS_NO_PROTECTION);
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
+                   
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_util_write_data(me,
                                                optiga_oid,
                                                OPTIGA_UTIL_ERASE_AND_WRITE,
@@ -176,6 +195,9 @@ void example_optiga_util_write_data(void)
                                                    sizeof(metadata));
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
@@ -191,6 +213,16 @@ void example_optiga_util_write_data(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);     
 }
 
 /**

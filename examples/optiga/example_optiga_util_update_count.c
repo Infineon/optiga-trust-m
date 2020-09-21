@@ -39,6 +39,11 @@
 #include "optiga/optiga_util.h"
 #include "optiga_example.h"
 
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
 /**
  * Initialize the counter object with a threshold value 0x0A
  */
@@ -71,15 +76,25 @@ static void optiga_util_callback(void * context, optiga_lib_status_t return_stat
  */
 void example_optiga_util_update_count(void)
 {
+    uint32_t time_taken = 0;
     uint16_t optiga_counter_oid;
     uint8_t offset;
 
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     optiga_util_t * me = NULL;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
-
+    
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
         /**
          * 1. Create OPTIGA Util Instance
          */
@@ -88,7 +103,7 @@ void example_optiga_util_update_count(void)
         {
             break;
         }
-
+        
         /**
          * Pre-condition
          * Any data object can be converted to counter data object by changing metadata as mentioned below:
@@ -106,6 +121,9 @@ void example_optiga_util_update_count(void)
         optiga_counter_oid = 0xE120;
         offset = 0x00;
         optiga_lib_status = OPTIGA_LIB_BUSY;
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_util_write_data(me,
                                                optiga_counter_oid,
                                                OPTIGA_UTIL_ERASE_AND_WRITE,
@@ -122,6 +140,9 @@ void example_optiga_util_update_count(void)
                                                  0x05);
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = OPTIGA_LIB_SUCCESS;
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
@@ -136,6 +157,16 @@ void example_optiga_util_update_count(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);     
 }
 
 /**

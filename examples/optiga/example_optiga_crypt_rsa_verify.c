@@ -40,6 +40,11 @@
 
 #ifdef OPTIGA_CRYPT_RSA_VERIFY_ENABLED
 
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
 void example_util_encode_rsa_public_key_in_bit_string_format(const uint8_t * n_buffer,
                                                         uint16_t n_length,
                                                         const uint8_t * e_buffer,
@@ -116,7 +121,7 @@ void example_optiga_crypt_rsa_verify(void)
 {
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     optiga_crypt_t * me = NULL;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+    uint32_t time_taken = 0;
     
     // Form rsa public key in bit string format
     example_util_encode_rsa_public_key_in_bit_string_format(rsa_public_key_modulus,
@@ -135,6 +140,16 @@ void example_optiga_crypt_rsa_verify(void)
     
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
         /**
          * 1. Create OPTIGA Crypt Instance
          */
@@ -148,6 +163,9 @@ void example_optiga_crypt_rsa_verify(void)
          * 2. Verify RSA signature using public key from host
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_crypt_rsa_verify (me,
                                                  OPTIGA_RSASSA_PKCS1_V15_SHA256,
                                                  digest,
@@ -159,6 +177,9 @@ void example_optiga_crypt_rsa_verify(void)
                                                  0x0000);
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = OPTIGA_LIB_SUCCESS;
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
@@ -173,6 +194,16 @@ void example_optiga_crypt_rsa_verify(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY  
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
+    
 }
 
 #endif  //OPTIGA_CRYPT_RSA_VERIFY_ENABLED

@@ -44,7 +44,12 @@
 
 #if defined (OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) && defined (OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)
 
-extern void example_optiga_crypt_symmetric_generate_key(void);
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
+extern optiga_lib_status_t generate_symmetric_key(void);
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
  */
@@ -98,11 +103,22 @@ void example_optiga_crypt_symmetric_encrypt_decrypt_cbc(void)
     uint8_t decrypted_data_buffer_final[32] = {0};
     uint32_t decrypted_data_length_final = sizeof(decrypted_data_buffer_final);
     optiga_crypt_t * me = NULL;
+    uint32_t time_taken = 0;
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+        
         /**
          * 1. Create OPTIGA Crypt Instance
          *
@@ -117,11 +133,20 @@ void example_optiga_crypt_symmetric_encrypt_decrypt_cbc(void)
          * 2. Update AES 128 symmetric key using secure key update
          *
          */
-        example_optiga_crypt_symmetric_generate_key();
+        OPTIGA_EXAMPLE_LOG_MESSAGE("Symmetric key generation");
+        return_status = generate_symmetric_key();
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            break;
+        }
+        
         /**
          * 3. Start encryption sequence and encrypt the plain data 
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_crypt_symmetric_encrypt_start(me,
                                                              OPTIGA_SYMMETRIC_CBC,
                                                              OPTIGA_KEY_ID_SECRET_BASED,
@@ -240,6 +265,9 @@ void example_optiga_crypt_symmetric_encrypt_decrypt_cbc(void)
                                                              &decrypted_data_length_final);
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+        
         // Compare the decrypted data with plain data
         if( OPTIGA_LIB_SUCCESS != memcmp(plain_data_buffer_final, decrypted_data_buffer_final, decrypted_data_length_final))
         {
@@ -256,6 +284,8 @@ void example_optiga_crypt_symmetric_encrypt_decrypt_cbc(void)
 
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
+    
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
@@ -266,6 +296,15 @@ void example_optiga_crypt_symmetric_encrypt_decrypt_cbc(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    
 }
 
 /**
@@ -283,12 +322,23 @@ void example_optiga_crypt_symmetric_encrypt_cbcmac(void)
     uint8_t encrypted_data_buffer[32] = {0};
     uint32_t encrypted_data_length = sizeof(encrypted_data_buffer);
     uint32_t expected_data_length = 0x10;
+    uint32_t time_taken = 0;
     optiga_crypt_t * me = NULL;
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+        
         /**
          * 1. Create OPTIGA Crypt Instance
          *
@@ -303,11 +353,20 @@ void example_optiga_crypt_symmetric_encrypt_cbcmac(void)
          * 2. Update symmetric key using secure key update
          *
          */
-        example_optiga_crypt_symmetric_generate_key();
+        OPTIGA_EXAMPLE_LOG_MESSAGE("Symmetric key generation");
+        return_status = generate_symmetric_key();
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            break;
+        }
+        
         /**
          * 3. Encrypt the plain data
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_crypt_symmetric_encrypt(me,
                                                        OPTIGA_SYMMETRIC_CBC,
                                                        OPTIGA_KEY_ID_SECRET_BASED,
@@ -321,6 +380,9 @@ void example_optiga_crypt_symmetric_encrypt_cbcmac(void)
                                                        &encrypted_data_length);
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+       
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+       
         if (encrypted_data_length != expected_data_length)
         {
             //Encrypted data length is incorrect
@@ -332,6 +394,7 @@ void example_optiga_crypt_symmetric_encrypt_cbcmac(void)
 
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
@@ -342,6 +405,16 @@ void example_optiga_crypt_symmetric_encrypt_cbcmac(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
+    
 }
 
 #endif  //OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED && OPTIGA_CRYPT_SYM_DECRYPT_ENABLED

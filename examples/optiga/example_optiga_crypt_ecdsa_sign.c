@@ -40,6 +40,11 @@
 
 #ifdef OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
 
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
  */
@@ -73,13 +78,24 @@ void example_optiga_crypt_ecdsa_sign(void)
     //To store the signture generated
     uint8_t signature [80];
     uint16_t signature_length = sizeof(signature);
-
+    uint32_t time_taken = 0;
     optiga_crypt_t * me = NULL;
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        
+        
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+        
         /**
          * 1. Create OPTIGA Crypt Instance
          */
@@ -89,6 +105,8 @@ void example_optiga_crypt_ecdsa_sign(void)
             break;
         }
 
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         /**
          * 2. Sign the digest using Private key from Key Store ID E0F0
          */
@@ -101,6 +119,9 @@ void example_optiga_crypt_ecdsa_sign(void)
                                                 &signature_length);
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+                                                
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+                                                
         return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
@@ -116,6 +137,15 @@ void example_optiga_crypt_ecdsa_sign(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
 }
 #endif  //OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
 /**

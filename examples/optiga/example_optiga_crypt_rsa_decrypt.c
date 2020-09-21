@@ -41,6 +41,11 @@
 
 #ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
 
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
  */
@@ -74,12 +79,22 @@ void example_optiga_crypt_rsa_decrypt_and_export(void)
     uint8_t decrypted_message[150];
     uint16_t decrypted_message_length = sizeof(decrypted_message);
     uint16_t public_key_length = sizeof(public_key);
+    uint32_t time_taken = 0;
 
     optiga_crypt_t * me = NULL;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
         /**
          * 1. Create OPTIGA Crypt Instance
          *
@@ -137,6 +152,9 @@ void example_optiga_crypt_rsa_decrypt_and_export(void)
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
         encryption_scheme = OPTIGA_RSAES_PKCS1_V15;
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_crypt_rsa_decrypt_and_export(me,
                                                             encryption_scheme,
                                                             encrypted_message,
@@ -148,6 +166,9 @@ void example_optiga_crypt_rsa_decrypt_and_export(void)
                                                             &decrypted_message_length);
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+
         return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
@@ -162,6 +183,16 @@ void example_optiga_crypt_rsa_decrypt_and_export(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
+    
 }
 
 /**
@@ -179,13 +210,23 @@ void example_optiga_crypt_rsa_decrypt_and_store(void)
     uint16_t encrypted_message_length = sizeof(encrypted_message);
     uint8_t public_key [150];
     uint16_t public_key_length = sizeof(public_key);
+    uint32_t time_taken = 0;
     const uint8_t optional_data[] = {0x01, 0x02};
 
     optiga_crypt_t * me = NULL;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
         /**
          * 1. Create OPTIGA Crypt Instance
          *
@@ -254,6 +295,9 @@ void example_optiga_crypt_rsa_decrypt_and_store(void)
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
         encryption_scheme = OPTIGA_RSAES_PKCS1_V15;
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_crypt_rsa_decrypt_and_store(me,
                                                            encryption_scheme,
                                                            encrypted_message,
@@ -263,6 +307,8 @@ void example_optiga_crypt_rsa_decrypt_and_store(void)
                                                            optiga_key_id);
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
 
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
@@ -278,6 +324,16 @@ void example_optiga_crypt_rsa_decrypt_and_store(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
+    
 }
 
 #endif  // OPTIGA_CRYPT_RSA_DECRYPT_ENABLED

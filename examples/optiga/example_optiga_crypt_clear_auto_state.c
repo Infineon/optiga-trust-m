@@ -45,6 +45,12 @@
 #include "mbedtls/md.h"
 #include "mbedtls/ssl.h"
 #if defined (OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined (OPTIGA_CRYPT_HMAC_VERIFY_ENABLED) && defined (OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED)
+
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
 //lint --e{526} suppress "CalcHMAC" it's define in other file"
 extern pal_status_t CalcHMAC(const uint8_t * secret_key,
                              uint16_t secret_key_len,
@@ -124,11 +130,20 @@ void example_optiga_crypt_clear_auto_state(void)
     pal_status_t pal_return_status;
     optiga_util_t * me_util = NULL;
     optiga_crypt_t * me_crypt = NULL;
-
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+    uint32_t time_taken = 0;
 
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
         /**
          * 1. Create OPTIGA crypt and util Instances
          */
@@ -224,9 +239,14 @@ void example_optiga_crypt_clear_auto_state(void)
          * 8. Perform clear auto state using OPTIGA
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_crypt_clear_auto_state(me_crypt,
                                                       0xF1D0);
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
         
         return_status = OPTIGA_LIB_SUCCESS;
 
@@ -253,6 +273,15 @@ void example_optiga_crypt_clear_auto_state(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
     
 }
 #endif //(OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && (OPTIGA_CRYPT_HMAC_VERIFY_ENABLED) && (OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED)

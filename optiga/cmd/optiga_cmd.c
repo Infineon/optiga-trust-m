@@ -3014,6 +3014,66 @@ optiga_lib_status_t optiga_cmd_derive_key(optiga_cmd_t * me, uint8_t cmd_param, 
 #endif //(OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED || OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED || OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED) || (OPTIGA_CRYPT_HKDF_ENABLED)
 
 #if defined (OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) || defined (OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED)
+
+_STATIC_H uint16_t optiga_cmd_check_private_key_length(uint8_t algorithm)
+{
+    uint16_t priv_key_len = 0;    
+
+    switch(algorithm)
+    {
+
+        case OPTIGA_ECC_CURVE_NIST_P_256:
+        {
+            priv_key_len = 0x22;
+        }
+        break;
+        case OPTIGA_ECC_CURVE_NIST_P_384:
+        {            
+            priv_key_len = 0x32;
+        }            
+        break;
+#ifdef OPTIGA_CRYPT_ECC_NIST_P_521_ENABLED
+        case OPTIGA_ECC_CURVE_NIST_P_521:
+        {            
+            priv_key_len = 0x44;
+        }            
+        break;            
+#endif
+
+#ifdef OPTIGA_CRYPT_ECC_BRAINPOOL_P_R1_ENABLED
+        case OPTIGA_ECC_CURVE_BRAIN_POOL_P_256R1:
+        {            
+            priv_key_len = 0x22;
+        }            
+        break;
+        case OPTIGA_ECC_CURVE_BRAIN_POOL_P_384R1:
+        {            
+            priv_key_len = 0x32;
+        }            
+        break;
+        case OPTIGA_ECC_CURVE_BRAIN_POOL_P_512R1:
+        {            
+            priv_key_len = 0x42;
+        }            
+        break;  
+#endif        
+        case OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL:
+        {            
+            priv_key_len = 0x83;
+        }            
+        break;
+        case OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL:
+        {            
+            priv_key_len = 0x104;
+        }            
+        break;            
+        default:
+        break;
+    }        
+
+    return priv_key_len;
+}
+
 /*
 * GenKeyPair handler
 */
@@ -3126,12 +3186,19 @@ _STATIC_H optiga_lib_status_t optiga_cmd_gen_keypair_handler(optiga_cmd_t * me)
                                         *p_optiga_gen_keypair->public_key_length;
                     return_status = OPTIGA_LIB_SUCCESS;
                 }
-                else if (OPTIGA_CMD_GEN_KEY_PAIR_PRIVATE_KEY_TAG == me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET +
-                                                             header_offset])
+                else if ((OPTIGA_CMD_GEN_KEY_PAIR_PRIVATE_KEY_TAG == me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET +
+                                                             header_offset]) && (FALSE != p_optiga_gen_keypair->export_private_key))
                 {
                     optiga_common_get_uint16(&me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET + header_offset
                                              + OPTIGA_CMD_NO_OF_BYTES_IN_TAG], &private_key_length);
-
+                    // Check the private key length for algorithm
+                    if( private_key_length != optiga_cmd_check_private_key_length(me->cmd_param))
+                    {
+                        OPTIGA_CMD_LOG_MESSAGE("Error in processing generate keypair response...");
+                        return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
+                        break;
+                    }
+                    
                     pal_os_memcpy(p_optiga_gen_keypair->private_key,
                                   &me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET + header_offset +
                                   OPTIGA_CMD_UINT16_SIZE_IN_BYTES+ OPTIGA_CMD_NO_OF_BYTES_IN_TAG], private_key_length);
@@ -3556,6 +3623,25 @@ _STATIC_H void optiga_cmd_calc_hash_set_current_hash_sequence(const optiga_cmd_t
     }
 }
 
+_STATIC_H uint16_t optiga_cmd_check_hash_alg_length(uint8_t algo_identifier)
+{
+    uint16_t hash_output_len = 0;    
+
+    switch(algo_identifier)
+    {
+
+        case OPTIGA_HASH_TYPE_SHA_256:
+        {
+            hash_output_len = 0x20;
+        }
+        break;
+        default:
+        break;
+    }        
+
+    return hash_output_len;
+}
+
 /*
 * CalCHash handler
 */
@@ -3689,6 +3775,10 @@ _STATIC_H optiga_lib_status_t optiga_cmd_calc_hash_handler(optiga_cmd_t * me)
                 optiga_common_get_uint16(&me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET +
                                          OPTIGA_CMD_NO_OF_BYTES_IN_TAG], &out_data_size);
 
+                if(optiga_cmd_check_hash_alg_length(me->cmd_param) != out_data_size)
+                {
+                    break;
+                }
                 pal_os_memcpy(p_optiga_calc_hash->p_out_digest,
                               &me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET + OPTIGA_CMD_UINT16_SIZE_IN_BYTES +
                               OPTIGA_CMD_NO_OF_BYTES_IN_TAG], out_data_size);

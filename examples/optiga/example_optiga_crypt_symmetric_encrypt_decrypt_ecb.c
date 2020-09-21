@@ -41,7 +41,13 @@
 
 #if defined (OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) && defined (OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)
 
-extern void example_optiga_crypt_symmetric_generate_key(void);
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+extern void example_optiga_init(void);
+extern void example_optiga_deinit(void);
+#endif
+
+extern optiga_lib_status_t generate_symmetric_key(void);
+
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
  */
@@ -74,11 +80,21 @@ void example_optiga_crypt_symmetric_encrypt_decrypt_ecb(void)
     uint8_t decrypted_data_buffer[32] = {0};
     uint32_t decrypted_data_length = sizeof(decrypted_data_buffer);
     optiga_crypt_t * me = NULL;
+    uint32_t time_taken = 0;
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
-    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
 
     do
     {
+        
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */
+        example_optiga_init();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+
+        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
         /**
          * 1. Create OPTIGA Crypt Instance
          *
@@ -93,11 +109,20 @@ void example_optiga_crypt_symmetric_encrypt_decrypt_ecb(void)
          * 2. Update AES 128 symmetric key using secure key update
          *
          */
-        example_optiga_crypt_symmetric_generate_key();
+        OPTIGA_EXAMPLE_LOG_MESSAGE("Symmetric key generation");
+        return_status = generate_symmetric_key();
+        if(OPTIGA_LIB_SUCCESS != return_status)
+        {
+            break;
+        }
+        
         /**
          * 3. Encrypt the plain data
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_crypt_symmetric_encrypt_ecb(me,
                                                            OPTIGA_KEY_ID_SECRET_BASED,
                                                            plain_data_buffer,
@@ -125,6 +150,9 @@ void example_optiga_crypt_symmetric_encrypt_decrypt_ecb(void)
                                                            &decrypted_data_length);
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+        
         // Compare the decrypted data with plain data
         if( OPTIGA_LIB_SUCCESS != memcmp(decrypted_data_buffer, plain_data_buffer, plain_data_length))
         {
@@ -151,6 +179,15 @@ void example_optiga_crypt_symmetric_encrypt_decrypt_ecb(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
 }
 
 #endif  //OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED && OPTIGA_CRYPT_SYM_DECRYPT_ENABLED

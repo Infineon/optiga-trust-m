@@ -36,7 +36,11 @@
 */
 
 #include "optiga/pal/pal_os_memory.h"
+#include "optiga/pal/pal_os_timer.h"
+#include "optiga/common/optiga_lib_logger.h"
 #include "optiga/common/optiga_lib_return_codes.h"
+
+char performance_buffer_string[30];
 
 #define OPTIGA_EXAMPLE_UTIL_RSA_NEGATIVE_INTEGER          (0x7F)
 #define OPTIGA_EXAMPLE_UTIL_DER_BITSTRING_TAG               (0x03)
@@ -159,6 +163,19 @@ optiga_lib_status_t example_check_tag_in_metadata(const uint8_t * buffer, const 
     } while (FALSE);
     return (return_status);
 }
+
+void example_performance_measurement(uint32_t* time_value, uint8_t time_reset_flag)
+{
+    if(TRUE == time_reset_flag)
+    {
+        *time_value = pal_os_timer_get_time_in_milliseconds();
+    }
+    else if(FALSE == time_reset_flag)
+    {
+        *time_value = pal_os_timer_get_time_in_milliseconds() - *time_value;
+    }
+}
+
 /**
 * @}
 */
