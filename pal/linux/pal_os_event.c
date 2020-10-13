@@ -68,6 +68,10 @@
 
 static void handler(int sig, siginfo_t *si, void *uc)
 {
+    (void)sig;
+    (void)si;
+    (void)uc;
+
     TRUSTM_PAL_EVENT_DBGFN(">"); 
     pal_os_event_trigger_registered_callback();
     TRUSTM_PAL_EVENT_DBGFN("<");   

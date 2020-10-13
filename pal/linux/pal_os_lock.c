@@ -46,7 +46,7 @@ void pal_os_lock_create(pal_os_lock_t * p_lock, uint8_t lock_type)
 //lint --e{818} suppress "Not declared as pointer as nothing needs to be updated in the pointer."
 void pal_os_lock_destroy(pal_os_lock_t * p_lock)
 {
-    
+    (void)p_lock;   
 }
 
 pal_status_t pal_os_lock_acquire(pal_os_lock_t * p_lock)

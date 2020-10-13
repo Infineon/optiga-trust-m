@@ -98,7 +98,7 @@ GPIODirection(int pin, int dir)
 {
     static const char s_directions_str[]  = "in\0out";
 
-#define DIRECTION_MAX 34
+#define DIRECTION_MAX 48
     char path[DIRECTION_MAX];
     int fd;
 
@@ -139,7 +139,7 @@ GPIOWrite(pal_linux_gpio_t* pin, int value)
 //lint --e{714,715} suppress "This function is used for to support multiple platforms "
 pal_status_t pal_gpio_init(const pal_gpio_t * p_gpio_context)
 {
-#define VALUE_MAX 30
+#define VALUE_MAX 48
     char path[VALUE_MAX] = {0};
 
     if (p_gpio_context->p_gpio_hw != NULL)

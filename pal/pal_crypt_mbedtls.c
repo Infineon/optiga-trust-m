@@ -67,6 +67,8 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
     mbedtls_md_context_t message_digest_context;
     uint16_t final_seed_length = 0;
        
+    (void)p_pal_crypt;
+
     mbedtls_md_init(&message_digest_context);
     
     do
@@ -184,6 +186,8 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
     uint8_t mac_output[MAC_TAG_BUFFER_SIZE];
     mbedtls_ccm_context sEncrypt;
 
+    (void)p_pal_crypt;
+    
     mbedtls_ccm_init(&sEncrypt);
 
     do
@@ -241,6 +245,8 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
     pal_status_t return_status = PAL_STATUS_FAILURE;
     mbedtls_ccm_context sDecrypt;
 
+    (void)p_pal_crypt;
+    
     mbedtls_ccm_init(&sDecrypt);
 
     do

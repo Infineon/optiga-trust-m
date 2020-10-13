@@ -105,8 +105,56 @@ ifx_i2c_context_t ifx_i2c_context_0 =
     &optiga_pal_i2c_context_0,
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION            
     /// Data store context
-    &ifx_i2c_datastore_config
+    &ifx_i2c_datastore_config,
 #endif    
+    /// Upper layer event handler
+    NULL,
+    /// Upper layer context
+    NULL,
+    /// Pointer to upper layer rx buffer
+    NULL,
+    /// Pointer to length of upper layer rx buffer
+    NULL,
+
+    /// Protocol variables
+    /// ifx i2c wrapper apis state
+    0,
+    /// ifx i2c wrapper api status
+    0,
+    /// reset states
+    0,
+    /// Close states
+    0,
+    /// type of reset
+    0,
+    /// init pal
+    0,
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
+    // protection level:
+    //0(master unprotected and slave unprotected),1(master protected and slave unprotected),
+    //2(master unprotected and slave protected),3(master protected and slave protected),
+    //255(re-negotiate)
+    0,
+    ///Supported presentation layer protocol version
+    0,
+    ///Variable to indicate manage context operation
+    0,
+#endif
+    /// Transport layer context
+    { },
+    /// Datalink layer context
+    { },
+    /// Physical layer context
+    { },
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
+    /// Presentation layer context
+    { },
+#endif
+    /// IFX I2C tx frame of max length
+    { 0, },
+    /// IFX I2C rx frame of max length
+    { 0, },
+    NULL
 };
 
 /**

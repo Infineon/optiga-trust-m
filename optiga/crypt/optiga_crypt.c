@@ -71,10 +71,6 @@ _STATIC_H void optiga_crypt_reset_protection_level(optiga_crypt_t * me)
     }
 }
 
-extern void optiga_cmd_set_shielded_connection_option(optiga_cmd_t * me,
-                                                      uint8_t value,
-                                                      uint8_t shielded_connection_option);
-
 #if defined (OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) || defined (OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED)
 _STATIC_H optiga_lib_status_t optiga_crypt_generate_keypair(optiga_crypt_t * me,
                                                             uint8_t cmd_param,
@@ -149,6 +145,8 @@ _STATIC_H optiga_lib_status_t optiga_crypt_sign(optiga_crypt_t * me,
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR;
     optiga_calc_sign_params_t * p_params;
 
+    (void)salt_length;
+
     do
     {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
@@ -207,6 +205,8 @@ _STATIC_H optiga_lib_status_t optiga_crypt_verify(optiga_crypt_t * me,
 {
     optiga_verify_sign_params_t * p_params;
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR;
+
+    (void)salt_length;
 
     do
     {
@@ -276,6 +276,9 @@ _STATIC_H optiga_lib_status_t optiga_crypt_rsa_enc_dec(optiga_crypt_t * me,
 {
     optiga_lib_status_t return_value = OPTIGA_CRYPT_ERROR;
     optiga_encrypt_asym_params_t * p_params;
+
+    (void)p_label;
+    (void)label_length;
 
     do
     {

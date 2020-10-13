@@ -227,6 +227,9 @@ void ifx_i2c_tl_event_handler(ifx_i2c_context_t * p_ctx,
                               const uint8_t * p_data,
                               uint16_t data_len)
 {
+    (void)p_data;
+    (void)data_len;
+
     // If there is no upper layer handler, don't do anything and return
     if (NULL != p_ctx->upper_layer_event_handler)
     {
@@ -257,6 +260,9 @@ void ifx_i2c_prl_close_event_handler(ifx_i2c_context_t * p_ctx,
                                      const uint8_t * p_data,
                                      uint16_t data_len)
 {
+    (void)p_data;
+    (void)data_len;
+
     p_ctx->status = IFX_I2C_STATUS_NOT_BUSY;
     switch (p_ctx->state)
     {
@@ -279,6 +285,12 @@ void ifx_i2c_prl_close_event_handler(ifx_i2c_context_t * p_ctx,
     }
 }
 
+_STATIC_H optiga_lib_status_t ifx_i2c_init(ifx_i2c_context_t * p_ifx_i2c_context);
+_STATIC_H void ifx_i2c_init_cb(void * p_ifx_i2c_context)
+{
+    (void)ifx_i2c_init((ifx_i2c_context_t *) p_ifx_i2c_context);
+}
+
 _STATIC_H optiga_lib_status_t ifx_i2c_init(ifx_i2c_context_t * p_ifx_i2c_context)
 {
     optiga_lib_status_t api_status = IFX_I2C_STACK_ERROR;
@@ -298,7 +310,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_init(ifx_i2c_context_t * p_ifx_i2c_context
                 pal_gpio_set_low(p_ifx_i2c_context->p_slave_reset_pin);
                 p_ifx_i2c_context->reset_state = IFX_I2C_STATE_RESET_PIN_HIGH;
                 pal_os_event_register_callback_oneshot(p_ifx_i2c_context->pal_os_event_ctx,
-                                                       (register_callback)ifx_i2c_init,
+                                                       (register_callback)ifx_i2c_init_cb,
                                                        (void * )p_ifx_i2c_context,
                                                        RESET_LOW_TIME_MSEC);
                 api_status = IFX_I2C_STACK_SUCCESS;
@@ -314,7 +326,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_init(ifx_i2c_context_t * p_ifx_i2c_context
                 pal_gpio_set_high(p_ifx_i2c_context->p_slave_reset_pin);
                 p_ifx_i2c_context->reset_state = IFX_I2C_STATE_RESET_INIT;
                 pal_os_event_register_callback_oneshot(p_ifx_i2c_context->pal_os_event_ctx,
-                                                       (register_callback)ifx_i2c_init,
+                                                       (register_callback)ifx_i2c_init_cb,
                                                        (void * )p_ifx_i2c_context,
                                                        STARTUP_TIME_MSEC);
                 api_status = IFX_I2C_STACK_SUCCESS;
