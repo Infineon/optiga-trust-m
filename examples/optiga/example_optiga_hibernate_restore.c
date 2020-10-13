@@ -38,6 +38,7 @@
 
 #include "optiga/optiga_util.h"
 #include "optiga/pal/pal_os_timer.h"
+#include "optiga_example.h"
 
 extern void example_log_execution_status(const char_t* function, uint8_t status);
 extern void example_log_function_name(const char_t* function);
@@ -69,7 +70,7 @@ void example_optiga_util_hibernate_restore(void)
     uint8_t logging_status = 0;
     uint8_t security_event_counter = 0;
     uint16_t bytes_to_read = 1;
-    example_log_function_name(__FUNCTION__);
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
     
     do
     {
@@ -202,7 +203,7 @@ void example_optiga_util_hibernate_restore(void)
         //Destroy the instance after the completion of usecase if not required.
         return_status = optiga_util_destroy(me);
     }
-    example_log_execution_status(__FUNCTION__,logging_status);
+    OPTIGA_EXAMPLE_LOG_STATUS(return_status);
 }
 
 /**

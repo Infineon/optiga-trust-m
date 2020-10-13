@@ -34,22 +34,44 @@
 *
 * @{
 */
-
-#include <DAVE.h>
+#include <stdbool.h>
+#include "main.h"
 #include "optiga/pal/pal_os_timer.h"
 
-/// @cond hidden
-static volatile uint32_t g_tick_count = 0;
+extern void pal_os_event_trigger_registered_callback(void);
 
-void delay_timer_isr(void)
-{
-    TIMER_ClearEvent(&tick_timer);
-    (void)TIMER_Clear(&tick_timer);
-    g_tick_count += 1U;
-}
+/// @cond hidden
+volatile uint32_t g_tick_count = 0;
+volatile uint32_t g_tick_event = 0;
+
+volatile uint32_t os_event_time_us;
+volatile bool os_event_start;
+volatile bool os_event_stop;
+
 
 /// @endcond
 
+void hal_sw_timer_handler(void)
+{
+    g_tick_count += 1U;
+
+    if(os_event_start == true)
+    {
+        g_tick_event += 1U;
+
+        if(os_event_time_us < 1000)
+        {
+            os_event_time_us = 1000;
+        }
+
+        if(g_tick_event == os_event_time_us/1000)
+        {
+            g_tick_event = 0;
+            pal_os_event_trigger_registered_callback();
+        }
+    }
+
+}
 
 uint32_t pal_os_timer_get_time_in_microseconds(void)
 {
@@ -62,6 +84,8 @@ uint32_t pal_os_timer_get_time_in_microseconds(void)
 
 uint32_t pal_os_timer_get_time_in_milliseconds(void)
 {
+	// !!!OPTIGA_LIB_PORTING_REQUIRED
+	// You need to return here a unique value corresponding to the real-time
     return (g_tick_count);
 }
 
@@ -88,6 +112,8 @@ void pal_os_timer_delay_in_milliseconds(uint16_t milliseconds)
 //lint --e{714} suppress "This is implemented for overall completion of API"
 pal_status_t pal_timer_init(void)
 {
+	//Set tick to 1ms or 1000Hz
+	HAL_SetTickFreq(1000);
     return PAL_STATUS_SUCCESS;
 }
 

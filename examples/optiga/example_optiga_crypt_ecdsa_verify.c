@@ -103,6 +103,7 @@ static uint8_t signature [] =
             0x6A,0xE1,0xFD,0x1E,0x92,0xB4,
 };
 
+
 /**
  * The below example demonstrates the verification of signature using
  * the public key provided by host.
