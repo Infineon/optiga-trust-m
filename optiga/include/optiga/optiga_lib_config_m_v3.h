@@ -110,7 +110,7 @@ extern "C" {
      *         Warm Reset - (2) : This is applicable if the host platform doesn't have GPIO option for VDD. \n
      *         Any other value will lead to error
      */
-    #define OPTIGA_COMMS_DEFAULT_RESET_TYPE     (1U)
+    #define OPTIGA_COMMS_DEFAULT_RESET_TYPE     (0U)
     
     /** @brief NULL parameter check.
      *         To disable the check, undefine the macro
