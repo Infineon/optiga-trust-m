@@ -47,6 +47,8 @@ extern void example_optiga_init(void);
 extern void example_optiga_deinit(void);
 #endif
 
+uint32_t time_taken_for_pairing = 0;
+    
 // Value of Operational state
 #define LCSO_STATE_CREATION       (0x01)
 // Value of Operational state
@@ -138,6 +140,9 @@ optiga_lib_status_t pair_host_and_optiga_using_pre_shared_secret(void)
          */
         bytes_to_read = sizeof(platform_binding_secret_metadata);
         optiga_lib_status = OPTIGA_LIB_BUSY;
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken_for_pairing);
+        
         return_status = optiga_util_read_metadata(me_util,
                                                   0xE140,
                                                   platform_binding_secret_metadata,
@@ -220,6 +225,8 @@ optiga_lib_status_t pair_host_and_optiga_using_pre_shared_secret(void)
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
         
+        READ_PERFORMANCE_MEASUREMENT(time_taken_for_pairing);
+        
         return_status = OPTIGA_LIB_SUCCESS;
 
     } while(FALSE);
@@ -265,25 +272,28 @@ optiga_lib_status_t pair_host_and_optiga_using_pre_shared_secret(void)
  *
  */
 void example_pair_host_and_optiga_using_pre_shared_secret(void)
-{      
-#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-        /**
-         * Open the application on OPTIGA which is a precondition to perform any other operations
-         * using optiga_util_open_application
-         */
-        example_optiga_init();
-#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-        OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+{
+    optiga_lib_status_t return_status;
     
-        (void)pair_host_and_optiga_using_pre_shared_secret();
-               
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-        /**
-         * Close the application on OPTIGA after all the operations are executed
-         * using optiga_util_close_application
-         */
-        example_optiga_deinit();
+    /**
+     * Open the application on OPTIGA which is a precondition to perform any other operations
+     * using optiga_util_open_application
+     */
+    example_optiga_init();
 #endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
+    
+    return_status = pair_host_and_optiga_using_pre_shared_secret();
+     
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken_for_pairing,return_status);
     
 }
 #endif

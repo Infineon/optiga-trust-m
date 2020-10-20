@@ -223,6 +223,9 @@
 /// Set object protected tag
 #define OPTIGA_CMD_SET_OBJECT_PROTECTED_TAG                     (0x30)
 
+/// Supported instance number 
+#define OPTIGA_CMD_MAX_INSTANCE_ID                              (0x00)
+
 #define OPTIGA_CMD_TAG_LENGTH_SIZE                              (0x03)
 #define OPTIGA_CMD_PARAM_INITIALIZE_APP_CONTEXT                 (0x00)
 #ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
@@ -1637,6 +1640,11 @@ optiga_cmd_t * optiga_cmd_create(uint8_t optiga_instance_id, callback_handler_t 
     pal_os_lock_enter_critical_section();
     do
     {
+        //lint --e{778} suppress "There is no chance of g_optiga_list become 0."
+        if ( optiga_instance_id > (uint8_t)((sizeof(g_optiga_list)/sizeof(optiga_context_t *)) - 1 ) )
+        {
+            break;
+        }
         // Get number of free slots
         if (0 == optiga_cmd_queue_get_count_of(g_optiga_list[optiga_instance_id],
                                                OPTIGA_CMD_QUEUE_SLOT_STATE,

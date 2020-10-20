@@ -199,6 +199,8 @@ typedef struct optiga_protected_update_data_configuration
     uint16_t target_oid_metadata_length;
     /// Pointer to a buffer where continue fragment data is stored.
     const optiga_protected_update_manifest_fragment_configuration_t * data_config;
+    /// Pointer to a protected update example string.
+    const char * set_prot_example_string;    
 }optiga_protected_update_data_configuration_t;
 
 

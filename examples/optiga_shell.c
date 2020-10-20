@@ -719,13 +719,8 @@ static void optiga_shell_crypt_clear_auto_state(void)
 #endif
 
 void run_example(void (*test_case)(void)) 
-{
-    char buffer_string[30];
-    unsigned int timestamp = pal_os_timer_get_time_in_milliseconds(); 
-    test_case(); 
-    //lint --e{713} suppress "Due to function parameter typecasting is done from unsigned int to int "
-    sprintf(buffer_string, "Example takes %d msec", (int) (pal_os_timer_get_time_in_milliseconds() - timestamp));
-    OPTIGA_SHELL_LOG_MESSAGE(buffer_string); 
+{ 
+    test_case();  
     optiga_lib_print_string_with_newline(""); 
     pal_os_timer_delay_in_milliseconds(2000);
 }

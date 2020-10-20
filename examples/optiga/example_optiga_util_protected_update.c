@@ -203,7 +203,8 @@ const optiga_protected_update_data_configuration_t  optiga_protected_update_data
         0xE0E1,
         target_oid_metadata,
         sizeof(target_oid_metadata),
-        &data_integrity_configuration
+        &data_integrity_configuration, 
+        "Protected Update - Integrity"
     },
 #endif
 
@@ -212,7 +213,8 @@ const optiga_protected_update_data_configuration_t  optiga_protected_update_data
         0xE0E1,
         target_oid_metadata_with_confidentiality,
         sizeof(target_oid_metadata_with_confidentiality),
-        &data_confidentiality_configuration
+        &data_confidentiality_configuration,
+        "Protected Update - Confidentiality"
     },
 #endif
 
@@ -221,7 +223,8 @@ const optiga_protected_update_data_configuration_t  optiga_protected_update_data
         0xE200,
         target_oid_metadata,
         sizeof(target_oid_metadata),
-        &data_aes_key_configuration
+        &data_aes_key_configuration, 
+        "Protected Update - AES Key"
     },
 #endif
 
@@ -230,7 +233,8 @@ const optiga_protected_update_data_configuration_t  optiga_protected_update_data
         0xE0F1,
         target_key_oid_metadata,
         sizeof(target_key_oid_metadata),
-        &data_ecc_key_configuration
+        &data_ecc_key_configuration,
+        "Protected Update - ECC Key"
     },
 #endif
 
@@ -239,7 +243,8 @@ const optiga_protected_update_data_configuration_t  optiga_protected_update_data
         0xE0E2,
         target_oid_metadata_for_secure_metadata_update,
         sizeof(target_oid_metadata_for_secure_metadata_update),
-        &metadata_update_configuration
+        &metadata_update_configuration, 
+        "Protected Update - Metadata"
     },
 #endif
     
@@ -248,7 +253,8 @@ const optiga_protected_update_data_configuration_t  optiga_protected_update_data
         0xE0FC,
         target_key_oid_metadata,
         sizeof(target_key_oid_metadata),
-        &data_rsa_key_configuration
+        &data_rsa_key_configuration, 
+        "Protected Update - RSA Key"
     },
 #endif
 };
@@ -441,8 +447,6 @@ void example_optiga_util_protected_update(void)
             break;
         }
         
-        START_PERFORMANCE_MEASUREMENT(time_taken);
-        
         for (data_config = 0; 
             data_config < \
             sizeof(optiga_protected_update_data_set)/sizeof(optiga_protected_update_data_configuration_t); data_config++)
@@ -461,8 +465,10 @@ void example_optiga_util_protected_update(void)
             {
                 break;
             }
+        
+            START_PERFORMANCE_MEASUREMENT(time_taken);                      
             
-            
+            OPTIGA_EXAMPLE_LOG_MESSAGE(optiga_protected_update_data_set[data_config].set_prot_example_string);
             
             /**
             *   Send the manifest using optiga_util_protected_update_start
@@ -499,6 +505,9 @@ void example_optiga_util_protected_update(void)
 
             WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
             
+            READ_PERFORMANCE_MEASUREMENT(time_taken);
+            
+            OPTIGA_EXAMPLE_PROTECTED_UPDATE_PERFORMANCE_VALUE(time_taken);
             
             /**
             *  Revert the version tag of metadata configuration to re-run the protected update examples
@@ -513,10 +522,19 @@ void example_optiga_util_protected_update(void)
                 break;
             }
             
+
         }
-        READ_PERFORMANCE_MEASUREMENT(time_taken);
+
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY 
     
     if (me)
     {
@@ -528,15 +546,6 @@ void example_optiga_util_protected_update(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
-    
-#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-    /**
-     * Close the application on OPTIGA after all the operations are executed
-     * using optiga_util_close_application
-     */
-    example_optiga_deinit();
-#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY 
-    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
 }
 
 /**

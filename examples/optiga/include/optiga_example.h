@@ -162,6 +162,12 @@ extern void example_performance_measurement(uint32_t* time_value, uint8_t time_r
         OPTIGA_EXAMPLE_LOG_MESSAGE(performance_buffer_string);  \
     }   \
 }
+
+#define OPTIGA_EXAMPLE_PROTECTED_UPDATE_PERFORMANCE_VALUE(time_taken) \
+{   \
+        sprintf(performance_buffer_string, "Execution time %d msec", (int)time_taken);    \
+        OPTIGA_EXAMPLE_LOG_MESSAGE(performance_buffer_string);  \
+}
 #ifdef __cplusplus
 }
 #endif

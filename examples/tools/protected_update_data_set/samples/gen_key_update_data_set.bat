@@ -45,4 +45,4 @@ set PATH=..\bin
 ::%PATH%\protected_update_data_set.exe payload_version=3 trust_anchor_oid=E0E3 target_oid=E0F1 sign_algo=ES_256 priv_key=..\samples\integrity\sample_ecc_brainpool_512_priv.pem payload_type=key key_algo=03 key_usage=10 key_data=..\samples\payload\key\ecc_secp256r1_test.pem
 
 :: ECC-NIST P 256 key update with Sign algo as ECC Brain Pool 512
-%PATH%\protected_update_data_set.exe payload_version=3 trust_anchor_oid=E0E3 target_oid=E0F1 sign_algo=ES_256 priv_key=..\samples\integrity\sample_ec_521_priv.pem payload_type=key key_algo=03 key_usage=10 key_data=..\samples\payload\key\ecc_secp256r1_test.pem
+::%PATH%\protected_update_data_set.exe payload_version=3 trust_anchor_oid=E0E3 target_oid=E0F1 sign_algo=ES_256 priv_key=..\samples\integrity\sample_ec_521_priv.pem payload_type=key key_algo=03 key_usage=10 key_data=..\samples\payload\key\ecc_secp256r1_test.pem

@@ -164,6 +164,15 @@ void example_optiga_crypt_rsa_encrypt_session(void)
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
     
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status); 
+    
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
@@ -174,15 +183,6 @@ void example_optiga_crypt_rsa_encrypt_session(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
-    
-#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-    /**
-     * Close the application on OPTIGA after all the operations are executed
-     * using optiga_util_close_application
-     */
-    example_optiga_deinit();
-#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
     
 }
 

@@ -267,6 +267,7 @@ void example_optiga_hmac_verify_with_authorization_reference(void)
 {
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     pal_status_t pal_return_status;
+    uint32_t time_taken = 0;
     uint16_t offset, bytes_to_read;
     uint8_t read_data_buffer[100];
     optiga_util_t * me_util = NULL;
@@ -307,6 +308,8 @@ void example_optiga_hmac_verify_with_authorization_reference(void)
 
         OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL(me_crypt,OPTIGA_COMMS_NO_PROTECTION);
         OPTIGA_CRYPT_SET_COMMS_PROTOCOL_VERSION(me_crypt,OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET);
+        
+        START_PERFORMANCE_MEASUREMENT(time_taken);
         
         /**
          * Precondition : Get the User Secret and store it in OID
@@ -446,10 +449,21 @@ void example_optiga_hmac_verify_with_authorization_reference(void)
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
         
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = OPTIGA_LIB_SUCCESS;
 
     } while(FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
     
     if(me_util)
     {
@@ -471,14 +485,6 @@ void example_optiga_hmac_verify_with_authorization_reference(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
-    
-#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-    /**
-     * Close the application on OPTIGA after all the operations are executed
-     * using optiga_util_close_application
-     */
-    example_optiga_deinit();
-#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     
 }
 #endif

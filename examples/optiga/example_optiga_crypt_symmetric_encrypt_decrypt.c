@@ -284,6 +284,15 @@ void example_optiga_crypt_symmetric_encrypt_decrypt_cbc(void)
 
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
+    
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    
     OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
     
     if (me)
@@ -296,15 +305,6 @@ void example_optiga_crypt_symmetric_encrypt_decrypt_cbc(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
-    
-#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-    /**
-     * Close the application on OPTIGA after all the operations are executed
-     * using optiga_util_close_application
-     */
-    example_optiga_deinit();
-#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-    
 }
 
 /**
@@ -395,6 +395,15 @@ void example_optiga_crypt_symmetric_encrypt_cbcmac(void)
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
     
+#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    /**
+     * Close the application on OPTIGA after all the operations are executed
+     * using optiga_util_close_application
+     */
+    example_optiga_deinit();
+#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status); 
+    
     if (me)
     {
         //Destroy the instance after the completion of usecase if not required.
@@ -405,15 +414,6 @@ void example_optiga_crypt_symmetric_encrypt_cbcmac(void)
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
-    
-#ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-    /**
-     * Close the application on OPTIGA after all the operations are executed
-     * using optiga_util_close_application
-     */
-    example_optiga_deinit();
-#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-    OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
     
 }
 

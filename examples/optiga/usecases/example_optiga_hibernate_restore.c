@@ -89,6 +89,7 @@ void example_optiga_util_hibernate_restore(void)
     public_key_from_host_t public_key_details;
     //To store the generated public key as part of Generate key pair
     uint16_t public_key_length = sizeof(public_key);
+	uint32_t time_taken = 0;
 
     OPTIGA_EXAMPLE_LOG_MESSAGE("Begin demonstrating hibernate feature...\n");    
     OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
@@ -113,6 +114,9 @@ void example_optiga_util_hibernate_restore(void)
          *    using optiga_util_open_application
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
+                
+        START_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = optiga_util_open_application(me_util, 0);
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
@@ -228,6 +232,9 @@ void example_optiga_util_hibernate_restore(void)
         optiga_lib_status = OPTIGA_LIB_BUSY;
         return_status = optiga_util_close_application(me_util, 0);
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
+        
+        READ_PERFORMANCE_MEASUREMENT(time_taken);
+        
         return_status = OPTIGA_LIB_SUCCESS;
         OPTIGA_EXAMPLE_LOG_MESSAGE("Hibernate feature demonstration completed...\n");
     } while (FALSE);

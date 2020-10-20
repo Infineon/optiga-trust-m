@@ -78,7 +78,7 @@ void pal_os_event_trigger_registered_callback(void)
     //lint --e{534} suppress "Error handling is not required so return value is not checked"
     TIMER_Stop(&scheduler_timer);
     TIMER_Clear(&scheduler_timer);
-
+    /// If callback_ctx is NULL then callback function will have unexpected behavior 
     if (pal_os_event_0.callback_registered)
     {
         callback = pal_os_event_0.callback_registered;
