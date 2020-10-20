@@ -44,6 +44,8 @@
 #include "optiga/pal/pal_os_event.h"
 #include "optiga/pal/pal_i2c.h"
 #include "optiga/ifx_i2c/ifx_i2c_config.h"
+#include "optiga/pal/pal_ifx_i2c_config.h"
+
 #include "pkcs11.h"
 #include <semaphore.h>
 
@@ -59,6 +61,21 @@
 #define MAX_PUBLIC_KEY_SIZE           100
 
 #define MAX_DELAY 					  50
+// Value of Operational state
+#define LCSO_STATE_CREATION       	(0x01)
+// Value of Operational state
+#define LCSO_STATE_OPERATIONAL      (0x07)
+
+#define PKCS_ENCRYPT_ENABLE			(1 << 0)	
+
+#define PKCS_DECRYPT_ENABLE			(1 << 1)
+
+#define PKCS_SIGN_ENABLE			(1 << 2)
+
+#define PKCS_VERIFY_ENABLE			(1 << 3)
+
+//Currently set to Creation state(defualt value). At the real time/customer side this needs to be LCSO_STATE_OPERATIONAL (0x07)
+#define FINAL_LCSO_STATE          (LCSO_STATE_CREATION)
 
 typedef struct pkcs11_object_t
 {
@@ -114,12 +131,15 @@ typedef struct pkcs11_session
     uint16_t sign_key_oid;
     CK_BBOOL sign_init_done;
     CK_BBOOL verify_init_done;
+    CK_BBOOL encrypt_init_done;
+    CK_BBOOL decrypt_init_done;
     optiga_sha256_ctx_t sha256_ctx;
 	CK_ULONG rsa_key_size;
 	CK_ULONG ec_key_size;
 	optiga_ecc_curve_t ec_key_type;
 	uint16_t encryption_key_oid;
 	uint16_t decryption_key_oid;
+	uint8_t key_template_enabled;
 } pkcs11_session_t, * p_pkcs11_session_t;
 
 pal_os_lock_t optiga_mutex;
@@ -198,7 +218,7 @@ CK_OBJECT_HANDLE find_object( uint8_t * pLabel,
                           &pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
                           sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) ) )
     {
-        /* This operation isn't supported for the OPTIGA(TM) Trust X due to a security considerations
+        /* This operation isn't supported for the OPTIGA(TM) Trust M due to a security considerations
          * You can only generate a keypair and export a private component if you like */
         /* We do assign a handle though, as the AWS can#t handle the lables without having a handle*/
         object_handle = DevicePrivateKey;
@@ -281,7 +301,7 @@ long get_object_value( CK_OBJECT_HANDLE object_handle,
 				break;
 			case DevicePrivateKey:
 				/*
-				 * This operation isn't supported for the OPTIGA(TM) Trust X due to a security considerations
+				 * This operation isn't supported for the OPTIGA(TM) Trust M due to a security considerations
 				 * You can only generate a keypair and export a private component if you like
 				 */
 			default:
@@ -403,11 +423,11 @@ static CK_FUNCTION_LIST prvP11FunctionList =
     C_Decrypt,
     C_DecryptUpdate,
     C_DecryptFinal,
-    NULL, //C_DigestInit,*/
+    C_DigestInit,
     NULL, /*C_Digest*/
-    NULL, //C_DigestUpdate,
+    C_DigestUpdate,
     NULL, /* C_DigestKey*/
-    NULL, //C_DigestFinal,
+    C_DigestFinal,
     C_SignInit,
     C_Sign,
     C_SignUpdate,
@@ -436,11 +456,207 @@ static CK_FUNCTION_LIST prvP11FunctionList =
     NULL  /*C_WaitForSlotEvent*/
 };
 
+CK_RV pair_host_and_optiga_using_pre_shared_secret(void)
+{
+    uint16_t bytes_to_read;
+    uint8_t platform_binding_secret[64];
+    uint8_t platform_binding_secret_metadata[44];
+    optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
+    pal_status_t pal_return_status;
+
+	
+	/* Platform Binding Shared Secret (0xE140) Metadata to be updated */
+	
+	const uint8_t platform_binding_shared_secret_metadata_final [] = {
+		//Metadata to be updated
+		0x20, 0x17,
+			// LcsO
+			0xC0, 0x01,
+						FINAL_LCSO_STATE,		// Refer Macro to see the value or some more notes
+			// Change/Write Access tag
+			0xD0, 0x07,
+						// This allows updating the binding secret during the runtime using shielded connection
+						// If not required to update the secret over the runtime, set this to NEV and
+						// update Metadata length accordingly
+						0xE1, 0xFC, LCSO_STATE_OPERATIONAL,   // LcsO < Operational state
+						0xFE,
+						0x20, 0xE1, 0x40,
+			// Read Access tag
+			0xD1, 0x03,
+						0xE1, 0xFC, LCSO_STATE_OPERATIONAL,   // LcsO < Operational state
+			// Execute Access tag
+			0xD3, 0x01,
+						0x00,	// Always
+			// Data object Type
+			0xE8, 0x01,
+						0x22,	// Platform binding secret type
+	};
+
+    do
+    {
+
+
+        /**
+         * 1. Initialize the protection level and protocol version for the instances
+         */
+        OPTIGA_UTIL_SET_COMMS_PROTECTION_LEVEL(pkcs11_context.object_list.optiga_util_instance,OPTIGA_COMMS_NO_PROTECTION);
+        OPTIGA_UTIL_SET_COMMS_PROTOCOL_VERSION(pkcs11_context.object_list.optiga_util_instance,OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET);
+
+        OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL(pkcs11_context.object_list.optiga_util_instance,OPTIGA_COMMS_NO_PROTECTION);
+        OPTIGA_CRYPT_SET_COMMS_PROTOCOL_VERSION(pkcs11_context.object_list.optiga_util_instance,OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET);
+
+        /**
+         * 2. Read Platform Binding Shared secret (0xE140) data object metadata from OPTIGA
+         *    using optiga_util_read_metadata.
+         */
+        bytes_to_read = sizeof(platform_binding_secret_metadata);
+        pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+        return_status = optiga_util_read_metadata(pkcs11_context.object_list.optiga_util_instance,
+                                                  0xE140,
+                                                  platform_binding_secret_metadata,
+                                                  &bytes_to_read);
+
+		if (OPTIGA_LIB_SUCCESS != return_status)
+		{
+			return_status = CKR_FUNCTION_FAILED;
+			break;
+		}
+		while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
+		{
+			
+		}
+		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+		{
+			return_status = CKR_FUNCTION_FAILED;
+			break;
+		}
+
+
+        /**
+         * 3. Validate LcsO in the metadata.
+         *    Skip the rest of the procedure if LcsO is greater than or equal to operational state(0x07)
+         */
+        if (platform_binding_secret_metadata[4] >= LCSO_STATE_OPERATIONAL)
+        {
+            // The LcsO is already greater than or equal to operational state
+            break;
+        }
+
+        /**
+         * 4. Generate Random using optiga_crypt_random
+         *       - Specify the Random type as TRNG
+         *    a. The maximum supported size of secret is 64 bytes.
+         *       The minimum recommended is 32 bytes.
+         *    b. If the host platform doesn't support random generation,
+         *       use OPTIGA to generate the maximum size chosen.
+         *       else choose the appropriate length of random to be generated by OPTIGA
+         *
+         */
+        pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+        return_status = optiga_crypt_random(pkcs11_context.object_list.optiga_crypt_instance,
+                                            OPTIGA_RNG_TYPE_TRNG,
+                                            platform_binding_secret,
+                                            sizeof(platform_binding_secret));
+		if (OPTIGA_LIB_SUCCESS != return_status)
+		{
+			return_status = CKR_FUNCTION_FAILED;
+			break;
+		}
+		while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
+		{
+			
+		}
+		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+		{
+			return_status = CKR_FUNCTION_FAILED;
+			break;
+		}
+
+
+        /**
+         * 5. Generate random on Host
+         *    If the host platform doesn't support, skip this step
+         */
+
+
+        /**
+         * 6. Write random(secret) to OPTIGA platform Binding shared secret data object (0xE140)
+         */
+        pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+        OPTIGA_UTIL_SET_COMMS_PROTECTION_LEVEL(pkcs11_context.object_list.optiga_util_instance,OPTIGA_COMMS_NO_PROTECTION);
+        return_status = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
+                                               0xE140,
+                                               OPTIGA_UTIL_ERASE_AND_WRITE,
+                                               0,
+                                               platform_binding_secret,
+                                               sizeof(platform_binding_secret));
+		if (OPTIGA_LIB_SUCCESS != return_status)
+		{
+			return_status = CKR_FUNCTION_FAILED;
+			break;
+		}
+		while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
+		{
+			
+		}
+		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+		{
+			return_status = CKR_FUNCTION_FAILED;
+			break;
+		}
+
+
+        /**
+         * 7. Write/store the random(secret) on the Host platform
+         *
+         */
+        pal_return_status = pal_os_datastore_write(OPTIGA_PLATFORM_BINDING_SHARED_SECRET_ID,
+                                                   platform_binding_secret,
+                                                   sizeof(platform_binding_secret));
+
+        if (PAL_STATUS_SUCCESS != pal_return_status)
+        {
+            break;
+        }
+
+
+        /**
+         * 8. Update metadata of OPTIGA Platform Binding shared secret data object (0xE140)
+         */
+        pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+        OPTIGA_UTIL_SET_COMMS_PROTECTION_LEVEL(pkcs11_context.object_list.optiga_util_instance,OPTIGA_COMMS_NO_PROTECTION);
+        return_status = optiga_util_write_metadata(pkcs11_context.object_list.optiga_util_instance,
+                                                   0xE140,
+                                                   platform_binding_shared_secret_metadata_final,
+                                                   sizeof(platform_binding_shared_secret_metadata_final));
+
+    	if (OPTIGA_LIB_SUCCESS != return_status)
+		{
+			return_status = CKR_FUNCTION_FAILED;
+			break;
+		}
+		while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
+		{
+			
+		};
+		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+		{
+			return_status = CKR_FUNCTION_FAILED;
+			break;
+		}
+
+        return_status = OPTIGA_LIB_SUCCESS;
+
+    } while(FALSE);
+
+	return (CK_RV)return_status;
+}
 
 CK_RV optiga_trustm_initialize( void )
 {
     CK_RV xResult = CKR_OK;
     uint16_t dOptigaOID;
+	static uint8_t host_pair_done = 1;
 	do
 	{
 	    if( pkcs11_context.is_initialized == CK_TRUE )
@@ -456,6 +672,8 @@ CK_RV optiga_trustm_initialize( void )
 			{
 				break;
 			}
+			pal_gpio_init(&optiga_reset_0);
+			pal_gpio_init(&optiga_vdd_0);
 			pkcs11_context.object_list.timeout.tv_sec = 0;
 			pkcs11_context.object_list.timeout.tv_nsec = 0xffff;
 	        //pkcs11_context.object_list.semaphore = xSemaphoreCreateMutex();
@@ -516,7 +734,18 @@ CK_RV optiga_trustm_initialize( void )
 		        	xResult = CKR_FUNCTION_FAILED;
 					break;
 		        }
-		       
+		        #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
+				if(host_pair_done)
+				{
+					xResult = pair_host_and_optiga_using_pre_shared_secret();
+					if (OPTIGA_LIB_SUCCESS != xResult)
+			        {
+			        	xResult = CKR_FUNCTION_FAILED;
+						break;
+			        }
+					host_pair_done = 0;
+				}
+				#endif
 			}
 
 	    }
@@ -556,7 +785,6 @@ CK_RV optiga_trustm_deinitialize( void )
 		        }
 				//Destroy the instances after the completion of usecase			
 				xResult = optiga_crypt_destroy(pkcs11_context.object_list.optiga_crypt_instance);
-
 				xResult |= optiga_util_destroy(pkcs11_context.object_list.optiga_util_instance);
 
 				if(OPTIGA_LIB_SUCCESS != xResult)
@@ -969,7 +1197,7 @@ CK_OBJECT_HANDLE save_object( CK_ATTRIBUTE_PTR pxLabel,
 							   &pkcs11configLABEL_DEVICE_RSA_PRIVATE_KEY_FOR_TLS,
 							   sizeof( pkcs11configLABEL_DEVICE_RSA_PRIVATE_KEY_FOR_TLS ) )))
 		{
-			/* This operation isn't supported for the OPTIGA(TM) Trust X due to a security considerations
+			/* This operation isn't supported for the OPTIGA(TM) Trust M due to a security considerations
 			 * You can only generate a keypair and export a private component if you like */
 			/* We do assign a handle though, as the AWS can#t handle the lables without having a handle*/
 			object_handle = DevicePrivateKey;
@@ -1485,7 +1713,6 @@ CK_DEFINE_FUNCTION( CK_RV, C_CreateObject )( CK_SESSION_HANDLE xSession,
                                              CK_ULONG ulCount,
                                              CK_OBJECT_HANDLE_PTR pxObject )
 { 
-	printf("%s %d\n",__FUNCTION__,__LINE__);
 	/*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     CK_OBJECT_CLASS xClass;
@@ -1539,7 +1766,6 @@ CK_DEFINE_FUNCTION( CK_RV, C_CreateObject )( CK_SESSION_HANDLE xSession,
 CK_DEFINE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE xSession,
                                               CK_OBJECT_HANDLE xObject )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
     CK_RV xResult;
 
     ( void ) xSession;
@@ -1557,7 +1783,6 @@ CK_DEFINE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE xSession,
 
 CK_DEFINE_FUNCTION( CK_RV, C_Initialize )( CK_VOID_PTR pvInitArgs )
 {   
-	printf("%s %d\n",__FUNCTION__,__LINE__);
 	/*lint !e9072 It's OK to have different parameter name. */
     ( void ) ( pvInitArgs );
 
@@ -1593,7 +1818,6 @@ CK_DEFINE_FUNCTION( CK_RV, C_Initialize )( CK_VOID_PTR pvInitArgs )
  */
 CK_DEFINE_FUNCTION( CK_RV, C_Finalize )( CK_VOID_PTR pvReserved )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
     /*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = CKR_OK;
 
@@ -1623,6 +1847,8 @@ CK_DEFINE_FUNCTION( CK_RV, C_Finalize )( CK_VOID_PTR pvReserved )
 
 			pkcs11_context.is_initialized = CK_FALSE;
 		}
+		pal_gpio_deinit(&optiga_reset_0);
+        pal_gpio_deinit(&optiga_vdd_0);
     }
 
     return xResult;
@@ -1634,7 +1860,6 @@ CK_DEFINE_FUNCTION( CK_RV, C_Finalize )( CK_VOID_PTR pvReserved )
 CK_DEFINE_FUNCTION( CK_RV, C_GetFunctionList )( CK_FUNCTION_LIST_PTR_PTR ppxFunctionList )
 {   
 	
-	printf("%s %d\n",__FUNCTION__,__LINE__);
 	/*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = CKR_OK;
 
@@ -1657,8 +1882,6 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetSlotList )( CK_BBOOL xTokenPresent,
                                             CK_SLOT_ID_PTR pxSlotList,
                                             CK_ULONG_PTR pulCount )
 {   
-	
-	printf("%s %d\n",__FUNCTION__,__LINE__);
 	/*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = CKR_OK;
 
@@ -1700,14 +1923,20 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetTokenInfo )( CK_SLOT_ID slotID,
                                               CK_TOKEN_INFO_PTR pInfo )
 {
 	
-	printf("%s %d\n",__FUNCTION__,__LINE__);
-    /* Avoid compiler warnings about unused variables. */
-    ( void ) slotID;
-	//printf("C_GetTokenInfo\n");
-
-    if (pInfo != NULL)
-    {
-        pInfo->firmwareVersion.major = 0x2;
+    CK_RV xResult = CKR_SLOT_ID_INVALID;
+	
+	do
+	{
+		if ( pkcs11SLOT_ID != slotID)
+		{
+			break;
+		}
+	    if ( pInfo == NULL )
+	    {
+			xResult = CKR_ARGUMENTS_BAD;
+			break;
+	    }
+		pInfo->firmwareVersion.major = 0x2;
         pInfo->firmwareVersion.minor = 0x28;
 
         pInfo->hardwareVersion.major = 1;
@@ -1716,9 +1945,11 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetTokenInfo )( CK_SLOT_ID slotID,
         sprintf((char *)pInfo->manufacturerID, "Infineon Technologies AG");
         sprintf((char *)pInfo->model, "OPTIGA Trust M");
         pInfo->ulMaxSessionCount = 4;
-    }
-
-    return CKR_OK;
+		xResult = CKR_OK;
+		
+	} while(0);
+	
+    return xResult;
 }
 
 
@@ -1738,7 +1969,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetMechanismInfo )( CK_SLOT_ID slotID,
                                                   CK_MECHANISM_TYPE type,
                                                   CK_MECHANISM_INFO_PTR pInfo )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     CK_RV xResult = CKR_MECHANISM_INVALID;
 
     struct CryptoMechanisms
@@ -1748,10 +1979,10 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetMechanismInfo )( CK_SLOT_ID slotID,
     }
     pxSupportedMechanisms[] =
     {
-        { CKM_ECDSA,           		 { 256,  256,  CKF_SIGN | CKF_VERIFY 							 } },
+        { CKM_ECDSA,           		 { 256,  521,  CKF_SIGN | CKF_VERIFY 							 } },
         { CKM_RSA_PKCS,              { 1024, 2048, CKF_SIGN | CKF_VERIFY | CKA_ENCRYPT | CKA_DECRYPT } },
         { CKM_RSA_PKCS_KEY_PAIR_GEN, { 1024, 2048, CKF_GENERATE_KEY_PAIR 							 } },
-        { CKM_EC_KEY_PAIR_GEN, 		 { 256,  256,  CKF_GENERATE_KEY_PAIR 							 } },
+        { CKM_EC_KEY_PAIR_GEN, 		 { 256,  521,  CKF_GENERATE_KEY_PAIR 							 } },
         { CKM_SHA256,          		 { 0,    0,    CKF_DIGEST             							 } }
     };
     uint32_t ulMech = 0;
@@ -1789,7 +2020,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_InitToken )( CK_SLOT_ID slotID,
                                            CK_ULONG ulPinLen,
                                            CK_UTF8CHAR_PTR pLabel )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     /* Avoid compiler warnings about unused variables. */
     ( void ) slotID;
     ( void ) pPin;
@@ -1809,7 +2040,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID xSlotID,
                                             CK_NOTIFY xNotify,
                                             CK_SESSION_HANDLE_PTR pxSession )
 {   
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
 	/*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = CKR_OK;
     p_pkcs11_session_t pxSessionObj = NULL;
@@ -1888,7 +2119,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID xSlotID,
  */
 CK_DEFINE_FUNCTION( CK_RV, C_CloseSession )( CK_SESSION_HANDLE xSession )
 {  
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
 	/*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     p_pkcs11_session_t pxSession = get_session_pointer( xSession );
@@ -1910,7 +2141,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_Login )( CK_SESSION_HANDLE hSession,
                                       CK_UTF8CHAR_PTR pPin,
                                       CK_ULONG ulPinLen )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     /* THIS FUNCTION IS NOT IMPLEMENTED
      * If login capability is required, implement it here.
      * Defined for compatibility with other PKCS #11 ports. */
@@ -1926,7 +2157,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE xSession,
                                                   CK_ATTRIBUTE_PTR pxTemplate,
                                                   CK_ULONG ulCount )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     /*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     CK_BBOOL xIsPrivate = CK_TRUE;
@@ -2129,8 +2360,6 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE xSession,
             }
         }
 
-		//printf("\n%s xResult=%x\n",__FUNCTION__,xResult);
-
         /* Free the buffer where object was stored. */
         get_object_value_cleanup( pxObjectValue, ulLength );
     }
@@ -2146,7 +2375,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE xSession,
                                                 CK_ATTRIBUTE_PTR pxTemplate,
                                                 CK_ULONG ulCount )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     p_pkcs11_session_t pxSession = get_session_pointer( xSession );
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     CK_BYTE * find_object_lable = NULL;
@@ -2234,7 +2463,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE xSession,
                                             CK_ULONG ulMaxObjectCount,
                                             CK_ULONG_PTR pulObjectCount )
 {  
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
 	/*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     long xDone = 0;
@@ -2345,8 +2574,6 @@ CK_DEFINE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE xSession,
 CK_DEFINE_FUNCTION( CK_RV, C_FindObjectsFinal )( CK_SESSION_HANDLE xSession )
 {   
 
-	printf("%s %d\n",__FUNCTION__,__LINE__);
-
 	/*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     p_pkcs11_session_t pxSession = get_session_pointer( xSession );
@@ -2378,10 +2605,12 @@ CK_DEFINE_FUNCTION( CK_RV, C_FindObjectsFinal )( CK_SESSION_HANDLE xSession )
 
 
 
-CK_RV verify_private_key_template(CK_ATTRIBUTE_PTR * ppxLabel,
+CK_RV verify_private_key_template(CK_SESSION_HANDLE xSession,
+									 CK_ATTRIBUTE_PTR * ppxLabel,
                                      CK_ATTRIBUTE_PTR pxTemplate,
                                      CK_ULONG ulTemplateLength )
 {
+
 #define LABEL      ( 1U )
 #define PRIVATE    ( 1U << 1 )
 #define SIGN       ( 1U << 2 ) 
@@ -2395,7 +2624,12 @@ CK_RV verify_private_key_template(CK_ATTRIBUTE_PTR * ppxLabel,
 	CK_BBOOL is_error = FALSE;
 	uint32_t received_attribute = 0;
 	uint32_t ec_expected_attribute = ( LABEL | PRIVATE | SIGN );
-	uint32_t rsa_expected_attribute = ( LABEL | PRIVATE | SIGN | DECRYPT );
+	uint32_t rsa_expected_attribute[] = {( LABEL | PRIVATE | SIGN | DECRYPT ),
+										  ( LABEL | PRIVATE | DECRYPT ),
+										  ( LABEL | PRIVATE | SIGN )
+										};
+
+	p_pkcs11_session_t session = get_session_pointer( xSession );
 
     for( xIndex = 0; xIndex < ulTemplateLength; xIndex++ )
     {
@@ -2460,11 +2694,9 @@ CK_RV verify_private_key_template(CK_ATTRIBUTE_PTR * ppxLabel,
 
                 if( xBool != CK_TRUE )
                 {
-                    PKCS11_PRINT( ( "ERROR: Generating private keys that cannot sign is not supported. \r\n" ) );
-                    xResult = CKR_TEMPLATE_INCONSISTENT;
-					is_error = TRUE;
 					break;
                 }
+				session->key_template_enabled |= PKCS_SIGN_ENABLE;
 				received_attribute |= SIGN;
             }
             break;
@@ -2474,11 +2706,9 @@ CK_RV verify_private_key_template(CK_ATTRIBUTE_PTR * ppxLabel,
 			
 				if( xBool != CK_TRUE )
 				{
-					PKCS11_PRINT( ( "ERROR: Generating private keys that cannot decrept is not supported. \r\n" ) );
-					xResult = CKR_TEMPLATE_INCONSISTENT;
-					is_error = TRUE;
 					break;
 				}
+				session->key_template_enabled |= PKCS_DECRYPT_ENABLE;
 				received_attribute |= DECRYPT;
 			}
 			break;
@@ -2501,11 +2731,18 @@ CK_RV verify_private_key_template(CK_ATTRIBUTE_PTR * ppxLabel,
 	}
     else if ( xTemp == CKK_RSA )
     {
-		if( (( received_attribute & rsa_expected_attribute ) != rsa_expected_attribute ) ||
-			(( received_attribute & ( LABEL | PRIVATE | DECRYPT ) ) != ( LABEL | PRIVATE | DECRYPT ) ))
-	    {
-	        xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-	    }
+			for(xIndex = 0; xIndex < sizeof(rsa_expected_attribute)/sizeof(uint32_t); xIndex++)
+		    {
+		    	if(received_attribute == rsa_expected_attribute[xIndex])
+		    	{
+					break;
+				}
+		        
+		    }
+			if (xIndex == sizeof(rsa_expected_attribute)/sizeof(uint32_t))
+			{
+				xResult = CKR_TEMPLATE_INCONSISTENT;
+			}
     }
 	else
 	{
@@ -2522,6 +2759,7 @@ CK_RV verify_public_key_template( CK_SESSION_HANDLE xSession,
                                       CK_ATTRIBUTE_PTR pxTemplate,
                                       CK_ULONG ulTemplateLength )
 {
+
 #define LABEL        ( 1U )
 #define EC_PARAMS    ( 1U << 1 )
 #define VERIFY       ( 1U << 2 )
@@ -2543,7 +2781,10 @@ CK_RV verify_public_key_template( CK_SESSION_HANDLE xSession,
     CK_ULONG ulIndex;
 	uint32_t received_attribute = 0;
 	uint32_t ec_expected_attribute = ( LABEL | EC_PARAMS | VERIFY );
-	uint32_t rsa_expected_attribute = ( LABEL | ENCRYPT | VERIFY | MODULUS |EXPONENT );
+	uint32_t rsa_expected_attribute[] = {( LABEL | ENCRYPT | VERIFY | MODULUS |EXPONENT ),
+										 ( LABEL | ENCRYPT | MODULUS | EXPONENT ),
+										 ( LABEL | VERIFY | MODULUS | EXPONENT ),
+										};
 	
 	p_pkcs11_session_t session = get_session_pointer( xSession );
 	
@@ -2610,10 +2851,9 @@ CK_RV verify_public_key_template( CK_SESSION_HANDLE xSession,
                 if( xBool != CK_TRUE )
                 {
                     PKCS11_PRINT( ( "ERROR: Generating public keys that cannot verify is not supported. \r\n" ) );
-                    xResult = CKR_TEMPLATE_INCONSISTENT;
-					is_error = TRUE;
 					break;
                 }
+				session->key_template_enabled |= PKCS_VERIFY_ENABLE;
 				received_attribute |= VERIFY;
             }
             break;
@@ -2636,10 +2876,9 @@ CK_RV verify_public_key_template( CK_SESSION_HANDLE xSession,
 				if( xBool != CK_TRUE )
 				{
 					PKCS11_PRINT( ( "ERROR: Generating public keys that cannot encrypt is not supported. \r\n" ) );
-					xResult = CKR_TEMPLATE_INCONSISTENT;
-					is_error = TRUE;
 					break;
 				}
+				session->key_template_enabled |= PKCS_ENCRYPT_ENABLE;
 				received_attribute |= ENCRYPT;
 			}
 			break;
@@ -2681,7 +2920,7 @@ CK_RV verify_public_key_template( CK_SESSION_HANDLE xSession,
 	{
 		if ( xKeyType == CKK_EC )
 		{
-			if( (( received_attribute & rsa_expected_attribute ) == rsa_expected_attribute ) ||
+			if( (( received_attribute & rsa_expected_attribute[0] ) == rsa_expected_attribute[0] ) ||
 				(( received_attribute & ( LABEL | ENCRYPT | MODULUS | EXPONENT ) ) == 
 				( LABEL | ENCRYPT | MODULUS | EXPONENT ) ))
 		    {
@@ -2694,12 +2933,22 @@ CK_RV verify_public_key_template( CK_SESSION_HANDLE xSession,
 		}
 	    else if ( xKeyType == CKK_RSA )
 	    {
-			if( (( received_attribute & rsa_expected_attribute ) != rsa_expected_attribute ) ||
-				(( received_attribute & ( LABEL | ENCRYPT | MODULUS | EXPONENT ) ) != 
-				( LABEL | ENCRYPT | MODULUS | EXPONENT ) ))
+			for(ulIndex = 0; ulIndex < sizeof(rsa_expected_attribute)/sizeof(uint32_t); ulIndex++)
 		    {
-		        xResult = CKR_TEMPLATE_INCONSISTENT;
+		    	if(received_attribute == rsa_expected_attribute[ulIndex])
+		    	{
+					break;
+				}
+		        
 		    }
+			if (ulIndex == sizeof(rsa_expected_attribute)/sizeof(uint32_t))
+			{
+				xResult = CKR_TEMPLATE_INCONSISTENT;
+			}
+			if (received_attribute & EC_PARAMS)
+			{
+				xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+			}
 	    }
 		else
 		{
@@ -2724,7 +2973,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE xSession,
                                                 CK_OBJECT_HANDLE_PTR pxPublicKey,
                                                 CK_OBJECT_HANDLE_PTR pxPrivateKey )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED( xSession );
     uint8_t * pucPublicKeyDer = NULL;
     uint16_t ucPublicKeyDerLength = 0;
@@ -2735,6 +2984,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE xSession,
     char* xEnd = NULL;
     long lOptigaOid = 0;
 	optiga_rsa_key_type_t rsa_key_type = 0;
+	uint8_t key_usage;
 	
 	do
 	{
@@ -2745,7 +2995,8 @@ CK_DEFINE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE xSession,
 			break;
 	    }
 		
-		xResult = verify_private_key_template(&pxPrivateLabel,
+		xResult = verify_private_key_template(xSession,
+											  &pxPrivateLabel,
 											  pxPrivateKeyTemplate,
 											  ulPrivateKeyAttributeCount );
 
@@ -2802,12 +3053,24 @@ CK_DEFINE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE xSession,
 		            xResult = CKR_HOST_MEMORY;
 					break;
 		        }
+
+				if (( session->key_template_enabled & PKCS_ENCRYPT_ENABLE ) && 
+					( session->key_template_enabled & PKCS_DECRYPT_ENABLE ))
+				{
+					key_usage = OPTIGA_KEY_USAGE_ENCRYPTION;
+				}
+				
+				if (( session->key_template_enabled & PKCS_SIGN_ENABLE ) && 
+					( session->key_template_enabled & PKCS_VERIFY_ENABLE ))
+				{
+					key_usage |= OPTIGA_KEY_USAGE_SIGN;
+				}
 				rsa_key_type = (session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ? 
 														 OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL: 
 														 OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL);
 				xResult = optiga_crypt_rsa_generate_keypair(pkcs11_context.object_list.optiga_crypt_instance,
                                                             rsa_key_type,
-                                                            (uint8_t)OPTIGA_KEY_USAGE_SIGN | OPTIGA_KEY_USAGE_ENCRYPTION,
+                                                            key_usage,
                                                             FALSE,
                                                             &lOptigaOid,
 															pucPublicKeyDer,
@@ -2877,6 +3140,11 @@ CK_DEFINE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE xSession,
 	        }
 	        
 	    }
+		else
+		{
+	        xResult = CK_INVALID_HANDLE;
+			break;			
+		}
 	} while(0);
     /* Clean up. */
     if( NULL != pucPublicKeyDer )
@@ -2946,7 +3214,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE xSession,
                                          CK_MECHANISM_PTR pxMechanism,
                                          CK_OBJECT_HANDLE xKey )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     CK_OBJECT_HANDLE xPalHandle;
     uint8_t * pxLabel = NULL;
@@ -2966,6 +3234,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE xSession,
 	        xResult = CKR_ARGUMENTS_BAD;
 			break;
 	    }
+		
 
 	    /* Retrieve key value from storage. */
 
@@ -2987,13 +3256,15 @@ CK_DEFINE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE xSession,
 				xResult = CKR_KEY_HANDLE_INVALID;
 				break;
             }
+			
         }
         else
         {
             xResult = CKR_KEY_HANDLE_INVALID;
 			break;
         }
-	    
+
+		
 
 	    /* Check that the mechanism and key type are compatible, supported. */
 	    if( (pxMechanism->mechanism != CKM_ECDSA) && (check_valid_rsa_signature_scheme(pxMechanism->mechanism)) )
@@ -3006,6 +3277,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE xSession,
         {
             pxSession->sign_mechanism = pxMechanism->mechanism;
         }
+
 	    session->sign_init_done = TRUE;
 	}while(0);
     return xResult;
@@ -3020,7 +3292,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE xSession,
                                      CK_BYTE_PTR pucSignature,
                                      CK_ULONG_PTR pulSignatureLen )
 {  
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
 	/*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     p_pkcs11_session_t session = get_session_pointer( xSession );
@@ -3180,7 +3452,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE xSession,
                                            CK_MECHANISM_PTR pxMechanism,
                                            CK_OBJECT_HANDLE xKey )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     CK_RV xResult = CKR_OK;
     p_pkcs11_session_t session;
     CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
@@ -3250,7 +3522,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE xSession,
                                        CK_BYTE_PTR pucSignature,
                                        CK_ULONG ulSignatureLen )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     CK_RV xResult = CKR_OK;
     p_pkcs11_session_t session;
     uint8_t temp[2048];
@@ -3461,7 +3733,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_GenerateRandom )( CK_SESSION_HANDLE xSession,
                                                CK_BYTE_PTR pucRandomData,
                                                CK_ULONG ulRandomLen )
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     CK_RV xResult = CKR_OK;
     // this is to truncate random numbers to the required length, as OPTIGA(TM) Trust can generate
     // values starting from 8 bytes
@@ -3528,7 +3800,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_EncryptInit )( CK_SESSION_HANDLE xSession,
                        					    CK_MECHANISM_PTR pxMechanism,
                                             CK_OBJECT_HANDLE xKey ) 
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     CK_RV xResult = CKR_OK;
     p_pkcs11_session_t session;
     CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
@@ -3542,6 +3814,11 @@ CK_DEFINE_FUNCTION( CK_RV, C_EncryptInit )( CK_SESSION_HANDLE xSession,
 
 	do
 	{
+		if (!( session->key_template_enabled & PKCS_ENCRYPT_ENABLE ))
+		{
+	        xResult = CKR_KEY_FUNCTION_NOT_PERMITTED;
+			break;
+		}
 	    if( NULL == pxMechanism )
 	    {
 	        xResult = CKR_ARGUMENTS_BAD;
@@ -3570,6 +3847,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_EncryptInit )( CK_SESSION_HANDLE xSession,
         {
             xResult = CKR_KEY_HANDLE_INVALID;
         }
+		session->encrypt_init_done = TRUE;
 	    
 	} while (0);
     return xResult;
@@ -3582,7 +3860,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Encrypt) ( CK_SESSION_HANDLE xSession,
 					                   CK_BYTE_PTR pxEncryptedData,
 					                   CK_ULONG_PTR pxulEncryptedDataLen ) 
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     CK_RV xResult = CKR_OK;
     p_pkcs11_session_t session;
     uint8_t temp[2048];
@@ -3595,7 +3873,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_Encrypt) ( CK_SESSION_HANDLE xSession,
 
 	do
 	{	
-	
+		if ( FALSE == session->encrypt_init_done )
+		{
+			xResult = CKR_OPERATION_NOT_INITIALIZED;
+			break;
+		}	
 		key_type = (uint8_t)(session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
 													  OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL :
 													  OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL);
@@ -3606,6 +3888,14 @@ CK_DEFINE_FUNCTION(CK_RV, C_Encrypt) ( CK_SESSION_HANDLE xSession,
 			(ulDataLen > ((pkcs11RSA_2048_MODULUS_BITS / 8) - 11))))
 		{
 			xResult = CKR_ARGUMENTS_BAD;
+			break;
+		}
+		if  (((key_type == OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL ) && 			
+			 (*pxulEncryptedDataLen < (pkcs11RSA_1024_MODULUS_BITS / 8))) ||			
+			 ((key_type == OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL ) && 			
+			 (*pxulEncryptedDataLen < (pkcs11RSA_2048_MODULUS_BITS / 8))))		
+	    {			
+	    	xResult = CKR_BUFFER_TOO_SMALL ;
 			break;
 		}
 
@@ -3656,7 +3946,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Encrypt) ( CK_SESSION_HANDLE xSession,
 		
 		if (OPTIGA_LIB_SUCCESS != xResult)
 		{
-			PKCS11_PRINT( ( "ERROR: Failed to generate a random value \r\n" ) );
+			PKCS11_PRINT( ( "ERROR: Failed to encrypt value \r\n" ) );
 			xResult = CKR_ENCRYPTED_DATA_INVALID;
 			break;
 		}
@@ -3669,7 +3959,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Encrypt) ( CK_SESSION_HANDLE xSession,
 		// Either by timout or because of success it should end up here
 		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
 		{
-			PKCS11_PRINT( ( "ERROR: Failed to generate a random value \r\n" ) );
+			PKCS11_PRINT( ( "ERROR: Failed to encrypt value \r\n" ) );
 			xResult = CKR_FUNCTION_FAILED;
 			break;
 		}
@@ -3702,7 +3992,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit) ( CK_SESSION_HANDLE xSession,
 					                       CK_MECHANISM *pxMechanism, 
 					                       CK_OBJECT_HANDLE xKey) 
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     CK_RV xResult = CKR_OK;
     p_pkcs11_session_t session;
     CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
@@ -3716,6 +4006,11 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit) ( CK_SESSION_HANDLE xSession,
 
 	do
 	{
+		if (!( session->key_template_enabled & PKCS_DECRYPT_ENABLE ))
+		{
+	        xResult = CKR_KEY_FUNCTION_NOT_PERMITTED;
+			break;
+		}
 	    if( NULL == pxMechanism )
 	    {
 	        xResult = CKR_ARGUMENTS_BAD;
@@ -3744,6 +4039,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit) ( CK_SESSION_HANDLE xSession,
         {
             xResult = CKR_KEY_HANDLE_INVALID;
         }
+		session->decrypt_init_done = TRUE;
 	    
 	} while (0);
     return xResult;    
@@ -3755,7 +4051,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt) ( CK_SESSION_HANDLE xSession,
 					                   CK_BYTE_PTR data, 
 					                   CK_ULONG_PTR data_len) 
 {
-	printf("%s %d\n",__FUNCTION__,__LINE__);
+
     CK_RV xResult = CKR_OK;
     p_pkcs11_session_t session;	
 	uint8_t key_type;
@@ -3765,7 +4061,12 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt) ( CK_SESSION_HANDLE xSession,
 
 	do
 	{	
-	
+		if ( FALSE == session->decrypt_init_done )
+		{
+			xResult = CKR_OPERATION_NOT_INITIALIZED;
+			break;
+		}
+		
 		key_type = (uint8_t)(session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
 													  OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL :
 													  OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL);
@@ -3775,7 +4076,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt) ( CK_SESSION_HANDLE xSession,
 			((key_type == OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL ) && 
 			(encrypted_data_len != (pkcs11RSA_2048_MODULUS_BITS / 8))))
 		{
-			xResult = CKR_BUFFER_TOO_SMALL ;
+			xResult = CKR_ENCRYPTED_DATA_LEN_RANGE ;
 			break;
 		}
 
@@ -3794,7 +4095,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt) ( CK_SESSION_HANDLE xSession,
 		
 		if (OPTIGA_LIB_SUCCESS != xResult)
 		{
-			PKCS11_PRINT( ( "ERROR: Failed to generate a random value \r\n" ) );
+			PKCS11_PRINT( ( "ERROR: Failed to decrypt value \r\n" ) );
 			xResult = CKR_ENCRYPTED_DATA_INVALID;
 			break;
 		}
@@ -3807,7 +4108,7 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt) ( CK_SESSION_HANDLE xSession,
 		// Either by timout or because of success it should end up here
 		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
 		{
-			PKCS11_PRINT( ( "ERROR: Failed to generate a random value \r\n" ) );
+			PKCS11_PRINT( ( "ERROR: Failed to decrypt value \r\n" ) );
 			xResult = CKR_FUNCTION_FAILED;
 			break;
 		}
@@ -3834,4 +4135,183 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptFinal) ( CK_SESSION_HANDLE xSession,
     return CKR_OK;
 }
 
+CK_DEFINE_FUNCTION( CK_RV, C_DigestInit )( CK_SESSION_HANDLE xSession,
+                                           CK_MECHANISM_PTR pMechanism )
+{
+    CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
+	p_pkcs11_session_t session;
+	
+	do
+	{
+	    session = get_session_pointer( xSession );
 
+	    if( session == NULL )
+	    {
+	        xResult = CKR_SESSION_HANDLE_INVALID;
+			break;
+	    }
+
+	    if( pMechanism->mechanism != CKM_SHA256 )
+	    {
+	        xResult = CKR_MECHANISM_INVALID;
+			break;
+	    }
+
+        session->sha256_ctx.hash_ctx.context_buffer = session->sha256_ctx.hash_ctx_buff;
+        session->sha256_ctx.hash_ctx.context_buffer_length = sizeof(session->sha256_ctx.hash_ctx_buff);
+        session->sha256_ctx.hash_ctx.hash_algo = OPTIGA_HASH_TYPE_SHA_256;
+
+        pal_os_lock_acquire(&optiga_mutex);
+
+        //Hash start
+        pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+        xResult = optiga_crypt_hash_start( pkcs11_context.object_list.optiga_crypt_instance, 
+										   &session->sha256_ctx.hash_ctx);
+
+		if (OPTIGA_LIB_SUCCESS != xResult)
+		{
+			xResult = CKR_FUNCTION_FAILED;
+			break;
+		}
+
+		while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+		{
+		}
+
+		// Either by timout or because of success it should end up here
+		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+		{
+			xResult = CKR_FUNCTION_FAILED;
+			break;
+		}
+		session->operation_in_progress = pMechanism->mechanism;
+
+		pal_os_lock_release(&optiga_mutex);
+	    
+	}while(0);
+    return xResult;
+}
+
+CK_DEFINE_FUNCTION( CK_RV, C_DigestUpdate )( CK_SESSION_HANDLE xSession,
+                                             CK_BYTE_PTR pPart,
+                                             CK_ULONG ulPartLen )
+{
+    CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
+    p_pkcs11_session_t session;
+    hash_data_from_host_t hash_data_host;
+	do
+	{
+		session = get_session_pointer( xSession );
+	    if( session == NULL )
+	    {
+	        xResult = CKR_SESSION_HANDLE_INVALID;
+			break;
+	    }
+	    else if( session->operation_in_progress != CKM_SHA256 )
+	    {
+	        xResult = CKR_OPERATION_NOT_INITIALIZED;
+			break;
+	    }
+
+        hash_data_host.buffer = pPart;
+        hash_data_host.length = ulPartLen;
+
+        pal_os_lock_acquire(&optiga_mutex);
+
+        pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+        xResult = optiga_crypt_hash_update(pkcs11_context.object_list.optiga_crypt_instance,
+        								   &session->sha256_ctx.hash_ctx,
+										   OPTIGA_CRYPT_HOST_DATA,
+										   &hash_data_host);
+
+		if (OPTIGA_LIB_SUCCESS != xResult)
+		{
+			xResult = CKR_FUNCTION_FAILED;
+			break;
+		}
+
+		while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+		{
+		}
+
+		// Either by timout or because of success it should end up here
+		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+		{
+            xResult = CKR_FUNCTION_FAILED;
+            session->operation_in_progress = pkcs11NO_OPERATION;
+			break;
+		}
+
+		pal_os_lock_release(&optiga_mutex);
+	}while(0);
+    return xResult;
+}
+
+CK_DEFINE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE xSession,
+                                            CK_BYTE_PTR pDigest,
+                                            CK_ULONG_PTR pulDigestLen )
+{
+    CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
+    p_pkcs11_session_t session;
+
+	do
+	{
+		session = get_session_pointer( xSession );
+	    if( session == NULL )
+	    {
+	        xResult = CKR_SESSION_HANDLE_INVALID;
+			break;
+	    }
+	    else if( session->operation_in_progress != CKM_SHA256 )
+	    {
+	        xResult = CKR_OPERATION_NOT_INITIALIZED;
+	        session->operation_in_progress = pkcs11NO_OPERATION;
+			break;
+	    }
+
+
+        if( pDigest == NULL )
+        {
+            /* Supply the required buffer size. */
+            *pulDigestLen = pkcs11SHA256_DIGEST_LENGTH;
+        }
+        else
+        {
+            if( *pulDigestLen < pkcs11SHA256_DIGEST_LENGTH )
+            {
+                xResult = CKR_BUFFER_TOO_SMALL;
+				break;
+            }
+        	pal_os_lock_acquire(&optiga_mutex);
+
+            // hash finalize
+        	pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+        	xResult = optiga_crypt_hash_finalize( pkcs11_context.object_list.optiga_crypt_instance,
+                                      	  	  	  &session->sha256_ctx.hash_ctx,
+												  pDigest);
+
+			if (OPTIGA_LIB_SUCCESS != xResult)
+			{
+				xResult = CKR_FUNCTION_FAILED;
+				break;
+			}
+
+			while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+			{
+			}
+
+			// Either by timout or because of success it should end up here
+			if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+			{
+				xResult = CKR_FUNCTION_FAILED;
+				break;
+			}
+
+			pal_os_lock_release(&optiga_mutex);
+
+            session->operation_in_progress = pkcs11NO_OPERATION;
+            
+        }
+	}while(0);
+    return xResult;
+}
