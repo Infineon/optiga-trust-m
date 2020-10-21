@@ -99,7 +99,7 @@ int mbedtls_ecdh_gen_public(mbedtls_ecp_group *grp, mbedtls_mpi *d,
 	{
 		curve_id = OPTIGA_ECC_CURVE_BRAIN_POOL_P_384R1;
 	}
-	else
+	else if(grp->id == MBEDTLS_ECP_DP_BP512R1)
 	{
 		curve_id = OPTIGA_ECC_CURVE_BRAIN_POOL_P_512R1;
 		public_key_offset = 4;
@@ -216,7 +216,7 @@ int mbedtls_ecdh_compute_shared(mbedtls_ecp_group *grp, mbedtls_mpi *z,
 		pk.key_type = OPTIGA_ECC_CURVE_BRAIN_POOL_P_384R1;
 		pk_out[publickey_offset-2] = 0x62;
 	}
-	else
+	else if(grp->id == MBEDTLS_ECP_DP_BP512R1)
 	{
 		pk.key_type = OPTIGA_ECC_CURVE_BRAIN_POOL_P_512R1;
 		publickey_offset = 4;
@@ -270,7 +270,7 @@ int mbedtls_ecdh_compute_shared(mbedtls_ecp_group *grp, mbedtls_mpi *z,
 
 	crypt_event_completed_status = OPTIGA_LIB_BUSY;
 	//Invoke OPTIGA command to generate shared secret and store in the OID/buffer.
-	crypt_sync_status = optiga_crypt_ecdh(me, (optiga_key_id_t *)&optiga_key_id , &pk, 1, buf);
+	crypt_sync_status = optiga_crypt_ecdh(me, optiga_key_id , &pk, 1, buf);
 
 	if (OPTIGA_LIB_SUCCESS != crypt_sync_status)
 	{

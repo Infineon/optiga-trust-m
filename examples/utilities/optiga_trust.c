@@ -40,8 +40,14 @@
 #include "optiga/optiga_util.h"
 #include "optiga/common/optiga_lib_logger.h"
 #include "optiga/pal/pal_os_event.h"
+#include "optiga/pal/pal_gpio.h"
 #include "optiga/ifx_i2c/ifx_i2c_config.h"
+#include "optiga/pal/pal_ifx_i2c_config.h"
 #include "mbedtls/base64.h"
+
+#ifndef CONFIG_OPTIGA_TRUST_M_CERT_SLOT
+#define CONFIG_OPTIGA_TRUST_M_CERT_SLOT 0xE0E0
+#endif
 
 pal_status_t pal_os_event_init(void);
 
@@ -74,7 +80,7 @@ void read_certificate_from_optiga(char * cert_pem, uint16_t * cert_pem_length)
         me_util = optiga_util_create(0, optiga_util_callback, NULL);
         if(!me_util)
         {
-            OPTIGA_UTIL_LOG_MESSAGE("optiga_util_create failed !!!");
+			optiga_lib_print_message("optiga_util_create failed !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
         optiga_lib_status = OPTIGA_LIB_BUSY;
@@ -82,7 +88,7 @@ void read_certificate_from_optiga(char * cert_pem, uint16_t * cert_pem_length)
         if (OPTIGA_LIB_SUCCESS != return_status)
         {
             //optiga_util_read_data api returns error !!!
-            OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_read_data api returns error !!!");
+			optiga_lib_print_message("optiga_util_read_data api returns error !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
             
@@ -90,7 +96,7 @@ void read_certificate_from_optiga(char * cert_pem, uint16_t * cert_pem_length)
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
             //optiga_util_read_data failed
-            OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_read_data failed");
+			optiga_lib_print_message("optiga_util_read_data failed",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
         //ESP_LOG_BUFFER_HEX("OPTIGA Certificate", ifx_cert_hex, ifx_cert_hex_len);
@@ -158,7 +164,7 @@ void read_trust_anchor_from_optiga(uint16_t oid, char * cert_pem, uint16_t * cer
         me_util = optiga_util_create(0, optiga_util_callback, NULL);
         if(!me_util)
         {
-            OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_create failed !!!");
+			optiga_lib_print_message("optiga_util_create failed !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
         optiga_lib_status = OPTIGA_LIB_BUSY;   
@@ -166,7 +172,7 @@ void read_trust_anchor_from_optiga(uint16_t oid, char * cert_pem, uint16_t * cer
         if (OPTIGA_LIB_SUCCESS != return_status)
         {
             //optiga_util_read_data api returns error !!!
-            OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_read_data api for trust anchor returns error !!!");
+			optiga_lib_print_message("optiga_util_read_data api for trust anchor returns error !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
             
@@ -178,7 +184,7 @@ void read_trust_anchor_from_optiga(uint16_t oid, char * cert_pem, uint16_t * cer
         if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
         {
             //optiga_util_read_data failed
-            OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_read_data failed for reading trust anchor");
+			optiga_lib_print_message("optiga_util_read_data failed for reading trust anchor",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
 
@@ -239,7 +245,7 @@ void write_data_object (uint16_t oid, const uint8_t * p_data, uint16_t length)
         me_util = optiga_util_create(0, optiga_util_callback, NULL);
         if(!me_util)
         {
-            OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_create failed !!!");
+            optiga_lib_print_message("optiga_util_create failed !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
 
@@ -253,7 +259,7 @@ void write_data_object (uint16_t oid, const uint8_t * p_data, uint16_t length)
         {
             if (OPTIGA_LIB_SUCCESS != return_status)
             {
-                OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_wirte_data api returns error !!!");
+				optiga_lib_print_message("optiga_util_wirte_data api returns error !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
                 break;
             }
 
@@ -264,13 +270,13 @@ void write_data_object (uint16_t oid, const uint8_t * p_data, uint16_t length)
 
             if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
             {
-                OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_write_data failed");
+				optiga_lib_print_message("optiga_util_write_data failed",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
                 return_status = optiga_lib_status;
                 break;
             }
 			else
 			{
-				OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_write_data successful");
+				optiga_lib_print_message("optiga_util_write_data successful",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
 			}
         }
     } while (0);
@@ -581,8 +587,9 @@ void optiga_trust_init(void)
     optiga_util_t * me_util = NULL;
 
     pal_os_event_init();
+	pal_gpio_init(&optiga_vdd_0);
 
-	OPTIGA_UTIL_LOG_MESSAGE("OPTIGA Trust initialization");
+	optiga_lib_print_message("OPTIGA Trust initialization",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
 	
     do
     {
@@ -590,18 +597,17 @@ void optiga_trust_init(void)
         me_util = optiga_util_create(0, optiga_util_callback, NULL);
         if(!me_util)
         {
-            OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_create failed !!!");
+            optiga_lib_print_message("optiga_util_create failed !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
 
-		
         optiga_lib_status = OPTIGA_LIB_BUSY;
         return_status = optiga_util_open_application(me_util, 0);
         {
             if (OPTIGA_LIB_SUCCESS != return_status)
             {
                 //optiga_util_open_application api returns error !!!
-                OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_open_application api returns error !!!");
+				optiga_lib_print_message("optiga_util_open_application api returns error !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
                 break;
             }
             
@@ -609,13 +615,11 @@ void optiga_trust_init(void)
             if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
             {
                 //optiga_util_open_application failed
-                OPTIGA_UTIL_LOG_MESSAGE ("optiga_util_open_application failed");
+				optiga_lib_print_message("optiga_util_open_application failed",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
                 break;
             }
         }
 
-		
-		
 		//The below specified functions can be used to personalize OPTIGA w.r.t
 		//certificates, Trust Anchors, etc.
 		
@@ -625,8 +629,7 @@ void optiga_trust_init(void)
         //read_certificate ();
 		//write_optiga_trust_anchor();  //can be used to write server root certificate to optiga data object
 
-		
-        OPTIGA_UTIL_LOG_MESSAGE("OPTIGA Trust initialization is successful");
+		optiga_lib_print_message("OPTIGA Trust initialization is successful",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
     }while(0);
 
     //me_util instance can be destroyed 

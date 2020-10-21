@@ -379,7 +379,9 @@ int example_mbedtls_optiga_crypt_ecc_extendedcurve_genkeypair()
                                        sizeof(digestbp256), 
                                        sizeof(digestbp384), 
                                        sizeof(digestbp512)};
-									   
+
+	memset(&ctr_drbg, 0x00, sizeof(ctr_drbg));
+	memset(&entropy, 0x00, sizeof(entropy));
 	mbedtls_ctr_drbg_init(&ctr_drbg);
     mbedtls_entropy_init(&entropy);
 	
@@ -482,7 +484,7 @@ int example_mbedtls_optiga_crypt_ecc_extendedcurve_calsign()
 	
     uint8_t public_key [150];
     uint16_t public_key_length = sizeof(public_key);	
-    optiga_key_id_t optiga_key_id = CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT;
+    optiga_key_id_t optiga_key_id = OPTIGA_KEY_ID_E0F2;
 	
 	optiga_ecc_curve_t curve_id[] = {OPTIGA_ECC_CURVE_NIST_P_521,
 									OPTIGA_ECC_CURVE_BRAIN_POOL_P_256R1,
@@ -504,7 +506,10 @@ int example_mbedtls_optiga_crypt_ecc_extendedcurve_calsign()
                                        sizeof(digestbp512)};
 									   
 	uint16_t public_key_offset[] = {4,3,3,4};
-									   
+
+	memset(&ctr_drbg, 0x00, sizeof(ctr_drbg));
+	memset(&entropy, 0x00, sizeof(entropy));
+
 	mbedtls_ctr_drbg_init(&ctr_drbg);
     mbedtls_entropy_init(&entropy);
 	
@@ -560,6 +565,7 @@ int example_mbedtls_optiga_crypt_ecc_extendedcurve_calsign()
 			}
 			
 			//Verify operation using mbedtls API integrated with optiga libraries
+			//Note: Make sure to use same private key oid used for calcsign in trust_ecdsa.c file, for generating the key pair also
 			return_status = mbedtls_ecdsa_verify( &grp, digest_buffer[loop_count], digest_buffer_size[loop_count], &Q, &r, &s);
 			if(0 != return_status)
 			{
@@ -613,7 +619,7 @@ int example_mbedtls_optiga_crypt_ecc_extendedcurve_verify()
                                        sizeof(digestbp384), 
                                        sizeof(digestbp512)};
 									   
-    uint8_t * signature_buffer[] = {&signature521[0], 
+	const unsigned char * signature_buffer[] = {&signature521[0],
                                           &signaturebp256[0], 
                                           &signaturebp384[0], 
                                           &signaturebp512[0]};
@@ -711,9 +717,7 @@ int example_mbedtls_optiga_crypt_ecc_extendedcurve_calcssec()
 	optiga_key_id_t optiga_key_id = 0xE102;
 	
 	uint8_t shared_secret_mbedtls_optiga [150];
-    uint16_t shared_secret_mbedtls_optiga_length = sizeof(shared_secret_mbedtls_optiga);
 	uint8_t shared_secret_host[150];
-    uint16_t shared_secret_host_length = sizeof(shared_secret_host);
 	public_key_from_host_t peer_public_key_details;
 	
 	uint16_t public_key_offset ;
@@ -730,6 +734,8 @@ int example_mbedtls_optiga_crypt_ecc_extendedcurve_calcssec()
 	
 	uint8_t key_offset[] = {4, 3, 3, 4};
 	
+	memset(&ctr_drbg, 0x00, sizeof(ctr_drbg));
+	memset(&entropy, 0x00, sizeof(entropy));
 	mbedtls_ctr_drbg_init(&ctr_drbg);
     mbedtls_entropy_init(&entropy);
 	
@@ -800,7 +806,7 @@ int example_mbedtls_optiga_crypt_ecc_extendedcurve_calcssec()
 			}
 			
 			//Copy the public key generated into the mbedtls structure
-			return_status = mbedtls_ecp_point_write_binary(&grp, &Q1, MBEDTLS_ECP_PF_UNCOMPRESSED, &public_key_length, &public_key[public_key_offset], sizeof(public_key) );
+			return_status = mbedtls_ecp_point_write_binary(&grp, &Q1, MBEDTLS_ECP_PF_UNCOMPRESSED, (size_t *)&public_key_length, &public_key[public_key_offset], sizeof(public_key) );
 			if (0 != return_status)
 			{
 				break;

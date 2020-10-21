@@ -62,7 +62,7 @@
 #define LENGTH_SHA256			    32
 
 ///size of end entity certificate of OPTIGA™ Trust M
-#define LENGTH_OPTIGA_CERT          512
+#define LENGTH_OPTIGA_CERT          700
 
 #define MODULE_ENABLE_ONE_WAY_AUTH
 
