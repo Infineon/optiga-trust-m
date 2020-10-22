@@ -46,8 +46,14 @@
 #include "optiga/ifx_i2c/ifx_i2c_config.h"
 #include "optiga/pal/pal_ifx_i2c_config.h"
 
-#include "pkcs11.h"
+
+#include "pkcs11_optiga_trustm.h"
+
+#ifdef __linux__
 #include <semaphore.h>
+#else
+//Platgorm specific header file
+#endif
 
 
 #define PKCS11_PRINT( X )            //printf(X);//vLoggingPrintf X
@@ -82,18 +88,22 @@ typedef struct pkcs11_object_t
     CK_OBJECT_HANDLE object_handle;
     // If Label is associated with a private key slot.
     // This flag is used to mark it active/non-active, as we can't remove the private key
-    CK_BYTE status_lable[ pkcs11configMAX_LABEL_LENGTH + 1 ]; /* Plus 1 for the null terminator. */
+    CK_BYTE status_lable[ MAX_LABEL_LENGTH + 1 ]; /* Plus 1 for the null terminator. */
 } pkcs11_object_t;
 
 
 typedef struct pkcs11_object_list
 {
+#ifdef __linux__
     sem_t semaphore; /* Semaphore that protects write operations to the objects array. */
+#else
+	//Platform specific semaphore vriables 
+#endif
     struct timespec timeout;
     optiga_crypt_t* optiga_crypt_instance;
     optiga_util_t* optiga_util_instance;
     optiga_lib_status_t optiga_lib_status;
-    pkcs11_object_t objects[ pkcs11configMAX_NUM_OBJECTS ];
+    pkcs11_object_t objects[ MAX_NUM_OBJECTS ];
 } pkcs11_object_list;
 
 /* PKCS #11 Object */
@@ -209,14 +219,14 @@ CK_OBJECT_HANDLE find_object( uint8_t * pLabel,
 
     /* Translate from the PKCS#11 label to local storage file name. */
     if( 0 == memcmp( pLabel,
-                     &pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
-                     sizeof( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ) ) )
+                     &LABEL_DEVICE_CERTIFICATE_FOR_TLS,
+                     sizeof( LABEL_DEVICE_CERTIFICATE_FOR_TLS ) ) )
     {
         object_handle = DeviceCertificate;
     }
     else if( 0 == memcmp( pLabel,
-                          &pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
-                          sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) ) )
+                          &LABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
+                          sizeof( LABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) ) )
     {
         /* This operation isn't supported for the OPTIGA(TM) Trust M due to a security considerations
          * You can only generate a keypair and export a private component if you like */
@@ -225,14 +235,14 @@ CK_OBJECT_HANDLE find_object( uint8_t * pLabel,
     }
 
     else if( 0 == memcmp( pLabel,
-                          &pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
-                          sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
+                          &LABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
+                          sizeof( LABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
     {
         object_handle = DevicePublicKey;
     }
     else if( 0 == memcmp( pLabel,
-                          &pkcs11configLABEL_CODE_VERIFICATION_KEY,
-                          sizeof( pkcs11configLABEL_CODE_VERIFICATION_KEY ) ) )
+                          &LABEL_CODE_VERIFICATION_KEY,
+                          sizeof( LABEL_CODE_VERIFICATION_KEY ) ) )
     {
         object_handle = CodeSigningKey;
     }
@@ -289,15 +299,15 @@ long get_object_value( CK_OBJECT_HANDLE object_handle,
 		switch (object_handle) 
 		{
 			case DeviceCertificate:
-				lOptigaOid = strtol(pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS, &xEnd, 16);
+				lOptigaOid = strtol(LABEL_DEVICE_CERTIFICATE_FOR_TLS, &xEnd, 16);
 				xOffset = 9;
 				break;
 			case DevicePublicKey:
-				lOptigaOid = strtol(pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS, &xEnd, 16);
+				lOptigaOid = strtol(LABEL_DEVICE_PUBLIC_KEY_FOR_TLS, &xEnd, 16);
 				break;
 
 			case CodeSigningKey:
-				lOptigaOid = strtol(pkcs11configLABEL_CODE_VERIFICATION_KEY, &xEnd, 16);
+				lOptigaOid = strtol(LABEL_CODE_VERIFICATION_KEY, &xEnd, 16);
 				break;
 			case DevicePrivateKey:
 				/*
@@ -666,8 +676,11 @@ CK_RV optiga_trustm_initialize( void )
 	    if( xResult == CKR_OK )
 	    {
 	        memset( &pkcs11_context, 0, sizeof( pkcs11_context ) );
-	    	//pal_i2c_init(NULL);
+	    	#ifdef __linux__
 	    	xResult = sem_init(&pkcs11_context.object_list.semaphore , 0, 1);
+			#else
+			//Platform specific semaphore implementation
+			#endif
 			if( xResult != CKR_OK )
 			{
 				break;
@@ -676,7 +689,7 @@ CK_RV optiga_trustm_initialize( void )
 			pal_gpio_init(&optiga_vdd_0);
 			pkcs11_context.object_list.timeout.tv_sec = 0;
 			pkcs11_context.object_list.timeout.tv_nsec = 0xffff;
-	        //pkcs11_context.object_list.semaphore = xSemaphoreCreateMutex();
+
 	        pkcs11_context.object_list.optiga_crypt_instance =
 	        		optiga_crypt_create(0, optiga_callback, &pkcs11_context.object_list.optiga_lib_status);
 
@@ -818,7 +831,7 @@ void find_object_in_list_by_label( uint8_t * pcLabel,
     *pxPalHandle = CK_INVALID_HANDLE;
     *pxAppHandle = CK_INVALID_HANDLE;
 
-    for( ucIndex = 0; ucIndex < pkcs11configMAX_NUM_OBJECTS; ucIndex++ )
+    for( ucIndex = 0; ucIndex < MAX_NUM_OBJECTS; ucIndex++ )
     {
         if( 0 == memcmp( pcLabel, pkcs11_context.object_list.objects[ ucIndex ].status_lable, xLabelLength ) )
         {
@@ -849,7 +862,7 @@ void find_object_in_list_by_handle( CK_OBJECT_HANDLE xAppHandle,
     *ppcLabel = NULL;
     *pxLabelLength = 0;
 
-    if (pkcs11configMAX_NUM_OBJECTS >= lIndex)
+    if (MAX_NUM_OBJECTS >= lIndex)
     {
         if( pkcs11_context.object_list.objects[ lIndex ].object_handle != CK_INVALID_HANDLE )
         {
@@ -870,9 +883,9 @@ CK_RV delete_object_from_list( CK_OBJECT_HANDLE xAppHandle )
     CK_RV xResult = CKR_OK;
     int32_t get_semaphore;
     int lIndex = xAppHandle - 1;
-	
+#ifdef __linux__	
     get_semaphore = sem_timedwait( &pkcs11_context.object_list.semaphore, &pkcs11_context.object_list.timeout );
-
+#endif
     if( get_semaphore == 0 )
     {
         if( pkcs11_context.object_list.objects[ lIndex ].object_handle != CK_INVALID_HANDLE )
@@ -883,8 +896,9 @@ CK_RV delete_object_from_list( CK_OBJECT_HANDLE xAppHandle )
         {
             xResult = CKR_OBJECT_HANDLE_INVALID;
         }
-
+#ifdef __linux__
         sem_post( &pkcs11_context.object_list.semaphore );
+#endif
     }
     else
     {
@@ -904,13 +918,13 @@ CK_RV add_object_to_list( CK_OBJECT_HANDLE xPalHandle,
 
     CK_BBOOL xObjectFound = CK_FALSE;
     int lInsertIndex = -1;
-    int lSearchIndex = pkcs11configMAX_NUM_OBJECTS - 1;
-
+    int lSearchIndex = MAX_NUM_OBJECTS - 1;
+#ifdef __linux__
     get_semaphore = sem_timedwait( &pkcs11_context.object_list.semaphore, &pkcs11_context.object_list.timeout);
-
+#endif
     if( get_semaphore == 0 )
     {
-        for( lSearchIndex = pkcs11configMAX_NUM_OBJECTS - 1; lSearchIndex >= 0; lSearchIndex-- )
+        for( lSearchIndex = MAX_NUM_OBJECTS - 1; lSearchIndex >= 0; lSearchIndex-- )
         {
             if( pkcs11_context.object_list.objects[ lSearchIndex ].object_handle == xPalHandle )
             {
@@ -929,7 +943,7 @@ CK_RV add_object_to_list( CK_OBJECT_HANDLE xPalHandle,
         {
             if( lInsertIndex != -1 )
             {
-                if( xLabelLength < pkcs11configMAX_LABEL_LENGTH )
+                if( xLabelLength < MAX_LABEL_LENGTH )
                 {
                     pkcs11_context.object_list.objects[ lInsertIndex ].object_handle = xPalHandle;
                     memcpy( pkcs11_context.object_list.objects[ lInsertIndex ].status_lable, pcLabel, xLabelLength );
@@ -941,8 +955,9 @@ CK_RV add_object_to_list( CK_OBJECT_HANDLE xPalHandle,
                 }
             }
         }
-
+#ifdef __linux__
         sem_post( &pkcs11_context.object_list.semaphore );
+#endif
     }
     else
     {
@@ -1182,20 +1197,20 @@ CK_OBJECT_HANDLE save_object( CK_ATTRIBUTE_PTR pxLabel,
 	{
 		/* Translate from the PKCS#11 label to local storage file name. */
 		if( 0 == memcmp( pxLabel->pValue,
-						 &pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS,
-						 sizeof( pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS ) ) )
+						 &LABEL_DEVICE_CERTIFICATE_FOR_TLS,
+						 sizeof( LABEL_DEVICE_CERTIFICATE_FOR_TLS ) ) )
 		{
-			if ( upload_certificate(pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
+			if ( upload_certificate(LABEL_DEVICE_CERTIFICATE_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
 			{
 				object_handle = DeviceCertificate;
 			}
 		}
 		else if( (0 == memcmp( pxLabel->pValue,
-							   &pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
-							   sizeof( pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) )) ||
+							   &LABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
+							   sizeof( LABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) )) ||
 				 (0 == memcmp( pxLabel->pValue,
-							   &pkcs11configLABEL_DEVICE_RSA_PRIVATE_KEY_FOR_TLS,
-							   sizeof( pkcs11configLABEL_DEVICE_RSA_PRIVATE_KEY_FOR_TLS ) )))
+							   &LABEL_DEVICE_RSA_PRIVATE_KEY_FOR_TLS,
+							   sizeof( LABEL_DEVICE_RSA_PRIVATE_KEY_FOR_TLS ) )))
 		{
 			/* This operation isn't supported for the OPTIGA(TM) Trust M due to a security considerations
 			 * You can only generate a keypair and export a private component if you like */
@@ -1203,27 +1218,27 @@ CK_OBJECT_HANDLE save_object( CK_ATTRIBUTE_PTR pxLabel,
 			object_handle = DevicePrivateKey;
 		}
 		else if( 0 == memcmp( pxLabel->pValue,
-							  &pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
-							  sizeof( pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
+							  &LABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
+							  sizeof( LABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
 		{
-			if (upload_public_key(pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
+			if (upload_public_key(LABEL_DEVICE_PUBLIC_KEY_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
 			{
 					object_handle = DevicePublicKey;
 			}
 		}
 		else if( 0 == memcmp( pxLabel->pValue,
-							  &pkcs11configLABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS,
-							  sizeof( pkcs11configLABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS ) ) )
+							  &LABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS,
+							  sizeof( LABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS ) ) )
 		{
-			if (upload_public_key(pkcs11configLABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
+			if (upload_public_key(LABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
 			{
 					object_handle = DevicePublicKey;
 			}
 		}
 
 		else if( 0 == memcmp( pxLabel->pValue,
-							  &pkcs11configLABEL_CODE_VERIFICATION_KEY,
-							  sizeof( pkcs11configLABEL_CODE_VERIFICATION_KEY ) ) )
+							  &LABEL_CODE_VERIFICATION_KEY,
+							  sizeof( LABEL_CODE_VERIFICATION_KEY ) ) )
 		{
 			/**
 			 * Write a Code Verification Key/Certificate to an Trust Anchor data object
@@ -1232,7 +1247,7 @@ CK_OBJECT_HANDLE save_object( CK_ATTRIBUTE_PTR pxLabel,
 			 * Use Erase and Write (OPTIGA_UTIL_ERASE_AND_WRITE) option,
 			 * to clear the remaining data in the object
 			 */
-			lOptigaOid = strtol(pkcs11configLABEL_CODE_VERIFICATION_KEY, &xEnd, 16);
+			lOptigaOid = strtol(LABEL_CODE_VERIFICATION_KEY, &xEnd, 16);
 
 			if ( (0 != lOptigaOid) && (USHRT_MAX > lOptigaOid) && (USHRT_MAX > ulDataSize))
 			{
@@ -1288,7 +1303,7 @@ CK_RV destroy_object( CK_OBJECT_HANDLE xAppHandle )
 
 	if( pcLabel != NULL )
 	{
-		if( (0 == memcmp( pcLabel, pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS, xLabelLength )))
+		if( (0 == memcmp( pcLabel, LABEL_DEVICE_PRIVATE_KEY_FOR_TLS, xLabelLength )))
 		{
 			find_object_in_list_by_label( ( uint8_t * ) pcLabel, strlen( ( char * ) pcLabel ), &xPalHandle, &xAppHandle2 );
 
@@ -1338,17 +1353,17 @@ CK_RV destroy_object( CK_OBJECT_HANDLE xAppHandle )
 		}
 		else
 		{
-			if( 0 == memcmp( pcLabel, pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS, xLabelLength ) )
+			if( 0 == memcmp( pcLabel, LABEL_DEVICE_PUBLIC_KEY_FOR_TLS, xLabelLength ) )
 			{
-				pcTempLabel = pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
+				pcTempLabel = LABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
 			}
-			else if( 0 == memcmp( pcLabel, pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS, xLabelLength ) )
+			else if( 0 == memcmp( pcLabel, LABEL_DEVICE_CERTIFICATE_FOR_TLS, xLabelLength ) )
 			{
-				pcTempLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
+				pcTempLabel = LABEL_DEVICE_CERTIFICATE_FOR_TLS;
 			}
-			else if( 0 == memcmp( pcLabel, pkcs11configLABEL_CODE_VERIFICATION_KEY, xLabelLength ) )
+			else if( 0 == memcmp( pcLabel, LABEL_CODE_VERIFICATION_KEY, xLabelLength ) )
 			{
-				pcTempLabel = pkcs11configLABEL_CODE_VERIFICATION_KEY;
+				pcTempLabel = LABEL_CODE_VERIFICATION_KEY;
 			}
 
 			if (pcTempLabel != NULL)
@@ -1450,7 +1465,7 @@ CK_RV create_certificate( CK_ATTRIBUTE_PTR pxTemplate,
 
             case ( CKA_LABEL ):
 
-                if( xAttribute.ulValueLen < pkcs11configMAX_LABEL_LENGTH )
+                if( xAttribute.ulValueLen < MAX_LABEL_LENGTH )
                 {
                     pxLabel = &pxTemplate[ ulIndex ];
                 }
@@ -1583,7 +1598,7 @@ CK_RV create_ec_public_key( uint8_t* pxPublicKey,
 
             case ( CKA_LABEL ):
 
-                if( xAttribute.ulValueLen < pkcs11configMAX_LABEL_LENGTH )
+                if( xAttribute.ulValueLen < MAX_LABEL_LENGTH )
                 {
                     *ppxLabel = &pxTemplate[ ulIndex ];
                 }
@@ -1842,9 +1857,9 @@ CK_DEFINE_FUNCTION( CK_RV, C_Finalize )( CK_VOID_PTR pvReserved )
 
 		if( xResult == CKR_OK )
 		{
-
+#ifdef __linux__
 			sem_destroy( &pkcs11_context.object_list.semaphore );
-
+#endif
 			pkcs11_context.is_initialized = CK_FALSE;
 		}
 		pal_gpio_deinit(&optiga_reset_0);
@@ -4315,3 +4330,5 @@ CK_DEFINE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE xSession,
 	}while(0);
     return xResult;
 }
+
+
