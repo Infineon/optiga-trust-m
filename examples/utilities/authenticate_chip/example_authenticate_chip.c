@@ -38,6 +38,7 @@
 #include "optiga/optiga_crypt.h"
 #include "optiga/optiga_util.h"
 #include "optiga/common/optiga_lib_common.h"
+#include "optiga/pal/pal_os_memory.h"
 #include "pal_crypt.h"
 
 /*************************************************************************
@@ -62,7 +63,7 @@
 #define LENGTH_SHA256			    32
 
 ///size of end entity certificate of OPTIGA™ Trust M
-#define LENGTH_OPTIGA_CERT          700
+#define LENGTH_OPTIGA_CERT          840
 
 #define MODULE_ENABLE_ONE_WAY_AUTH
 
@@ -246,12 +247,9 @@ optiga_lib_status_t read_chip_cert(uint16_t cert_oid,
 		                                   uint8_t* p_cert, uint16_t* p_cert_size)
 {
 	int32_t status  = (int32_t)OPTIGA_DEVICE_ERROR;
-	uint8_t tmp_cert[LENGTH_OPTIGA_CERT];
-	uint8_t* p_tmp_cert_pointer = tmp_cert;
 
 	configPRINTF((">read_chip_cert()\r\n"));
 
-	memset(tmp_cert, 0, LENGTH_OPTIGA_CERT);
 	do
 	{
 		// Sanity check
@@ -260,11 +258,10 @@ optiga_lib_status_t read_chip_cert(uint16_t cert_oid,
 		{
 			break;
 		}
-
 		open_app_status = OPTIGA_LIB_BUSY;
 
 		//Read end-entity device certificate
-		status = optiga_util_read_data((optiga_util_t *)util_handler, cert_oid, 0, p_tmp_cert_pointer, p_cert_size);
+		status = optiga_util_read_data((optiga_util_t *)util_handler, cert_oid, 0, p_cert, p_cert_size);
 		if(OPTIGA_LIB_SUCCESS != status)
 		{
 			configPRINTF(("Error: optiga_util_read_data error status=0x%x\r\n", status));
@@ -277,7 +274,7 @@ optiga_lib_status_t read_chip_cert(uint16_t cert_oid,
         }
 
 		// Refer to the Solution Reference Manual (SRM) v1.35 Table 30. Certificate Types
-		switch (p_tmp_cert_pointer[0])
+		switch (p_cert[0])
 		{
 		/* One-Way Authentication Identity. Certificate DER coded The first byte
 		*  of the DER encoded certificate is 0x30 and is used as Tag to differentiate
@@ -294,9 +291,9 @@ optiga_lib_status_t read_chip_cert(uint16_t cert_oid,
 			/* There might be a certificate chain encoded.
 			 * For this example we will consider only one certificate in the chain
 			 */
-			p_tmp_cert_pointer = p_tmp_cert_pointer + 9;
+			
 			*p_cert_size = *p_cert_size - 9;
-			memcpy(p_cert, p_tmp_cert_pointer, *p_cert_size);
+			memcpy(p_cert, p_cert + 9, *p_cert_size);
 			status = OPTIGA_LIB_SUCCESS;
 			break;
 		/* USB Type-C identity
@@ -418,7 +415,7 @@ static optiga_lib_status_t Send_Challenge_Get_Response(uint8_t* p_pubkey, uint16
 #endif
         configPRINTF(("Sign hash using Private Key\r\n"));
 #else//Fixed Challenge
-        memset(digest, 0x0, LENGTH_SHA256);
+        memset(digest, 0x00, LENGTH_SHA256);
         for(int i=0; i<LENGTH_SHA256;)
         {
         	configPRINTF(("%.2x %.2x %.2x %.2x %.2x %.2x %.2x %.2x \r\n", digest[i],digest[i+1],digest[i+2],digest[i+3],

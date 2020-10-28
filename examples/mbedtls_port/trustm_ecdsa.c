@@ -209,7 +209,7 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
 		public_key.key_type = OPTIGA_ECC_CURVE_BRAIN_POOL_P_384R1;
 		truncated_hash_length = 48;
 	}
-	else
+	else if(grp->id == MBEDTLS_ECP_DP_BP512R1)
 	{
 		public_key.key_type = OPTIGA_ECC_CURVE_BRAIN_POOL_P_512R1;
 		truncated_hash_length = 64;
@@ -361,7 +361,7 @@ int mbedtls_ecdsa_genkey( mbedtls_ecdsa_context *ctx, mbedtls_ecp_group_id gid,
 	{
 		curve_id = OPTIGA_ECC_CURVE_BRAIN_POOL_P_384R1;
 	}
-	else
+	else if(grp->id == MBEDTLS_ECP_DP_BP512R1)
 	{
 		curve_id = OPTIGA_ECC_CURVE_BRAIN_POOL_P_512R1;
 	}

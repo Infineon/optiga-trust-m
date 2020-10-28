@@ -208,6 +208,11 @@ static int mbedtls_rsa_get_sig_scheme_digest_len(mbedtls_md_type_t md_alg,
             sig_scheme = OPTIGA_RSASSA_PKCS1_V15_SHA384;
             digest_len = 48;
         }
+        else if (MBEDTLS_MD_SHA512 == md_alg)
+		{
+			sig_scheme = OPTIGA_RSASSA_PKCS1_V15_SHA512;
+			digest_len = 64;
+		}
         else
         {
             return_status = MBEDTLS_ERR_RSA_BAD_INPUT_DATA;
