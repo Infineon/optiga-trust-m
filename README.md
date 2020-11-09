@@ -1,4 +1,4 @@
-# OPTIGA&trade; Trust M V3 Software Framework
+# OPTIGA&trade; Trust M Software Framework
 
 ## Quick navigation
 
@@ -183,8 +183,6 @@ External links, open in the same tab.
   <summary> S2Go Security OPTIGA M Schematic</summary>
   <img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_shield2go_schematics.png" alt="drawing"/>
   </details>
-* [XMC1400 OPTIGA™ Trust M Connectivity Kit](link is pending)
-* [OPTIGA™ Trust M Feather Wing™](link is pending)
 
 ## <a name="documentation"></a>Documentation
 
