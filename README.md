@@ -39,93 +39,79 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
   <tr>
     <th class="tg-fymr">Features</th>
     <th class="tg-fymr">Supported Curve/Algorithm</th>
-    <th class="tg-fymr">API Command</th>
     <th class="tg-fymr">V1</th>
     <th class="tg-fymr">V3</th>
   </tr>
   <tr>
     <td class="tg-c3ow" rowspan="2">ECC</td>
     <td class="tg-0pky">ECC NIST P256/384 </td>
-    <td class="tg-0pky"  rowspan="2" ><a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_ecc_generate_keypair">optiga_crypt_ecc_generate_keypair</a>, <a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_ecdsa_sign">optiga_crypt_ecdsa_sign</a>, <a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_ecdsa_verify">optiga_crypt_ecdsa_verify</a> </td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-0pky">ECC NIST P521, ECC Brainpool P256/384/512 r1</td>
-    <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">RSA</td>
     <td class="tg-0pky">RSA® 1024/2048 </td>
-    <td class="tg-0pky" ><a href="github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_rsa_generate_keypair">optiga_crypt_rsa_generate_keypair</a>, <a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_rsa_sign">optiga_crypt_rsa_sign</a>, <a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API#optiga_crypt_rsa_verify">optiga_crypt_rsa_verify</a></td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow" rowspan="3">Key Derivation</td>
     <td class="tg-0pky">TLS v1.2 PRF SHA 256 </td>
-    <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-0pky">TLS v1.2 PRF SHA 384/512 </td>
-    <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-0pky">HKDF SHA-256/384/512  </td>
-    <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">AES</td>
     <td class="tg-0pky">Key size - 128/192/256 (ECB, CBC, CBC-MAC, CMAC)</td>
-    <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">Random Generation</td>
     <td class="tg-0pky">TRNG, DRNG, Pre-Master secret for RSA® Key exchange</td>
-    <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">HMAC</td>
     <td class="tg-0pky">HMAC with SHA256/384/512 </td>
-    <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">Hash </td>
     <td class="tg-0pky">SHA256 </td>
-    <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow" rowspan="2">Protected data (object) update (Integrity)</td>
     <td class="tg-0pky">ECC NIST P256/384</br>RSA® 1024/2048 </br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing </td>
-    <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">ECC NIST P521,</br>ECC Brainpool P256/384/512 r1</br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing</td>
-    <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
     <td class="tg-c3ow">Protected Data/key/metadata update (Integrity and/or confidentiality)</td>
     <td class="tg-0pky">ECC NIST P256/384/521</br>ECC Brainpool P256/384/512 r1</br>RSA® 1024/2048</br>Signature scheme as ECDSA FIPS 186-3/RSA SSA PKCS#1 v1.5 without hashing</td>
-    <td class="tg-0pky"></td>
     <td class="tg-0pky"> </td>
     <td class="tg-0pky">✓</td>
   </tr>
