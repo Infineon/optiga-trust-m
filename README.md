@@ -50,6 +50,7 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
   </tr>
   <tr>
     <td class="tg-0pky">ECC NIST P521, ECC Brainpool P256/384/512 r1</td>
+    <td class="tg-0pky"></td>
     <td class="tg-0pky">✓</td>
   </tr>
   <tr>
