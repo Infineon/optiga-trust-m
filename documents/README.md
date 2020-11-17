@@ -1,4 +1,4 @@
-# Which document do I need?
+# What document do I need?
 
 * **Infineon_I2C_Protocol_vX.XX.pdf** - Infineon I2C protocol specification. In this document you can find all information related to the communication protocol between a Host MCU and the Secure Element, for instance how shielded connection works.
 * **License.pdf** - MIT License
