@@ -66,19 +66,19 @@
 
 #define MAX_PUBLIC_KEY_SIZE           100
 
-#define MAX_DELAY 					  50
+#define MAX_DELAY                       50
 // Value of Operational state
-#define LCSO_STATE_CREATION       	(0x01)
+#define LCSO_STATE_CREATION           (0x01)
 // Value of Operational state
 #define LCSO_STATE_OPERATIONAL      (0x07)
 
-#define PKCS_ENCRYPT_ENABLE			(1 << 0)	
+#define PKCS_ENCRYPT_ENABLE            (1 << 0)    
 
-#define PKCS_DECRYPT_ENABLE			(1 << 1)
+#define PKCS_DECRYPT_ENABLE            (1 << 1)
 
-#define PKCS_SIGN_ENABLE			(1 << 2)
+#define PKCS_SIGN_ENABLE            (1 << 2)
 
-#define PKCS_VERIFY_ENABLE			(1 << 3)
+#define PKCS_VERIFY_ENABLE            (1 << 3)
 
 //Currently set to Creation state(defualt value). At the real time/customer side this needs to be LCSO_STATE_OPERATIONAL (0x07)
 #define FINAL_LCSO_STATE          (LCSO_STATE_CREATION)
@@ -97,7 +97,7 @@ typedef struct pkcs11_object_list
 #ifdef __linux__
     sem_t semaphore; /* Semaphore that protects write operations to the objects array. */
 #else
-	//Platform specific semaphore vriables 
+    //Platform specific semaphore vriables 
 #endif
     struct timespec timeout;
     optiga_crypt_t* optiga_crypt_instance;
@@ -144,12 +144,12 @@ typedef struct pkcs11_session
     CK_BBOOL encrypt_init_done;
     CK_BBOOL decrypt_init_done;
     optiga_sha256_ctx_t sha256_ctx;
-	CK_ULONG rsa_key_size;
-	CK_ULONG ec_key_size;
-	optiga_ecc_curve_t ec_key_type;
-	uint16_t encryption_key_oid;
-	uint16_t decryption_key_oid;
-	uint8_t key_template_enabled;
+    CK_ULONG rsa_key_size;
+    CK_ULONG ec_key_size;
+    optiga_ecc_curve_t ec_key_type;
+    uint16_t encryption_key_oid;
+    uint16_t decryption_key_oid;
+    uint8_t key_template_enabled;
 } pkcs11_session_t, * p_pkcs11_session_t;
 
 pal_os_lock_t optiga_mutex;
@@ -177,24 +177,24 @@ pal_os_lock_t optiga_mutex;
 
 enum eObjectHandles
 {
-	eInvalidHandle = 0, /* According to PKCS #11 spec, 0 is never a valid object handle. */
-	DevicePrivateKey,
-	TestPrivateKey,
-	DevicePublicKey,
-	TestPublicKey,
-	DeviceCertificate,
-	TestCertificate,
-	CodeSigningKey
+    eInvalidHandle = 0, /* According to PKCS #11 spec, 0 is never a valid object handle. */
+    DevicePrivateKey,
+    TestPrivateKey,
+    DevicePublicKey,
+    TestPublicKey,
+    DeviceCertificate,
+    TestCertificate,
+    CodeSigningKey
 };
 
 //lint --e{818} suppress "argument "context" is not used in the sample provided"
 static void optiga_callback(void * pvContext, optiga_lib_status_t xReturnStatus)
 {
-	optiga_lib_status_t * xInstanceStatus = (optiga_lib_status_t *)pvContext;
+    optiga_lib_status_t * xInstanceStatus = (optiga_lib_status_t *)pvContext;
 
     if (NULL != xInstanceStatus)
     {
-    	*xInstanceStatus = xReturnStatus;
+        *xInstanceStatus = xReturnStatus;
     }
 }
 
@@ -294,60 +294,60 @@ long get_object_value( CK_OBJECT_HANDLE object_handle,
     if (NULL != *ppucData)
     {
         *pulDataSize = pkcs11OBJECT_CERTIFICATE_MAX_SIZE;
-		*pIsPrivate = CK_FALSE;
-	
-		switch (object_handle) 
-		{
-			case DeviceCertificate:
-				lOptigaOid = strtol(LABEL_DEVICE_CERTIFICATE_FOR_TLS, &xEnd, 16);
-				xOffset = 9;
-				break;
-			case DevicePublicKey:
-				lOptigaOid = strtol(LABEL_DEVICE_PUBLIC_KEY_FOR_TLS, &xEnd, 16);
-				break;
+        *pIsPrivate = CK_FALSE;
+    
+        switch (object_handle) 
+        {
+            case DeviceCertificate:
+                lOptigaOid = strtol(LABEL_DEVICE_CERTIFICATE_FOR_TLS, &xEnd, 16);
+                xOffset = 9;
+                break;
+            case DevicePublicKey:
+                lOptigaOid = strtol(LABEL_DEVICE_PUBLIC_KEY_FOR_TLS, &xEnd, 16);
+                break;
 
-			case CodeSigningKey:
-				lOptigaOid = strtol(LABEL_CODE_VERIFICATION_KEY, &xEnd, 16);
-				break;
-			case DevicePrivateKey:
-				/*
-				 * This operation isn't supported for the OPTIGA(TM) Trust M due to a security considerations
-				 * You can only generate a keypair and export a private component if you like
-				 */
-			default:
-				ulReturn = CKR_KEY_HANDLE_INVALID;
-				break;
-		}
+            case CodeSigningKey:
+                lOptigaOid = strtol(LABEL_CODE_VERIFICATION_KEY, &xEnd, 16);
+                break;
+            case DevicePrivateKey:
+                /*
+                 * This operation isn't supported for the OPTIGA(TM) Trust M due to a security considerations
+                 * You can only generate a keypair and export a private component if you like
+                 */
+            default:
+                ulReturn = CKR_KEY_HANDLE_INVALID;
+                break;
+        }
 
         if ( (0 != lOptigaOid) && (USHRT_MAX > lOptigaOid) && (NULL != pulDataSize))
         {
-        	pal_os_lock_acquire(&optiga_mutex);
+            pal_os_lock_acquire(&optiga_mutex);
 
-        	pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-			xReturn = optiga_util_read_data(pkcs11_context.object_list.optiga_util_instance, lOptigaOid, xOffset, *ppucData, (uint16_t*)pulDataSize);
+            pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+            xReturn = optiga_util_read_data(pkcs11_context.object_list.optiga_util_instance, lOptigaOid, xOffset, *ppucData, (uint16_t*)pulDataSize);
 
-			if (OPTIGA_LIB_SUCCESS == xReturn)
-			{
-				while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-				{
-				
-				}
+            if (OPTIGA_LIB_SUCCESS == xReturn)
+            {
+                while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+                {
+                
+                }
 
-				// In case the read was ok, but no data inside
-				if (0x8008 == pkcs11_context.object_list.optiga_lib_status)
-				{
-					*ppucData = NULL;
-					*pulDataSize = 0;
-				}
-				else if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-				{
-					*ppucData = NULL;
-					*pulDataSize = 0;
-					ulReturn = CKR_KEY_HANDLE_INVALID;
-				}
-			}
+                // In case the read was ok, but no data inside
+                if (0x8008 == pkcs11_context.object_list.optiga_lib_status)
+                {
+                    *ppucData = NULL;
+                    *pulDataSize = 0;
+                }
+                else if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+                {
+                    *ppucData = NULL;
+                    *pulDataSize = 0;
+                    ulReturn = CKR_KEY_HANDLE_INVALID;
+                }
+            }
 
-			pal_os_lock_release(&optiga_mutex);
+            pal_os_lock_release(&optiga_mutex);
         }
     }
 
@@ -474,33 +474,33 @@ CK_RV pair_host_and_optiga_using_pre_shared_secret(void)
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     pal_status_t pal_return_status;
 
-	
-	/* Platform Binding Shared Secret (0xE140) Metadata to be updated */
-	
-	const uint8_t platform_binding_shared_secret_metadata_final [] = {
-		//Metadata to be updated
-		0x20, 0x17,
-			// LcsO
-			0xC0, 0x01,
-						FINAL_LCSO_STATE,		// Refer Macro to see the value or some more notes
-			// Change/Write Access tag
-			0xD0, 0x07,
-						// This allows updating the binding secret during the runtime using shielded connection
-						// If not required to update the secret over the runtime, set this to NEV and
-						// update Metadata length accordingly
-						0xE1, 0xFC, LCSO_STATE_OPERATIONAL,   // LcsO < Operational state
-						0xFE,
-						0x20, 0xE1, 0x40,
-			// Read Access tag
-			0xD1, 0x03,
-						0xE1, 0xFC, LCSO_STATE_OPERATIONAL,   // LcsO < Operational state
-			// Execute Access tag
-			0xD3, 0x01,
-						0x00,	// Always
-			// Data object Type
-			0xE8, 0x01,
-						0x22,	// Platform binding secret type
-	};
+    
+    /* Platform Binding Shared Secret (0xE140) Metadata to be updated */
+    
+    const uint8_t platform_binding_shared_secret_metadata_final [] = {
+        //Metadata to be updated
+        0x20, 0x17,
+            // LcsO
+            0xC0, 0x01,
+                        FINAL_LCSO_STATE,        // Refer Macro to see the value or some more notes
+            // Change/Write Access tag
+            0xD0, 0x07,
+                        // This allows updating the binding secret during the runtime using shielded connection
+                        // If not required to update the secret over the runtime, set this to NEV and
+                        // update Metadata length accordingly
+                        0xE1, 0xFC, LCSO_STATE_OPERATIONAL,   // LcsO < Operational state
+                        0xFE,
+                        0x20, 0xE1, 0x40,
+            // Read Access tag
+            0xD1, 0x03,
+                        0xE1, 0xFC, LCSO_STATE_OPERATIONAL,   // LcsO < Operational state
+            // Execute Access tag
+            0xD3, 0x01,
+                        0x00,    // Always
+            // Data object Type
+            0xE8, 0x01,
+                        0x22,    // Platform binding secret type
+    };
 
     do
     {
@@ -526,20 +526,20 @@ CK_RV pair_host_and_optiga_using_pre_shared_secret(void)
                                                   platform_binding_secret_metadata,
                                                   &bytes_to_read);
 
-		if (OPTIGA_LIB_SUCCESS != return_status)
-		{
-			return_status = CKR_FUNCTION_FAILED;
-			break;
-		}
-		while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
-		{
-			
-		}
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
-			return_status = CKR_FUNCTION_FAILED;
-			break;
-		}
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            return_status = CKR_FUNCTION_FAILED;
+            break;
+        }
+        while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
+        {
+            
+        }
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
+            return_status = CKR_FUNCTION_FAILED;
+            break;
+        }
 
 
         /**
@@ -567,20 +567,20 @@ CK_RV pair_host_and_optiga_using_pre_shared_secret(void)
                                             OPTIGA_RNG_TYPE_TRNG,
                                             platform_binding_secret,
                                             sizeof(platform_binding_secret));
-		if (OPTIGA_LIB_SUCCESS != return_status)
-		{
-			return_status = CKR_FUNCTION_FAILED;
-			break;
-		}
-		while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
-		{
-			
-		}
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
-			return_status = CKR_FUNCTION_FAILED;
-			break;
-		}
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            return_status = CKR_FUNCTION_FAILED;
+            break;
+        }
+        while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
+        {
+            
+        }
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
+            return_status = CKR_FUNCTION_FAILED;
+            break;
+        }
 
 
         /**
@@ -600,20 +600,20 @@ CK_RV pair_host_and_optiga_using_pre_shared_secret(void)
                                                0,
                                                platform_binding_secret,
                                                sizeof(platform_binding_secret));
-		if (OPTIGA_LIB_SUCCESS != return_status)
-		{
-			return_status = CKR_FUNCTION_FAILED;
-			break;
-		}
-		while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
-		{
-			
-		}
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
-			return_status = CKR_FUNCTION_FAILED;
-			break;
-		}
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            return_status = CKR_FUNCTION_FAILED;
+            break;
+        }
+        while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
+        {
+            
+        }
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
+            return_status = CKR_FUNCTION_FAILED;
+            break;
+        }
 
 
         /**
@@ -640,129 +640,129 @@ CK_RV pair_host_and_optiga_using_pre_shared_secret(void)
                                                    platform_binding_shared_secret_metadata_final,
                                                    sizeof(platform_binding_shared_secret_metadata_final));
 
-    	if (OPTIGA_LIB_SUCCESS != return_status)
-		{
-			return_status = CKR_FUNCTION_FAILED;
-			break;
-		}
-		while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
-		{
-			
-		};
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
-			return_status = CKR_FUNCTION_FAILED;
-			break;
-		}
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            return_status = CKR_FUNCTION_FAILED;
+            break;
+        }
+        while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
+        {
+            
+        };
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
+            return_status = CKR_FUNCTION_FAILED;
+            break;
+        }
 
         return_status = OPTIGA_LIB_SUCCESS;
 
     } while(FALSE);
 
-	return (CK_RV)return_status;
+    return (CK_RV)return_status;
 }
 
 CK_RV optiga_trustm_initialize( void )
 {
     CK_RV xResult = CKR_OK;
     uint16_t dOptigaOID;
-	static uint8_t host_pair_done = 1;
-	do
-	{
-	    if( pkcs11_context.is_initialized == CK_TRUE )
-	    {
-	        xResult = CKR_CRYPTOKI_ALREADY_INITIALIZED;
-	    }
-	    if( xResult == CKR_OK )
-	    {
-	        memset( &pkcs11_context, 0, sizeof( pkcs11_context ) );
-	    	#ifdef __linux__
-	    	xResult = sem_init(&pkcs11_context.object_list.semaphore , 0, 1);
-			#else
-			//Platform specific semaphore implementation
-			#endif
-			if( xResult != CKR_OK )
-			{
-				break;
-			}
-			pal_gpio_init(&optiga_reset_0);
-			pal_gpio_init(&optiga_vdd_0);
-			pkcs11_context.object_list.timeout.tv_sec = 0;
-			pkcs11_context.object_list.timeout.tv_nsec = 0xffff;
+    static uint8_t host_pair_done = 1;
+    do
+    {
+        if( pkcs11_context.is_initialized == CK_TRUE )
+        {
+            xResult = CKR_CRYPTOKI_ALREADY_INITIALIZED;
+        }
+        if( xResult == CKR_OK )
+        {
+            memset( &pkcs11_context, 0, sizeof( pkcs11_context ) );
+            #ifdef __linux__
+            xResult = sem_init(&pkcs11_context.object_list.semaphore , 0, 1);
+            #else
+            //Platform specific semaphore implementation
+            #endif
+            if( xResult != CKR_OK )
+            {
+                break;
+            }
+            pal_gpio_init(&optiga_reset_0);
+            pal_gpio_init(&optiga_vdd_0);
+            pkcs11_context.object_list.timeout.tv_sec = 0;
+            pkcs11_context.object_list.timeout.tv_nsec = 0xffff;
 
-	        pkcs11_context.object_list.optiga_crypt_instance =
-	        		optiga_crypt_create(0, optiga_callback, &pkcs11_context.object_list.optiga_lib_status);
+            pkcs11_context.object_list.optiga_crypt_instance =
+                    optiga_crypt_create(0, optiga_callback, &pkcs11_context.object_list.optiga_lib_status);
 
-	        pkcs11_context.object_list.optiga_util_instance =
-	        		optiga_util_create(0, optiga_callback, &pkcs11_context.object_list.optiga_lib_status);
+            pkcs11_context.object_list.optiga_util_instance =
+                    optiga_util_create(0, optiga_callback, &pkcs11_context.object_list.optiga_lib_status);
 
-			pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-			xResult = optiga_util_open_application(pkcs11_context.object_list.optiga_util_instance, 0);
+            pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+            xResult = optiga_util_open_application(pkcs11_context.object_list.optiga_util_instance, 0);
 
-			if (OPTIGA_LIB_SUCCESS != xResult)
-			{
-				xResult = CKR_FUNCTION_FAILED;
-				break;
-			}
-			while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
-			{
-				
-			}
+            if (OPTIGA_LIB_SUCCESS != xResult)
+            {
+                xResult = CKR_FUNCTION_FAILED;
+                break;
+            }
+            while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
+            {
+                
+            }
 
-			if ((NULL == pkcs11_context.object_list.optiga_crypt_instance) ||
-				(NULL == pkcs11_context.object_list.optiga_util_instance) ||
-				(OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status) ||
-				(CKR_FUNCTION_FAILED == xResult))
-			{
-				xResult = CKR_FUNCTION_FAILED;
-				break;
-			}
-			else
-			{
-				// Current limitation
-				dOptigaOID = 0xE0C4;
-				// Maximum Power, Minimum Current limitation
-				uint8_t cCurrentLimit = 15;
-				pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-				xResult = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
-												dOptigaOID, OPTIGA_UTIL_WRITE_ONLY,
-												0, //offset
-												&cCurrentLimit,
-												1);
+            if ((NULL == pkcs11_context.object_list.optiga_crypt_instance) ||
+                (NULL == pkcs11_context.object_list.optiga_util_instance) ||
+                (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status) ||
+                (CKR_FUNCTION_FAILED == xResult))
+            {
+                xResult = CKR_FUNCTION_FAILED;
+                break;
+            }
+            else
+            {
+                // Current limitation
+                dOptigaOID = 0xE0C4;
+                // Maximum Power, Minimum Current limitation
+                uint8_t cCurrentLimit = 15;
+                pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+                xResult = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
+                                                dOptigaOID, OPTIGA_UTIL_WRITE_ONLY,
+                                                0, //offset
+                                                &cCurrentLimit,
+                                                1);
 
-		        if (OPTIGA_LIB_SUCCESS != xResult)
-		        {
-		        	xResult = CKR_FUNCTION_FAILED;
-					break;
-		        }
+                if (OPTIGA_LIB_SUCCESS != xResult)
+                {
+                    xResult = CKR_FUNCTION_FAILED;
+                    break;
+                }
 
-		        while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-		        {
+                while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+                {
 
-		        }
+                }
 
-		        // Either by timout or because of success it should end up here
-		        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		        {
-		        	xResult = CKR_FUNCTION_FAILED;
-					break;
-		        }
-		        #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
-				if(host_pair_done)
-				{
-					xResult = pair_host_and_optiga_using_pre_shared_secret();
-					if (OPTIGA_LIB_SUCCESS != xResult)
-			        {
-			        	xResult = CKR_FUNCTION_FAILED;
-						break;
-			        }
-					host_pair_done = 0;
-				}
-				#endif
-			}
+                // Either by timout or because of success it should end up here
+                if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+                {
+                    xResult = CKR_FUNCTION_FAILED;
+                    break;
+                }
+                #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
+                if(host_pair_done)
+                {
+                    xResult = pair_host_and_optiga_using_pre_shared_secret();
+                    if (OPTIGA_LIB_SUCCESS != xResult)
+                    {
+                        xResult = CKR_FUNCTION_FAILED;
+                        break;
+                    }
+                    host_pair_done = 0;
+                }
+                #endif
+            }
 
-	    }
-	} while(0);
+        }
+    } while(0);
 
     return xResult;
 }
@@ -775,37 +775,37 @@ CK_RV optiga_trustm_deinitialize( void )
 
     if( pkcs11_context.is_initialized == CK_TRUE )
     {
-		do
-		{
-			if( xResult == CKR_OK )
-			{
-				pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-				xResult = optiga_util_close_application(pkcs11_context.object_list.optiga_util_instance, 0);
+        do
+        {
+            if( xResult == CKR_OK )
+            {
+                pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+                xResult = optiga_util_close_application(pkcs11_context.object_list.optiga_util_instance, 0);
 
-				if (OPTIGA_LIB_SUCCESS != xResult)
-				{
-					xResult = CKR_FUNCTION_FAILED;
-					break;
-				}
-				while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
-				{
-					
-				}
-				if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		        {
-		        	xResult = CKR_FUNCTION_FAILED;
-					break;
-		        }
-				//Destroy the instances after the completion of usecase			
-				xResult = optiga_crypt_destroy(pkcs11_context.object_list.optiga_crypt_instance);
-				xResult |= optiga_util_destroy(pkcs11_context.object_list.optiga_util_instance);
+                if (OPTIGA_LIB_SUCCESS != xResult)
+                {
+                    xResult = CKR_FUNCTION_FAILED;
+                    break;
+                }
+                while (pkcs11_context.object_list.optiga_lib_status == OPTIGA_LIB_BUSY)
+                {
+                    
+                }
+                if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+                {
+                    xResult = CKR_FUNCTION_FAILED;
+                    break;
+                }
+                //Destroy the instances after the completion of usecase            
+                xResult = optiga_crypt_destroy(pkcs11_context.object_list.optiga_crypt_instance);
+                xResult |= optiga_util_destroy(pkcs11_context.object_list.optiga_util_instance);
 
-				if(OPTIGA_LIB_SUCCESS != xResult)
-				{
-					xResult = CKR_FUNCTION_FAILED;
-				}
-			}
-		}while(0);
+                if(OPTIGA_LIB_SUCCESS != xResult)
+                {
+                    xResult = CKR_FUNCTION_FAILED;
+                }
+            }
+        }while(0);
     }
 
     return xResult;
@@ -883,7 +883,7 @@ CK_RV delete_object_from_list( CK_OBJECT_HANDLE xAppHandle )
     CK_RV xResult = CKR_OK;
     int32_t get_semaphore;
     int lIndex = xAppHandle - 1;
-#ifdef __linux__	
+#ifdef __linux__    
     get_semaphore = sem_timedwait( &pkcs11_context.object_list.semaphore, &pkcs11_context.object_list.timeout );
 #endif
     if( get_semaphore == 0 )
@@ -935,7 +935,7 @@ CK_RV add_object_to_list( CK_OBJECT_HANDLE xPalHandle,
             else if( pkcs11_context.object_list.objects[ lSearchIndex ].object_handle == CK_INVALID_HANDLE )
             {
 
-				lInsertIndex = lSearchIndex;
+                lInsertIndex = lSearchIndex;
             }
         }
 
@@ -969,473 +969,473 @@ CK_RV add_object_to_list( CK_OBJECT_HANDLE xPalHandle,
 
 
 static uint8_t append_optiga_certificate_tags (uint16_t xCertWithoutTagsLength, 
-										uint8_t* pxCertTags, uint16_t xCertTagsLength)
+                                        uint8_t* pxCertTags, uint16_t xCertTagsLength)
 {
-	char t1[3], t2[3], t3[3];
+    char t1[3], t2[3], t3[3];
 
-	int xCalc = xCertWithoutTagsLength,
-		xCalc1 = 0,
-		xCalc2 = 0;
+    int xCalc = xCertWithoutTagsLength,
+        xCalc1 = 0,
+        xCalc2 = 0;
 
-	uint8_t ret = 0;
-	do
-	{
-		if ((pxCertTags == NULL) || (xCertWithoutTagsLength == 0) ||
-			(xCertTagsLength != 9))
-		{
-			break;
-		}
+    uint8_t ret = 0;
+    do
+    {
+        if ((pxCertTags == NULL) || (xCertWithoutTagsLength == 0) ||
+            (xCertTagsLength != 9))
+        {
+            break;
+        }
 
-		if (xCalc > 0xFF)
-		{
-			xCalc1 = xCalc >> 8;
-			xCalc = xCalc%0x100;
-			if (xCalc1 > 0xFF)
-			{
-				xCalc2 = xCalc1 >> 8;
-				xCalc1 = xCalc1%0x100;
-			}
-		}
-		t3[0] = xCalc2;
-		t3[1] = xCalc1;
-		t3[2] = xCalc;
-		xCalc = xCertWithoutTagsLength + 3;
-		if (xCalc > 0xFF)
-		{
-			xCalc1 = xCalc >> 8;
-			xCalc = xCalc%0x100;
-			if (xCalc1 > 0xFF)
-			{
-				xCalc2 = xCalc1 >> 8;
-				xCalc1 = xCalc1%0x100;
-			}
-		}
-		t2[0] = xCalc2;
-		t2[1] = xCalc1;
-		t2[2] = xCalc;
-		xCalc = xCertWithoutTagsLength + 6;
-		if (xCalc > 0xFF)
-		{
-			xCalc1 = xCalc >> 8;
-			xCalc = xCalc%0x100;
-			if (xCalc1 > 0xFF)
-			{
-				xCalc2 = xCalc1 >> 8;
-				xCalc1 = xCalc1%0x100;
-			}
-		}
-		t1[0] = 0xC0;
-		t1[1] = xCalc1;
-		t1[2] = xCalc;
+        if (xCalc > 0xFF)
+        {
+            xCalc1 = xCalc >> 8;
+            xCalc = xCalc%0x100;
+            if (xCalc1 > 0xFF)
+            {
+                xCalc2 = xCalc1 >> 8;
+                xCalc1 = xCalc1%0x100;
+            }
+        }
+        t3[0] = xCalc2;
+        t3[1] = xCalc1;
+        t3[2] = xCalc;
+        xCalc = xCertWithoutTagsLength + 3;
+        if (xCalc > 0xFF)
+        {
+            xCalc1 = xCalc >> 8;
+            xCalc = xCalc%0x100;
+            if (xCalc1 > 0xFF)
+            {
+                xCalc2 = xCalc1 >> 8;
+                xCalc1 = xCalc1%0x100;
+            }
+        }
+        t2[0] = xCalc2;
+        t2[1] = xCalc1;
+        t2[2] = xCalc;
+        xCalc = xCertWithoutTagsLength + 6;
+        if (xCalc > 0xFF)
+        {
+            xCalc1 = xCalc >> 8;
+            xCalc = xCalc%0x100;
+            if (xCalc1 > 0xFF)
+            {
+                xCalc2 = xCalc1 >> 8;
+                xCalc1 = xCalc1%0x100;
+            }
+        }
+        t1[0] = 0xC0;
+        t1[1] = xCalc1;
+        t1[2] = xCalc;
 
-		for (int i = 0; i < 3; i++) {
-			pxCertTags[i] = t1[i];
-		}
-		for (int i = 0; i < 3; i++)
-		{
-			pxCertTags[i+3] = t2[i];
-		}
-		for (int i = 0; i < 3; i++) {
-			pxCertTags[i+6] = t3[i];
-		}
+        for (int i = 0; i < 3; i++) {
+            pxCertTags[i] = t1[i];
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            pxCertTags[i+3] = t2[i];
+        }
+        for (int i = 0; i < 3; i++) {
+            pxCertTags[i+6] = t3[i];
+        }
 
-		ret = 1;
+        ret = 1;
 
-	}while(0);
+    }while(0);
 
-	return ret;
+    return ret;
 }
 
 static int32_t upload_certificate(char * pucLabel, uint8_t * pucData, uint32_t ulDataSize)
 {
-	long	 lOptigaOid = 0;
-	const	 uint8_t xTagsLength = 9;
-	uint8_t  pxCertTags[xTagsLength];
-	optiga_lib_status_t xReturn = OPTIGA_UTIL_ERROR;
-	char*	 xEnd = NULL;
+    long     lOptigaOid = 0;
+    const     uint8_t xTagsLength = 9;
+    uint8_t  pxCertTags[xTagsLength];
+    optiga_lib_status_t xReturn = OPTIGA_UTIL_ERROR;
+    char*     xEnd = NULL;
 
-	/**
-	 * Write a certificate to a given cert object (e.g. E0E8)
-	 * using optiga_util_write_data.
-	 *
-	 * We do create here another instance, as the certificate slot is shared bz all isntances
-	 *
-	 * Use Erase and Write (OPTIGA_UTIL_ERASE_AND_WRITE) option,
-	 * to clear the remaining data in the object
-	 */
+    /**
+     * Write a certificate to a given cert object (e.g. E0E8)
+     * using optiga_util_write_data.
+     *
+     * We do create here another instance, as the certificate slot is shared bz all isntances
+     *
+     * Use Erase and Write (OPTIGA_UTIL_ERASE_AND_WRITE) option,
+     * to clear the remaining data in the object
+     */
 
-	lOptigaOid = strtol(pucLabel, &xEnd, 16);
+    lOptigaOid = strtol(pucLabel, &xEnd, 16);
 
-	if ( (0 != lOptigaOid) && (USHRT_MAX > lOptigaOid) && (USHRT_MAX > ulDataSize))
-	{
-		// Certificates on OPTIGA Trust SE are stored with certitficate identifiers -> tags,
-		// which are 9 bytes long
-		if (append_optiga_certificate_tags(ulDataSize, pxCertTags, xTagsLength))
-		{
-			pal_os_lock_acquire(&optiga_mutex);
+    if ( (0 != lOptigaOid) && (USHRT_MAX > lOptigaOid) && (USHRT_MAX > ulDataSize))
+    {
+        // Certificates on OPTIGA Trust SE are stored with certitficate identifiers -> tags,
+        // which are 9 bytes long
+        if (append_optiga_certificate_tags(ulDataSize, pxCertTags, xTagsLength))
+        {
+            pal_os_lock_acquire(&optiga_mutex);
 
-			pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-			xReturn = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
-											 (uint16_t)lOptigaOid,
-											 OPTIGA_UTIL_ERASE_AND_WRITE,
-											 0,
-											 pxCertTags,
-											 9);
+            pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+            xReturn = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
+                                             (uint16_t)lOptigaOid,
+                                             OPTIGA_UTIL_ERASE_AND_WRITE,
+                                             0,
+                                             pxCertTags,
+                                             9);
 
-			if (OPTIGA_LIB_SUCCESS == xReturn)
-			{
-				while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-				{
-					
-				}
+            if (OPTIGA_LIB_SUCCESS == xReturn)
+            {
+                while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+                {
+                    
+                }
 
-				if (OPTIGA_LIB_SUCCESS == pkcs11_context.object_list.optiga_lib_status)
-				{
-					pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-					xReturn = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
-													 (uint16_t)lOptigaOid,
-													 OPTIGA_UTIL_WRITE_ONLY,
-													 xTagsLength,
-													 pucData,
-													 ulDataSize);
+                if (OPTIGA_LIB_SUCCESS == pkcs11_context.object_list.optiga_lib_status)
+                {
+                    pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+                    xReturn = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
+                                                     (uint16_t)lOptigaOid,
+                                                     OPTIGA_UTIL_WRITE_ONLY,
+                                                     xTagsLength,
+                                                     pucData,
+                                                     ulDataSize);
 
-					if (OPTIGA_LIB_SUCCESS == xReturn)
-					{
-						while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-						{
-							
-						}
+                    if (OPTIGA_LIB_SUCCESS == xReturn)
+                    {
+                        while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+                        {
+                            
+                        }
 
-						if (OPTIGA_LIB_SUCCESS == pkcs11_context.object_list.optiga_lib_status)
-						{
-							xReturn = OPTIGA_LIB_SUCCESS;
-						}
-					}
-				}
-			}
+                        if (OPTIGA_LIB_SUCCESS == pkcs11_context.object_list.optiga_lib_status)
+                        {
+                            xReturn = OPTIGA_LIB_SUCCESS;
+                        }
+                    }
+                }
+            }
 
-			pal_os_lock_release(&optiga_mutex);
-		}
-	}
+            pal_os_lock_release(&optiga_mutex);
+        }
+    }
 
-	return xReturn;
+    return xReturn;
 }
 static int32_t upload_public_key(char * pucLabel, uint8_t * pucData, uint32_t ulDataSize)
 {
-	long	 lOptigaOid = 0;
-	optiga_lib_status_t xReturn = OPTIGA_UTIL_ERROR;;
-	char*	 xEnd = NULL;
+    long     lOptigaOid = 0;
+    optiga_lib_status_t xReturn = OPTIGA_UTIL_ERROR;;
+    char*     xEnd = NULL;
 
-	/**
-	 * Write a public key to an arbitrary data object
-	 * Note: You might need to lock the data object here. see optiga_util_write_metadata()
-	 *
-	 * Use Erase and Write (OPTIGA_UTIL_ERASE_AND_WRITE) option,
-	 * to clear the remaining data in the object
-	 */
-	lOptigaOid = strtol(pucLabel, &xEnd, 16);
+    /**
+     * Write a public key to an arbitrary data object
+     * Note: You might need to lock the data object here. see optiga_util_write_metadata()
+     *
+     * Use Erase and Write (OPTIGA_UTIL_ERASE_AND_WRITE) option,
+     * to clear the remaining data in the object
+     */
+    lOptigaOid = strtol(pucLabel, &xEnd, 16);
 
-	if ( (0 != lOptigaOid) && (USHRT_MAX >= lOptigaOid) && (USHRT_MAX >= ulDataSize))
-	{
-		pal_os_lock_acquire(&optiga_mutex);
+    if ( (0 != lOptigaOid) && (USHRT_MAX >= lOptigaOid) && (USHRT_MAX >= ulDataSize))
+    {
+        pal_os_lock_acquire(&optiga_mutex);
 
-		pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-		xReturn = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
-										 (uint16_t)lOptigaOid,
-										 OPTIGA_UTIL_ERASE_AND_WRITE,
-										 0,
-										 pucData,
-										 ulDataSize);
+        pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+        xReturn = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
+                                         (uint16_t)lOptigaOid,
+                                         OPTIGA_UTIL_ERASE_AND_WRITE,
+                                         0,
+                                         pucData,
+                                         ulDataSize);
 
-		if (OPTIGA_LIB_SUCCESS == xReturn)
-		{
-			while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-			{
-				
-			}
+        if (OPTIGA_LIB_SUCCESS == xReturn)
+        {
+            while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+            {
+                
+            }
 
-			if (OPTIGA_LIB_SUCCESS == pkcs11_context.object_list.optiga_lib_status)
-			{
-				xReturn = OPTIGA_LIB_SUCCESS;
-			}
-		}
+            if (OPTIGA_LIB_SUCCESS == pkcs11_context.object_list.optiga_lib_status)
+            {
+                xReturn = OPTIGA_LIB_SUCCESS;
+            }
+        }
 
-		pal_os_lock_release(&optiga_mutex);
+        pal_os_lock_release(&optiga_mutex);
 
-	}
+    }
 
-	return xReturn;
+    return xReturn;
 }
-	
+    
 
 /**
  * @brief Saves an object in non-volatile storage.
  *
  * Port-specific file write for cryptographic information.
  *
- * @param[in] pxLabel		The label of the object to be stored.
- * @param[in] pucData		The object data to be saved
- * @param[in] pulDataSize	Size (in bytes) of object data.
+ * @param[in] pxLabel        The label of the object to be stored.
+ * @param[in] pucData        The object data to be saved
+ * @param[in] pulDataSize    Size (in bytes) of object data.
  *
  * @return The object handle if successful.
  * eInvalidHandle = 0 if unsuccessful.
  */
 CK_OBJECT_HANDLE save_object( CK_ATTRIBUTE_PTR pxLabel,
-										uint8_t * pucData,
-										uint32_t ulDataSize )
+                                        uint8_t * pucData,
+                                        uint32_t ulDataSize )
 {
-	CK_OBJECT_HANDLE object_handle = eInvalidHandle;
+    CK_OBJECT_HANDLE object_handle = eInvalidHandle;
 
-	long	 lOptigaOid = 0;
-	uint8_t  bOffset = 0;
-	char*	 xEnd = NULL;
+    long     lOptigaOid = 0;
+    uint8_t  bOffset = 0;
+    char*     xEnd = NULL;
 
-	optiga_lib_status_t xReturn = OPTIGA_UTIL_ERROR;;
+    optiga_lib_status_t xReturn = OPTIGA_UTIL_ERROR;;
 
 
-	if( ulDataSize <= pkcs11OBJECT_CERTIFICATE_MAX_SIZE )
-	{
-		/* Translate from the PKCS#11 label to local storage file name. */
-		if( 0 == memcmp( pxLabel->pValue,
-						 &LABEL_DEVICE_CERTIFICATE_FOR_TLS,
-						 sizeof( LABEL_DEVICE_CERTIFICATE_FOR_TLS ) ) )
-		{
-			if ( upload_certificate(LABEL_DEVICE_CERTIFICATE_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
-			{
-				object_handle = DeviceCertificate;
-			}
-		}
-		else if( (0 == memcmp( pxLabel->pValue,
-							   &LABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
-							   sizeof( LABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) )) ||
-				 (0 == memcmp( pxLabel->pValue,
-							   &LABEL_DEVICE_RSA_PRIVATE_KEY_FOR_TLS,
-							   sizeof( LABEL_DEVICE_RSA_PRIVATE_KEY_FOR_TLS ) )))
-		{
-			/* This operation isn't supported for the OPTIGA(TM) Trust M due to a security considerations
-			 * You can only generate a keypair and export a private component if you like */
-			/* We do assign a handle though, as the AWS can#t handle the lables without having a handle*/
-			object_handle = DevicePrivateKey;
-		}
-		else if( 0 == memcmp( pxLabel->pValue,
-							  &LABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
-							  sizeof( LABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
-		{
-			if (upload_public_key(LABEL_DEVICE_PUBLIC_KEY_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
-			{
-					object_handle = DevicePublicKey;
-			}
-		}
-		else if( 0 == memcmp( pxLabel->pValue,
-							  &LABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS,
-							  sizeof( LABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS ) ) )
-		{
-			if (upload_public_key(LABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
-			{
-					object_handle = DevicePublicKey;
-			}
-		}
+    if( ulDataSize <= pkcs11OBJECT_CERTIFICATE_MAX_SIZE )
+    {
+        /* Translate from the PKCS#11 label to local storage file name. */
+        if( 0 == memcmp( pxLabel->pValue,
+                         &LABEL_DEVICE_CERTIFICATE_FOR_TLS,
+                         sizeof( LABEL_DEVICE_CERTIFICATE_FOR_TLS ) ) )
+        {
+            if ( upload_certificate(LABEL_DEVICE_CERTIFICATE_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
+            {
+                object_handle = DeviceCertificate;
+            }
+        }
+        else if( (0 == memcmp( pxLabel->pValue,
+                               &LABEL_DEVICE_PRIVATE_KEY_FOR_TLS,
+                               sizeof( LABEL_DEVICE_PRIVATE_KEY_FOR_TLS ) )) ||
+                 (0 == memcmp( pxLabel->pValue,
+                               &LABEL_DEVICE_RSA_PRIVATE_KEY_FOR_TLS,
+                               sizeof( LABEL_DEVICE_RSA_PRIVATE_KEY_FOR_TLS ) )))
+        {
+            /* This operation isn't supported for the OPTIGA(TM) Trust M due to a security considerations
+             * You can only generate a keypair and export a private component if you like */
+            /* We do assign a handle though, as the AWS can#t handle the lables without having a handle*/
+            object_handle = DevicePrivateKey;
+        }
+        else if( 0 == memcmp( pxLabel->pValue,
+                              &LABEL_DEVICE_PUBLIC_KEY_FOR_TLS,
+                              sizeof( LABEL_DEVICE_PUBLIC_KEY_FOR_TLS ) ) )
+        {
+            if (upload_public_key(LABEL_DEVICE_PUBLIC_KEY_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
+            {
+                    object_handle = DevicePublicKey;
+            }
+        }
+        else if( 0 == memcmp( pxLabel->pValue,
+                              &LABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS,
+                              sizeof( LABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS ) ) )
+        {
+            if (upload_public_key(LABEL_DEVICE_RSA_PUBLIC_KEY_FOR_TLS, pucData, ulDataSize) ==  OPTIGA_LIB_SUCCESS)
+            {
+                    object_handle = DevicePublicKey;
+            }
+        }
 
-		else if( 0 == memcmp( pxLabel->pValue,
-							  &LABEL_CODE_VERIFICATION_KEY,
-							  sizeof( LABEL_CODE_VERIFICATION_KEY ) ) )
-		{
-			/**
-			 * Write a Code Verification Key/Certificate to an Trust Anchor data object
-			 * Note: You might need to lock the data object here. see optiga_util_write_metadata()
-			 *
-			 * Use Erase and Write (OPTIGA_UTIL_ERASE_AND_WRITE) option,
-			 * to clear the remaining data in the object
-			 */
-			lOptigaOid = strtol(LABEL_CODE_VERIFICATION_KEY, &xEnd, 16);
+        else if( 0 == memcmp( pxLabel->pValue,
+                              &LABEL_CODE_VERIFICATION_KEY,
+                              sizeof( LABEL_CODE_VERIFICATION_KEY ) ) )
+        {
+            /**
+             * Write a Code Verification Key/Certificate to an Trust Anchor data object
+             * Note: You might need to lock the data object here. see optiga_util_write_metadata()
+             *
+             * Use Erase and Write (OPTIGA_UTIL_ERASE_AND_WRITE) option,
+             * to clear the remaining data in the object
+             */
+            lOptigaOid = strtol(LABEL_CODE_VERIFICATION_KEY, &xEnd, 16);
 
-			if ( (0 != lOptigaOid) && (USHRT_MAX > lOptigaOid) && (USHRT_MAX > ulDataSize))
-			{
-				pal_os_lock_acquire(&optiga_mutex);
+            if ( (0 != lOptigaOid) && (USHRT_MAX > lOptigaOid) && (USHRT_MAX > ulDataSize))
+            {
+                pal_os_lock_acquire(&optiga_mutex);
 
-				pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-				xReturn = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
-												 (uint16_t)lOptigaOid,
-												 OPTIGA_UTIL_ERASE_AND_WRITE,
-												 bOffset,
-												 pucData,
-												 ulDataSize);
+                pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+                xReturn = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
+                                                 (uint16_t)lOptigaOid,
+                                                 OPTIGA_UTIL_ERASE_AND_WRITE,
+                                                 bOffset,
+                                                 pucData,
+                                                 ulDataSize);
 
-				if (OPTIGA_LIB_SUCCESS == xReturn)
-				{
-					while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-					{
-						
-					}
+                if (OPTIGA_LIB_SUCCESS == xReturn)
+                {
+                    while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+                    {
+                        
+                    }
 
-					if (OPTIGA_LIB_SUCCESS == pkcs11_context.object_list.optiga_lib_status)
-					{
-						if (OPTIGA_LIB_SUCCESS == xReturn)
-							object_handle = CodeSigningKey;
-					}
-				}
+                    if (OPTIGA_LIB_SUCCESS == pkcs11_context.object_list.optiga_lib_status)
+                    {
+                        if (OPTIGA_LIB_SUCCESS == xReturn)
+                            object_handle = CodeSigningKey;
+                    }
+                }
 
-				pal_os_lock_release(&optiga_mutex);
-			}
-		}
+                pal_os_lock_release(&optiga_mutex);
+            }
+        }
 
-	}
+    }
 
-	return object_handle;
+    return object_handle;
 }
 
-	
+    
 CK_RV destroy_object( CK_OBJECT_HANDLE xAppHandle )
 {
-	uint8_t * pcLabel = NULL;
-	char * pcTempLabel = NULL;
-	size_t xLabelLength = 0;
-	uint32_t ulObjectLength = 0;
-	CK_RV xResult = CKR_OK;
-	CK_BBOOL xFreeMemory = CK_FALSE;
-	CK_BYTE_PTR pxObject = NULL;
-	CK_OBJECT_HANDLE xPalHandle;
-	CK_OBJECT_HANDLE xAppHandle2;
-	CK_LONG lOptigaOid = 0;
-	char* xEnd = NULL;
+    uint8_t * pcLabel = NULL;
+    char * pcTempLabel = NULL;
+    size_t xLabelLength = 0;
+    uint32_t ulObjectLength = 0;
+    CK_RV xResult = CKR_OK;
+    CK_BBOOL xFreeMemory = CK_FALSE;
+    CK_BYTE_PTR pxObject = NULL;
+    CK_OBJECT_HANDLE xPalHandle;
+    CK_OBJECT_HANDLE xAppHandle2;
+    CK_LONG lOptigaOid = 0;
+    char* xEnd = NULL;
 
-	find_object_in_list_by_handle( xAppHandle, &xPalHandle, &pcLabel, &xLabelLength );
+    find_object_in_list_by_handle( xAppHandle, &xPalHandle, &pcLabel, &xLabelLength );
 
-	if( pcLabel != NULL )
-	{
-		if( (0 == memcmp( pcLabel, LABEL_DEVICE_PRIVATE_KEY_FOR_TLS, xLabelLength )))
-		{
-			find_object_in_list_by_label( ( uint8_t * ) pcLabel, strlen( ( char * ) pcLabel ), &xPalHandle, &xAppHandle2 );
+    if( pcLabel != NULL )
+    {
+        if( (0 == memcmp( pcLabel, LABEL_DEVICE_PRIVATE_KEY_FOR_TLS, xLabelLength )))
+        {
+            find_object_in_list_by_label( ( uint8_t * ) pcLabel, strlen( ( char * ) pcLabel ), &xPalHandle, &xAppHandle2 );
 
-			if( xPalHandle != CK_INVALID_HANDLE )
-			{
-				xResult = delete_object_from_list( xAppHandle2 );
-			}
+            if( xPalHandle != CK_INVALID_HANDLE )
+            {
+                xResult = delete_object_from_list( xAppHandle2 );
+            }
 
-			lOptigaOid = strtol((const char *)pcLabel, &xEnd, 16);
+            lOptigaOid = strtol((const char *)pcLabel, &xEnd, 16);
 
-			CK_BYTE pucDumbData[68];
-			uint16_t ucDumbDataLength = 68;
+            CK_BYTE pucDumbData[68];
+            uint16_t ucDumbDataLength = 68;
 
-			pal_os_lock_acquire(&optiga_mutex);
+            pal_os_lock_acquire(&optiga_mutex);
 
-			pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-			xResult = optiga_crypt_ecc_generate_keypair(pkcs11_context.object_list.optiga_crypt_instance,
-														OPTIGA_ECC_CURVE_NIST_P_256,
-														(uint8_t)OPTIGA_KEY_USAGE_SIGN,
-														FALSE,
-														&lOptigaOid,
-														pucDumbData,
-														&ucDumbDataLength);
-			if (OPTIGA_LIB_SUCCESS != xResult)
-			{
-				PKCS11_PRINT( ( "ERROR: Failed to invalidate a keypair \r\n" ) );
-				xResult = CKR_FUNCTION_FAILED;
-			}
+            pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+            xResult = optiga_crypt_ecc_generate_keypair(pkcs11_context.object_list.optiga_crypt_instance,
+                                                        OPTIGA_ECC_CURVE_NIST_P_256,
+                                                        (uint8_t)OPTIGA_KEY_USAGE_SIGN,
+                                                        FALSE,
+                                                        &lOptigaOid,
+                                                        pucDumbData,
+                                                        &ucDumbDataLength);
+            if (OPTIGA_LIB_SUCCESS != xResult)
+            {
+                PKCS11_PRINT( ( "ERROR: Failed to invalidate a keypair \r\n" ) );
+                xResult = CKR_FUNCTION_FAILED;
+            }
 
-			if (OPTIGA_LIB_SUCCESS == xResult)
-			{
-				while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-				{
-					
-				}
+            if (OPTIGA_LIB_SUCCESS == xResult)
+            {
+                while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+                {
+                    
+                }
 
-				// Either by timout or because of success it should end up here
-				if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-				{
-					PKCS11_PRINT( ( "ERROR: Failed to invalidate a keypair \r\n" ) );
-					xResult = CKR_FUNCTION_FAILED;
-				}
-			}
+                // Either by timout or because of success it should end up here
+                if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+                {
+                    PKCS11_PRINT( ( "ERROR: Failed to invalidate a keypair \r\n" ) );
+                    xResult = CKR_FUNCTION_FAILED;
+                }
+            }
 
-			pal_os_lock_release(&optiga_mutex);
+            pal_os_lock_release(&optiga_mutex);
 
-		}
-		else
-		{
-			if( 0 == memcmp( pcLabel, LABEL_DEVICE_PUBLIC_KEY_FOR_TLS, xLabelLength ) )
-			{
-				pcTempLabel = LABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
-			}
-			else if( 0 == memcmp( pcLabel, LABEL_DEVICE_CERTIFICATE_FOR_TLS, xLabelLength ) )
-			{
-				pcTempLabel = LABEL_DEVICE_CERTIFICATE_FOR_TLS;
-			}
-			else if( 0 == memcmp( pcLabel, LABEL_CODE_VERIFICATION_KEY, xLabelLength ) )
-			{
-				pcTempLabel = LABEL_CODE_VERIFICATION_KEY;
-			}
+        }
+        else
+        {
+            if( 0 == memcmp( pcLabel, LABEL_DEVICE_PUBLIC_KEY_FOR_TLS, xLabelLength ) )
+            {
+                pcTempLabel = LABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
+            }
+            else if( 0 == memcmp( pcLabel, LABEL_DEVICE_CERTIFICATE_FOR_TLS, xLabelLength ) )
+            {
+                pcTempLabel = LABEL_DEVICE_CERTIFICATE_FOR_TLS;
+            }
+            else if( 0 == memcmp( pcLabel, LABEL_CODE_VERIFICATION_KEY, xLabelLength ) )
+            {
+                pcTempLabel = LABEL_CODE_VERIFICATION_KEY;
+            }
 
-			if (pcTempLabel != NULL)
-			{
-				lOptigaOid = strtol(pcTempLabel, &xEnd, 16);
+            if (pcTempLabel != NULL)
+            {
+                lOptigaOid = strtol(pcTempLabel, &xEnd, 16);
 
-				if ( (0 != lOptigaOid) && (USHRT_MAX >= lOptigaOid) )
-				{
+                if ( (0 != lOptigaOid) && (USHRT_MAX >= lOptigaOid) )
+                {
 
-					// Erase the object
-					CK_BYTE pucData[] = {0};
+                    // Erase the object
+                    CK_BYTE pucData[] = {0};
 
-					pal_os_lock_acquire(&optiga_mutex);
+                    pal_os_lock_acquire(&optiga_mutex);
 
-					pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-					xResult = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
-													 (uint16_t)lOptigaOid,
-													 OPTIGA_UTIL_ERASE_AND_WRITE,
-													 0, // Offset
-													 pucData,
-													 1);
+                    pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+                    xResult = optiga_util_write_data(pkcs11_context.object_list.optiga_util_instance,
+                                                     (uint16_t)lOptigaOid,
+                                                     OPTIGA_UTIL_ERASE_AND_WRITE,
+                                                     0, // Offset
+                                                     pucData,
+                                                     1);
 
-					if (OPTIGA_LIB_SUCCESS != xResult)
-					{
-						xResult = CKR_FUNCTION_FAILED;
-					}
+                    if (OPTIGA_LIB_SUCCESS != xResult)
+                    {
+                        xResult = CKR_FUNCTION_FAILED;
+                    }
 
-					if (OPTIGA_LIB_SUCCESS == xResult)
-					{
-						while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-						{
-							
-						}
+                    if (OPTIGA_LIB_SUCCESS == xResult)
+                    {
+                        while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+                        {
+                            
+                        }
 
-						// Either by timout or because of success it should end up here
-						if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-						{
-							xResult = CKR_FUNCTION_FAILED;
-						}
-						else
-						{
-							find_object_in_list_by_label( ( uint8_t * ) pcTempLabel, strlen( ( char * ) pcTempLabel ), &xPalHandle, &xAppHandle2 );
+                        // Either by timout or because of success it should end up here
+                        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+                        {
+                            xResult = CKR_FUNCTION_FAILED;
+                        }
+                        else
+                        {
+                            find_object_in_list_by_label( ( uint8_t * ) pcTempLabel, strlen( ( char * ) pcTempLabel ), &xPalHandle, &xAppHandle2 );
 
-							if( xPalHandle != CK_INVALID_HANDLE )
-							{
-								xResult = delete_object_from_list( xAppHandle2 );
-							}
-						}
-					}
+                            if( xPalHandle != CK_INVALID_HANDLE )
+                            {
+                                xResult = delete_object_from_list( xAppHandle2 );
+                            }
+                        }
+                    }
 
-					pal_os_lock_release(&optiga_mutex);
-				}
-			} else
-			{
-				xResult = CKR_KEY_HANDLE_INVALID;
-			}
-		}
+                    pal_os_lock_release(&optiga_mutex);
+                }
+            } else
+            {
+                xResult = CKR_KEY_HANDLE_INVALID;
+            }
+        }
 
-		if (xAppHandle2 != xAppHandle)
-			xResult = delete_object_from_list( xAppHandle );
-	}
-	else
-	{
-		xResult = CKR_KEY_HANDLE_INVALID;
-	}
+        if (xAppHandle2 != xAppHandle)
+            xResult = delete_object_from_list( xAppHandle );
+    }
+    else
+    {
+        xResult = CKR_KEY_HANDLE_INVALID;
+    }
 
-	if( xFreeMemory == CK_TRUE )
-	{
-		get_object_value_cleanup( pxObject, ulObjectLength );
-	}
+    if( xFreeMemory == CK_TRUE )
+    {
+        get_object_value_cleanup( pxObject, ulObjectLength );
+    }
 
-	return xResult;
+    return xResult;
 }
 
 CK_RV create_certificate( CK_ATTRIBUTE_PTR pxTemplate,
@@ -1728,7 +1728,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_CreateObject )( CK_SESSION_HANDLE xSession,
                                              CK_ULONG ulCount,
                                              CK_OBJECT_HANDLE_PTR pxObject )
 { 
-	/*lint !e9072 It's OK to have different parameter name. */
+    /*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     CK_OBJECT_CLASS xClass;
 
@@ -1798,7 +1798,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE xSession,
 
 CK_DEFINE_FUNCTION( CK_RV, C_Initialize )( CK_VOID_PTR pvInitArgs )
 {   
-	/*lint !e9072 It's OK to have different parameter name. */
+    /*lint !e9072 It's OK to have different parameter name. */
     ( void ) ( pvInitArgs );
 
     CK_RV xResult = CKR_OK;
@@ -1815,7 +1815,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_Initialize )( CK_VOID_PTR pvInitArgs )
 
         if (xResult == CKR_OK)
         {
-        	pkcs11_context.is_initialized = CK_TRUE;
+            pkcs11_context.is_initialized = CK_TRUE;
         }
 
     }
@@ -1843,26 +1843,26 @@ CK_DEFINE_FUNCTION( CK_RV, C_Finalize )( CK_VOID_PTR pvReserved )
 
     if( xResult == CKR_OK )
     {
-    	if( pkcs11_context.is_initialized == CK_FALSE )
-		{
-			xResult = CKR_CRYPTOKI_NOT_INITIALIZED;
-		}
-		else
-		{
-			/*
-			 *   Reset OPTIGA(TM) Trust M and open an application on it
-			 */
-			xResult = optiga_trustm_deinitialize();
-		}
+        if( pkcs11_context.is_initialized == CK_FALSE )
+        {
+            xResult = CKR_CRYPTOKI_NOT_INITIALIZED;
+        }
+        else
+        {
+            /*
+             *   Reset OPTIGA(TM) Trust M and open an application on it
+             */
+            xResult = optiga_trustm_deinitialize();
+        }
 
-		if( xResult == CKR_OK )
-		{
+        if( xResult == CKR_OK )
+        {
 #ifdef __linux__
-			sem_destroy( &pkcs11_context.object_list.semaphore );
+            sem_destroy( &pkcs11_context.object_list.semaphore );
 #endif
-			pkcs11_context.is_initialized = CK_FALSE;
-		}
-		pal_gpio_deinit(&optiga_reset_0);
+            pkcs11_context.is_initialized = CK_FALSE;
+        }
+        pal_gpio_deinit(&optiga_reset_0);
         pal_gpio_deinit(&optiga_vdd_0);
     }
 
@@ -1874,8 +1874,8 @@ CK_DEFINE_FUNCTION( CK_RV, C_Finalize )( CK_VOID_PTR pvReserved )
  */
 CK_DEFINE_FUNCTION( CK_RV, C_GetFunctionList )( CK_FUNCTION_LIST_PTR_PTR ppxFunctionList )
 {   
-	
-	/*lint !e9072 It's OK to have different parameter name. */
+    
+    /*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = CKR_OK;
 
     if( NULL == ppxFunctionList )
@@ -1897,7 +1897,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetSlotList )( CK_BBOOL xTokenPresent,
                                             CK_SLOT_ID_PTR pxSlotList,
                                             CK_ULONG_PTR pulCount )
 {   
-	/*lint !e9072 It's OK to have different parameter name. */
+    /*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = CKR_OK;
 
     /* Since the implementation of PKCS#11 does not depend
@@ -1937,21 +1937,21 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetSlotList )( CK_BBOOL xTokenPresent,
 CK_DEFINE_FUNCTION( CK_RV, C_GetTokenInfo )( CK_SLOT_ID slotID,
                                               CK_TOKEN_INFO_PTR pInfo )
 {
-	
+    
     CK_RV xResult = CKR_SLOT_ID_INVALID;
-	
-	do
-	{
-		if ( pkcs11SLOT_ID != slotID)
-		{
-			break;
-		}
-	    if ( pInfo == NULL )
-	    {
-			xResult = CKR_ARGUMENTS_BAD;
-			break;
-	    }
-		pInfo->firmwareVersion.major = 0x2;
+    
+    do
+    {
+        if ( pkcs11SLOT_ID != slotID)
+        {
+            break;
+        }
+        if ( pInfo == NULL )
+        {
+            xResult = CKR_ARGUMENTS_BAD;
+            break;
+        }
+        pInfo->firmwareVersion.major = 0x2;
         pInfo->firmwareVersion.minor = 0x28;
 
         pInfo->hardwareVersion.major = 1;
@@ -1960,10 +1960,10 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetTokenInfo )( CK_SLOT_ID slotID,
         sprintf((char *)pInfo->manufacturerID, "Infineon Technologies AG");
         sprintf((char *)pInfo->model, "OPTIGA Trust M");
         pInfo->ulMaxSessionCount = 4;
-		xResult = CKR_OK;
-		
-	} while(0);
-	
+        xResult = CKR_OK;
+        
+    } while(0);
+    
     return xResult;
 }
 
@@ -1994,11 +1994,11 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetMechanismInfo )( CK_SLOT_ID slotID,
     }
     pxSupportedMechanisms[] =
     {
-        { CKM_ECDSA,           		 { 256,  521,  CKF_SIGN | CKF_VERIFY 							 } },
+        { CKM_ECDSA,                    { 256,  521,  CKF_SIGN | CKF_VERIFY                              } },
         { CKM_RSA_PKCS,              { 1024, 2048, CKF_SIGN | CKF_VERIFY | CKA_ENCRYPT | CKA_DECRYPT } },
-        { CKM_RSA_PKCS_KEY_PAIR_GEN, { 1024, 2048, CKF_GENERATE_KEY_PAIR 							 } },
-        { CKM_EC_KEY_PAIR_GEN, 		 { 256,  521,  CKF_GENERATE_KEY_PAIR 							 } },
-        { CKM_SHA256,          		 { 0,    0,    CKF_DIGEST             							 } }
+        { CKM_RSA_PKCS_KEY_PAIR_GEN, { 1024, 2048, CKF_GENERATE_KEY_PAIR                              } },
+        { CKM_EC_KEY_PAIR_GEN,          { 256,  521,  CKF_GENERATE_KEY_PAIR                              } },
+        { CKM_SHA256,                   { 0,    0,    CKF_DIGEST                                          } }
     };
     uint32_t ulMech = 0;
 
@@ -2056,7 +2056,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID xSlotID,
                                             CK_SESSION_HANDLE_PTR pxSession )
 {   
 
-	/*lint !e9072 It's OK to have different parameter name. */
+    /*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = CKR_OK;
     p_pkcs11_session_t pxSessionObj = NULL;
 
@@ -2135,7 +2135,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID xSlotID,
 CK_DEFINE_FUNCTION( CK_RV, C_CloseSession )( CK_SESSION_HANDLE xSession )
 {  
 
-	/*lint !e9072 It's OK to have different parameter name. */
+    /*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     p_pkcs11_session_t pxSession = get_session_pointer( xSession );
 
@@ -2184,13 +2184,13 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE xSession,
     uint8_t ucP256Oid[] = pkcs11DER_ENCODED_OID_P256;
     uint8_t ucP384Oid[] = pkcs11DER_ENCODED_OID_P384;
     uint8_t ucP521Oid[] = pkcs11DER_ENCODED_OID_P521;
-	uint8_t temp_ec_value[11] = {0};
-	uint8_t temp_ec_length = 0;
+    uint8_t temp_ec_value[11] = {0};
+    uint8_t temp_ec_length = 0;
     CK_OBJECT_HANDLE xPalHandle = CK_INVALID_HANDLE;
     size_t xSize;
     uint8_t * pcLabel = NULL;
-	
-	p_pkcs11_session_t session = get_session_pointer( xSession );
+    
+    p_pkcs11_session_t session = get_session_pointer( xSession );
     /* Avoid warnings about unused parameters. */
     ( void ) xSession;
 
@@ -2318,20 +2318,20 @@ CK_DEFINE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE xSession,
                 case CKA_EC_PARAMS:
 
                     if ( session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_256)
-					{
-						temp_ec_length = sizeof(ucP256Oid);
-						memcpy(temp_ec_value,ucP256Oid,temp_ec_length);
-					}
+                    {
+                        temp_ec_length = sizeof(ucP256Oid);
+                        memcpy(temp_ec_value,ucP256Oid,temp_ec_length);
+                    }
                     else if ( session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_384)
-					{
-						temp_ec_length = sizeof(ucP384Oid);
-						memcpy(temp_ec_value,ucP384Oid,temp_ec_length);
-					}
+                    {
+                        temp_ec_length = sizeof(ucP384Oid);
+                        memcpy(temp_ec_value,ucP384Oid,temp_ec_length);
+                    }
                     else if ( session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_521)
-					{
-						temp_ec_length = sizeof(ucP521Oid);
-						memcpy(temp_ec_value,ucP521Oid,temp_ec_length);
-					}
+                    {
+                        temp_ec_length = sizeof(ucP521Oid);
+                        memcpy(temp_ec_value,ucP521Oid,temp_ec_length);
+                    }
 
                     pxTemplate[ iAttrib ].ulValueLen = temp_ec_length;
 
@@ -2479,7 +2479,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE xSession,
                                             CK_ULONG_PTR pulObjectCount )
 {  
 
-	/*lint !e9072 It's OK to have different parameter name. */
+    /*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     long xDone = 0;
     p_pkcs11_session_t pxSession = get_session_pointer( xSession );
@@ -2589,7 +2589,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE xSession,
 CK_DEFINE_FUNCTION( CK_RV, C_FindObjectsFinal )( CK_SESSION_HANDLE xSession )
 {   
 
-	/*lint !e9072 It's OK to have different parameter name. */
+    /*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     p_pkcs11_session_t pxSession = get_session_pointer( xSession );
 
@@ -2621,7 +2621,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_FindObjectsFinal )( CK_SESSION_HANDLE xSession )
 
 
 CK_RV verify_private_key_template(CK_SESSION_HANDLE xSession,
-									 CK_ATTRIBUTE_PTR * ppxLabel,
+                                     CK_ATTRIBUTE_PTR * ppxLabel,
                                      CK_ATTRIBUTE_PTR pxTemplate,
                                      CK_ULONG ulTemplateLength )
 {
@@ -2636,141 +2636,141 @@ CK_RV verify_private_key_template(CK_SESSION_HANDLE xSession,
     CK_BBOOL xBool;
     CK_ULONG xTemp;
     CK_ULONG xIndex;
-	CK_BBOOL is_error = FALSE;
-	uint32_t received_attribute = 0;
-	uint32_t ec_expected_attribute = ( LABEL | PRIVATE | SIGN );
-	uint32_t rsa_expected_attribute[] = {( LABEL | PRIVATE | SIGN | DECRYPT ),
-										  ( LABEL | PRIVATE | DECRYPT ),
-										  ( LABEL | PRIVATE | SIGN )
-										};
+    CK_BBOOL is_error = FALSE;
+    uint32_t received_attribute = 0;
+    uint32_t ec_expected_attribute = ( LABEL | PRIVATE | SIGN );
+    uint32_t rsa_expected_attribute[] = {( LABEL | PRIVATE | SIGN | DECRYPT ),
+                                          ( LABEL | PRIVATE | DECRYPT ),
+                                          ( LABEL | PRIVATE | SIGN )
+                                        };
 
-	p_pkcs11_session_t session = get_session_pointer( xSession );
+    p_pkcs11_session_t session = get_session_pointer( xSession );
 
     for( xIndex = 0; xIndex < ulTemplateLength; xIndex++ )
     {
-    	if(TRUE == is_error)
-    	{
-			break;
-		}
+        if(TRUE == is_error)
+        {
+            break;
+        }
 
         xAttribute = pxTemplate[ xIndex ];
 
         switch( xAttribute.type )
         {
             case ( CKA_LABEL ):
-			{
+            {
                 *ppxLabel = &pxTemplate[ xIndex ];
-				received_attribute |= LABEL;
+                received_attribute |= LABEL;
             }
-			break;
+            break;
             case ( CKA_TOKEN ):
-			{
+            {
                 memcpy( &xBool, xAttribute.pValue, sizeof( CK_BBOOL ) );
 
                 if( xBool != CK_TRUE )
                 {
                     PKCS11_PRINT( ( "ERROR: Only token key generation is supported. \r\n" ) );
                     xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-					is_error = TRUE;
-					break;
+                    is_error = TRUE;
+                    break;
                 }
-        	}
+            }
             break;
             case ( CKA_KEY_TYPE ):
-			{
+            {
                 memcpy( &xTemp, xAttribute.pValue, sizeof( CK_ULONG ) );
 
                 if( (xTemp != CKK_EC) && (xTemp != CKK_RSA))
                 {
                     PKCS11_PRINT( ( "ERROR: Only EC and RSA key pair generation is supported. \r\n" ) );
                     xResult = CKR_TEMPLATE_INCONSISTENT;
-					is_error = TRUE;
-					break;
+                    is_error = TRUE;
+                    break;
                 }
-        	}
+            }
             break;
             case ( CKA_PRIVATE ):
-			{
+            {
                 memcpy( &xBool, xAttribute.pValue, sizeof( CK_BBOOL ) );
 
                 if( xBool != CK_TRUE )
                 {
                     PKCS11_PRINT( ( "ERROR: Generating private keys that are not marked private is not supported. \r\n" ) );
                     xResult = CKR_TEMPLATE_INCONSISTENT;
-					is_error = TRUE;
-					break;
+                    is_error = TRUE;
+                    break;
                 }
-				received_attribute |= PRIVATE;
+                received_attribute |= PRIVATE;
             }
             break;
             case ( CKA_SIGN ):
-			{
+            {
                 memcpy( &xBool, xAttribute.pValue, sizeof( CK_BBOOL ) );
 
                 if( xBool != CK_TRUE )
                 {
-					break;
+                    break;
                 }
-				session->key_template_enabled |= PKCS_SIGN_ENABLE;
-				received_attribute |= SIGN;
+                session->key_template_enabled |= PKCS_SIGN_ENABLE;
+                received_attribute |= SIGN;
             }
             break;
-			case ( CKA_DECRYPT ):
-			{
-				memcpy( &xBool, xAttribute.pValue, sizeof( CK_BBOOL ) );
-			
-				if( xBool != CK_TRUE )
-				{
-					break;
-				}
-				session->key_template_enabled |= PKCS_DECRYPT_ENABLE;
-				received_attribute |= DECRYPT;
-			}
-			break;
-			default:
-			{
-				is_error = TRUE;
-				xResult = CKR_TEMPLATE_INCONSISTENT;
-			}
-			break;
+            case ( CKA_DECRYPT ):
+            {
+                memcpy( &xBool, xAttribute.pValue, sizeof( CK_BBOOL ) );
+            
+                if( xBool != CK_TRUE )
+                {
+                    break;
+                }
+                session->key_template_enabled |= PKCS_DECRYPT_ENABLE;
+                received_attribute |= DECRYPT;
+            }
+            break;
+            default:
+            {
+                is_error = TRUE;
+                xResult = CKR_TEMPLATE_INCONSISTENT;
+            }
+            break;
 
         }
     }
-	
-	if ( xTemp == CKK_EC )
-	{
-		if( ( received_attribute & ec_expected_attribute ) != ec_expected_attribute )
-	    {
-	        xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-	    }		
-	}
+    
+    if ( xTemp == CKK_EC )
+    {
+        if( ( received_attribute & ec_expected_attribute ) != ec_expected_attribute )
+        {
+            xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+        }        
+    }
     else if ( xTemp == CKK_RSA )
     {
-			for(xIndex = 0; xIndex < sizeof(rsa_expected_attribute)/sizeof(uint32_t); xIndex++)
-		    {
-		    	if(received_attribute == rsa_expected_attribute[xIndex])
-		    	{
-					break;
-				}
-		        
-		    }
-			if (xIndex == sizeof(rsa_expected_attribute)/sizeof(uint32_t))
-			{
-				xResult = CKR_TEMPLATE_INCONSISTENT;
-			}
+            for(xIndex = 0; xIndex < sizeof(rsa_expected_attribute)/sizeof(uint32_t); xIndex++)
+            {
+                if(received_attribute == rsa_expected_attribute[xIndex])
+                {
+                    break;
+                }
+                
+            }
+            if (xIndex == sizeof(rsa_expected_attribute)/sizeof(uint32_t))
+            {
+                xResult = CKR_TEMPLATE_INCONSISTENT;
+            }
     }
-	else
-	{
-		xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-	}
-	
+    else
+    {
+        xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+    }
+    
 
 
     return xResult;
 }
 
 CK_RV verify_public_key_template( CK_SESSION_HANDLE xSession,
-									  CK_ATTRIBUTE_PTR * ppxLabel,
+                                      CK_ATTRIBUTE_PTR * ppxLabel,
                                       CK_ATTRIBUTE_PTR pxTemplate,
                                       CK_ULONG ulTemplateLength )
 {
@@ -2780,196 +2780,196 @@ CK_RV verify_public_key_template( CK_SESSION_HANDLE xSession,
 #define VERIFY       ( 1U << 2 )
 #define ENCRYPT      ( 1U << 3 )
 #define MODULUS      ( 1U << 4 )
-#define EXPONENT	 ( 1U << 5 )
+#define EXPONENT     ( 1U << 5 )
 
     CK_ATTRIBUTE xAttribute;
     CK_RV xResult = CKR_OK;
     CK_BBOOL xBool;
-	CK_BBOOL is_error = FALSE;
-	CK_ULONG modulus_bits;
-	CK_BYTE exp_bits[] = {0x01, 0x00, 0x01};
+    CK_BBOOL is_error = FALSE;
+    CK_ULONG modulus_bits;
+    CK_BYTE exp_bits[] = {0x01, 0x00, 0x01};
     CK_KEY_TYPE xKeyType;
     CK_BYTE ec_param_p256[] = pkcs11DER_ENCODED_OID_P256;
     CK_BYTE ec_param_p384[] = pkcs11DER_ENCODED_OID_P384;
     CK_BYTE ec_param_p521[] = pkcs11DER_ENCODED_OID_P521;
     int lCompare;
     CK_ULONG ulIndex;
-	uint32_t received_attribute = 0;
-	uint32_t ec_expected_attribute = ( LABEL | EC_PARAMS | VERIFY );
-	uint32_t rsa_expected_attribute[] = {( LABEL | ENCRYPT | VERIFY | MODULUS |EXPONENT ),
-										 ( LABEL | ENCRYPT | MODULUS | EXPONENT ),
-										 ( LABEL | VERIFY | MODULUS | EXPONENT ),
-										};
-	
-	p_pkcs11_session_t session = get_session_pointer( xSession );
-	
+    uint32_t received_attribute = 0;
+    uint32_t ec_expected_attribute = ( LABEL | EC_PARAMS | VERIFY );
+    uint32_t rsa_expected_attribute[] = {( LABEL | ENCRYPT | VERIFY | MODULUS |EXPONENT ),
+                                         ( LABEL | ENCRYPT | MODULUS | EXPONENT ),
+                                         ( LABEL | VERIFY | MODULUS | EXPONENT ),
+                                        };
+    
+    p_pkcs11_session_t session = get_session_pointer( xSession );
+    
     for( ulIndex = 0; ulIndex < ulTemplateLength; ulIndex++ )
     {
-    	if(TRUE == is_error)
-    	{
-			break;
-		}
+        if(TRUE == is_error)
+        {
+            break;
+        }
         xAttribute = pxTemplate[ ulIndex ];
 
         switch( xAttribute.type )
         {
             case ( CKA_LABEL ):
-			{
+            {
                 *ppxLabel = &pxTemplate[ ulIndex ];
-				received_attribute |= LABEL;
+                received_attribute |= LABEL;
             }
-			break;
+            break;
             case ( CKA_KEY_TYPE ):
-			{
+            {
                 memcpy( &xKeyType, xAttribute.pValue, sizeof( CK_KEY_TYPE ) );
 
                 if( ( xKeyType != CKK_EC ) && ( xKeyType != CKK_RSA ) )
                 {
                     PKCS11_PRINT( ( "ERROR: Only EC and RSA key pair generation is supported. \r\n" ) );
                     xResult = CKR_TEMPLATE_INCONSISTENT;
-					is_error = TRUE;
+                    is_error = TRUE;
                 }
             }
             break;
             case ( CKA_EC_PARAMS ):
-			{
+            {
                 if (0 == memcmp( ec_param_p256, xAttribute.pValue, sizeof( ec_param_p256 ) ))
-				{
-					session->ec_key_type = OPTIGA_ECC_CURVE_NIST_P_256;
-					session->ec_key_size = 0x44;
-					received_attribute |= EC_PARAMS;
-				}
-				else if(0 == memcmp( ec_param_p384, xAttribute.pValue, sizeof( ec_param_p384 )))
-				{
-					session->ec_key_type = OPTIGA_ECC_CURVE_NIST_P_384;
-					session->ec_key_size = 0x64;
-					received_attribute |= EC_PARAMS;
-				}
-				else if(0 == memcmp( ec_param_p521, xAttribute.pValue, sizeof( ec_param_p521 )))
-				{
-					session->ec_key_type = OPTIGA_ECC_CURVE_NIST_P_521;
-					session->ec_key_size = 0x89;
-					received_attribute |= EC_PARAMS;
-				}
+                {
+                    session->ec_key_type = OPTIGA_ECC_CURVE_NIST_P_256;
+                    session->ec_key_size = 0x44;
+                    received_attribute |= EC_PARAMS;
+                }
+                else if(0 == memcmp( ec_param_p384, xAttribute.pValue, sizeof( ec_param_p384 )))
+                {
+                    session->ec_key_type = OPTIGA_ECC_CURVE_NIST_P_384;
+                    session->ec_key_size = 0x64;
+                    received_attribute |= EC_PARAMS;
+                }
+                else if(0 == memcmp( ec_param_p521, xAttribute.pValue, sizeof( ec_param_p521 )))
+                {
+                    session->ec_key_type = OPTIGA_ECC_CURVE_NIST_P_521;
+                    session->ec_key_size = 0x89;
+                    received_attribute |= EC_PARAMS;
+                }
                 else
                 {
                     PKCS11_PRINT( ( "ERROR: key generation is supported. \r\n" ) );
                     xResult = CKR_TEMPLATE_INCONSISTENT;
-					is_error = TRUE;
+                    is_error = TRUE;
                 }
             }
             break;
             case ( CKA_VERIFY ):
-			{
+            {
                 memcpy( &xBool, xAttribute.pValue, sizeof( CK_BBOOL ) );
 
                 if( xBool != CK_TRUE )
                 {
                     PKCS11_PRINT( ( "ERROR: Generating public keys that cannot verify is not supported. \r\n" ) );
-					break;
+                    break;
                 }
-				session->key_template_enabled |= PKCS_VERIFY_ENABLE;
-				received_attribute |= VERIFY;
+                session->key_template_enabled |= PKCS_VERIFY_ENABLE;
+                received_attribute |= VERIFY;
             }
             break;
             case ( CKA_TOKEN ):
-			{
+            {
                 memcpy( &xBool, xAttribute.pValue, sizeof( CK_BBOOL ) );
 
                 if( xBool != CK_TRUE )
                 {
                     PKCS11_PRINT( ( "ERROR: Only token key generation is supported. \r\n" ) );
                     xResult = CKR_TEMPLATE_INCONSISTENT;
-					is_error = TRUE;
+                    is_error = TRUE;
                 }
             }
             break;
-			case ( CKA_ENCRYPT ):
-			{
-				memcpy( &xBool, xAttribute.pValue, sizeof( CK_BBOOL ) );
-			
-				if( xBool != CK_TRUE )
-				{
-					PKCS11_PRINT( ( "ERROR: Generating public keys that cannot encrypt is not supported. \r\n" ) );
-					break;
-				}
-				session->key_template_enabled |= PKCS_ENCRYPT_ENABLE;
-				received_attribute |= ENCRYPT;
-			}
-			break;
-			case ( CKA_MODULUS_BITS ):
-			{
-				memcpy( &modulus_bits, xAttribute.pValue, sizeof( CK_ULONG ) );
-			
-				if( modulus_bits == 0 )
-				{
-					PKCS11_PRINT( ( "ERROR: Generating public keys that cannot modulus size is not supported. \r\n" ) );
-					xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-					is_error = TRUE;
-					break;
-				}
-				session->rsa_key_size = modulus_bits;
-				received_attribute |= MODULUS;
-			}
-			break;
-			case ( CKA_PUBLIC_EXPONENT ):
-			{ 
-			  if (0 != memcmp( exp_bits, xAttribute.pValue, sizeof( exp_bits ) ))
-				{
-                	xResult = CKR_TEMPLATE_INCONSISTENT;
-					is_error = TRUE;
-					break;
-				}
-				received_attribute |= EXPONENT;
-			}
-			break;
+            case ( CKA_ENCRYPT ):
+            {
+                memcpy( &xBool, xAttribute.pValue, sizeof( CK_BBOOL ) );
+            
+                if( xBool != CK_TRUE )
+                {
+                    PKCS11_PRINT( ( "ERROR: Generating public keys that cannot encrypt is not supported. \r\n" ) );
+                    break;
+                }
+                session->key_template_enabled |= PKCS_ENCRYPT_ENABLE;
+                received_attribute |= ENCRYPT;
+            }
+            break;
+            case ( CKA_MODULUS_BITS ):
+            {
+                memcpy( &modulus_bits, xAttribute.pValue, sizeof( CK_ULONG ) );
+            
+                if( modulus_bits == 0 )
+                {
+                    PKCS11_PRINT( ( "ERROR: Generating public keys that cannot modulus size is not supported. \r\n" ) );
+                    xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+                    is_error = TRUE;
+                    break;
+                }
+                session->rsa_key_size = modulus_bits;
+                received_attribute |= MODULUS;
+            }
+            break;
+            case ( CKA_PUBLIC_EXPONENT ):
+            { 
+              if (0 != memcmp( exp_bits, xAttribute.pValue, sizeof( exp_bits ) ))
+                {
+                    xResult = CKR_TEMPLATE_INCONSISTENT;
+                    is_error = TRUE;
+                    break;
+                }
+                received_attribute |= EXPONENT;
+            }
+            break;
             default:
-			{
-				is_error = TRUE;
+            {
+                is_error = TRUE;
                 xResult = CKR_TEMPLATE_INCONSISTENT;
             }
-			break;
+            break;
         }
     }
-	if ( CKR_OK == xResult )
-	{
-		if ( xKeyType == CKK_EC )
-		{
-			if( (( received_attribute & rsa_expected_attribute[0] ) == rsa_expected_attribute[0] ) ||
-				(( received_attribute & ( LABEL | ENCRYPT | MODULUS | EXPONENT ) ) == 
-				( LABEL | ENCRYPT | MODULUS | EXPONENT ) ))
-		    {
-		        xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-		    }
-			else if( ( received_attribute & ec_expected_attribute ) != ec_expected_attribute )
-		    {
-		        xResult = CKR_TEMPLATE_INCONSISTENT;
-		    }		
-		}
-	    else if ( xKeyType == CKK_RSA )
-	    {
-			for(ulIndex = 0; ulIndex < sizeof(rsa_expected_attribute)/sizeof(uint32_t); ulIndex++)
-		    {
-		    	if(received_attribute == rsa_expected_attribute[ulIndex])
-		    	{
-					break;
-				}
-		        
-		    }
-			if (ulIndex == sizeof(rsa_expected_attribute)/sizeof(uint32_t))
-			{
-				xResult = CKR_TEMPLATE_INCONSISTENT;
-			}
-			if (received_attribute & EC_PARAMS)
-			{
-				xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-			}
-	    }
-		else
-		{
-			xResult = CKR_ATTRIBUTE_VALUE_INVALID;
-		}
-	}
+    if ( CKR_OK == xResult )
+    {
+        if ( xKeyType == CKK_EC )
+        {
+            if( (( received_attribute & rsa_expected_attribute[0] ) == rsa_expected_attribute[0] ) ||
+                (( received_attribute & ( LABEL | ENCRYPT | MODULUS | EXPONENT ) ) == 
+                ( LABEL | ENCRYPT | MODULUS | EXPONENT ) ))
+            {
+                xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+            }
+            else if( ( received_attribute & ec_expected_attribute ) != ec_expected_attribute )
+            {
+                xResult = CKR_TEMPLATE_INCONSISTENT;
+            }        
+        }
+        else if ( xKeyType == CKK_RSA )
+        {
+            for(ulIndex = 0; ulIndex < sizeof(rsa_expected_attribute)/sizeof(uint32_t); ulIndex++)
+            {
+                if(received_attribute == rsa_expected_attribute[ulIndex])
+                {
+                    break;
+                }
+                
+            }
+            if (ulIndex == sizeof(rsa_expected_attribute)/sizeof(uint32_t))
+            {
+                xResult = CKR_TEMPLATE_INCONSISTENT;
+            }
+            if (received_attribute & EC_PARAMS)
+            {
+                xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+            }
+        }
+        else
+        {
+            xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+        }
+    }
     return xResult;
 }
 
@@ -2998,169 +2998,169 @@ CK_DEFINE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE xSession,
     CK_OBJECT_HANDLE xPalPrivate = CK_INVALID_HANDLE;
     char* xEnd = NULL;
     long lOptigaOid = 0;
-	optiga_rsa_key_type_t rsa_key_type = 0;
-	uint8_t key_usage;
-	
-	do
-	{
-		p_pkcs11_session_t session = get_session_pointer( xSession );
-	    if( (CKM_EC_KEY_PAIR_GEN != pxMechanism->mechanism) && (CKM_RSA_PKCS_KEY_PAIR_GEN != pxMechanism->mechanism) )
-	    {
-	        xResult = CKR_MECHANISM_PARAM_INVALID;
-			break;
-	    }
-		
-		xResult = verify_private_key_template(xSession,
-											  &pxPrivateLabel,
-											  pxPrivateKeyTemplate,
-											  ulPrivateKeyAttributeCount );
+    optiga_rsa_key_type_t rsa_key_type = 0;
+    uint8_t key_usage;
+    
+    do
+    {
+        p_pkcs11_session_t session = get_session_pointer( xSession );
+        if( (CKM_EC_KEY_PAIR_GEN != pxMechanism->mechanism) && (CKM_RSA_PKCS_KEY_PAIR_GEN != pxMechanism->mechanism) )
+        {
+            xResult = CKR_MECHANISM_PARAM_INVALID;
+            break;
+        }
+        
+        xResult = verify_private_key_template(xSession,
+                                              &pxPrivateLabel,
+                                              pxPrivateKeyTemplate,
+                                              ulPrivateKeyAttributeCount );
 
-	    if( xResult != CKR_OK )
-	    {
-	    	break;
-	    }
-		
-		xResult = verify_public_key_template(xSession,
-											 &pxPublicLabel,
-											 pxPublicKeyTemplate,
-											 ulPublicKeyAttributeCount );
+        if( xResult != CKR_OK )
+        {
+            break;
+        }
+        
+        xResult = verify_public_key_template(xSession,
+                                             &pxPublicLabel,
+                                             pxPublicKeyTemplate,
+                                             ulPublicKeyAttributeCount );
 
-	    if( xResult != CKR_OK )
-	    {
-			break;
-	    }
+        if( xResult != CKR_OK )
+        {
+            break;
+        }
 
         lOptigaOid = strtol((char*)pxPrivateLabel->pValue, &xEnd, 16);
 
         if ( 0 != lOptigaOid)
         {
-        	pal_os_lock_acquire(&optiga_mutex);
+            pal_os_lock_acquire(&optiga_mutex);
 
             /* For the public key, the OPTIGA library will return the standard 65 
-            		  bytes of uncompressed curve points plus a 3-byte tag. The latter will 
+                      bytes of uncompressed curve points plus a 3-byte tag. The latter will 
                        be intentionally overwritten below. */
-        	pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-			if ( pxMechanism->mechanism == CKM_EC_KEY_PAIR_GEN )
-			{
-				ucPublicKeyDerLength = session->ec_key_size;
-				pucPublicKeyDer = malloc(session->ec_key_size);
+            pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+            if ( pxMechanism->mechanism == CKM_EC_KEY_PAIR_GEN )
+            {
+                ucPublicKeyDerLength = session->ec_key_size;
+                pucPublicKeyDer = malloc(session->ec_key_size);
 
-		        if (pucPublicKeyDer == NULL)
-		        {
-		            xResult = CKR_HOST_MEMORY;
-					break;
-		        }
-	        	xResult = optiga_crypt_ecc_generate_keypair(pkcs11_context.object_list.optiga_crypt_instance,
-	        												session->ec_key_type,
-															(uint8_t)OPTIGA_KEY_USAGE_SIGN,
-															FALSE,
-															&lOptigaOid,
-															pucPublicKeyDer,
-															&ucPublicKeyDerLength);
-			}
-			else if ( pxMechanism->mechanism == CKM_RSA_PKCS_KEY_PAIR_GEN )
-			{
-				ucPublicKeyDerLength = session->rsa_key_size;
-		        pucPublicKeyDer = malloc(session->rsa_key_size);
+                if (pucPublicKeyDer == NULL)
+                {
+                    xResult = CKR_HOST_MEMORY;
+                    break;
+                }
+                xResult = optiga_crypt_ecc_generate_keypair(pkcs11_context.object_list.optiga_crypt_instance,
+                                                            session->ec_key_type,
+                                                            (uint8_t)OPTIGA_KEY_USAGE_SIGN,
+                                                            FALSE,
+                                                            &lOptigaOid,
+                                                            pucPublicKeyDer,
+                                                            &ucPublicKeyDerLength);
+            }
+            else if ( pxMechanism->mechanism == CKM_RSA_PKCS_KEY_PAIR_GEN )
+            {
+                ucPublicKeyDerLength = session->rsa_key_size;
+                pucPublicKeyDer = malloc(session->rsa_key_size);
 
-		        if (pucPublicKeyDer == NULL)
-		        {
-		            xResult = CKR_HOST_MEMORY;
-					break;
-		        }
+                if (pucPublicKeyDer == NULL)
+                {
+                    xResult = CKR_HOST_MEMORY;
+                    break;
+                }
 
-				if (( session->key_template_enabled & PKCS_ENCRYPT_ENABLE ) && 
-					( session->key_template_enabled & PKCS_DECRYPT_ENABLE ))
-				{
-					key_usage = OPTIGA_KEY_USAGE_ENCRYPTION;
-				}
-				
-				if (( session->key_template_enabled & PKCS_SIGN_ENABLE ) && 
-					( session->key_template_enabled & PKCS_VERIFY_ENABLE ))
-				{
-					key_usage |= OPTIGA_KEY_USAGE_SIGN;
-				}
-				rsa_key_type = (session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ? 
-														 OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL: 
-														 OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL);
-				xResult = optiga_crypt_rsa_generate_keypair(pkcs11_context.object_list.optiga_crypt_instance,
+                if (( session->key_template_enabled & PKCS_ENCRYPT_ENABLE ) && 
+                    ( session->key_template_enabled & PKCS_DECRYPT_ENABLE ))
+                {
+                    key_usage = OPTIGA_KEY_USAGE_ENCRYPTION;
+                }
+                
+                if (( session->key_template_enabled & PKCS_SIGN_ENABLE ) && 
+                    ( session->key_template_enabled & PKCS_VERIFY_ENABLE ))
+                {
+                    key_usage |= OPTIGA_KEY_USAGE_SIGN;
+                }
+                rsa_key_type = (session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ? 
+                                                         OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL: 
+                                                         OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL);
+                xResult = optiga_crypt_rsa_generate_keypair(pkcs11_context.object_list.optiga_crypt_instance,
                                                             rsa_key_type,
                                                             key_usage,
                                                             FALSE,
                                                             &lOptigaOid,
-															pucPublicKeyDer,
-															&ucPublicKeyDerLength);
-			}
-			else
-			{
-				xResult = CKR_MECHANISM_PARAM_INVALID;
-				break;
-			}
+                                                            pucPublicKeyDer,
+                                                            &ucPublicKeyDerLength);
+            }
+            else
+            {
+                xResult = CKR_MECHANISM_PARAM_INVALID;
+                break;
+            }
 
-			if (OPTIGA_LIB_SUCCESS != xResult)
-			{
-				PKCS11_PRINT( ( "ERROR: Failed to generate a keypair \r\n" ) );
-				xResult = CKR_FUNCTION_FAILED;
-				break;
-			}
-
-			while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-			{
-			
-			}
-
-			// Either by timout or because of success it should end up here
-			if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-			{
+            if (OPTIGA_LIB_SUCCESS != xResult)
+            {
                 PKCS11_PRINT( ( "ERROR: Failed to generate a keypair \r\n" ) );
                 xResult = CKR_FUNCTION_FAILED;
-				break;
-			}
-			pal_os_lock_release(&optiga_mutex);
+                break;
+            }
+
+            while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+            {
+            
+            }
+
+            // Either by timout or because of success it should end up here
+            if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+            {
+                PKCS11_PRINT( ( "ERROR: Failed to generate a keypair \r\n" ) );
+                xResult = CKR_FUNCTION_FAILED;
+                break;
+            }
+            pal_os_lock_release(&optiga_mutex);
         }
         else
         {
             xResult = CKR_FUNCTION_FAILED;
-			break;
+            break;
         }
 
-	    if( xResult == CKR_OK)
-	    {
-	      
-	       xPalPublic = save_object(pxPublicLabel,
-	                                 (unsigned char *)pucPublicKeyDer,
-	                                 ucPublicKeyDerLength);   
+        if( xResult == CKR_OK)
+        {
+          
+           xPalPublic = save_object(pxPublicLabel,
+                                     (unsigned char *)pucPublicKeyDer,
+                                     ucPublicKeyDerLength);   
 
-	    }
-	    else
-	    {
-	        xResult = CKR_GENERAL_ERROR;
-			break;
-	    }
+        }
+        else
+        {
+            xResult = CKR_GENERAL_ERROR;
+            break;
+        }
 
         /* This is a trick to have a handle to store */
         xPalPrivate = save_object( pxPrivateLabel, NULL, 0);
 
-	    if( ( xPalPublic != CK_INVALID_HANDLE ) )
-	    {
-	        xResult = add_object_to_list( xPalPrivate, pxPrivateKey, pxPrivateLabel->pValue, pxPrivateLabel->ulValueLen );
-	        if( xResult == CKR_OK )
-	        {
-	            xResult = add_object_to_list( xPalPublic, pxPublicKey, pxPublicLabel->pValue, pxPublicLabel->ulValueLen );
-	            if( xResult != CKR_OK )
-	            {
-	                destroy_object( *pxPrivateKey );
-					break;
-	            }
-	        }
-	        
-	    }
-		else
-		{
-	        xResult = CK_INVALID_HANDLE;
-			break;			
-		}
-	} while(0);
+        if( ( xPalPublic != CK_INVALID_HANDLE ) )
+        {
+            xResult = add_object_to_list( xPalPrivate, pxPrivateKey, pxPrivateLabel->pValue, pxPrivateLabel->ulValueLen );
+            if( xResult == CKR_OK )
+            {
+                xResult = add_object_to_list( xPalPublic, pxPublicKey, pxPublicLabel->pValue, pxPublicLabel->ulValueLen );
+                if( xResult != CKR_OK )
+                {
+                    destroy_object( *pxPrivateKey );
+                    break;
+                }
+            }
+            
+        }
+        else
+        {
+            xResult = CK_INVALID_HANDLE;
+            break;            
+        }
+    } while(0);
     /* Clean up. */
     if( NULL != pucPublicKeyDer )
     {
@@ -3171,55 +3171,55 @@ CK_DEFINE_FUNCTION( CK_RV, C_GenerateKeyPair )( CK_SESSION_HANDLE xSession,
 
 CK_RV check_valid_rsa_signature_scheme(CK_MECHANISM_TYPE mechanism_type)
  {
-	CK_RV return_status = CKR_OK;
+    CK_RV return_status = CKR_OK;
 
     switch(mechanism_type)
-	{
-	    case CKM_RSA_PKCS:
-	        break;
-	    case CKM_SHA256_RSA_PKCS:
-	        break;
-	    case CKM_SHA384_RSA_PKCS:
-	        break;
-	    case CKM_SHA512_RSA_PKCS:
-	        break;
-	    default:
-			return_status = CKR_MECHANISM_INVALID;
+    {
+        case CKM_RSA_PKCS:
+            break;
+        case CKM_SHA256_RSA_PKCS:
+            break;
+        case CKM_SHA384_RSA_PKCS:
+            break;
+        case CKM_SHA512_RSA_PKCS:
+            break;
+        default:
+            return_status = CKR_MECHANISM_INVALID;
     }
-	return return_status;
+    return return_status;
 }
 
 CK_RV set_valid_rsa_signature_scheme(CK_MECHANISM_TYPE mechanism_type,
-										   optiga_rsa_signature_scheme_t* rsa_signature_scheme)
+                                           optiga_rsa_signature_scheme_t* rsa_signature_scheme)
  {
-	CK_RV return_status = CKR_OK;
+    CK_RV return_status = CKR_OK;
 
     switch(mechanism_type)
-	{
-	    case CKM_RSA_PKCS:
-		{
-			*rsa_signature_scheme =  OPTIGA_RSASSA_PKCS1_V15_SHA256;
-		}
+    {
+        case CKM_RSA_PKCS:
+        {
+            *rsa_signature_scheme =  OPTIGA_RSASSA_PKCS1_V15_SHA256;
+        }
         break;
-	    case CKM_SHA256_RSA_PKCS:
-		{
-			*rsa_signature_scheme =  OPTIGA_RSASSA_PKCS1_V15_SHA256;
-		}
+        case CKM_SHA256_RSA_PKCS:
+        {
+            *rsa_signature_scheme =  OPTIGA_RSASSA_PKCS1_V15_SHA256;
+        }
         break;
-	    case CKM_SHA384_RSA_PKCS:
-		{
-			*rsa_signature_scheme =  OPTIGA_RSASSA_PKCS1_V15_SHA384;
-		}
+        case CKM_SHA384_RSA_PKCS:
+        {
+            *rsa_signature_scheme =  OPTIGA_RSASSA_PKCS1_V15_SHA384;
+        }
         break;
-	    case CKM_SHA512_RSA_PKCS:
-		{
-			*rsa_signature_scheme =  OPTIGA_RSASSA_PKCS1_V15_SHA512;
-		}
+        case CKM_SHA512_RSA_PKCS:
+        {
+            *rsa_signature_scheme =  OPTIGA_RSASSA_PKCS1_V15_SHA512;
+        }
         break;
-	    default:
-			return_status = CKR_MECHANISM_INVALID;
+        default:
+            return_status = CKR_MECHANISM_INVALID;
     }
-	return return_status;
+    return return_status;
 }
 
 /**
@@ -3236,22 +3236,22 @@ CK_DEFINE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE xSession,
     size_t xLabelLength = 0;
     long     lOptigaOid = 0;
     char*    xEnd = NULL;
-	
+    
     p_pkcs11_session_t session = get_session_pointer( xSession );
-	do
-	{
-	
-	    /*lint !e9072 It's OK to have different parameter name. */
-    	p_pkcs11_session_t pxSession = get_session_pointer( xSession );
-	    if( NULL == pxMechanism )
-	    {
-	        PKCS11_PRINT( ( "ERROR: Null signing mechanism provided. \r\n" ) );
-	        xResult = CKR_ARGUMENTS_BAD;
-			break;
-	    }
-		
+    do
+    {
+    
+        /*lint !e9072 It's OK to have different parameter name. */
+        p_pkcs11_session_t pxSession = get_session_pointer( xSession );
+        if( NULL == pxMechanism )
+        {
+            PKCS11_PRINT( ( "ERROR: Null signing mechanism provided. \r\n" ) );
+            xResult = CKR_ARGUMENTS_BAD;
+            break;
+        }
+        
 
-	    /* Retrieve key value from storage. */
+        /* Retrieve key value from storage. */
 
         find_object_in_list_by_handle( xKey,
                                      &xPalHandle,
@@ -3268,33 +3268,33 @@ CK_DEFINE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE xSession,
             else
             {
                 PKCS11_PRINT( ("ERROR: Unable to retrieve value of private key for signing %d. \r\n", xResult) );
-				xResult = CKR_KEY_HANDLE_INVALID;
-				break;
+                xResult = CKR_KEY_HANDLE_INVALID;
+                break;
             }
-			
+            
         }
         else
         {
             xResult = CKR_KEY_HANDLE_INVALID;
-			break;
+            break;
         }
 
-		
+        
 
-	    /* Check that the mechanism and key type are compatible, supported. */
-	    if( (pxMechanism->mechanism != CKM_ECDSA) && (check_valid_rsa_signature_scheme(pxMechanism->mechanism)) )
+        /* Check that the mechanism and key type are compatible, supported. */
+        if( (pxMechanism->mechanism != CKM_ECDSA) && (check_valid_rsa_signature_scheme(pxMechanism->mechanism)) )
         {
             PKCS11_PRINT( ("ERROR: Unsupported mechanism type %d \r\n", pxMechanism->mechanism) );
             xResult = CKR_MECHANISM_INVALID;
-			break;
+            break;
         }
         else
         {
             pxSession->sign_mechanism = pxMechanism->mechanism;
         }
 
-	    session->sign_init_done = TRUE;
-	}while(0);
+        session->sign_init_done = TRUE;
+    }while(0);
     return xResult;
 }
 
@@ -3308,71 +3308,71 @@ CK_DEFINE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE xSession,
                                      CK_ULONG_PTR pulSignatureLen )
 {  
 
-	/*lint !e9072 It's OK to have different parameter name. */
+    /*lint !e9072 It's OK to have different parameter name. */
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     p_pkcs11_session_t session = get_session_pointer( xSession );
     CK_ULONG xSignatureLength = 0;
     /* Signature Length + 3x2 bytes reserved for DER tags */
     uint8_t ecSignature[ pkcs11ECDSA_P521_SIGNATURE_LENGTH + 3 + 3 ];
     uint16_t ecSignatureLength = sizeof(ecSignature);
-	optiga_rsa_signature_scheme_t rsa_signature_scheme = 0;
+    optiga_rsa_signature_scheme_t rsa_signature_scheme = 0;
 
-	do
-	{
-		if ( TRUE != session->sign_init_done)
-		{
+    do
+    {
+        if ( TRUE != session->sign_init_done)
+        {
             xResult = CKR_OPERATION_NOT_INITIALIZED;
-			break;			
-		}
+            break;            
+        }
 
-	    if( NULL == pulSignatureLen )
-	    {
-	        xResult = CKR_ARGUMENTS_BAD;
-			break;
-	    }
+        if( NULL == pulSignatureLen )
+        {
+            xResult = CKR_ARGUMENTS_BAD;
+            break;
+        }
         /* Update the signature length. */
-    	if (session->sign_mechanism == CKM_ECDSA)
-    	{
-    		if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_256)
-    		{
-				xSignatureLength = pkcs11ECDSA_P256_SIGNATURE_LENGTH;
-			}
-			else if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_384)
-    		{
-				xSignatureLength = pkcs11ECDSA_P384_SIGNATURE_LENGTH;
-			}
-			else if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_521)
-    		{
-				xSignatureLength = pkcs11ECDSA_P521_SIGNATURE_LENGTH;
-			}
-			else
-			{
-		        xResult = CKR_ARGUMENTS_BAD;
-				break;				
-			}
-		}
-		else if ( CKR_OK == check_valid_rsa_signature_scheme(session->sign_mechanism))
-		{
-			xSignatureLength = (session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
-													     pkcs11RSA_2048_SIGNATURE_LENGTH :
-													     pkcs11RSA_1024_SIGNATURE_LENGTH);
-		}
-		else
-		{
-	        xResult = CKR_ARGUMENTS_BAD;
-			break;
-		}
+        if (session->sign_mechanism == CKM_ECDSA)
+        {
+            if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_256)
+            {
+                xSignatureLength = pkcs11ECDSA_P256_SIGNATURE_LENGTH;
+            }
+            else if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_384)
+            {
+                xSignatureLength = pkcs11ECDSA_P384_SIGNATURE_LENGTH;
+            }
+            else if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_521)
+            {
+                xSignatureLength = pkcs11ECDSA_P521_SIGNATURE_LENGTH;
+            }
+            else
+            {
+                xResult = CKR_ARGUMENTS_BAD;
+                break;                
+            }
+        }
+        else if ( CKR_OK == check_valid_rsa_signature_scheme(session->sign_mechanism))
+        {
+            xSignatureLength = (session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
+                                                         pkcs11RSA_2048_SIGNATURE_LENGTH :
+                                                         pkcs11RSA_1024_SIGNATURE_LENGTH);
+        }
+        else
+        {
+            xResult = CKR_ARGUMENTS_BAD;
+            break;
+        }
 
         /* Check that the signature buffer is long enough. */
         if( *pulSignatureLen < xSignatureLength )
         {
             xResult = CKR_BUFFER_TOO_SMALL;
-			break;
+            break;
         }
 
         if (0 != session->sign_key_oid)
         {
-        	pal_os_lock_acquire(&optiga_mutex);
+            pal_os_lock_acquire(&optiga_mutex);
 
             /*
                      * An example of a returned signature
@@ -3382,79 +3382,79 @@ CK_DEFINE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE xSession,
                      * 0x000030: 0d 7d 46 5b 44 72 40 06 a5 7b 06 84 0f d7 6e 0f .}F[Dr@..{....n.
                      * 0x000040: 4b 45 7f 50                                     KE.P
                      */
-        	pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-			if (session->sign_mechanism == CKM_ECDSA)
-			{
-            	xResult = optiga_crypt_ecdsa_sign(pkcs11_context.object_list.optiga_crypt_instance,
-            									  pucData,
-												  ulDataLen,
-												  session->sign_key_oid,
-												  ecSignature,
-												  &ecSignatureLength);
-			}
-			else if ( CKR_OK == set_valid_rsa_signature_scheme(session->sign_mechanism, &rsa_signature_scheme) )
-			{
-            	xResult = optiga_crypt_rsa_sign(pkcs11_context.object_list.optiga_crypt_instance,
-												rsa_signature_scheme,
-            									pucData,
-												ulDataLen,
-												session->sign_key_oid,
-												pucSignature,
-												(uint16_t *)pulSignatureLen,
-												0x0000);
-												
-			}
-			else
-			{
-				xResult = CKR_ARGUMENTS_BAD;
-				break;
-			}
-			if (OPTIGA_LIB_SUCCESS != xResult)
-			{
-				xResult = CKR_FUNCTION_FAILED;
-				break;
-			}
+            pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+            if (session->sign_mechanism == CKM_ECDSA)
+            {
+                xResult = optiga_crypt_ecdsa_sign(pkcs11_context.object_list.optiga_crypt_instance,
+                                                  pucData,
+                                                  ulDataLen,
+                                                  session->sign_key_oid,
+                                                  ecSignature,
+                                                  &ecSignatureLength);
+            }
+            else if ( CKR_OK == set_valid_rsa_signature_scheme(session->sign_mechanism, &rsa_signature_scheme) )
+            {
+                xResult = optiga_crypt_rsa_sign(pkcs11_context.object_list.optiga_crypt_instance,
+                                                rsa_signature_scheme,
+                                                pucData,
+                                                ulDataLen,
+                                                session->sign_key_oid,
+                                                pucSignature,
+                                                (uint16_t *)pulSignatureLen,
+                                                0x0000);
+                                                
+            }
+            else
+            {
+                xResult = CKR_ARGUMENTS_BAD;
+                break;
+            }
+            if (OPTIGA_LIB_SUCCESS != xResult)
+            {
+                xResult = CKR_FUNCTION_FAILED;
+                break;
+            }
 
-			while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-			{
+            while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+            {
 
-			}
+            }
 
-			// Either by timout or because of success it should end up here
-			if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-			{
-				xResult = CKR_FUNCTION_FAILED;
-				break;
-			}
+            // Either by timout or because of success it should end up here
+            if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+            {
+                xResult = CKR_FUNCTION_FAILED;
+                break;
+            }
 
-			pal_os_lock_release(&optiga_mutex);
+            pal_os_lock_release(&optiga_mutex);
         }
         if (session->sign_mechanism == CKM_ECDSA)
-		{
-	        /* Reformat from DER encoded to 64-byte R & S components */
-	        asn1_to_ecdsa_rs(ecSignature, ecSignatureLength, pucSignature, xSignatureLength);
-			*pulSignatureLen = xSignatureLength;
+        {
+            /* Reformat from DER encoded to 64-byte R & S components */
+            asn1_to_ecdsa_rs(ecSignature, ecSignatureLength, pucSignature, xSignatureLength);
+            *pulSignatureLen = xSignatureLength;
         }
         /* Complete the operation in the context. */
-	    if( xResult != CKR_BUFFER_TOO_SMALL )
-	    {
-	        session->sign_mechanism = pkcs11NO_OPERATION;
-	    }
-	}while(0);
+        if( xResult != CKR_BUFFER_TOO_SMALL )
+        {
+            session->sign_mechanism = pkcs11NO_OPERATION;
+        }
+    }while(0);
     return xResult;
 }
 
 
 CK_DEFINE_FUNCTION(CK_RV, C_SignUpdate)( CK_SESSION_HANDLE xSession, 
-										  CK_BYTE_PTR part, 
-										  CK_ULONG part_len) 
+                                          CK_BYTE_PTR part, 
+                                          CK_ULONG part_len) 
 {
     return CKR_OK;
 }
 
 CK_DEFINE_FUNCTION(CK_RV, C_SignFinal)( CK_SESSION_HANDLE xSession, 
-									    CK_BYTE_PTR signature, 
-									    CK_ULONG_PTR signature_len) 
+                                        CK_BYTE_PTR signature, 
+                                        CK_ULONG_PTR signature_len) 
 {
     return CKR_OK;
 }
@@ -3478,15 +3478,15 @@ CK_DEFINE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE xSession,
 
     /*lint !e9072 It's OK to have different parameter name. */
     //( void ) ( xSession );
-	do
-	{
-    	session = get_session_pointer( xSession );
+    do
+    {
+        session = get_session_pointer( xSession );
 
-	    if( NULL == pxMechanism )
-	    {
-	        xResult = CKR_ARGUMENTS_BAD;
-			break;
-	    }
+        if( NULL == pxMechanism )
+        {
+            xResult = CKR_ARGUMENTS_BAD;
+            break;
+        }
 
     /* Retrieve key value from storage. */
         find_object_in_list_by_handle( xKey, &xPalHandle, &pxLabel, &xLabelLength );
@@ -3502,28 +3502,28 @@ CK_DEFINE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE xSession,
             else
             {
                 PKCS11_PRINT( ("ERROR: Unable to retrieve value of private key for signing %d. \r\n", xResult) );
-				xResult = CKR_ARGUMENTS_BAD;
-				break;
+                xResult = CKR_ARGUMENTS_BAD;
+                break;
             }
         }
         else
         {
             xResult = CKR_KEY_HANDLE_INVALID;
-			break;
+            break;
         }
     
-	    /* Check for a supported crypto algorithm. */
-	    if( (pxMechanism->mechanism == CKM_ECDSA) || !(check_valid_rsa_signature_scheme(pxMechanism->mechanism)) )
-	    {
-	        session->verify_mechanism = pxMechanism->mechanism;
-	    }
-	    else
-	    {
-	        xResult = CKR_MECHANISM_INVALID;
-			break;
-	    }
-		session->verify_init_done = TRUE;
-	} while (0);
+        /* Check for a supported crypto algorithm. */
+        if( (pxMechanism->mechanism == CKM_ECDSA) || !(check_valid_rsa_signature_scheme(pxMechanism->mechanism)) )
+        {
+            session->verify_mechanism = pxMechanism->mechanism;
+        }
+        else
+        {
+            xResult = CKR_MECHANISM_INVALID;
+            break;
+        }
+        session->verify_init_done = TRUE;
+    } while (0);
     return xResult;
 }
 
@@ -3542,200 +3542,200 @@ CK_DEFINE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE xSession,
     p_pkcs11_session_t session;
     uint8_t temp[2048];
     uint16_t tempLen = 2048;
-	public_key_from_host_t xPublicKeyDetails = {0};
-	optiga_rsa_signature_scheme_t rsa_signature_scheme = 0;
-	CK_ULONG xSignatureLength = 0;
+    public_key_from_host_t xPublicKeyDetails = {0};
+    optiga_rsa_signature_scheme_t rsa_signature_scheme = 0;
+    CK_ULONG xSignatureLength = 0;
      /* (R component ) + (S component ) + DER tags 3 bytes max each*/
     CK_BYTE pubASN1Signature[pkcs11ECDSA_P521_SIGNATURE_LENGTH + 0x03 + 0x03];
     CK_ULONG pubASN1SignatureLength = sizeof(pubASN1Signature);   
-	do
-	{
-		session = get_session_pointer( xSession );
-		if ( TRUE != session->verify_init_done)
-		{
+    do
+    {
+        session = get_session_pointer( xSession );
+        if ( TRUE != session->verify_init_done)
+        {
             xResult = CKR_OPERATION_NOT_INITIALIZED;
-			break;			
-		}
-	    /* Check parameters. */
-	    if( ( NULL == pucData ) ||
-	        ( NULL == pucSignature ) )
-	    {
-	        xResult = CKR_ARGUMENTS_BAD;
-			break;
-	    }
-	    /* Check that the signature and data are the expected length.
-	     * These PKCS #11 mechanism expect data to be pre-hashed/formatted. */
+            break;            
+        }
+        /* Check parameters. */
+        if( ( NULL == pucData ) ||
+            ( NULL == pucSignature ) )
+        {
+            xResult = CKR_ARGUMENTS_BAD;
+            break;
+        }
+        /* Check that the signature and data are the expected length.
+         * These PKCS #11 mechanism expect data to be pre-hashed/formatted. */
         if( session->verify_mechanism == CKM_ECDSA )
         {
             if( ulDataLen != pkcs11SHA256_DIGEST_LENGTH )
             {
                 xResult = CKR_DATA_LEN_RANGE;
-				break;
+                break;
             }
 
         }
-		else if( CKR_OK == check_valid_rsa_signature_scheme(session->verify_mechanism) )
-		{
-			xResult = CKR_OK;
-		}
+        else if( CKR_OK == check_valid_rsa_signature_scheme(session->verify_mechanism) )
+        {
+            xResult = CKR_OK;
+        }
         else
         {
             xResult = CKR_OPERATION_NOT_INITIALIZED;
-			break;
+            break;
         }
-		
+        
         /* Update the signature length. */
-    	if (session->verify_mechanism == CKM_ECDSA)
-    	{
-    		if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_256)
-    		{
-				xSignatureLength = pkcs11ECDSA_P256_SIGNATURE_LENGTH;
-			}
-			else if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_384)
-    		{
-				xSignatureLength = pkcs11ECDSA_P384_SIGNATURE_LENGTH;
-			}
-			else if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_521)
-    		{
-				xSignatureLength = pkcs11ECDSA_P521_SIGNATURE_LENGTH;
-			}
-			else
-			{
-		        xResult = CKR_ARGUMENTS_BAD;
-				break;				
-			}
-			/* Perform an ECDSA verification. */
-	        if ( !ecdsa_rs_to_asn1_integers(&pucSignature[ 0 ], &pucSignature[ xSignatureLength/2 ], xSignatureLength/2,
-	                                        pubASN1Signature, (size_t*)&pubASN1SignatureLength))
-	        {
-	            xResult = CKR_SIGNATURE_INVALID;
-	            PKCS11_PRINT( ( "Failed to parse EC signature \r\n" ) );
-	        }
-		}
-		else if ( CKR_OK == check_valid_rsa_signature_scheme(session->verify_mechanism))
-		{
-			xSignatureLength = (session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
-													     pkcs11RSA_2048_SIGNATURE_LENGTH :
-													     pkcs11RSA_1024_SIGNATURE_LENGTH);
-		}
-		else
-		{
-	        xResult = CKR_ARGUMENTS_BAD;
-			break;
-		}
+        if (session->verify_mechanism == CKM_ECDSA)
+        {
+            if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_256)
+            {
+                xSignatureLength = pkcs11ECDSA_P256_SIGNATURE_LENGTH;
+            }
+            else if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_384)
+            {
+                xSignatureLength = pkcs11ECDSA_P384_SIGNATURE_LENGTH;
+            }
+            else if(session->ec_key_type == OPTIGA_ECC_CURVE_NIST_P_521)
+            {
+                xSignatureLength = pkcs11ECDSA_P521_SIGNATURE_LENGTH;
+            }
+            else
+            {
+                xResult = CKR_ARGUMENTS_BAD;
+                break;                
+            }
+            /* Perform an ECDSA verification. */
+            if ( !ecdsa_rs_to_asn1_integers(&pucSignature[ 0 ], &pucSignature[ xSignatureLength/2 ], xSignatureLength/2,
+                                            pubASN1Signature, (size_t*)&pubASN1SignatureLength))
+            {
+                xResult = CKR_SIGNATURE_INVALID;
+                PKCS11_PRINT( ( "Failed to parse EC signature \r\n" ) );
+            }
+        }
+        else if ( CKR_OK == check_valid_rsa_signature_scheme(session->verify_mechanism))
+        {
+            xSignatureLength = (session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
+                                                         pkcs11RSA_2048_SIGNATURE_LENGTH :
+                                                         pkcs11RSA_1024_SIGNATURE_LENGTH);
+        }
+        else
+        {
+            xResult = CKR_ARGUMENTS_BAD;
+            break;
+        }
 
         /* Check that the signature buffer is long enough. */
         if( ulSignatureLen < xSignatureLength )
         {
             xResult = CKR_SIGNATURE_LEN_RANGE;
-			break;
+            break;
         }
 
         pal_os_lock_acquire(&optiga_mutex);
 
         pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
         xResult = optiga_util_read_data(pkcs11_context.object_list.optiga_util_instance, 
-										session->verify_key_oid, 
-										0, 
-										temp, 
-										&tempLen);
+                                        session->verify_key_oid, 
+                                        0, 
+                                        temp, 
+                                        &tempLen);
 
-		if (OPTIGA_LIB_SUCCESS != xResult)
-		{
-			PKCS11_PRINT( "Failed to extract the Public Key from the SE\r\n" );
-			xResult = CKR_SIGNATURE_INVALID;
-			break;
-		}
-		while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-		{
-		
-		}
+        if (OPTIGA_LIB_SUCCESS != xResult)
+        {
+            PKCS11_PRINT( "Failed to extract the Public Key from the SE\r\n" );
+            xResult = CKR_SIGNATURE_INVALID;
+            break;
+        }
+        while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+        {
+        
+        }
 
-		// Either by timout or because of success it should end up here
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
-			PKCS11_PRINT( "Failed to extract the Public Key from the SE\r\n" );
-			xResult = CKR_SIGNATURE_INVALID;
-			break;
-		}
+        // Either by timout or because of success it should end up here
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
+            PKCS11_PRINT( "Failed to extract the Public Key from the SE\r\n" );
+            xResult = CKR_SIGNATURE_INVALID;
+            break;
+        }
 
-		pal_os_lock_release(&optiga_mutex);
-		
+        pal_os_lock_release(&optiga_mutex);
+        
         pal_os_lock_acquire(&optiga_mutex);
-		
+        
         pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-		if (session->verify_mechanism == CKM_ECDSA)
-		{
+        if (session->verify_mechanism == CKM_ECDSA)
+        {
             xPublicKeyDetails.public_key = temp;
-			xPublicKeyDetails.length = tempLen;
-			xPublicKeyDetails.key_type = session->ec_key_type;
+            xPublicKeyDetails.length = tempLen;
+            xPublicKeyDetails.key_type = session->ec_key_type;
 
             xResult = optiga_crypt_ecdsa_verify (pkcs11_context.object_list.optiga_crypt_instance,
-            									 pucData, 
-            									 ulDataLen,
-												 pubASN1Signature,
-												 pubASN1SignatureLength,
-												 OPTIGA_CRYPT_HOST_DATA, 
-												 &xPublicKeyDetails );
-		}
-		else if ( CKR_OK == set_valid_rsa_signature_scheme(session->verify_mechanism, &rsa_signature_scheme)) 
-		{
+                                                 pucData, 
+                                                 ulDataLen,
+                                                 pubASN1Signature,
+                                                 pubASN1SignatureLength,
+                                                 OPTIGA_CRYPT_HOST_DATA, 
+                                                 &xPublicKeyDetails );
+        }
+        else if ( CKR_OK == set_valid_rsa_signature_scheme(session->verify_mechanism, &rsa_signature_scheme)) 
+        {
             xPublicKeyDetails.public_key = temp;
-			xPublicKeyDetails.length = tempLen;
-			xPublicKeyDetails.key_type = (session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
-																   OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL :
-																   OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL);
-            		
-			xResult = optiga_crypt_rsa_verify (pkcs11_context.object_list.optiga_crypt_instance,
-											   rsa_signature_scheme,
-											   pucData,
-											   ulDataLen,
-											   pucSignature,
-											   ulSignatureLen,
-											   OPTIGA_CRYPT_HOST_DATA,
-											   &xPublicKeyDetails,
-											   0x0000);
+            xPublicKeyDetails.length = tempLen;
+            xPublicKeyDetails.key_type = (session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
+                                                                   OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL :
+                                                                   OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL);
+                    
+            xResult = optiga_crypt_rsa_verify (pkcs11_context.object_list.optiga_crypt_instance,
+                                               rsa_signature_scheme,
+                                               pucData,
+                                               ulDataLen,
+                                               pucSignature,
+                                               ulSignatureLen,
+                                               OPTIGA_CRYPT_HOST_DATA,
+                                               &xPublicKeyDetails,
+                                               0x0000);
 
-		}
-		else
-		{
-			xResult = CKR_ARGUMENTS_BAD;
-		}
-		if (OPTIGA_LIB_SUCCESS != xResult)
-		{
-			PKCS11_PRINT( ("Failed to verify the signature\r\n") );
-			xResult = CKR_SIGNATURE_INVALID;
-			break;
-		}
-		while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-		{
-		
-		}
+        }
+        else
+        {
+            xResult = CKR_ARGUMENTS_BAD;
+        }
+        if (OPTIGA_LIB_SUCCESS != xResult)
+        {
+            PKCS11_PRINT( ("Failed to verify the signature\r\n") );
+            xResult = CKR_SIGNATURE_INVALID;
+            break;
+        }
+        while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+        {
+        
+        }
 
-		// Either by timout or because of success it should end up here
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
+        // Either by timout or because of success it should end up here
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
             PKCS11_PRINT( "Failed to verify the signature\r\n" );
-			xResult = CKR_SIGNATURE_INVALID;
-			break;
-		}
-		pal_os_lock_release(&optiga_mutex);
+            xResult = CKR_SIGNATURE_INVALID;
+            break;
+        }
+        pal_os_lock_release(&optiga_mutex);
     
-	}while (0);
+    }while (0);
     /* Return the signature verification result. */
     return xResult;
 }
 
 CK_DEFINE_FUNCTION( CK_RV, C_VerifyUpdate)( CK_SESSION_HANDLE xSession, 
-										   CK_BYTE_PTR part, 
-										   CK_ULONG part_len) 
+                                           CK_BYTE_PTR part, 
+                                           CK_ULONG part_len) 
 {
     return CKR_OK;
 }
 
 CK_DEFINE_FUNCTION( CK_RV, C_VerifyFinal)( CK_SESSION_HANDLE xSession,
-										  CK_BYTE_PTR signature, 
-										  CK_ULONG signature_len) 
+                                          CK_BYTE_PTR signature, 
+                                          CK_ULONG signature_len) 
 {
     return CKR_OK;
 }
@@ -3755,21 +3755,21 @@ CK_DEFINE_FUNCTION( CK_RV, C_GenerateRandom )( CK_SESSION_HANDLE xSession,
     CK_BYTE xRandomBuf4SmallLengths[8];
     CK_ULONG xBuferSwitcherLength = ulRandomLen;
     CK_BYTE_PTR pxBufferSwitcher = pucRandomData;
-	
-	do
-	{
-    	xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED( xSession );
-	    if( xResult != CKR_OK )
-	    {
-			break;
-		}
+    
+    do
+    {
+        xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED( xSession );
+        if( xResult != CKR_OK )
+        {
+            break;
+        }
         if( ( NULL == pucRandomData ) || ( ulRandomLen == 0 ) )
         {
             xResult = CKR_ARGUMENTS_BAD;
-			break;
+            break;
         }
         if (xBuferSwitcherLength < 8) 
-		{
+        {
             pxBufferSwitcher = xRandomBuf4SmallLengths;
             xBuferSwitcherLength = 8;
         }
@@ -3778,41 +3778,41 @@ CK_DEFINE_FUNCTION( CK_RV, C_GenerateRandom )( CK_SESSION_HANDLE xSession,
 
         pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
         xResult = optiga_crypt_random(pkcs11_context.object_list.optiga_crypt_instance,
-        							  OPTIGA_RNG_TYPE_TRNG,
-									  pxBufferSwitcher,
-									  xBuferSwitcherLength);
+                                      OPTIGA_RNG_TYPE_TRNG,
+                                      pxBufferSwitcher,
+                                      xBuferSwitcherLength);
 
-		if (OPTIGA_LIB_SUCCESS != xResult)
-		{
-			PKCS11_PRINT( ( "ERROR: Failed to generate a random value \r\n" ) );
-			xResult = CKR_SIGNATURE_INVALID;
-			break;
-		}
-		while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-		{
-		
-		}
+        if (OPTIGA_LIB_SUCCESS != xResult)
+        {
+            PKCS11_PRINT( ( "ERROR: Failed to generate a random value \r\n" ) );
+            xResult = CKR_SIGNATURE_INVALID;
+            break;
+        }
+        while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+        {
+        
+        }
 
-		// Either by timout or because of success it should end up here
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
+        // Either by timout or because of success it should end up here
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
             PKCS11_PRINT( ( "ERROR: Failed to generate a random value \r\n" ) );
             xResult = CKR_FUNCTION_FAILED;
-			break;
-		}
-		pal_os_lock_release(&optiga_mutex);
+            break;
+        }
+        pal_os_lock_release(&optiga_mutex);
 
-		if (pxBufferSwitcher == xRandomBuf4SmallLengths)
+        if (pxBufferSwitcher == xRandomBuf4SmallLengths)
         {
             memcpy(pucRandomData, xRandomBuf4SmallLengths, ulRandomLen);
         }
-	        
-	}while(0);
+            
+    }while(0);
     return xResult;
 }
 
 CK_DEFINE_FUNCTION( CK_RV, C_EncryptInit )( CK_SESSION_HANDLE xSession,
-                       					    CK_MECHANISM_PTR pxMechanism,
+                                               CK_MECHANISM_PTR pxMechanism,
                                             CK_OBJECT_HANDLE xKey ) 
 {
 
@@ -3823,24 +3823,24 @@ CK_DEFINE_FUNCTION( CK_RV, C_EncryptInit )( CK_SESSION_HANDLE xSession,
     size_t xLabelLength = 0;
     CK_LONG lOptigaOid = 0;
     char* xEnd = NULL;
-	
+    
     session = get_session_pointer( xSession );
-	
+    
 
-	do
-	{
-		if (!( session->key_template_enabled & PKCS_ENCRYPT_ENABLE ))
-		{
-	        xResult = CKR_KEY_FUNCTION_NOT_PERMITTED;
-			break;
-		}
-	    if( NULL == pxMechanism )
-	    {
-	        xResult = CKR_ARGUMENTS_BAD;
-			break;
-	    }
+    do
+    {
+        if (!( session->key_template_enabled & PKCS_ENCRYPT_ENABLE ))
+        {
+            xResult = CKR_KEY_FUNCTION_NOT_PERMITTED;
+            break;
+        }
+        if( NULL == pxMechanism )
+        {
+            xResult = CKR_ARGUMENTS_BAD;
+            break;
+        }
 
-	    /* Retrieve key value from storage. */
+        /* Retrieve key value from storage. */
         find_object_in_list_by_handle( xKey, &xPalHandle, &pxLabel, &xLabelLength );
 
         if( xPalHandle != CK_INVALID_HANDLE )
@@ -3854,158 +3854,158 @@ CK_DEFINE_FUNCTION( CK_RV, C_EncryptInit )( CK_SESSION_HANDLE xSession,
             else
             {
                 PKCS11_PRINT( ("ERROR: Unable to retrieve value of public key for encryption %d. \r\n", xResult) );
-				xResult = CKR_ARGUMENTS_BAD;
-				break;
+                xResult = CKR_ARGUMENTS_BAD;
+                break;
             }
         }
         else
         {
             xResult = CKR_KEY_HANDLE_INVALID;
         }
-		session->encrypt_init_done = TRUE;
-	    
-	} while (0);
+        session->encrypt_init_done = TRUE;
+        
+    } while (0);
     return xResult;
 
 }
 
 CK_DEFINE_FUNCTION(CK_RV, C_Encrypt) ( CK_SESSION_HANDLE xSession,
-					                   CK_BYTE_PTR pxData,
-					                   CK_ULONG ulDataLen,
-					                   CK_BYTE_PTR pxEncryptedData,
-					                   CK_ULONG_PTR pxulEncryptedDataLen ) 
+                                       CK_BYTE_PTR pxData,
+                                       CK_ULONG ulDataLen,
+                                       CK_BYTE_PTR pxEncryptedData,
+                                       CK_ULONG_PTR pxulEncryptedDataLen ) 
 {
 
     CK_RV xResult = CKR_OK;
     p_pkcs11_session_t session;
     uint8_t temp[2048];
-    uint16_t tempLen = sizeof(temp);	
-	uint8_t key_type;
-	public_key_from_host_t xPublicKeyDetails = {0};
-	
+    uint16_t tempLen = sizeof(temp);    
+    uint8_t key_type;
+    public_key_from_host_t xPublicKeyDetails = {0};
+    
     session = get_session_pointer( xSession );
-	
+    
 
-	do
-	{	
-		if ( FALSE == session->encrypt_init_done )
-		{
-			xResult = CKR_OPERATION_NOT_INITIALIZED;
-			break;
-		}	
-		key_type = (uint8_t)(session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
-													  OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL :
-													  OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL);
-													  
-		if (((key_type == OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL ) && 
-			(ulDataLen > ((pkcs11RSA_1024_MODULUS_BITS / 8) - 11))) ||
-			((key_type == OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL ) && 
-			(ulDataLen > ((pkcs11RSA_2048_MODULUS_BITS / 8) - 11))))
-		{
-			xResult = CKR_ARGUMENTS_BAD;
-			break;
-		}
-		if  (((key_type == OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL ) && 			
-			 (*pxulEncryptedDataLen < (pkcs11RSA_1024_MODULUS_BITS / 8))) ||			
-			 ((key_type == OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL ) && 			
-			 (*pxulEncryptedDataLen < (pkcs11RSA_2048_MODULUS_BITS / 8))))		
-	    {			
-	    	xResult = CKR_BUFFER_TOO_SMALL ;
-			break;
-		}
+    do
+    {    
+        if ( FALSE == session->encrypt_init_done )
+        {
+            xResult = CKR_OPERATION_NOT_INITIALIZED;
+            break;
+        }    
+        key_type = (uint8_t)(session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
+                                                      OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL :
+                                                      OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL);
+                                                      
+        if (((key_type == OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL ) && 
+            (ulDataLen > ((pkcs11RSA_1024_MODULUS_BITS / 8) - 11))) ||
+            ((key_type == OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL ) && 
+            (ulDataLen > ((pkcs11RSA_2048_MODULUS_BITS / 8) - 11))))
+        {
+            xResult = CKR_ARGUMENTS_BAD;
+            break;
+        }
+        if  (((key_type == OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL ) &&             
+             (*pxulEncryptedDataLen < (pkcs11RSA_1024_MODULUS_BITS / 8))) ||            
+             ((key_type == OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL ) &&             
+             (*pxulEncryptedDataLen < (pkcs11RSA_2048_MODULUS_BITS / 8))))        
+        {            
+            xResult = CKR_BUFFER_TOO_SMALL ;
+            break;
+        }
 
-		pal_os_lock_acquire(&optiga_mutex);
-		
-		pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-		xResult = optiga_util_read_data(pkcs11_context.object_list.optiga_util_instance, 
-										session->encryption_key_oid,
-										0, temp, &tempLen);
-		
-		if (OPTIGA_LIB_SUCCESS != xResult)
-		{
-			PKCS11_PRINT( "Failed to extract the Public Key from the Encryption\r\n" );
-			xResult = CKR_ENCRYPTED_DATA_INVALID;
-			break;
-		}
-		
-		while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-		{
-		
-		}
-	
-		// Either by timout or because of success it should end up here
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
-			PKCS11_PRINT( "Failed to extract the Public Key from the Encryption\r\n" );
-			xResult = CKR_ENCRYPTED_DATA_INVALID;
-			break;
-		}
-		pal_os_lock_release(&optiga_mutex);
-		
-		pal_os_lock_acquire(&optiga_mutex);
-		xPublicKeyDetails.public_key = temp;
-		xPublicKeyDetails.length = tempLen;
-		xPublicKeyDetails.key_type = key_type;
-		
-		pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-		xResult = optiga_crypt_rsa_encrypt_message(pkcs11_context.object_list.optiga_crypt_instance,
-												   OPTIGA_RSAES_PKCS1_V15,
-												   pxData,
-												   ulDataLen,
-												   NULL,
-												   0,
-												   OPTIGA_CRYPT_HOST_DATA,
-												   &xPublicKeyDetails,
-												   pxEncryptedData,
-												   (uint16_t *)pxulEncryptedDataLen);
-		
-		if (OPTIGA_LIB_SUCCESS != xResult)
-		{
-			PKCS11_PRINT( ( "ERROR: Failed to encrypt value \r\n" ) );
-			xResult = CKR_ENCRYPTED_DATA_INVALID;
-			break;
-		}
-		
-		while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-		{
-		
-		}
-	
-		// Either by timout or because of success it should end up here
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
-			PKCS11_PRINT( ( "ERROR: Failed to encrypt value \r\n" ) );
-			xResult = CKR_FUNCTION_FAILED;
-			break;
-		}
-		pal_os_lock_release(&optiga_mutex);
+        pal_os_lock_acquire(&optiga_mutex);
+        
+        pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+        xResult = optiga_util_read_data(pkcs11_context.object_list.optiga_util_instance, 
+                                        session->encryption_key_oid,
+                                        0, temp, &tempLen);
+        
+        if (OPTIGA_LIB_SUCCESS != xResult)
+        {
+            PKCS11_PRINT( "Failed to extract the Public Key from the Encryption\r\n" );
+            xResult = CKR_ENCRYPTED_DATA_INVALID;
+            break;
+        }
+        
+        while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+        {
+        
+        }
+    
+        // Either by timout or because of success it should end up here
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
+            PKCS11_PRINT( "Failed to extract the Public Key from the Encryption\r\n" );
+            xResult = CKR_ENCRYPTED_DATA_INVALID;
+            break;
+        }
+        pal_os_lock_release(&optiga_mutex);
+        
+        pal_os_lock_acquire(&optiga_mutex);
+        xPublicKeyDetails.public_key = temp;
+        xPublicKeyDetails.length = tempLen;
+        xPublicKeyDetails.key_type = key_type;
+        
+        pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+        xResult = optiga_crypt_rsa_encrypt_message(pkcs11_context.object_list.optiga_crypt_instance,
+                                                   OPTIGA_RSAES_PKCS1_V15,
+                                                   pxData,
+                                                   ulDataLen,
+                                                   NULL,
+                                                   0,
+                                                   OPTIGA_CRYPT_HOST_DATA,
+                                                   &xPublicKeyDetails,
+                                                   pxEncryptedData,
+                                                   (uint16_t *)pxulEncryptedDataLen);
+        
+        if (OPTIGA_LIB_SUCCESS != xResult)
+        {
+            PKCS11_PRINT( ( "ERROR: Failed to encrypt value \r\n" ) );
+            xResult = CKR_ENCRYPTED_DATA_INVALID;
+            break;
+        }
+        
+        while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+        {
+        
+        }
+    
+        // Either by timout or because of success it should end up here
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
+            PKCS11_PRINT( ( "ERROR: Failed to encrypt value \r\n" ) );
+            xResult = CKR_FUNCTION_FAILED;
+            break;
+        }
+        pal_os_lock_release(&optiga_mutex);
 
-	} while (0);
-	
+    } while (0);
+    
     return xResult;
 
 }
 
 
 CK_DEFINE_FUNCTION(CK_RV, C_EncryptUpdate) ( CK_SESSION_HANDLE xSession, 
-						                     CK_BYTE_PTR part, 
-						                     CK_ULONG part_len, 
-						                     CK_BYTE_PTR encrypted_part, 
-						                     CK_ULONG_PTR encrypted_part_len) 
+                                             CK_BYTE_PTR part, 
+                                             CK_ULONG part_len, 
+                                             CK_BYTE_PTR encrypted_part, 
+                                             CK_ULONG_PTR encrypted_part_len) 
 {
    return CKR_OK;
 }
 
 CK_DEFINE_FUNCTION(CK_RV, C_EncryptFinal) ( CK_SESSION_HANDLE xSession, 
-						                    CK_BYTE_PTR last_encrypted_part, 
-						                    CK_ULONG_PTR last_encrypted_part_len) 
+                                            CK_BYTE_PTR last_encrypted_part, 
+                                            CK_ULONG_PTR last_encrypted_part_len) 
 {
     return CKR_OK;
 }
 
 CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit) ( CK_SESSION_HANDLE xSession, 
-					                       CK_MECHANISM *pxMechanism, 
-					                       CK_OBJECT_HANDLE xKey) 
+                                           CK_MECHANISM *pxMechanism, 
+                                           CK_OBJECT_HANDLE xKey) 
 {
 
     CK_RV xResult = CKR_OK;
@@ -4015,24 +4015,24 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit) ( CK_SESSION_HANDLE xSession,
     size_t xLabelLength = 0;
     CK_LONG lOptigaOid = 0;
     char* xEnd = NULL;
-	
+    
     session = get_session_pointer( xSession );
-	
+    
 
-	do
-	{
-		if (!( session->key_template_enabled & PKCS_DECRYPT_ENABLE ))
-		{
-	        xResult = CKR_KEY_FUNCTION_NOT_PERMITTED;
-			break;
-		}
-	    if( NULL == pxMechanism )
-	    {
-	        xResult = CKR_ARGUMENTS_BAD;
-			break;
-	    }
+    do
+    {
+        if (!( session->key_template_enabled & PKCS_DECRYPT_ENABLE ))
+        {
+            xResult = CKR_KEY_FUNCTION_NOT_PERMITTED;
+            break;
+        }
+        if( NULL == pxMechanism )
+        {
+            xResult = CKR_ARGUMENTS_BAD;
+            break;
+        }
 
-	    /* Retrieve key value from storage. */
+        /* Retrieve key value from storage. */
         find_object_in_list_by_handle( xKey, &xPalHandle, &pxLabel, &xLabelLength );
 
         if( xPalHandle != CK_INVALID_HANDLE )
@@ -4046,59 +4046,59 @@ CK_DEFINE_FUNCTION(CK_RV, C_DecryptInit) ( CK_SESSION_HANDLE xSession,
             else
             {
                 PKCS11_PRINT( ("ERROR: Unable to retrieve value of private key for decryption %d. \r\n", xResult) );
-				xResult = CKR_ARGUMENTS_BAD;
-				break;
+                xResult = CKR_ARGUMENTS_BAD;
+                break;
             }
         }
         else
         {
             xResult = CKR_KEY_HANDLE_INVALID;
         }
-		session->decrypt_init_done = TRUE;
-	    
-	} while (0);
+        session->decrypt_init_done = TRUE;
+        
+    } while (0);
     return xResult;    
 }
 
 CK_DEFINE_FUNCTION(CK_RV, C_Decrypt) ( CK_SESSION_HANDLE xSession, 
-									   CK_BYTE_PTR encrypted_data, 
-					                   CK_ULONG encrypted_data_len, 
-					                   CK_BYTE_PTR data, 
-					                   CK_ULONG_PTR data_len) 
+                                       CK_BYTE_PTR encrypted_data, 
+                                       CK_ULONG encrypted_data_len, 
+                                       CK_BYTE_PTR data, 
+                                       CK_ULONG_PTR data_len) 
 {
 
     CK_RV xResult = CKR_OK;
-    p_pkcs11_session_t session;	
-	uint8_t key_type;
-	
+    p_pkcs11_session_t session;    
+    uint8_t key_type;
+    
     session = get_session_pointer( xSession );
-	
+    
 
-	do
-	{	
-		if ( FALSE == session->decrypt_init_done )
-		{
-			xResult = CKR_OPERATION_NOT_INITIALIZED;
-			break;
-		}
-		
-		key_type = (uint8_t)(session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
-													  OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL :
-													  OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL);
-													  
-		if  (((key_type == OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL ) && 
-			(encrypted_data_len != (pkcs11RSA_1024_MODULUS_BITS / 8))) ||
-			((key_type == OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL ) && 
-			(encrypted_data_len != (pkcs11RSA_2048_MODULUS_BITS / 8))))
-		{
-			xResult = CKR_ENCRYPTED_DATA_LEN_RANGE ;
-			break;
-		}
+    do
+    {    
+        if ( FALSE == session->decrypt_init_done )
+        {
+            xResult = CKR_OPERATION_NOT_INITIALIZED;
+            break;
+        }
+        
+        key_type = (uint8_t)(session->rsa_key_size == pkcs11RSA_2048_MODULUS_BITS ?
+                                                      OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL :
+                                                      OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL);
+                                                      
+        if  (((key_type == OPTIGA_RSA_KEY_1024_BIT_EXPONENTIAL ) && 
+            (encrypted_data_len != (pkcs11RSA_1024_MODULUS_BITS / 8))) ||
+            ((key_type == OPTIGA_RSA_KEY_2048_BIT_EXPONENTIAL ) && 
+            (encrypted_data_len != (pkcs11RSA_2048_MODULUS_BITS / 8))))
+        {
+            xResult = CKR_ENCRYPTED_DATA_LEN_RANGE ;
+            break;
+        }
 
-		pal_os_lock_acquire(&optiga_mutex);;
-		
-		pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-		xResult = optiga_crypt_rsa_decrypt_and_export(pkcs11_context.object_list.optiga_crypt_instance,
+        pal_os_lock_acquire(&optiga_mutex);;
+        
+        pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+        xResult = optiga_crypt_rsa_decrypt_and_export(pkcs11_context.object_list.optiga_crypt_instance,
                                                       OPTIGA_RSAES_PKCS1_V15,
                                                       encrypted_data,
                                                       encrypted_data_len,
@@ -4107,45 +4107,45 @@ CK_DEFINE_FUNCTION(CK_RV, C_Decrypt) ( CK_SESSION_HANDLE xSession,
                                                       session->decryption_key_oid,
                                                       data,
                                                       (uint16_t *)data_len);
-		
-		if (OPTIGA_LIB_SUCCESS != xResult)
-		{
-			PKCS11_PRINT( ( "ERROR: Failed to decrypt value \r\n" ) );
-			xResult = CKR_ENCRYPTED_DATA_INVALID;
-			break;
-		}
-		
-		while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-		{
-		
-		}
-	
-		// Either by timout or because of success it should end up here
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
-			PKCS11_PRINT( ( "ERROR: Failed to decrypt value \r\n" ) );
-			xResult = CKR_FUNCTION_FAILED;
-			break;
-		}
-		pal_os_lock_release(&optiga_mutex);
+        
+        if (OPTIGA_LIB_SUCCESS != xResult)
+        {
+            PKCS11_PRINT( ( "ERROR: Failed to decrypt value \r\n" ) );
+            xResult = CKR_ENCRYPTED_DATA_INVALID;
+            break;
+        }
+        
+        while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+        {
+        
+        }
+    
+        // Either by timout or because of success it should end up here
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
+            PKCS11_PRINT( ( "ERROR: Failed to decrypt value \r\n" ) );
+            xResult = CKR_FUNCTION_FAILED;
+            break;
+        }
+        pal_os_lock_release(&optiga_mutex);
 
-	} while (0);
-	
+    } while (0);
+    
     return xResult;    
 }
 
 CK_DEFINE_FUNCTION(CK_RV, C_DecryptUpdate) ( CK_SESSION_HANDLE xSession, 
-							                 CK_BYTE_PTR encrypted_part, 
-							                 CK_ULONG encrypted_part_len, 
-							                 CK_BYTE_PTR part, 
-							                 CK_ULONG_PTR part_len) 
+                                             CK_BYTE_PTR encrypted_part, 
+                                             CK_ULONG encrypted_part_len, 
+                                             CK_BYTE_PTR part, 
+                                             CK_ULONG_PTR part_len) 
 {
     return CKR_OK;
 }
 
 CK_DEFINE_FUNCTION(CK_RV, C_DecryptFinal) ( CK_SESSION_HANDLE xSession, 
-						                    CK_BYTE_PTR last_part, 
-						                    CK_ULONG_PTR last_part_len) 
+                                            CK_BYTE_PTR last_part, 
+                                            CK_ULONG_PTR last_part_len) 
 {
     return CKR_OK;
 }
@@ -4154,23 +4154,23 @@ CK_DEFINE_FUNCTION( CK_RV, C_DigestInit )( CK_SESSION_HANDLE xSession,
                                            CK_MECHANISM_PTR pMechanism )
 {
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
-	p_pkcs11_session_t session;
-	
-	do
-	{
-	    session = get_session_pointer( xSession );
+    p_pkcs11_session_t session;
+    
+    do
+    {
+        session = get_session_pointer( xSession );
 
-	    if( session == NULL )
-	    {
-	        xResult = CKR_SESSION_HANDLE_INVALID;
-			break;
-	    }
+        if( session == NULL )
+        {
+            xResult = CKR_SESSION_HANDLE_INVALID;
+            break;
+        }
 
-	    if( pMechanism->mechanism != CKM_SHA256 )
-	    {
-	        xResult = CKR_MECHANISM_INVALID;
-			break;
-	    }
+        if( pMechanism->mechanism != CKM_SHA256 )
+        {
+            xResult = CKR_MECHANISM_INVALID;
+            break;
+        }
 
         session->sha256_ctx.hash_ctx.context_buffer = session->sha256_ctx.hash_ctx_buff;
         session->sha256_ctx.hash_ctx.context_buffer_length = sizeof(session->sha256_ctx.hash_ctx_buff);
@@ -4181,29 +4181,29 @@ CK_DEFINE_FUNCTION( CK_RV, C_DigestInit )( CK_SESSION_HANDLE xSession,
         //Hash start
         pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
         xResult = optiga_crypt_hash_start( pkcs11_context.object_list.optiga_crypt_instance, 
-										   &session->sha256_ctx.hash_ctx);
+                                           &session->sha256_ctx.hash_ctx);
 
-		if (OPTIGA_LIB_SUCCESS != xResult)
-		{
-			xResult = CKR_FUNCTION_FAILED;
-			break;
-		}
+        if (OPTIGA_LIB_SUCCESS != xResult)
+        {
+            xResult = CKR_FUNCTION_FAILED;
+            break;
+        }
 
-		while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-		{
-		}
+        while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+        {
+        }
 
-		// Either by timout or because of success it should end up here
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
-			xResult = CKR_FUNCTION_FAILED;
-			break;
-		}
-		session->operation_in_progress = pMechanism->mechanism;
+        // Either by timout or because of success it should end up here
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
+            xResult = CKR_FUNCTION_FAILED;
+            break;
+        }
+        session->operation_in_progress = pMechanism->mechanism;
 
-		pal_os_lock_release(&optiga_mutex);
-	    
-	}while(0);
+        pal_os_lock_release(&optiga_mutex);
+        
+    }while(0);
     return xResult;
 }
 
@@ -4214,19 +4214,19 @@ CK_DEFINE_FUNCTION( CK_RV, C_DigestUpdate )( CK_SESSION_HANDLE xSession,
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     p_pkcs11_session_t session;
     hash_data_from_host_t hash_data_host;
-	do
-	{
-		session = get_session_pointer( xSession );
-	    if( session == NULL )
-	    {
-	        xResult = CKR_SESSION_HANDLE_INVALID;
-			break;
-	    }
-	    else if( session->operation_in_progress != CKM_SHA256 )
-	    {
-	        xResult = CKR_OPERATION_NOT_INITIALIZED;
-			break;
-	    }
+    do
+    {
+        session = get_session_pointer( xSession );
+        if( session == NULL )
+        {
+            xResult = CKR_SESSION_HANDLE_INVALID;
+            break;
+        }
+        else if( session->operation_in_progress != CKM_SHA256 )
+        {
+            xResult = CKR_OPERATION_NOT_INITIALIZED;
+            break;
+        }
 
         hash_data_host.buffer = pPart;
         hash_data_host.length = ulPartLen;
@@ -4235,30 +4235,30 @@ CK_DEFINE_FUNCTION( CK_RV, C_DigestUpdate )( CK_SESSION_HANDLE xSession,
 
         pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
         xResult = optiga_crypt_hash_update(pkcs11_context.object_list.optiga_crypt_instance,
-        								   &session->sha256_ctx.hash_ctx,
-										   OPTIGA_CRYPT_HOST_DATA,
-										   &hash_data_host);
+                                           &session->sha256_ctx.hash_ctx,
+                                           OPTIGA_CRYPT_HOST_DATA,
+                                           &hash_data_host);
 
-		if (OPTIGA_LIB_SUCCESS != xResult)
-		{
-			xResult = CKR_FUNCTION_FAILED;
-			break;
-		}
+        if (OPTIGA_LIB_SUCCESS != xResult)
+        {
+            xResult = CKR_FUNCTION_FAILED;
+            break;
+        }
 
-		while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-		{
-		}
+        while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+        {
+        }
 
-		// Either by timout or because of success it should end up here
-		if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-		{
+        // Either by timout or because of success it should end up here
+        if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+        {
             xResult = CKR_FUNCTION_FAILED;
             session->operation_in_progress = pkcs11NO_OPERATION;
-			break;
-		}
+            break;
+        }
 
-		pal_os_lock_release(&optiga_mutex);
-	}while(0);
+        pal_os_lock_release(&optiga_mutex);
+    }while(0);
     return xResult;
 }
 
@@ -4269,20 +4269,20 @@ CK_DEFINE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE xSession,
     CK_RV xResult = PKCS11_SESSION_VALID_AND_MODULE_INITIALIZED(xSession);
     p_pkcs11_session_t session;
 
-	do
-	{
-		session = get_session_pointer( xSession );
-	    if( session == NULL )
-	    {
-	        xResult = CKR_SESSION_HANDLE_INVALID;
-			break;
-	    }
-	    else if( session->operation_in_progress != CKM_SHA256 )
-	    {
-	        xResult = CKR_OPERATION_NOT_INITIALIZED;
-	        session->operation_in_progress = pkcs11NO_OPERATION;
-			break;
-	    }
+    do
+    {
+        session = get_session_pointer( xSession );
+        if( session == NULL )
+        {
+            xResult = CKR_SESSION_HANDLE_INVALID;
+            break;
+        }
+        else if( session->operation_in_progress != CKM_SHA256 )
+        {
+            xResult = CKR_OPERATION_NOT_INITIALIZED;
+            session->operation_in_progress = pkcs11NO_OPERATION;
+            break;
+        }
 
 
         if( pDigest == NULL )
@@ -4295,39 +4295,39 @@ CK_DEFINE_FUNCTION( CK_RV, C_DigestFinal )( CK_SESSION_HANDLE xSession,
             if( *pulDigestLen < pkcs11SHA256_DIGEST_LENGTH )
             {
                 xResult = CKR_BUFFER_TOO_SMALL;
-				break;
+                break;
             }
-        	pal_os_lock_acquire(&optiga_mutex);
+            pal_os_lock_acquire(&optiga_mutex);
 
             // hash finalize
-        	pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
-        	xResult = optiga_crypt_hash_finalize( pkcs11_context.object_list.optiga_crypt_instance,
-                                      	  	  	  &session->sha256_ctx.hash_ctx,
-												  pDigest);
+            pkcs11_context.object_list.optiga_lib_status = OPTIGA_LIB_BUSY;
+            xResult = optiga_crypt_hash_finalize( pkcs11_context.object_list.optiga_crypt_instance,
+                                                  &session->sha256_ctx.hash_ctx,
+                                                  pDigest);
 
-			if (OPTIGA_LIB_SUCCESS != xResult)
-			{
-				xResult = CKR_FUNCTION_FAILED;
-				break;
-			}
+            if (OPTIGA_LIB_SUCCESS != xResult)
+            {
+                xResult = CKR_FUNCTION_FAILED;
+                break;
+            }
 
-			while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
-			{
-			}
+            while (OPTIGA_LIB_BUSY == pkcs11_context.object_list.optiga_lib_status)
+            {
+            }
 
-			// Either by timout or because of success it should end up here
-			if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
-			{
-				xResult = CKR_FUNCTION_FAILED;
-				break;
-			}
+            // Either by timout or because of success it should end up here
+            if (OPTIGA_LIB_SUCCESS != pkcs11_context.object_list.optiga_lib_status)
+            {
+                xResult = CKR_FUNCTION_FAILED;
+                break;
+            }
 
-			pal_os_lock_release(&optiga_mutex);
+            pal_os_lock_release(&optiga_mutex);
 
             session->operation_in_progress = pkcs11NO_OPERATION;
             
         }
-	}while(0);
+    }while(0);
     return xResult;
 }
 
