@@ -40,6 +40,7 @@
 /* OPTIGA(TM) Trust M Includes */
 #include "optiga/optiga_crypt.h"
 #include "optiga/optiga_util.h"
+#include "ecdsa_utils.h"
 #include "optiga/pal/pal_os_lock.h"
 #include "optiga/pal/pal_os_event.h"
 #include "optiga/pal/pal_i2c.h"
@@ -512,8 +513,8 @@ CK_RV pair_host_and_optiga_using_pre_shared_secret(void)
         OPTIGA_UTIL_SET_COMMS_PROTECTION_LEVEL(pkcs11_context.object_list.optiga_util_instance,OPTIGA_COMMS_NO_PROTECTION);
         OPTIGA_UTIL_SET_COMMS_PROTOCOL_VERSION(pkcs11_context.object_list.optiga_util_instance,OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET);
 
-        OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL(pkcs11_context.object_list.optiga_util_instance,OPTIGA_COMMS_NO_PROTECTION);
-        OPTIGA_CRYPT_SET_COMMS_PROTOCOL_VERSION(pkcs11_context.object_list.optiga_util_instance,OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET);
+        OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL(pkcs11_context.object_list.optiga_crypt_instance,OPTIGA_COMMS_NO_PROTECTION);
+        OPTIGA_CRYPT_SET_COMMS_PROTOCOL_VERSION(pkcs11_context.object_list.optiga_crypt_instance,OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHARED_SECRET);
 
         /**
          * 2. Read Platform Binding Shared secret (0xE140) data object metadata from OPTIGA
