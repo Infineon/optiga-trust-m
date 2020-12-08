@@ -303,7 +303,7 @@ pal_status_t pal_i2c_write(const pal_i2c_t * p_i2c_context, uint8_t * p_data, ui
 
     if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context))
     {
-        gp_pal_i2c_current_ctx = p_i2c_context;
+        gp_pal_i2c_current_ctx = (pal_i2c_t *)p_i2c_context;
 
         //Invoke the low level i2c master driver API to write to the bus
         usb_lib_status = libusb_interrupt_transfer(pal_usb->handle,
@@ -323,7 +323,7 @@ pal_status_t pal_i2c_write(const pal_i2c_t * p_i2c_context, uint8_t * p_data, ui
         }
         else
         {
-            if (usb_i2c_poll_operation_result(p_i2c_context) == PAL_STATUS_SUCCESS)
+            if (usb_i2c_poll_operation_result((pal_i2c_t *)p_i2c_context) == PAL_STATUS_SUCCESS)
             {
                 i2c_master_end_of_transmit_callback();
                 status = PAL_STATUS_SUCCESS;
@@ -394,7 +394,7 @@ pal_status_t pal_i2c_read(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uin
     //Acquire the I2C bus before read/write
     if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context))
     {
-        gp_pal_i2c_current_ctx = p_i2c_context;
+        gp_pal_i2c_current_ctx = (pal_i2c_t *)p_i2c_context;
         usb_lib_status = libusb_interrupt_transfer(pal_usb->handle,
                                                    pal_usb->hid_ep_out,
                                                    report,
@@ -419,7 +419,7 @@ pal_status_t pal_i2c_read(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uin
                                                    sizeof(report),
                                                    &transfered,
                                                    USB_TIMEOUT);
-        rx_result = usb_i2c_poll_operation_result(p_i2c_context);
+        rx_result = usb_i2c_poll_operation_result((pal_i2c_t *)p_i2c_context);
         if (rx_result == PAL_STATUS_SUCCESS && usb_lib_status == 0 && transfered >= (2 + length) && report[1] == length)
         {
             memcpy(p_data, &report[2], report[1]);
