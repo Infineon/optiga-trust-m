@@ -1,4 +1,7 @@
-These files are part of the Application Note [TLS client implementation using mbed TLS crypto library with OPTIGA™ Trust M](https://github.com/Infineon/mbedtls-optiga-trust-m)
+These files are part of the Application Notes
+1. [TLS client implementation using mbed TLS crypto library with OPTIGA™ Trust M](https://github.com/Infineon/mbedtls-optiga-trust-m)
+2. [AWS IoT FreeRTOS](https://github.com/Infineon/amazon-freertos-optiga-trust)
+3. [Microsoft Azure IoT](https://github.com/Infineon/azure-optiga-trust-m) 
 
 **Note A.** If you want to use these files standalone, please keep in mind, that you need to [initialise](https://github.com/Infineon/optiga-trust-m/wiki/Initialisation-hints) your chip prior calling the API.
 
