@@ -972,9 +972,9 @@ int32_t protected_update_create_manifest(   manifest_t * manifest_data,
             cbor_set_byte_string(local_manifest_buffer, COUID_SIZE, &offset);
             memcpy((local_manifest_buffer+offset), couid, COUID_SIZE);
             offset += COUID_SIZE;
-			pal_logger_print_message("Used CO-UID:");
-			pal_logger_print_hex_data(couid, COUID_SIZE);
-			pal_logger_print_message("\r\n");
+			//pal_logger_print_message("Used CO-UID:");
+			//pal_logger_print_hex_data(couid, COUID_SIZE);
+			//pal_logger_print_message("\r\n");
 			free(couid);
         }
         else
