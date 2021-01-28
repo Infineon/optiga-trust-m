@@ -36,7 +36,7 @@
 #include "optiga/pal/pal_gpio.h"
 #include "optiga/pal/pal_i2c.h"
 
-
+#include "cyhal.h"
 ///**
 //* @brief Initialization data structure of DIGITAL_IO APP
 //*/
