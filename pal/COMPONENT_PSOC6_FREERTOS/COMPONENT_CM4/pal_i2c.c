@@ -60,17 +60,17 @@ static void i2c_task(void *pvParameters)
 
 	upper_layer_handler = (upper_layer_callback_t)gp_pal_i2c_current_ctx->upper_layer_event_handler;
 
-    if (event & ARM_I2C_EVENT_TRANSFER_DONE)
-	{
-	  if (event & (ARM_I2C_EVENT_ADDRESS_NACK | ARM_I2C_EVENT_ARBITRATION_LOST | ARM_I2C_EVENT_BUS_ERROR | ARM_I2C_EVENT_TRANSFER_INCOMPLETE))
-	  {
-	    upper_layer_handler(gp_pal_i2c_current_ctx->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
-	  }
-	  else
-	  {
-	    upper_layer_handler(gp_pal_i2c_current_ctx->p_upper_layer_ctx, PAL_I2C_EVENT_SUCCESS);
-	  }
-	}
+//    if (event & ARM_I2C_EVENT_TRANSFER_DONE)
+//	{
+//	  if (event & (ARM_I2C_EVENT_ADDRESS_NACK | ARM_I2C_EVENT_ARBITRATION_LOST | ARM_I2C_EVENT_BUS_ERROR | ARM_I2C_EVENT_TRANSFER_INCOMPLETE))
+//	  {
+//	    upper_layer_handler(gp_pal_i2c_current_ctx->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
+//	  }
+//	  else
+//	  {
+//	    upper_layer_handler(gp_pal_i2c_current_ctx->p_upper_layer_ctx, PAL_I2C_EVENT_SUCCESS);
+//	  }
+//	}
   }
 }
 
@@ -203,7 +203,7 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t* p_i2c_context)
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C write fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy. 
  */
-pal_status_t pal_i2c_write(pal_i2c_t *p_i2c_context, uint8_t *p_data, uint16_t length)
+pal_status_t pal_i2c_write(const pal_i2c_t *p_i2c_context, uint8_t *p_data, uint16_t length)
 {
   pal_status_t pal_status = PAL_STATUS_FAILURE;
 
@@ -271,7 +271,7 @@ pal_status_t pal_i2c_write(pal_i2c_t *p_i2c_context, uint8_t *p_data, uint16_t l
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C read fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
-pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t length)
+pal_status_t pal_i2c_read(const pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t length)
 {
   pal_status_t pal_status = PAL_STATUS_FAILURE;
 
