@@ -36,6 +36,7 @@
 #include "optiga/pal/pal_gpio.h"
 #include "optiga/pal/pal_i2c.h"
 
+
 ///**
 //* @brief Initialization data structure of DIGITAL_IO APP
 //*/
@@ -60,7 +61,7 @@
 //  .hwctrl = XMC_GPIO_HWCTRL_DISABLED
 //};
 
-//extern I2C_MASTER_t i2c_master_0;
+cyhal_i2c_t i2c_master_0;
 /*********************************************************************************************************************
  * pal ifx i2c instance
  *********************************************************************************************************************/
@@ -70,7 +71,7 @@
 pal_i2c_t optiga_pal_i2c_context_0 =
 {
     /// Pointer to I2C master platform specific context
-    //(void*)&i2c_master_0,
+    (void*)&i2c_master_0,
 	NULL,
     /// Slave address
     0x30,
