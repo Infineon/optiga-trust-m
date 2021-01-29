@@ -72,7 +72,6 @@ pal_i2c_t optiga_pal_i2c_context_0 =
 {
     /// Pointer to I2C master platform specific context
     (void*)&i2c_master_0,
-	NULL,
     /// Slave address
     0x30,
     /// Upper layer context
