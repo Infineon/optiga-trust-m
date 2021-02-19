@@ -191,33 +191,27 @@ void pal_os_event_trigger_registered_callback(void)
     register_callback callback;
     struct itimerspec its;
 
-    // !!!OPTIGA_LIB_PORTING_REQUIRED
-    // The following steps related to TIMER must be taken care while porting to different platform
-    // TBD
-    TRUSTM_PAL_EVENT_DBGFN(">");    
+    TRUSTM_PAL_EVENT_DBGFN(">");  
+    
+    its.it_value.tv_sec = 0;
+    its.it_value.tv_nsec = 0;
+    its.it_interval.tv_sec = 0;
+    its.it_interval.tv_nsec = 0;
+    
+    if (timer_settime(timerid, 0, &its, NULL) == -1)
+    {
+        fprintf(stderr, "Error in timer_settime\n");
+        exit(1);
+    }
 
     if (pal_os_event_0.callback_registered)
     {
         callback = pal_os_event_0.callback_registered;
         pal_os_event_0.callback_registered = NULL;
-	
-	// Stop the timer
-	its.it_value.tv_sec = 0;
-	its.it_value.tv_nsec = 0;
-	its.it_interval.tv_sec = 0;
-	its.it_interval.tv_nsec = 0;
-
-	if (timer_settime(timerid, 0, &its, NULL) == -1)
-	{
-	    TRUSTM_PAL_EVENT_ERRFN("Fail to stop the timer\n");
-	    exit(1);
-	}
-	
         callback((void * )pal_os_event_0.callback_ctx);
     }
-    
-    TRUSTM_PAL_EVENT_DBGFN("<");    
-    
+
+    TRUSTM_PAL_EVENT_DBGFN("<"); 
 }
 /// @endcond
 
@@ -226,40 +220,41 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
                                              void * callback_args,
                                              uint32_t time_us)
 {
-	struct itimerspec its;
-	long long freq_nanosecs;
-	//sigset_t mask;
+    struct itimerspec its;
+    long long freq_nanosecs;
+    int ret = 0;
+    //sigset_t mask;
 
-	TRUSTM_PAL_EVENT_DBGFN(">");    
-
-
-	//uint8_t scheduler_timer;
+    TRUSTM_PAL_EVENT_DBGFN(">");
+    
+    //uint8_t scheduler_timer;
     p_pal_os_event->callback_registered = callback;
     p_pal_os_event->callback_ctx = callback_args;
-	
-	/* Start the timer */
-
-	freq_nanosecs = time_us * 1000;
-	its.it_value.tv_sec = freq_nanosecs / 1000000000;
-	its.it_value.tv_nsec = freq_nanosecs % 1000000000;
-	its.it_interval.tv_sec = its.it_value.tv_sec;
-	its.it_interval.tv_nsec = its.it_value.tv_nsec;
-
-	//printf("freq_nanosecs = %lld\n", time_us * 1000);
-	//printf("its.it_value.tv_sec = %lld", freq_nanosecs / 1000000000);
-	//printf("its.it_value.tv_nsec = %lld\n", freq_nanosecs % 1000000000);
-	//printf("its.it_interval.tv_sec = %lld\n", its.it_value.tv_sec);
-	//printf("its.it_interval.tv_nsec = %lld\n", its.it_value.tv_nsec);
-
-	
-	if (timer_settime(timerid, 0, &its, NULL) == -1)
-	{
-		printf("timer_settime\n");
-	    exit(1);
-	}
-	TRUSTM_PAL_EVENT_DBGFN("<");    
+    
+    /* Start the timer */
+    freq_nanosecs = time_us * 1000;
+    its.it_value.tv_sec = (freq_nanosecs / 1000000000);
+    its.it_value.tv_nsec = (freq_nanosecs % 1000000000);
+    its.it_interval.tv_sec = 0;
+    its.it_interval.tv_nsec = 0;
+    
+    if (( ret = timer_settime(timerid, 0, &its, NULL)) == -1)    
+    {
+        int errsv = errno;
+        fprintf(stderr,"timer_settime FAILED!!!\n");
+        if(errsv == EINVAL)
+        {
+            fprintf(stderr,"INVALID VALUE!\n");
+        }
+        else
+        {
+            fprintf(stderr,"UNKOWN ERROR: %d\n",errsv);
+        }
+        exit(1);
+    }
+    
+    TRUSTM_PAL_EVENT_DBGFN("<"); 
 }
-
 //lint --e{818,715} suppress "As there is no implementation, pal_os_event is not used"
 void pal_os_event_destroy(pal_os_event_t * pal_os_event)
 {
