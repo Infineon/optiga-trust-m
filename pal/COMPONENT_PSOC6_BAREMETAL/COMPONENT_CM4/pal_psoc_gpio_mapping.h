@@ -26,40 +26,42 @@
 *
 * \author Infineon Technologies AG
 *
-* \file pal.c
+* \file pal_psoc_gpio_mapping.h
 *
-* \brief    This file implements the platform abstraction layer APIs.
+* \brief   This file provides the PSOC specific gpio pin mapping.
 *
 * \ingroup  grPAL
 *
 * @{
 */
 
+#ifndef PAL_PSOC_GPIO_MAPPING
+#define PAL_PSOC_GPIO_MAPPING
 
-#include "optiga/pal/pal.h"
-#include "optiga/pal/pal_gpio.h"
-#include "optiga/pal/pal_os_event.h"
-#include "optiga/pal/pal_os_timer.h"
-#include "pal_psoc_gpio_mapping.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-extern void pal_os_event_init(void);
-extern pal_gpio_t optiga_vdd_0;
+#include "pal.h"
 
-
-pal_status_t pal_init(void)
+/**
+ * \brief Structure defines PSOC6 gpio pin configuration.
+ */
+typedef struct pal_psoc_gpio
 {
-    pal_os_event_init();
-	pal_gpio_init(&optiga_vdd_0);
-	pal_timer_init();
-    return PAL_STATUS_SUCCESS;
-}
+    uint8_t port_num;
+    bool_t init_state;
+
+} pal_psoc_gpio_t;
 
 
-pal_status_t pal_deinit(void)
-{
-    return PAL_STATUS_SUCCESS;
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* PAL_PSOC_GPIO_MAPPING */
 
 /**
 * @}
 */
+

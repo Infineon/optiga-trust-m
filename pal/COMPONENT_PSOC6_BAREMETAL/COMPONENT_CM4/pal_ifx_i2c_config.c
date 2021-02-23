@@ -40,6 +40,8 @@
 #include "optiga/pal/pal_i2c.h"
 #include "optiga/ifx_i2c/ifx_i2c_config.h"
 #include "optiga/pal/pal_ifx_i2c_config.h"
+#include "pal_psoc_i2c_mapping.h"
+#include "pal_psoc_gpio_mapping.h"
 #include "cy_pdl.h"
 #include "cyhal.h"
 #include "cybsp.h"
@@ -47,25 +49,6 @@
 // i2c driver related
 cyhal_i2c_t i2c_master_obj;
 
-/**
- * \brief Structure defines PSOC6 gpio pin configuration.
- */
-typedef struct pal_psoc_gpio
-{
-    uint8_t port_num;
-    bool_t init_state;
-
-} pal_psoc_gpio_t;
-
-/**
- * \brief Structure defines PSOC6 gpio pin configuration.
- */
-typedef struct pal_psoc_i2c
-{
-    cyhal_i2c_t *     i2c_master_channel;
-    uint32_t         sda_port_num;
-    uint32_t         sca_port_num;
-}   pal_psoc_i2c_t;
 
 pal_psoc_gpio_t optiga_vdd_config =
 {
@@ -75,15 +58,15 @@ pal_psoc_gpio_t optiga_vdd_config =
 
 pal_psoc_gpio_t optiga_reset_config =
 {
-    .port_num = P5_6,
+    .port_num = P8_2,
     .init_state = true
 };
 
 pal_psoc_i2c_t optiga_i2c_master_config =
 {
     .i2c_master_channel = &i2c_master_obj,
-    .sca_port_num = P6_0,
-    .sda_port_num = P6_1
+    .sca_port_num = CYBSP_I2C_SCL_OPTIGA,
+    .sda_port_num = CYBSP_I2C_SDA_OPTIGA
 };
 
 /**
@@ -92,7 +75,7 @@ pal_psoc_i2c_t optiga_i2c_master_config =
 pal_gpio_t optiga_vdd_0 =
 {
     // Platform specific GPIO context for the pin used to toggle Vdd.
-    (void*)&optiga_vdd_config
+    NULL
 };
 
 /**
