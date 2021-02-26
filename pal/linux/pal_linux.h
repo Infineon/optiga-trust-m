@@ -49,8 +49,10 @@ typedef uint16_t gpio_pin_t;
 /** @brief PAL I2C context structure */
 typedef struct pal_linux
 {
+    /// I2C device file path, e.g. /dev/i2c-1
+    const char *i2c_if;
     /// This field consists the handle for I2c device
-    int32_t i2c_handle;
+    int i2c_handle;
     /// Pointer to store the callers handler
     void * upper_layer_event_handler;
 } pal_linux_t;

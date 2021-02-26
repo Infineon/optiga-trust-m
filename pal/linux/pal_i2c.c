@@ -49,9 +49,6 @@
 #define LOG_HAL(...) //printf(__VA_ARGS__)
 #endif
 
-/// I2C device
-char * i2c_if = "/dev/i2c-1";
-
 // Slave address not initialization
 #define IFXI2C_SLAVE_ADDRESS_INIT 0xFFFF
 #define PAL_I2C_MASTER_MAX_BITRATE 100
@@ -161,7 +158,7 @@ pal_status_t pal_i2c_init(const pal_i2c_t* p_i2c_context)
 	do
 	{
 		pal_linux = (pal_linux_t*) p_i2c_context->p_i2c_hw_config;
-		pal_linux->i2c_handle = open(i2c_if, O_RDWR);
+		pal_linux->i2c_handle = open(pal_linux->i2c_if, O_RDWR);
 		LOG_HAL("IFX OPTIGA TRUST X Logs \n");
 		
 		// Assign the slave address

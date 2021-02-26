@@ -41,7 +41,7 @@
 
 #include "pal_linux.h"
 
-pal_linux_t linux_events = {0};
+pal_linux_t linux_events = {"/dev/i2c-1", 0};
 
 #define GPIO_PIN_VDD 27
 #define GPIO_PIN_RESET 17
