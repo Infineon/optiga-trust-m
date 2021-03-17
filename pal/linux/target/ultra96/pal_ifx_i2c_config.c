@@ -41,7 +41,7 @@
 
 #include "pal_linux.h"
 
-pal_linux_t linux_events = {0};
+pal_linux_t linux_events = {"/dev/i2c-1", 0};
 
 // If you use Raspberry Pi, you can uncomment the following lines
 // gpio_pin_t gpio_pin_vdd = 27;
