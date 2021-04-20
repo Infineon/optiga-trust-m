@@ -37,15 +37,6 @@
 #ifndef _PAL_LINUX_H_
 #define _PAL_LINUX_H_
 
-#include "optiga/pal/pal.h"
-
-#define false 0
-#define true 1
-
-#define HIGH 1
-#define LOW 0
-typedef uint16_t gpio_pin_t;
-
 /** @brief PAL I2C context structure */
 typedef struct pal_linux
 {
@@ -58,7 +49,7 @@ typedef struct pal_linux
 } pal_linux_t;
 
 typedef struct pal_linux_gpio {
-    gpio_pin_t pin_nr;
+    int pin_nr;
     int fd;
 } pal_linux_gpio_t;
 
