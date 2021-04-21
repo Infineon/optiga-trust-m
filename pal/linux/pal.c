@@ -34,7 +34,11 @@
 * @{
 */
 
+#include "optiga/optiga_lib_config.h"
 #include "optiga/pal/pal.h"
+#include "optiga/pal/pal_gpio.h"
+#include "optiga/pal/pal_ifx_i2c_config.h"
+#include "optiga/pal/pal_os_timer.h"
 
 /**
  * @brief Initializes the PAL layer
@@ -53,6 +57,24 @@
  */
 pal_status_t pal_init(void)
 {
+	pal_status_t status;
+
+#if OPTIGA_COMMS_DEFAULT_RESET_TYPE == 0
+    status = pal_gpio_init(&optiga_vdd_0);
+    if (status != PAL_STATUS_SUCCESS)
+        return status;
+#endif
+
+#if OPTIGA_COMMS_DEFAULT_RESET_TYPE == 0 || OPTIGA_COMMS_DEFAULT_RESET_TYPE == 2
+    status = pal_gpio_init(&optiga_reset_0);
+    if (status != PAL_STATUS_SUCCESS)
+        return status;
+#endif
+
+	status = pal_timer_init();
+    if (status != PAL_STATUS_SUCCESS)
+        return status;
+
     return PAL_STATUS_SUCCESS;
 }
 
@@ -73,6 +95,16 @@ pal_status_t pal_init(void)
  */
 pal_status_t pal_deinit(void)
 {
+    pal_timer_deinit();
+
+#if OPTIGA_COMMS_DEFAULT_RESET_TYPE == 0 || OPTIGA_COMMS_DEFAULT_RESET_TYPE == 2
+    pal_gpio_deinit(&optiga_reset_0);
+#endif
+
+#if OPTIGA_COMMS_DEFAULT_RESET_TYPE == 0
+    pal_gpio_deinit(&optiga_vdd_0);
+#endif
+
     return PAL_STATUS_SUCCESS;
 }
 
