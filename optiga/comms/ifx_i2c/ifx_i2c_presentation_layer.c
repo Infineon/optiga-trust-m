@@ -317,7 +317,7 @@ _STATIC_H optiga_lib_status_t ifx_i2c_prl_prf(ifx_i2c_context_t * p_ctx)
     optiga_lib_status_t return_status = IFX_I2C_HANDSHAKE_ERROR;
     uint8_t label_input[] = PRL_LABEL;
     uint8_t secret_input[OPTIGA_SHARED_SECRET_MAX_LENGTH];
-    uint16_t shared_secret_length;
+    uint16_t shared_secret_length = OPTIGA_SHARED_SECRET_MAX_LENGTH;
     do
     {
         //Reading pre-shared secret from datastore
