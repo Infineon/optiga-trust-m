@@ -1,0 +1,9 @@
+<map id="mbedtls_ssl_key_cert" name="mbedtls_ssl_key_cert">
+<area shape="rect" id="node1" title=" " alt="" coords="630,437,779,464"/>
+<area shape="rect" id="node2" href="$structmbedtls__x509__crt.html" title=" " alt="" coords="505,348,630,375"/>
+<area shape="rect" id="node3" href="$structmbedtls__asn1__sequence.html" title=" " alt="" coords="119,177,285,203"/>
+<area shape="rect" id="node4" href="$structmbedtls__asn1__buf.html" title=" " alt="" coords="139,5,265,32"/>
+<area shape="rect" id="node5" href="$structmbedtls__asn1__named__data.html" title=" " alt="" coords="363,177,545,203"/>
+<area shape="rect" id="node6" href="$structmbedtls__x509__time.html" title=" " alt="" coords="623,177,757,203"/>
+<area shape="rect" id="node7" href="$structmbedtls__pk__context.html" title="Public key container." alt="" coords="782,177,921,203"/>
+</map>

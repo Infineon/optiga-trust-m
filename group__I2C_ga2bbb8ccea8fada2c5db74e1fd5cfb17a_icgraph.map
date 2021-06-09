@@ -1,0 +1,6 @@
+<map id="XMC_I2C_CH_ClearStatusFlag" name="XMC_I2C_CH_ClearStatusFlag">
+<area shape="rect" id="node1" title=" " alt="" coords="276,56,476,83"/>
+<area shape="rect" id="node2" href="$Generated_2I2C__MASTER_2i2c__master_8h.html#acf875e6d607672d79ad31f08d744716e" title="Sends repeated start command to slave." alt="" coords="5,5,228,32"/>
+<area shape="rect" id="node3" href="$Generated_2I2C__MASTER_2i2c__master_8h.html#a98378dd8b7dc667e0ce99db4d67ffb51" title="Sends start command to slave." alt="" coords="33,56,200,83"/>
+<area shape="rect" id="node4" href="$Generated_2I2C__MASTER_2i2c__master_8h.html#ac78febfb3c206e84381b5185054357cf" title="Sends stop command to slave." alt="" coords="33,107,200,133"/>
+</map>

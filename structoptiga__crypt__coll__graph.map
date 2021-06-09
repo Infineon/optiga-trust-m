@@ -1,0 +1,14 @@
+<map id="optiga_crypt" name="optiga_crypt">
+<area shape="rect" id="node1" title="OPTIGA crypt instance structure." alt="" coords="645,284,739,311"/>
+<area shape="rect" id="node2" href="$unionoptiga__crypt__params.html" title="union for OPTIGA crypt parameters" alt="" coords="407,284,549,311"/>
+<area shape="rect" id="node3" href="$structoptiga__symmetric__enc__dec__params.html" title="Specifies the data structure for symmetric encrypt and decrypt." alt="" coords="23,27,176,69"/>
+<area shape="rect" id="node4" href="$structoptiga__gen__symkey__params.html" title="Specifies the data structure for symmetric generate key." alt="" coords="5,95,193,121"/>
+<area shape="rect" id="node5" href="$structoptiga__enc__dec__asym.html" title="Specifies the structure for asymmetric encryption and decryption." alt="" coords="23,155,175,181"/>
+<area shape="rect" id="node6" href="$structoptiga__verify__sign.html" title="Specifies the data structure for ECDSA signature verification." alt="" coords="37,205,161,232"/>
+<area shape="rect" id="node7" href="$structoptiga__calc__ssec.html" title="Specifies the data structure for ecdh secret generation." alt="" coords="38,256,161,283"/>
+<area shape="rect" id="node8" href="$structoptiga__calc__hash.html" title="Specifies the data structure of calculate hash." alt="" coords="38,307,161,333"/>
+<area shape="rect" id="node9" href="$structoptiga__derive__key.html" title="Specifies the structure for derivation of key using pseudo random function." alt="" coords="37,357,162,384"/>
+<area shape="rect" id="node10" href="$structoptiga__calc__sign.html" title="Specifies the data structure for ECDSA signature." alt="" coords="40,408,159,435"/>
+<area shape="rect" id="node11" href="$structoptiga__gen__keypair.html" title="Specifies the data structure for generate key pair." alt="" coords="32,460,167,487"/>
+<area shape="rect" id="node12" href="$structoptiga__get__random.html" title="Specifies the data structure of random generation." alt="" coords="33,511,165,537"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Nested Vectored Interrupt Controller (NVIC)" name="Nested Vectored Interrupt Controller (NVIC)">
+<area shape="rect" id="node1" href="$group__CMSIS__CORE.html" title="Core Register type definitions." alt="" coords="5,5,136,45"/>
+<area shape="rect" id="node2" title="Type definitions for the NVIC Registers." alt="" coords="184,5,355,45"/>
+<area shape="rect" id="node3" href="$group__CMSIS__SCB.html" title="Type definitions for the System Control Block Registers." alt="" coords="403,5,552,45"/>
+</map>

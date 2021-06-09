@@ -1,0 +1,10 @@
+<map id="i2c_master.h" name="i2c_master.h">
+<area shape="rect" id="node1" title=" " alt="" coords="235,5,332,32"/>
+<area shape="rect" id="node2" href="$xmc__gpio_8h.html" title=" " alt="" coords="5,155,95,181"/>
+<area shape="rect" id="node4" href="$xmc__i2c_8h.html" title=" " alt="" coords="113,80,195,107"/>
+<area shape="rect" id="node6" href="$i2c__master__conf_8h.html" title=" " alt="" coords="219,80,347,107"/>
+<area shape="rect" id="node7" href="$DAVE__Common_8h.html" title=" " alt="" coords="371,80,499,107"/>
+<area shape="rect" id="node8" href="$i2c__master__extern_8h.html" title=" " alt="" coords="524,80,664,107"/>
+<area shape="rect" id="node3" href="$xmc__common_8h.html" title=" " alt="" coords="49,229,163,256"/>
+<area shape="rect" id="node5" href="$xmc__usic_8h.html" title=" " alt="" coords="119,155,208,181"/>
+</map>

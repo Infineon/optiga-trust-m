@@ -1,0 +1,5 @@
+<map id="USB_ClassInfo_CDC_Device_t" name="USB_ClassInfo_CDC_Device_t">
+<area shape="rect" id="node1" title="CDC Class Device Mode Configuration and State Structure." alt="" coords="57,124,256,151"/>
+<area shape="rect" id="node2" href="$structCDC__LineEncoding.html" title=" " alt="" coords="5,5,140,32"/>
+<area shape="rect" id="node3" href="$structUSB__Endpoint__Table__t.html" title=" " alt="" coords="164,5,320,32"/>
+</map>

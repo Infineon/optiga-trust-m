@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['random_5fdata_869',['random_data',['../structoptiga__get__random.html#abd8782a75ef5feb95f1d9f3a10333616',1,'optiga_get_random::random_data()'],['../structoptiga__derive__key.html#a5781d149a8c21530ccd3ef65f9fbc1e2',1,'optiga_derive_key::random_data()']]],
+  ['random_5fdata_5flength_870',['random_data_length',['../structoptiga__get__random.html#a9deb2f05a91a48a1834cfe73358cda9e',1,'optiga_get_random::random_data_length()'],['../structoptiga__derive__key.html#a0daece443d6d453140476f717df81523',1,'optiga_derive_key::random_data_length()']]],
+  ['re_5festablish_871',['RE_ESTABLISH',['../ifx__i2c__config_8h.html#a7971cc48518de0f336db687953eccd77',1,'ifx_i2c_config.h']]],
+  ['read_5fperformance_5fmeasurement_872',['READ_PERFORMANCE_MEASUREMENT',['../optiga__example_8h.html#a43962543618304ccace843709c9d8d5f',1,'optiga_example.h']]],
+  ['received_5fdata_5flength_873',['received_data_length',['../structoptiga__symmetric__enc__dec__params.html#aedd9f7f75baf3dccb658024c43f9f6fc',1,'optiga_symmetric_enc_dec_params']]],
+  ['ref_5fbytes_5fto_5fread_874',['ref_bytes_to_read',['../structoptiga__get__data__object.html#ab3ddef2313a64b3a0b4998bce0aa7e24',1,'optiga_get_data_object']]],
+  ['references_875',['References',['../reference.html',1,'']]],
+  ['register_5faction_876',['register_action',['../structifx__i2c__pl.html#ae76fda4ed415b72942e43057b3926b79',1,'ifx_i2c_pl']]],
+  ['register_5fcallback_877',['register_callback',['../pal__os__event_8h.html#a13465cf7cbc4056a8e2c7fc1cbf03198',1,'pal_os_event.h']]],
+  ['request_5fsoft_5freset_878',['request_soft_reset',['../structifx__i2c__pl.html#adc6f754d3c83b40338d9080d2c7911e5',1,'ifx_i2c_pl']]],
+  ['reset_5flow_5ftime_5fmsec_879',['RESET_LOW_TIME_MSEC',['../ifx__i2c__config_8h.html#a5c5c4dda743d36662283116533ee2489',1,'ifx_i2c_config.h']]],
+  ['reset_5fstate_880',['reset_state',['../structifx__i2c__context.html#a58c7f7a899653d8ea08d494956a32f26',1,'ifx_i2c_context']]],
+  ['reset_5ftype_881',['reset_type',['../structifx__i2c__context.html#a7f3565f397661ca5ef7f5dfa9773f82f',1,'ifx_i2c_context']]],
+  ['resynced_882',['resynced',['../structifx__i2c__dl.html#a9b4bc0873a4770a43aac7091f127022c',1,'ifx_i2c_dl']]],
+  ['retransmit_5fcounter_883',['retransmit_counter',['../structifx__i2c__dl.html#ab1d2a25a7eb50e6d13bc3f9c89f66c83',1,'ifx_i2c_dl']]],
+  ['retry_5fcounter_884',['retry_counter',['../structifx__i2c__pl.html#a8b3a67f0e90cb88e58a3b03f19e3bf6f',1,'ifx_i2c_pl']]],
+  ['rsa_5fkey_885',['rsa_key',['../structrsa__key.html',1,'rsa_key'],['../unionkey__params.html#ab01770ececb7e43ceac274d6c8a23688',1,'key_params::rsa_key()']]],
+  ['rsa_5fkey_5ffinal_5ffragment_5farray_886',['rsa_key_final_fragment_array',['../rsa__key__object__confidentiality_8h.html#a6c0e2b633d9d5f0f7b1b0ada94c0ece6',1,'rsa_key_object_confidentiality.h']]],
+  ['rsa_5fkey_5fobject_5fconfidentiality_2eh_887',['rsa_key_object_confidentiality.h',['../rsa__key__object__confidentiality_8h.html',1,'']]],
+  ['rsa_5fkey_5ft_888',['rsa_key_t',['../protected__update__data__set_8h.html#aeed17917434f094113aaaf963dc755bb',1,'protected_update_data_set.h']]],
+  ['rx_5fbuffer_5fsize_889',['rx_buffer_size',['../structifx__i2c__dl.html#a8981c84b5223672dc623d44e27f4a50e',1,'ifx_i2c_dl']]],
+  ['rx_5fframe_5fbuffer_890',['rx_frame_buffer',['../structifx__i2c__context.html#acbf3818403e0a321cb61e291df26e351',1,'ifx_i2c_context']]],
+  ['rx_5fseq_5fnr_891',['rx_seq_nr',['../structifx__i2c__dl.html#a9e92517e8e2271544d642af592d5ed89',1,'ifx_i2c_dl']]]
+];

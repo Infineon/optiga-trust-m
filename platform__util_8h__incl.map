@@ -1,0 +1,6 @@
+<map id="platform_util.h" name="platform_util.h">
+<area shape="rect" id="node1" title="Common and shared functions used by multiple modules in the Mbed TLS library." alt="" coords="71,5,174,32"/>
+<area shape="rect" id="node2" href="$config_8h.html" title="Configuration options (set of defines)" alt="" coords="5,80,123,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="147,80,215,107"/>
+<area shape="rect" id="node3" href="$check__config_8h.html" title="Consistency checks for configuration options." alt="" coords="9,155,119,181"/>
+</map>

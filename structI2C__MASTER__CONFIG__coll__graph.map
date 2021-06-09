@@ -1,0 +1,4 @@
+<map id="I2C_MASTER_CONFIG" name="I2C_MASTER_CONFIG">
+<area shape="rect" id="node1" title="Structure for DMA configuration." alt="" coords="5,95,164,121"/>
+<area shape="rect" id="node2" href="$structXMC__I2C__CH__CONFIG.html" title="I2C_CH configuration structure." alt="" coords="7,5,163,32"/>
+</map>

@@ -1,0 +1,14 @@
+<map id="pal.h" name="pal.h">
+<area shape="rect" id="node1" title="This file provides the prototype declarations of platform abstraction layer." alt="" coords="494,5,545,32"/>
+<area shape="rect" id="node2" href="$optiga_2include_2optiga_2pal_2pal__crypt_8h.html" title="This file provides the prototype declarations of PAL crypt." alt="" coords="5,80,92,107"/>
+<area shape="rect" id="node3" href="$pal__gpio_8h.html" title="This file provides the prototype declarations of PAL GPIO." alt="" coords="248,80,329,107"/>
+<area shape="rect" id="node6" href="$pal__ifx__i2c__config_8h.html" title="This file provides the platform abstraction layer extern declarations for IFX I2C." alt="" coords="409,155,544,181"/>
+<area shape="rect" id="node7" href="$pal__i2c_8h.html" title="This file provides the prototype declarations of PAL I2C." alt="" coords="354,80,429,107"/>
+<area shape="rect" id="node8" href="$optiga_2include_2optiga_2pal_2pal__logger_8h.html" title="This file provides the prototypes declarations for pal logger." alt="" coords="661,80,753,107"/>
+<area shape="rect" id="node9" href="$pal__os__datastore_8h.html" title="This file provides API prototypes of platform abstraction layer for datastore operations." alt="" coords="453,80,585,107"/>
+<area shape="rect" id="node10" href="$pal__os__lock_8h.html" title="This file provides the prototype declarations of PAL OS lock functionalities." alt="" coords="777,80,880,107"/>
+<area shape="rect" id="node11" href="$optiga_2include_2optiga_2pal_2pal__os__memory_8h.html" title="This file provides the prototype declarations of PAL OS MEMORY." alt="" coords="905,80,1030,107"/>
+<area shape="rect" id="node12" href="$pal__os__timer_8h.html" title="This file provides the prototype declarations of PAL OS timer functionalities." alt="" coords="117,80,223,107"/>
+<area shape="rect" id="node4" href="$ifx__i2c__config_8h.html" title="This file defines the structures and macros for the Infineon I2C Protocol." alt="" coords="233,155,344,181"/>
+<area shape="rect" id="node5" href="$ifx__i2c__transport__layer_8h.html" title="This file defines the API prototype for transport layer of the Infineon I2C Protocol Stack library." alt="" coords="149,229,311,256"/>
+</map>

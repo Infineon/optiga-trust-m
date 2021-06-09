@@ -1,0 +1,11 @@
+<map id="XMC_USIC_CH_SetInterruptNodePointer" name="XMC_USIC_CH_SetInterruptNodePointer">
+<area shape="rect" id="node1" title=" " alt="" coords="260,235,445,276"/>
+<area shape="rect" id="node2" href="$group__I2C.html#gacbe84db2e8f8dcd1946fd3ccc76d657b" title=" " alt="" coords="13,5,204,47"/>
+<area shape="rect" id="node3" href="$group__I2C.html#gaf6badf2e9a73b1ccd2f9b7813dc33114" title=" " alt="" coords="7,71,211,112"/>
+<area shape="rect" id="node4" href="$group__I2S.html#gae32b41a5c34173f65ca79f4e5adc6122" title=" " alt="" coords="13,136,204,177"/>
+<area shape="rect" id="node5" href="$group__I2S.html#ga54f492208f667b4fabe6a2d265ed56ac" title=" " alt="" coords="7,201,211,243"/>
+<area shape="rect" id="node6" href="$group__SPI.html#ga35acc7ffc762fc74473bf3dd59a259f3" title=" " alt="" coords="12,267,205,308"/>
+<area shape="rect" id="node7" href="$group__SPI.html#ga7c65917b592c67b71b4970d67cbedc4e" title=" " alt="" coords="5,332,212,373"/>
+<area shape="rect" id="node8" href="$group__UART.html#ga93fc1ad8d89020683ed39cdb546bacdd" title=" " alt="" coords="5,397,212,439"/>
+<area shape="rect" id="node9" href="$group__UART.html#ga78efe9d95ee8f625db1324caaba9306c" title=" " alt="" coords="14,463,203,504"/>
+</map>

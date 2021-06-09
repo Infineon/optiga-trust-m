@@ -1,0 +1,7 @@
+<map id="XMC_USIC_CH_SetInputSource" name="XMC_USIC_CH_SetInputSource">
+<area shape="rect" id="node1" title=" " alt="" coords="264,81,471,108"/>
+<area shape="rect" id="node2" href="$group__I2C.html#ga1b74dc72445ffb42447cec6cc8c0c392" title=" " alt="" coords="13,5,209,32"/>
+<area shape="rect" id="node3" href="$group__I2S.html#ga458fa12fd2eae928aa7bff62a58f89c7" title=" " alt="" coords="13,56,209,83"/>
+<area shape="rect" id="node4" href="$group__SPI.html#ga427979d23a0325fa4f4f3c38d84f4127" title=" " alt="" coords="11,107,210,133"/>
+<area shape="rect" id="node5" href="$group__UART.html#gae5f466fb1df22b9039936ed4e39f527a" title=" " alt="" coords="5,157,216,184"/>
+</map>

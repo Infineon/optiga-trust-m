@@ -1,0 +1,12 @@
+<map id="ssl_ticket.h" name="ssl_ticket.h">
+<area shape="rect" id="node1" title="TLS server ticket callbacks implementation." alt="" coords="351,5,441,32"/>
+<area shape="rect" id="node2" href="$ssl_8h.html" title="SSL/TLS functions." alt="" coords="236,80,287,107"/>
+<area shape="rect" id="node7" href="$cipher_8h.html" title="This file contains an abstraction interface for use with the cipher primitives provided by the librar..." alt="" coords="430,229,498,256"/>
+<area shape="rect" id="node3" href="$config_8h.html" title="Configuration options (set of defines)" alt="" coords="175,379,241,405"/>
+<area shape="rect" id="node4" href="$bignum_8h.html" title="Multi&#45;precision integer library." alt="" coords="171,304,245,331"/>
+<area shape="rect" id="node5" href="$ecp_8h.html" title="This file provides an API for Elliptic Curves over GF(P) (ECP)." alt="" coords="214,229,269,256"/>
+<area shape="rect" id="node6" href="$ssl__ciphersuites_8h.html" title="SSL Ciphersuites for mbed TLS." alt="" coords="401,155,527,181"/>
+<area shape="rect" id="node8" href="$x509__crt_8h.html" title="X.509 certificate parsing and writing." alt="" coords="5,155,88,181"/>
+<area shape="rect" id="node9" href="$x509__crl_8h.html" title="X.509 certificate revocation list parsing." alt="" coords="56,229,139,256"/>
+<area shape="rect" id="node10" href="$ecdh_8h.html" title="This file contains ECDH definitions and functions." alt="" coords="264,155,325,181"/>
+</map>

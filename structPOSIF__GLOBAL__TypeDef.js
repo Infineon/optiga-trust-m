@@ -1,0 +1,28 @@
+var structPOSIF__GLOBAL__TypeDef =
+[
+    [ "HALP", "structPOSIF__GLOBAL__TypeDef.html#a212e2a387e1e625d60ee7590536ee723", null ],
+    [ "HALPS", "structPOSIF__GLOBAL__TypeDef.html#a9556b6a8609d68f48b3d681933d0ee02", null ],
+    [ "MCM", "structPOSIF__GLOBAL__TypeDef.html#aea6807df1adedf7d5ba788004b2d731e", null ],
+    [ "MCMC", "structPOSIF__GLOBAL__TypeDef.html#a99098615841745f90901aa00cf7cd7fa", null ],
+    [ "MCMF", "structPOSIF__GLOBAL__TypeDef.html#ad3dc7333d998c85fbcbc49a31c33cdc7", null ],
+    [ "MCMS", "structPOSIF__GLOBAL__TypeDef.html#a3f12c6c40d2dfbf2a59a31de89e2c15d", null ],
+    [ "MCSM", "structPOSIF__GLOBAL__TypeDef.html#af98a0c2666bc8c13a5a8bab80e2d963c", null ],
+    [ "MIDR", "structPOSIF__GLOBAL__TypeDef.html#a2adf19ec0f3a1cc864e2248b4fff24b0", null ],
+    [ "PCONF", "structPOSIF__GLOBAL__TypeDef.html#a4161211044511e061baf5d59a711ecbf", null ],
+    [ "PDBG", "structPOSIF__GLOBAL__TypeDef.html#a993e27c025603f37ce3bc86819047f68", null ],
+    [ "PFLG", "structPOSIF__GLOBAL__TypeDef.html#abf75d478882a4edf9a572d41feabbab2", null ],
+    [ "PFLGE", "structPOSIF__GLOBAL__TypeDef.html#a8f7164037c6cb73e60474f4b9d7245e3", null ],
+    [ "PRUN", "structPOSIF__GLOBAL__TypeDef.html#a017f5cc4996b04a7f2809d0b2c9be778", null ],
+    [ "PRUNC", "structPOSIF__GLOBAL__TypeDef.html#acaf3594df4531e1fb88c80b31774b0ac", null ],
+    [ "PRUNS", "structPOSIF__GLOBAL__TypeDef.html#ae500e0197da047ec13beb56723634adb", null ],
+    [ "PSUS", "structPOSIF__GLOBAL__TypeDef.html#a344104f8e1b0785ad0e506b2adc1b563", null ],
+    [ "QDC", "structPOSIF__GLOBAL__TypeDef.html#a75285d16439991a782ba4e113e89d0e1", null ],
+    [ "RESERVED", "structPOSIF__GLOBAL__TypeDef.html#a4f456c15dbc2960d1d3f4dd67d27ba56", null ],
+    [ "RESERVED1", "structPOSIF__GLOBAL__TypeDef.html#ab511539126768720fe8998bbb6879969", null ],
+    [ "RESERVED2", "structPOSIF__GLOBAL__TypeDef.html#ac285b9dc2bfae354478e006d7bf91669", null ],
+    [ "RESERVED3", "structPOSIF__GLOBAL__TypeDef.html#a35f4d91d69b060d8bc4766a143e48524", null ],
+    [ "RESERVED4", "structPOSIF__GLOBAL__TypeDef.html#a4adfc140ac845435240717edc91b0442", null ],
+    [ "RESERVED5", "structPOSIF__GLOBAL__TypeDef.html#afaa5bb4e583a845641336d5139d3dc5a", null ],
+    [ "RPFLG", "structPOSIF__GLOBAL__TypeDef.html#ac20f8cbf01dd1d4734ce7b3715c3d3bf", null ],
+    [ "SPFLG", "structPOSIF__GLOBAL__TypeDef.html#ae8190ad6b8a66ee18aa1f470eb669ca7", null ]
+];

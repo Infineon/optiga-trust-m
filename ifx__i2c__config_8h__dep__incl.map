@@ -1,0 +1,8 @@
+<map id="ifx_i2c_config.h" name="ifx_i2c_config.h">
+<area shape="rect" id="node1" title="This file defines the structures and macros for the Infineon I2C Protocol." alt="" coords="313,5,424,32"/>
+<area shape="rect" id="node2" href="$ifx__i2c_8h.html" title="This file defines the API prototype for IFX I2C protocol v2.00 wrapper." alt="" coords="5,87,76,114"/>
+<area shape="rect" id="node3" href="$ifx__i2c__data__link__layer_8h.html" title="This file defines the API prototype for data link layer of the Infineon I2C Protocol Stack library." alt="" coords="100,87,264,114"/>
+<area shape="rect" id="node4" href="$ifx__i2c__physical__layer_8h.html" title="This file defines the API prototype for physical layer of the Infineon I2C Protocol Stack library." alt="" coords="289,87,449,114"/>
+<area shape="rect" id="node5" href="$ifx__i2c__presentation__layer_8h.html" title="Module for the presentation layer of the Infineon I2C Protocol Stack library." alt="" coords="473,80,611,121"/>
+<area shape="rect" id="node6" href="$ifx__i2c__transport__layer_8h.html" title="This file defines the API prototype for transport layer of the Infineon I2C Protocol Stack library." alt="" coords="635,87,798,114"/>
+</map>

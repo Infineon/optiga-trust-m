@@ -1,0 +1,6 @@
+<map id="mbedtls_ssl_cache_entry" name="mbedtls_ssl_cache_entry">
+<area shape="rect" id="node1" title="This structure is used for storing cache entries." alt="" coords="5,420,176,447"/>
+<area shape="rect" id="node2" href="$structmbedtls__asn1__buf.html" title=" " alt="" coords="27,5,154,32"/>
+<area shape="rect" id="node4" href="$structmbedtls__x509__crt.html" title=" " alt="" coords="111,241,236,268"/>
+<area shape="rect" id="node3" href="$structmbedtls__ssl__session.html" title=" " alt="" coords="107,331,251,357"/>
+</map>

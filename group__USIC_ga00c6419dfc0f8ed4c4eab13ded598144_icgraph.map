@@ -1,0 +1,5 @@
+<map id="XMC_USIC_CH_ConfigExternalInputSignalToBRG" name="XMC_USIC_CH_ConfigExternalInputSignalToBRG">
+<area shape="rect" id="node1" title=" " alt="" coords="247,39,449,80"/>
+<area shape="rect" id="node2" href="$group__I2C.html#ga2b4116bd10e27e098fbdffe4021ef222" title=" " alt="" coords="7,5,197,47"/>
+<area shape="rect" id="node3" href="$group__SPI.html#ga6f95820f983b220d767d9b4bd904ac1b" title=" " alt="" coords="5,71,199,112"/>
+</map>

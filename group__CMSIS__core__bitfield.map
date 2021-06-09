@@ -1,0 +1,5 @@
+<map id="Core register bit field macros" name="Core register bit field macros">
+<area shape="rect" id="node1" href="$group__CMSIS__core__base.html" title="Definitions for base addresses, unions, and structures." alt="" coords="392,13,505,38"/>
+<area shape="rect" id="node2" href="$group__CMSIS__CoreDebug.html" title="Type definitions for the Core Debug Registers." alt="" coords="5,5,155,45"/>
+<area shape="rect" id="node3" title="Macros for use with bit field definitions (xxx_Pos, xxx_Msk)." alt="" coords="203,5,344,45"/>
+</map>

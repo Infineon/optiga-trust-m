@@ -1,0 +1,4 @@
+<map id="XMC_I2C_CH_MasterReceiveAck" name="XMC_I2C_CH_MasterReceiveAck">
+<area shape="rect" id="node1" title=" " alt="" coords="235,5,449,32"/>
+<area shape="rect" id="node2" href="$Generated_2I2C__MASTER_2i2c__master_8h.html#aeb3d00e7f9ede38321b1b419c47d9e29" title="Receives the ACK from slave." alt="" coords="5,5,187,32"/>
+</map>

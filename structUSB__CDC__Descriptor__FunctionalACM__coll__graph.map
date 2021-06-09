@@ -1,0 +1,4 @@
+<map id="USB_CDC_Descriptor_FunctionalACM" name="USB_CDC_Descriptor_FunctionalACM">
+<area shape="rect" id="node1" title=" " alt="" coords="12,95,161,136"/>
+<area shape="rect" id="node2" href="$structUSB__Descriptor__Header.html" title="Standard USB Descriptor Header (LUFA naming conventions)." alt="" coords="5,5,168,32"/>
+</map>

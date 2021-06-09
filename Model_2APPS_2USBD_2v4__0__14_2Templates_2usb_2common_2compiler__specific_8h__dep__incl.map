@@ -1,0 +1,16 @@
+<map id="compiler_specific.h" name="compiler_specific.h">
+<area shape="rect" id="node1" title=" " alt="" coords="403,5,536,32"/>
+<area shape="rect" id="node2" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2common_2common_8h.html" title=" " alt="" coords="428,80,511,107"/>
+<area shape="rect" id="node3" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2device_8h.html" title=" " alt="" coords="559,393,628,420"/>
+<area shape="rect" id="node4" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2usb__task_8h.html" title=" " alt="" coords="506,468,593,495"/>
+<area shape="rect" id="node5" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2endpoint_8h.html" title=" " alt="" coords="387,244,469,271"/>
+<area shape="rect" id="node6" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html" title=" " alt="" coords="190,319,367,345"/>
+<area shape="rect" id="node7" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2endpoint__stream_8h.html" title=" " alt="" coords="43,244,173,271"/>
+<area shape="rect" id="node8" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2events_8h.html" title=" " alt="" coords="798,244,869,271"/>
+<area shape="rect" id="node9" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2std__descriptors_8h.html" title=" " alt="" coords="835,319,957,345"/>
+<area shape="rect" id="node10" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2std__request__type_8h.html" title=" " alt="" coords="893,244,1027,271"/>
+<area shape="rect" id="node11" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2usb__controller_8h.html" title=" " alt="" coords="197,244,312,271"/>
+<area shape="rect" id="node12" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2usb__mode_8h.html" title=" " alt="" coords="465,162,559,189"/>
+<area shape="rect" id="node13" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2xmc4000_2usbd__device__xmc4000_8h.html" title=" " alt="" coords="646,319,810,345"/>
+<area shape="rect" id="node14" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2xmc4000_2usbd__endpoint__stream__xmc4000_8h.html" title=" " alt="" coords="107,155,261,196"/>
+</map>

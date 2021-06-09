@@ -1,0 +1,8 @@
+<map id="clock_xmc4_extern.h" name="clock_xmc4_extern.h">
+<area shape="rect" id="node1" title=" " alt="" coords="154,5,301,32"/>
+<area shape="rect" id="node2" href="$Generated_2CLOCK__XMC4_2clock__xmc4_8h.html" title=" " alt="" coords="176,80,279,107"/>
+<area shape="rect" id="node3" href="$xmc__scu_8h.html" title=" " alt="" coords="5,155,92,181"/>
+<area shape="rect" id="node4" href="$xmc__gpio_8h.html" title=" " alt="" coords="116,155,205,181"/>
+<area shape="rect" id="node5" href="$DAVE__Common_8h.html" title=" " alt="" coords="230,155,358,181"/>
+<area shape="rect" id="node6" href="$clock__xmc4__conf_8h.html" title=" " alt="" coords="383,155,517,181"/>
+</map>

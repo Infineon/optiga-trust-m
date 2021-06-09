@@ -1,0 +1,6 @@
+<map id="XMC_USIC_CH_SetWordLength" name="XMC_USIC_CH_SetWordLength">
+<area shape="rect" id="node1" title=" " alt="" coords="265,56,473,83"/>
+<area shape="rect" id="node2" href="$group__I2S.html#gaed46695a6afbe543ed3552c7de56c9bf" title=" " alt="" coords="13,5,210,32"/>
+<area shape="rect" id="node3" href="$group__SPI.html#ga16ee7fa348155fd43fc58c18787110db" title=" " alt="" coords="12,56,211,83"/>
+<area shape="rect" id="node4" href="$group__UART.html#gab6f5a7ef41affa10c0190b50d90b2f68" title=" " alt="" coords="5,107,217,133"/>
+</map>

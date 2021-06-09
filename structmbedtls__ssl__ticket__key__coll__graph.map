@@ -1,0 +1,5 @@
+<map id="mbedtls_ssl_ticket_key" name="mbedtls_ssl_ticket_key">
+<area shape="rect" id="node1" title="Information for session ticket protection." alt="" coords="11,184,170,211"/>
+<area shape="rect" id="node2" href="$structmbedtls__cipher__context__t.html" title=" " alt="" coords="5,95,176,121"/>
+<area shape="rect" id="node3" href="$structmbedtls__cipher__info__t.html" title=" " alt="" coords="17,5,165,32"/>
+</map>

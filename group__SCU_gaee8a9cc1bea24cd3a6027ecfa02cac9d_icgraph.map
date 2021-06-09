@@ -1,0 +1,4 @@
+<map id="XMC_SCU_SetCcuTriggerLow" name="XMC_SCU_SetCcuTriggerLow">
+<area shape="rect" id="node1" title=" " alt="" coords="296,5,491,32"/>
+<area shape="rect" id="node2" href="$Generated_2GLOBAL__CCU4_2global__ccu4_8h.html#aacd4aa8ca6a385e0896b42f42e087275" title="Start all the timers which are configured to start externally on negative edge." alt="" coords="5,5,248,32"/>
+</map>

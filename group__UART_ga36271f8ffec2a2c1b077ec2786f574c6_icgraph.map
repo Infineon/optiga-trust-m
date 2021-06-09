@@ -1,0 +1,4 @@
+<map id="XMC_UART_CH_ClearStatusFlag" name="XMC_UART_CH_ClearStatusFlag">
+<area shape="rect" id="node1" title=" " alt="" coords="172,5,387,32"/>
+<area shape="rect" id="node2" href="$Generated_2UART_2uart_8h.html#ac52ee6902d61f66818761fe857c7ae88" title="Clears the event status in the register(PSR_ASCMode)." alt="" coords="5,5,124,32"/>
+</map>

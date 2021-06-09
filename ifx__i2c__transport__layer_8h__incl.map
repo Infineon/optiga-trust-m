@@ -1,0 +1,10 @@
+<map id="ifx_i2c_transport_layer.h" name="ifx_i2c_transport_layer.h">
+<area shape="rect" id="node1" title="This file defines the API prototype for transport layer of the Infineon I2C Protocol Stack library." alt="" coords="177,5,339,32"/>
+<area shape="rect" id="node2" href="$ifx__i2c__config_8h.html" title="This file defines the structures and macros for the Infineon I2C Protocol." alt="" coords="371,80,481,107"/>
+<area shape="rect" id="node5" href="$pal__os__timer_8h.html" title="This file provides the prototype declarations of PAL OS timer functionalities." alt="" coords="5,162,172,189"/>
+<area shape="rect" id="node3" href="$pal__i2c_8h.html" title="This file provides the prototype declarations of PAL I2C." alt="" coords="196,162,331,189"/>
+<area shape="rect" id="node4" href="$pal__gpio_8h.html" title="This file provides the prototype declarations of PAL GPIO." alt="" coords="355,162,497,189"/>
+<area shape="rect" id="node6" href="$pal__os__datastore_8h.html" title="This file provides API prototypes of platform abstraction layer for datastore operations." alt="" coords="521,162,713,189"/>
+<area shape="rect" id="node7" href="$optiga__lib__config_8h.html" title="This file is defines the compilation switches to build code with required features." alt="" coords="737,162,905,189"/>
+<area shape="rect" id="node8" href="$optiga__lib__logger_8h.html" title="This file provides the prototypes for the OPTIGA library logger." alt="" coords="929,155,1080,196"/>
+</map>

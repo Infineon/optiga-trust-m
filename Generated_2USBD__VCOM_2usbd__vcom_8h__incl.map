@@ -1,0 +1,17 @@
+<map id="usbd_vcom.h" name="usbd_vcom.h">
+<area shape="rect" id="node1" title=" " alt="" coords="555,5,654,32"/>
+<area shape="rect" id="node2" href="$xmc__common_8h.html" title=" " alt="" coords="167,177,282,203"/>
+<area shape="rect" id="node8" href="$DAVE__Common_8h.html" title=" " alt="" coords="306,177,434,203"/>
+<area shape="rect" id="node9" href="$Generated_2USBD__VCOM_2class__driver_2cdc__class_8h.html" title=" " alt="" coords="457,80,579,121"/>
+<area shape="rect" id="node12" href="$Generated_2USBD__VCOM_2virtual__com_2descriptors_8h.html" title=" " alt="" coords="604,87,779,114"/>
+<area shape="rect" id="node13" href="$Generated_2USBD_2usbd_8h.html" title=" " alt="" coords="284,87,381,114"/>
+<area shape="rect" id="node14" href="$usbd__vcom__conf_8h.html" title=" " alt="" coords="803,87,940,114"/>
+<area shape="rect" id="node15" href="$usbd__vcom__extern_8h.html" title=" " alt="" coords="965,87,1106,114"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,259,73,285"/>
+<area shape="rect" id="node4" title=" " alt="" coords="97,259,163,285"/>
+<area shape="rect" id="node5" title=" " alt="" coords="187,259,262,285"/>
+<area shape="rect" id="node6" title=" " alt="" coords="287,259,352,285"/>
+<area shape="rect" id="node7" href="$xmc__device_8h.html" title=" " alt="" coords="377,259,478,285"/>
+<area shape="rect" id="node10" href="$Generated_2USBD_2usb_2core_2usb__mode_8h.html" title=" " alt="" coords="458,169,594,211"/>
+<area shape="rect" id="node11" href="$Generated_2USBD__VCOM_2class__driver_2device_2cdc__class__device_8h.html" title=" " alt="" coords="619,177,793,203"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="usb_mode.h" name="usb_mode.h">
+<area shape="rect" id="node1" title=" " alt="" coords="407,5,500,32"/>
+<area shape="rect" id="node2" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2device_8h.html" title=" " alt="" coords="191,229,260,256"/>
+<area shape="rect" id="node3" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2usb__task_8h.html" title=" " alt="" coords="254,304,341,331"/>
+<area shape="rect" id="node4" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2endpoint_8h.html" title=" " alt="" coords="336,155,419,181"/>
+<area shape="rect" id="node6" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2endpoint__stream_8h.html" title=" " alt="" coords="797,80,926,107"/>
+<area shape="rect" id="node7" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2events_8h.html" title=" " alt="" coords="130,80,201,107"/>
+<area shape="rect" id="node8" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2std__descriptors_8h.html" title=" " alt="" coords="5,155,128,181"/>
+<area shape="rect" id="node9" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2std__request__type_8h.html" title=" " alt="" coords="588,229,721,256"/>
+<area shape="rect" id="node10" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2usb__controller_8h.html" title=" " alt="" coords="443,155,557,181"/>
+<area shape="rect" id="node5" href="$Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html" title=" " alt="" coords="335,229,513,256"/>
+</map>

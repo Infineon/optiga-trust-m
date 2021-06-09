@@ -1,0 +1,5 @@
+<map id="XMC_USIC_CH_RXFIFO_GetEvent" name="XMC_USIC_CH_RXFIFO_GetEvent">
+<area shape="rect" id="node1" title=" " alt="" coords="267,23,429,65"/>
+<area shape="rect" id="node2" href="$Generated_2I2C__MASTER_2i2c__master_8h.html#a9b6118cfe078b5142ea9e2a0dfda6af5" title="Gets the status of event flags related to receive FIFO." alt="" coords="5,5,219,32"/>
+<area shape="rect" id="node3" href="$Generated_2UART_2uart_8h.html#a193302cb44ecb5d1d665f85605c515d5" title="Gets the status of event flags related to receive FIFO." alt="" coords="29,56,195,83"/>
+</map>

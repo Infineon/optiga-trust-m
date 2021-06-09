@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['random_5fdata_1443',['random_data',['../structoptiga__get__random.html#abd8782a75ef5feb95f1d9f3a10333616',1,'optiga_get_random::random_data()'],['../structoptiga__derive__key.html#a5781d149a8c21530ccd3ef65f9fbc1e2',1,'optiga_derive_key::random_data()']]],
+  ['random_5fdata_5flength_1444',['random_data_length',['../structoptiga__get__random.html#a9deb2f05a91a48a1834cfe73358cda9e',1,'optiga_get_random::random_data_length()'],['../structoptiga__derive__key.html#a0daece443d6d453140476f717df81523',1,'optiga_derive_key::random_data_length()']]],
+  ['received_5fdata_5flength_1445',['received_data_length',['../structoptiga__symmetric__enc__dec__params.html#aedd9f7f75baf3dccb658024c43f9f6fc',1,'optiga_symmetric_enc_dec_params']]],
+  ['ref_5fbytes_5fto_5fread_1446',['ref_bytes_to_read',['../structoptiga__get__data__object.html#ab3ddef2313a64b3a0b4998bce0aa7e24',1,'optiga_get_data_object']]],
+  ['register_5faction_1447',['register_action',['../structifx__i2c__pl.html#ae76fda4ed415b72942e43057b3926b79',1,'ifx_i2c_pl']]],
+  ['request_5fsoft_5freset_1448',['request_soft_reset',['../structifx__i2c__pl.html#adc6f754d3c83b40338d9080d2c7911e5',1,'ifx_i2c_pl']]],
+  ['reset_5fstate_1449',['reset_state',['../structifx__i2c__context.html#a58c7f7a899653d8ea08d494956a32f26',1,'ifx_i2c_context']]],
+  ['reset_5ftype_1450',['reset_type',['../structifx__i2c__context.html#a7f3565f397661ca5ef7f5dfa9773f82f',1,'ifx_i2c_context']]],
+  ['resynced_1451',['resynced',['../structifx__i2c__dl.html#a9b4bc0873a4770a43aac7091f127022c',1,'ifx_i2c_dl']]],
+  ['retransmit_5fcounter_1452',['retransmit_counter',['../structifx__i2c__dl.html#ab1d2a25a7eb50e6d13bc3f9c89f66c83',1,'ifx_i2c_dl']]],
+  ['retry_5fcounter_1453',['retry_counter',['../structifx__i2c__pl.html#a8b3a67f0e90cb88e58a3b03f19e3bf6f',1,'ifx_i2c_pl']]],
+  ['rsa_5fkey_1454',['rsa_key',['../unionkey__params.html#ab01770ececb7e43ceac274d6c8a23688',1,'key_params']]],
+  ['rsa_5fkey_5ffinal_5ffragment_5farray_1455',['rsa_key_final_fragment_array',['../rsa__key__object__confidentiality_8h.html#a6c0e2b633d9d5f0f7b1b0ada94c0ece6',1,'rsa_key_object_confidentiality.h']]],
+  ['rx_5fbuffer_5fsize_1456',['rx_buffer_size',['../structifx__i2c__dl.html#a8981c84b5223672dc623d44e27f4a50e',1,'ifx_i2c_dl']]],
+  ['rx_5fframe_5fbuffer_1457',['rx_frame_buffer',['../structifx__i2c__context.html#acbf3818403e0a321cb61e291df26e351',1,'ifx_i2c_context']]],
+  ['rx_5fseq_5fnr_1458',['rx_seq_nr',['../structifx__i2c__dl.html#a9e92517e8e2271544d642af592d5ed89',1,'ifx_i2c_dl']]]
+];

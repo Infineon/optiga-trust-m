@@ -1,0 +1,5 @@
+<map id="dwc_otg_host_if" name="dwc_otg_host_if">
+<area shape="rect" id="node1" title=" " alt="" coords="96,95,211,121"/>
+<area shape="rect" id="node2" href="$structdwc__otg__hc__regs.html" title=" " alt="" coords="5,5,128,32"/>
+<area shape="rect" id="node3" href="$structdwc__otg__host__global__regs.html" title=" " alt="" coords="153,5,327,32"/>
+</map>

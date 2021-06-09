@@ -1,0 +1,14 @@
+<map id="net_sockets.h" name="net_sockets.h">
+<area shape="rect" id="node1" title="Network sockets abstraction layer to integrate Mbed TLS into a BSD&#45;style sockets API." alt="" coords="465,5,569,32"/>
+<area shape="rect" id="node2" href="$config_8h.html" title="Configuration options (set of defines)" alt="" coords="223,379,289,405"/>
+<area shape="rect" id="node4" href="$ssl_8h.html" title="SSL/TLS functions." alt="" coords="373,80,424,107"/>
+<area shape="rect" id="node6" title=" " alt="" coords="502,379,570,405"/>
+<area shape="rect" id="node7" title=" " alt="" coords="611,379,677,405"/>
+<area shape="rect" id="node3" href="$check__config_8h.html" title="Consistency checks for configuration options." alt="" coords="201,453,311,480"/>
+<area shape="rect" id="node5" href="$bignum_8h.html" title="Multi&#45;precision integer library." alt="" coords="491,304,565,331"/>
+<area shape="rect" id="node8" href="$ecp_8h.html" title="This file provides an API for Elliptic Curves over GF(P) (ECP)." alt="" coords="459,229,514,256"/>
+<area shape="rect" id="node9" href="$ssl__ciphersuites_8h.html" title="SSL Ciphersuites for mbed TLS." alt="" coords="150,155,277,181"/>
+<area shape="rect" id="node10" href="$x509__crt_8h.html" title="X.509 certificate parsing and writing." alt="" coords="43,155,125,181"/>
+<area shape="rect" id="node11" href="$x509__crl_8h.html" title="X.509 certificate revocation list parsing." alt="" coords="215,229,297,256"/>
+<area shape="rect" id="node12" href="$ecdh_8h.html" title="This file contains ECDH definitions and functions." alt="" coords="403,155,464,181"/>
+</map>

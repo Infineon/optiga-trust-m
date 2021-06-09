@@ -1,0 +1,5 @@
+<map id="XMC_USIC_CH_RXFIFO_IsEmpty" name="XMC_USIC_CH_RXFIFO_IsEmpty">
+<area shape="rect" id="node1" title=" " alt="" coords="256,23,419,65"/>
+<area shape="rect" id="node2" href="$Generated_2I2C__MASTER_2i2c__master_8h.html#ac665f35bdfa0759802d923aacaa358bc" title="Checks if the receive FIFO is empty." alt="" coords="5,5,208,32"/>
+<area shape="rect" id="node3" href="$Generated_2UART_2uart_8h.html#a3e5b37c9e69daa3f70d5cc496bf2fbb4" title="Checks if the receive FIFO is empty." alt="" coords="29,56,185,83"/>
+</map>

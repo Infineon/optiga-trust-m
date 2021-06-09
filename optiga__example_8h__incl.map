@@ -1,0 +1,7 @@
+<map id="optiga_example.h" name="optiga_example.h">
+<area shape="rect" id="node1" title="This file defines APIs, types and data structures used in the OPTIGA example." alt="" coords="119,5,243,32"/>
+<area shape="rect" id="node2" href="$optiga__lib__config_8h.html" title="This file is defines the compilation switches to build code with required features." alt="" coords="5,87,173,114"/>
+<area shape="rect" id="node4" href="$optiga__lib__logger_8h.html" title="This file provides the prototypes for the OPTIGA library logger." alt="" coords="198,80,349,121"/>
+<area shape="rect" id="node3" href="$optiga__lib__config__m__v3_8h.html" title="This file is defines the compilation switches to build code with required features." alt="" coords="6,177,173,203"/>
+<area shape="rect" id="node5" href="$optiga__lib__types_8h.html" title="This file contains the type definitions for the fundamental data types." alt="" coords="198,169,349,211"/>
+</map>

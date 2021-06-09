@@ -1,0 +1,7 @@
+<map id="optiga_cmd.h" name="optiga_cmd.h">
+<area shape="rect" id="node1" title="This file defines APIs, types and data structures used in the Command (cmd) module implementation." alt="" coords="223,5,323,32"/>
+<area shape="rect" id="node2" href="$optiga__lib__common_8h.html" title="This file provides the prototypes for the commonly used functions and structures of OPTIGA Library." alt="" coords="198,80,349,121"/>
+<area shape="rect" id="node3" href="$optiga__lib__config_8h.html" title="This file is defines the compilation switches to build code with required features." alt="" coords="5,177,173,203"/>
+<area shape="rect" id="node4" href="$optiga__lib__types_8h.html" title="This file contains the type definitions for the fundamental data types." alt="" coords="198,169,349,211"/>
+<area shape="rect" id="node5" href="$optiga__lib__return__codes_8h.html" title="This file defines the error codes for the all the layers and modules. &#160;OPTIGA host library return val..." alt="" coords="373,169,523,211"/>
+</map>

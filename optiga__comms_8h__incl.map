@@ -1,0 +1,11 @@
+<map id="optiga_comms.h" name="optiga_comms.h">
+<area shape="rect" id="node1" title="This file implements Optiga comms abstraction layer for IFX I2C Protocol." alt="" coords="291,5,410,32"/>
+<area shape="rect" id="node2" href="$optiga__lib__types_8h.html" title="This file contains the type definitions for the fundamental data types." alt="" coords="91,169,242,211"/>
+<area shape="rect" id="node7" href="$optiga__lib__return__codes_8h.html" title="This file defines the error codes for the all the layers and modules. &#160;OPTIGA host library return val..." alt="" coords="459,169,610,211"/>
+<area shape="rect" id="node8" href="$optiga__lib__common_8h.html" title="This file provides the prototypes for the commonly used functions and structures of OPTIGA Library." alt="" coords="275,80,426,121"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,259,67,285"/>
+<area shape="rect" id="node4" title=" " alt="" coords="91,259,155,285"/>
+<area shape="rect" id="node5" title=" " alt="" coords="179,259,245,285"/>
+<area shape="rect" id="node6" title=" " alt="" coords="269,259,334,285"/>
+<area shape="rect" id="node9" href="$optiga__lib__config_8h.html" title="This file is defines the compilation switches to build code with required features." alt="" coords="267,177,435,203"/>
+</map>

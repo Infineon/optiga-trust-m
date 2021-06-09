@@ -1,0 +1,8 @@
+<map id="pal_ifx_i2c_config.h" name="pal_ifx_i2c_config.h">
+<area shape="rect" id="node1" title="This file provides the platform abstraction layer extern declarations for IFX I2C." alt="" coords="43,5,177,32"/>
+<area shape="rect" id="node2" href="$pal_8h.html" title="This file provides the prototype declarations of platform abstraction layer." alt="" coords="85,155,135,181"/>
+<area shape="rect" id="node4" href="$pal__i2c_8h.html" title="This file provides the prototype declarations of PAL I2C." alt="" coords="22,80,97,107"/>
+<area shape="rect" id="node5" href="$pal__gpio_8h.html" title="This file provides the prototype declarations of PAL GPIO." alt="" coords="121,80,203,107"/>
+<area shape="rect" id="node6" href="$pal__os__datastore_8h.html" title="This file provides API prototypes of platform abstraction layer for datastore operations." alt="" coords="227,80,359,107"/>
+<area shape="rect" id="node3" href="$optiga__lib__types_8h.html" title="This file contains the type definitions for the fundamental data types." alt="" coords="35,229,185,271"/>
+</map>

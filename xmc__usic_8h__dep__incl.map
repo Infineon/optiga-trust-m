@@ -1,0 +1,11 @@
+<map id="xmc_usic.h" name="xmc_usic.h">
+<area shape="rect" id="node1" title=" " alt="" coords="229,5,319,32"/>
+<area shape="rect" id="node2" href="$xmc__i2c_8h.html" title=" " alt="" coords="73,80,155,107"/>
+<area shape="rect" id="node5" href="$xmc__i2s_8h.html" title=" " alt="" coords="179,80,262,107"/>
+<area shape="rect" id="node6" href="$xmc__spi_8h.html" title=" " alt="" coords="286,80,369,107"/>
+<area shape="rect" id="node7" href="$xmc__uart_8h.html" title=" " alt="" coords="393,80,480,107"/>
+<area shape="rect" id="node3" href="$Generated_2I2C__MASTER_2i2c__master_8h.html" title=" " alt="" coords="5,155,103,181"/>
+<area shape="rect" id="node4" href="$Model_2APPS_2I2C__MASTER_2v4__1__28_2Templates_2i2c__master_8h.html" title=" " alt="" coords="127,155,224,181"/>
+<area shape="rect" id="node8" href="$Generated_2UART_2uart_8h.html" title=" " alt="" coords="369,155,424,181"/>
+<area shape="rect" id="node9" href="$Model_2APPS_2UART_2v4__1__12_2Templates_2uart_8h.html" title=" " alt="" coords="448,155,503,181"/>
+</map>

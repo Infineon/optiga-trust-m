@@ -1,0 +1,9 @@
+<map id="optiga_lib_config_m_v3.h" name="optiga_lib_config_m_v3.h">
+<area shape="rect" id="node1" title="This file is defines the compilation switches to build code with required features." alt="" coords="307,5,473,32"/>
+<area shape="rect" id="node2" href="$optiga__lib__config_8h.html" title="This file is defines the compilation switches to build code with required features." alt="" coords="325,80,455,107"/>
+<area shape="rect" id="node3" href="$optiga__example_8h.html" title="This file defines APIs, types and data structures used in the OPTIGA example." alt="" coords="5,162,129,189"/>
+<area shape="rect" id="node4" href="$example__optiga__util__protected__update_8h.html" title="This file provides the data set for protected update of ecc key object with confidentiality." alt="" coords="153,155,293,196"/>
+<area shape="rect" id="node5" href="$optiga__lib__common_8h.html" title="This file provides the prototypes for the commonly used functions and structures of OPTIGA Library." alt="" coords="317,162,463,189"/>
+<area shape="rect" id="node6" href="$optiga__lib__common__internal_8h.html" title="This file provides the prototypes for the commonly used internal functions and structures of OPTIGA L..." alt="" coords="487,162,682,189"/>
+<area shape="rect" id="node7" href="$ifx__i2c__config_8h.html" title="This file defines the structures and macros for the Infineon I2C Protocol." alt="" coords="707,162,817,189"/>
+</map>

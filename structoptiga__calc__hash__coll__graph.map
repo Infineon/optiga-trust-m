@@ -1,0 +1,6 @@
+<map id="optiga_calc_hash" name="optiga_calc_hash">
+<area shape="rect" id="node1" title="Specifies the data structure of calculate hash." alt="" coords="185,95,307,121"/>
+<area shape="rect" id="node2" href="$structoptiga__hash__context.html" title="Specifies the structure to the Hash context details managed by OPTIGA." alt="" coords="5,5,148,32"/>
+<area shape="rect" id="node3" href="$structhash__data__from__host.html" title="Specifies the structure to provide the details of data to be hashed from host." alt="" coords="173,5,319,32"/>
+<area shape="rect" id="node4" href="$structhash__data__in__optiga.html" title="Specifies the structure to provide the details of data to be hashed from OPTIGA." alt="" coords="343,5,485,32"/>
+</map>

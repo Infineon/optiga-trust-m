@@ -1,0 +1,4 @@
+<map id="optiga_protected_update_data_configuration" name="optiga_protected_update_data_configuration">
+<area shape="rect" id="node1" title="Specifies the structure for protected update data configuration." alt="" coords="31,109,195,151"/>
+<area shape="rect" id="node2" href="$structoptiga__protected__update__manifest__fragment__configuration.html" title="Specifies the structure for protected update manifest and fragment configuration." alt="" coords="5,5,220,47"/>
+</map>

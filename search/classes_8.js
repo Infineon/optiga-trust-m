@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['optiga_5fcalc_5fhash_967',['optiga_calc_hash',['../structoptiga__calc__hash.html',1,'']]],
+  ['optiga_5fcalc_5fsign_968',['optiga_calc_sign',['../structoptiga__calc__sign.html',1,'']]],
+  ['optiga_5fcalc_5fssec_969',['optiga_calc_ssec',['../structoptiga__calc__ssec.html',1,'']]],
+  ['optiga_5fcomms_970',['optiga_comms',['../structoptiga__comms.html',1,'']]],
+  ['optiga_5fcrypt_971',['optiga_crypt',['../structoptiga__crypt.html',1,'']]],
+  ['optiga_5fcrypt_5fparams_972',['optiga_crypt_params',['../unionoptiga__crypt__params.html',1,'']]],
+  ['optiga_5fderive_5fkey_973',['optiga_derive_key',['../structoptiga__derive__key.html',1,'']]],
+  ['optiga_5fenc_5fdec_5fasym_974',['optiga_enc_dec_asym',['../structoptiga__enc__dec__asym.html',1,'']]],
+  ['optiga_5fgen_5fkeypair_975',['optiga_gen_keypair',['../structoptiga__gen__keypair.html',1,'']]],
+  ['optiga_5fgen_5fsymkey_5fparams_976',['optiga_gen_symkey_params',['../structoptiga__gen__symkey__params.html',1,'']]],
+  ['optiga_5fget_5fdata_5fobject_977',['optiga_get_data_object',['../structoptiga__get__data__object.html',1,'']]],
+  ['optiga_5fget_5frandom_978',['optiga_get_random',['../structoptiga__get__random.html',1,'']]],
+  ['optiga_5fhash_5fcontext_979',['optiga_hash_context',['../structoptiga__hash__context.html',1,'']]],
+  ['optiga_5fprotected_5fupdate_5fdata_5fconfiguration_980',['optiga_protected_update_data_configuration',['../structoptiga__protected__update__data__configuration.html',1,'']]],
+  ['optiga_5fprotected_5fupdate_5fmanifest_5ffragment_5fconfiguration_981',['optiga_protected_update_manifest_fragment_configuration',['../structoptiga__protected__update__manifest__fragment__configuration.html',1,'']]],
+  ['optiga_5fset_5fdata_5fobject_982',['optiga_set_data_object',['../structoptiga__set__data__object.html',1,'']]],
+  ['optiga_5fset_5fobject_5fprotected_5fparams_983',['optiga_set_object_protected_params',['../structoptiga__set__object__protected__params.html',1,'']]],
+  ['optiga_5fsymmetric_5fenc_5fdec_5fparams_984',['optiga_symmetric_enc_dec_params',['../structoptiga__symmetric__enc__dec__params.html',1,'']]],
+  ['optiga_5futil_985',['optiga_util',['../structoptiga__util.html',1,'']]],
+  ['optiga_5futil_5fparams_986',['optiga_util_params',['../unionoptiga__util__params.html',1,'']]],
+  ['optiga_5fverify_5fsign_987',['optiga_verify_sign',['../structoptiga__verify__sign.html',1,'']]]
+];

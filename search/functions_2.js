@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['ifx_5fi2c_5fclose_1057',['ifx_i2c_close',['../ifx__i2c_8h.html#af7f75cb230c5aaedcbfa2f33b38e16b2',1,'ifx_i2c.h']]],
+  ['ifx_5fi2c_5fdl_5finit_1058',['ifx_i2c_dl_init',['../ifx__i2c__data__link__layer_8h.html#a1d76da0524bf3fd20d5f16c779e25e97',1,'ifx_i2c_data_link_layer.h']]],
+  ['ifx_5fi2c_5fdl_5freceive_5fframe_1059',['ifx_i2c_dl_receive_frame',['../ifx__i2c__data__link__layer_8h.html#a2a365e5ad0cdb80929a5d12a5d1e7636',1,'ifx_i2c_data_link_layer.h']]],
+  ['ifx_5fi2c_5fdl_5fsend_5fframe_1060',['ifx_i2c_dl_send_frame',['../ifx__i2c__data__link__layer_8h.html#acda0916085df94f289a343110157fb99',1,'ifx_i2c_data_link_layer.h']]],
+  ['ifx_5fi2c_5fopen_1061',['ifx_i2c_open',['../ifx__i2c_8h.html#a1b6ef08b044c3d93203043f85fd96849',1,'ifx_i2c.h']]],
+  ['ifx_5fi2c_5fpl_5finit_1062',['ifx_i2c_pl_init',['../ifx__i2c__physical__layer_8h.html#a647203380c217b6c3048722398566c30',1,'ifx_i2c_physical_layer.h']]],
+  ['ifx_5fi2c_5fpl_5freceive_5fframe_1063',['ifx_i2c_pl_receive_frame',['../ifx__i2c__physical__layer_8h.html#a075cab410f4016145f765a9d7a61a8a3',1,'ifx_i2c_physical_layer.h']]],
+  ['ifx_5fi2c_5fpl_5fsend_5fframe_1064',['ifx_i2c_pl_send_frame',['../ifx__i2c__physical__layer_8h.html#a58465fb4468ce23d645cc37b060d8942',1,'ifx_i2c_physical_layer.h']]],
+  ['ifx_5fi2c_5fpl_5fwrite_5fslave_5faddress_1065',['ifx_i2c_pl_write_slave_address',['../ifx__i2c__physical__layer_8h.html#a6531837df510a87095f8194345d66b60',1,'ifx_i2c_physical_layer.h']]],
+  ['ifx_5fi2c_5fprl_5fclose_1066',['ifx_i2c_prl_close',['../ifx__i2c__presentation__layer_8h.html#ad5e750f2247d9990cb7c54ecf48a7dc8',1,'ifx_i2c_presentation_layer.h']]],
+  ['ifx_5fi2c_5fprl_5finit_1067',['ifx_i2c_prl_init',['../ifx__i2c__presentation__layer_8h.html#af5d889b2e52990dfda81e71d7f0fb4c4',1,'ifx_i2c_presentation_layer.h']]],
+  ['ifx_5fi2c_5fprl_5ftransceive_1068',['ifx_i2c_prl_transceive',['../ifx__i2c__presentation__layer_8h.html#a5d8f7771e0e6d3e40874438b598ec4eb',1,'ifx_i2c_presentation_layer.h']]],
+  ['ifx_5fi2c_5freset_1069',['ifx_i2c_reset',['../ifx__i2c_8h.html#a2e15b1b82649338ccb8e1fde8b812f9e',1,'ifx_i2c.h']]],
+  ['ifx_5fi2c_5fset_5fslave_5faddress_1070',['ifx_i2c_set_slave_address',['../ifx__i2c_8h.html#a565a6960e7cb46048b13366f3f732198',1,'ifx_i2c.h']]],
+  ['ifx_5fi2c_5ftl_5finit_1071',['ifx_i2c_tl_init',['../ifx__i2c__transport__layer_8h.html#ad3805667eb5fd82ea483c4ed93265f7b',1,'ifx_i2c_transport_layer.h']]],
+  ['ifx_5fi2c_5ftl_5ftransceive_1072',['ifx_i2c_tl_transceive',['../ifx__i2c__transport__layer_8h.html#afdd05b4c820b4be0257fff2a57547496',1,'ifx_i2c_transport_layer.h']]],
+  ['ifx_5fi2c_5ftransceive_1073',['ifx_i2c_transceive',['../ifx__i2c_8h.html#a7498db56439379fc5b73a5aab3234376',1,'ifx_i2c.h']]]
+];

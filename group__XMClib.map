@@ -1,0 +1,19 @@
+<map id="XMC Peripheral Library" name="XMC Peripheral Library">
+<area shape="rect" id="node1" title=" " alt="" coords="5,376,160,401"/>
+<area shape="rect" id="node2" href="$group__ETH__PHY.html" title="Ethernet PHY driver for XMC4000 microcontroller family." alt="" coords="209,5,290,31"/>
+<area shape="rect" id="node3" href="$group__RTC.html" title="RTC driver for XMC microcontroller family." alt="" coords="226,55,273,80"/>
+<area shape="rect" id="node4" href="$group__SCU.html" title="System Control Unit(SCU) driver for XMC microcontroller family." alt="" coords="225,104,274,129"/>
+<area shape="rect" id="node5" href="$group__ECAT.html" title="EtherCAT Low level driver for XMC4800/XMC4300 series." alt="" coords="221,153,277,179"/>
+<area shape="rect" id="node6" href="$group__WDT.html" title="Watchdog driver for the XMC microcontroller family." alt="" coords="224,203,275,228"/>
+<area shape="rect" id="node7" href="$group__ETH__MAC.html" title="Ethernet Low level driver for XMC4000 microcontroller family." alt="" coords="208,252,291,277"/>
+<area shape="rect" id="node8" href="$group__USIC.html" title="Universal Serial Interface Channel(USIC) driver for serial communication." alt="" coords="223,301,275,327"/>
+<area shape="rect" id="node9" href="$group__I2C.html" title="Inter Integrated Circuit(IIC) driver for the XMC microcontroller family." alt="" coords="229,351,270,376"/>
+<area shape="rect" id="node10" href="$group__I2S.html" title="(IIS) driver for the XMC microcontroller family." alt="" coords="229,400,270,425"/>
+<area shape="rect" id="node11" href="$group__SPI.html" title="Synchronous serial channel driver for SPI&#45;like communication." alt="" coords="228,449,271,475"/>
+<area shape="rect" id="node12" href="$group__COMMON.html" title="Common APIs to all peripherals for XMC microcontroller family." alt="" coords="208,499,291,524"/>
+<area shape="rect" id="node13" href="$group__VADC.html" title="Versatile Analog to Digital Converter (VADC) driver for XMC microcontroller family." alt="" coords="220,548,279,573"/>
+<area shape="rect" id="node14" href="$group__GPIO.html" title="General Purpose Input Output (GPIO) driver for the XMC microcontroller family." alt="" coords="222,597,277,623"/>
+<area shape="rect" id="node15" href="$group__ERU.html" title="Event Request Unit (ERU) driver for the XMC microcontroller family." alt="" coords="225,647,274,672"/>
+<area shape="rect" id="node16" href="$group__UART.html" title="Universal Asynchronous Receiver/Transmitter (UART) driver for XMC microcontroller family." alt="" coords="221,696,277,721"/>
+<area shape="rect" id="node17" href="$group__FLASH.html" title="Flash driver for XMC microcontroller family." alt="" coords="217,745,281,771"/>
+</map>

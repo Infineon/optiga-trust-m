@@ -1,0 +1,4 @@
+<map id="net_sockets.h" name="net_sockets.h">
+<area shape="rect" id="node1" title="Network sockets abstraction layer to integrate Mbed TLS into a BSD&#45;style sockets API." alt="" coords="5,5,109,32"/>
+<area shape="rect" id="node2" href="$net_8h.html" title="Deprecated header file that includes net_sockets.h." alt="" coords="32,80,83,107"/>
+</map>

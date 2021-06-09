@@ -1,0 +1,8 @@
+<map id="platform.h" name="platform.h">
+<area shape="rect" id="node1" title="This file contains the definitions and functions of the Mbed TLS platform abstraction layer." alt="" coords="151,5,230,32"/>
+<area shape="rect" id="node2" href="$config_8h.html" title="Configuration options (set of defines)" alt="" coords="27,80,93,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="117,80,179,107"/>
+<area shape="rect" id="node5" title=" " alt="" coords="203,80,267,107"/>
+<area shape="rect" id="node6" title=" " alt="" coords="291,80,349,107"/>
+<area shape="rect" id="node3" href="$check__config_8h.html" title="Consistency checks for configuration options." alt="" coords="5,155,115,181"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="XMC_USIC_CH_TriggerServiceRequest" name="XMC_USIC_CH_TriggerServiceRequest">
+<area shape="rect" id="node1" title=" " alt="" coords="256,104,455,145"/>
+<area shape="rect" id="node2" href="$group__I2C.html#ga23a5506a060fd4087ec7f1d3dd6bd571" title=" " alt="" coords="13,5,201,47"/>
+<area shape="rect" id="node3" href="$group__I2S.html#gab23dc5403a52610cbee7c3ca8f90c60d" title=" " alt="" coords="13,71,201,112"/>
+<area shape="rect" id="node4" href="$group__SPI.html#ga5f1ad3f2e47c7b4ad4c15f6ecded55c4" title=" " alt="" coords="11,136,202,177"/>
+<area shape="rect" id="node5" href="$group__UART.html#ga1d91c6f6e2be55f5c28be32435bbaad1" title=" " alt="" coords="5,201,208,243"/>
+</map>

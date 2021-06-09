@@ -1,0 +1,19 @@
+<map id="usbd_endpoint_xmc4000.h" name="usbd_endpoint_xmc4000.h">
+<area shape="rect" id="node1" title=" " alt="" coords="101,5,278,32"/>
+<area shape="rect" id="node2" href="$Generated_2USBD_2usb_2common_2common_8h.html" title=" " alt="" coords="185,229,346,256"/>
+<area shape="rect" id="node9" href="$Generated_2USBD_2usb_2core_2endpoint_8h.html" title=" " alt="" coords="7,80,102,107"/>
+<area shape="rect" id="node11" href="$Generated_2USBD_2usb_2core_2usb__controller_8h.html" title=" " alt="" coords="126,80,253,107"/>
+<area shape="rect" id="node12" href="$Generated_2USBD_2usbd_8h.html" title=" " alt="" coords="545,80,642,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="398,304,463,331"/>
+<area shape="rect" id="node4" title=" " alt="" coords="487,304,553,331"/>
+<area shape="rect" id="node5" title=" " alt="" coords="577,304,652,331"/>
+<area shape="rect" id="node6" href="$Generated_2USBD_2usb_2common_2compiler__specific_8h.html" title=" " alt="" coords="5,304,139,331"/>
+<area shape="rect" id="node7" href="$Generated_2USBD_2usb_2common_2attributes_8h.html" title=" " alt="" coords="163,304,250,331"/>
+<area shape="rect" id="node8" href="$Generated_2USBD_2usb_2common_2endianness_8h.html" title=" " alt="" coords="275,304,373,331"/>
+<area shape="rect" id="node10" href="$Generated_2USBD_2usb_2core_2usb__mode_8h.html" title=" " alt="" coords="109,155,203,181"/>
+<area shape="rect" id="node13" href="$xmc__usbd_8h.html" title=" " alt="" coords="733,155,827,181"/>
+<area shape="rect" id="node14" href="$xmc__common_8h.html" title=" " alt="" coords="557,229,672,256"/>
+<area shape="rect" id="node15" href="$DAVE__Common_8h.html" title=" " alt="" coords="328,155,456,181"/>
+<area shape="rect" id="node16" href="$usbd__conf_8h.html" title=" " alt="" coords="481,155,581,181"/>
+<area shape="rect" id="node17" href="$Generated_2USBD_2usbd__extern_8h.html" title=" " alt="" coords="605,155,709,181"/>
+</map>

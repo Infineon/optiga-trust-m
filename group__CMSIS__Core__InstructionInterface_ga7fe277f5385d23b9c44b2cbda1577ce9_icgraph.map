@@ -1,0 +1,7 @@
+<map id="__DSB" name="__DSB">
+<area shape="rect" id="node1" title="Data Synchronization Barrier." alt="" coords="205,81,268,108"/>
+<area shape="rect" id="node2" href="$group__CMSIS__Core__NVICFunctions.html#gae016e4c1986312044ee768806537d52f" title="Disable Interrupt." alt="" coords="12,5,151,32"/>
+<area shape="rect" id="node3" href="$group__CMSIS__Core__NVICFunctions.html#ga0d9aa2d30fa54b41eb780c16e35b676c" title="System Reset." alt="" coords="5,56,157,83"/>
+<area shape="rect" id="node4" href="$mpu__armv7_8h.html#a61814eba4652a0fdfb76bbe222086327" title=" " alt="" coords="13,107,150,133"/>
+<area shape="rect" id="node5" href="$mpu__armv7_8h.html#a5a3f40314553baccdeea551f86d9a997" title=" " alt="" coords="14,157,149,184"/>
+</map>

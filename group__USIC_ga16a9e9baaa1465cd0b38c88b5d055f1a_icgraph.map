@@ -1,0 +1,5 @@
+<map id="XMC_USIC_CH_TXFIFO_IsFull" name="XMC_USIC_CH_TXFIFO_IsFull">
+<area shape="rect" id="node1" title=" " alt="" coords="236,23,397,65"/>
+<area shape="rect" id="node2" href="$Generated_2I2C__MASTER_2i2c__master_8h.html#a41272b548622067a367654f5d30497b7" title="Checks if the transmit FIFO is full." alt="" coords="5,5,188,32"/>
+<area shape="rect" id="node3" href="$Generated_2UART_2uart_8h.html#a31442e159ac79f32267e25531272ab7b" title="Checks if the transmit FIFO is full." alt="" coords="28,56,165,83"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="optiga_lib_common.h" name="optiga_lib_common.h">
+<area shape="rect" id="node1" title="This file provides the prototypes for the commonly used functions and structures of OPTIGA Library." alt="" coords="113,5,258,32"/>
+<area shape="rect" id="node2" href="$optiga__cmd_8h.html" title="This file defines APIs, types and data structures used in the Command (cmd) module implementation." alt="" coords="69,80,169,107"/>
+<area shape="rect" id="node5" href="$optiga__comms_8h.html" title="This file implements Optiga comms abstraction layer for IFX I2C Protocol." alt="" coords="193,80,311,107"/>
+<area shape="rect" id="node3" href="$optiga__crypt_8h.html" title="This file implements the prototype declarations of OPTIGA Crypt module." alt="" coords="5,155,109,181"/>
+<area shape="rect" id="node4" href="$optiga__util_8h.html" title="This file defines APIs, types and data structures used in the OPTIGA utility module." alt="" coords="134,155,226,181"/>
+</map>

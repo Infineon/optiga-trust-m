@@ -1,0 +1,4 @@
+<map id="optiga_crypt_hkdf_sha512" name="optiga_crypt_hkdf_sha512">
+<area shape="rect" id="node1" title="Derives a key or shared secret using HKDF&#45;SHA512 operation from the secret stored in OPTIGA." alt="" coords="5,5,179,32"/>
+<area shape="rect" id="node2" href="$optiga__crypt_8h.html#a1e09748f1a0601251739b883be03596c" title="Derives a key or shared secret using HKDF operation from the secret stored in OPTIGA." alt="" coords="227,5,351,32"/>
+</map>

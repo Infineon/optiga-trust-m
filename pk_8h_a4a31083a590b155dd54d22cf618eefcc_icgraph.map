@@ -1,0 +1,4 @@
+<map id="mbedtls_pk_get_bitlen" name="mbedtls_pk_get_bitlen">
+<area shape="rect" id="node1" title="Get the size in bits of the underlying key." alt="" coords="192,5,344,32"/>
+<area shape="rect" id="node2" href="$pk_8h.html#a10b85028a74324c9c581650dfee9dd4d" title="Get the length in bytes of the underlying key." alt="" coords="5,5,144,32"/>
+</map>

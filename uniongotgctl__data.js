@@ -1,0 +1,27 @@
+var uniongotgctl__data =
+[
+    [ "asesvld", "uniongotgctl__data.html#a70271de0d0b0f1f3a855460a4305ffde", null ],
+    [ "avalidoven", "uniongotgctl__data.html#acd740c171a596d7a63db4274b1d6b0f6", null ],
+    [ "avalidovval", "uniongotgctl__data.html#a8005211321808c062df561d8a43cc113", null ],
+    [ "b", "uniongotgctl__data.html#ae6d7b3dfe83c70672913f093783ed1ee", null ],
+    [ "bsesvld", "uniongotgctl__data.html#ad25b71929b2c8fa63018015455534e98", null ],
+    [ "bvalidoven", "uniongotgctl__data.html#afdf37051b392f6b8e7382d4653346371", null ],
+    [ "bvalidovval", "uniongotgctl__data.html#ae51e29d8044a62b0843d2158910404ff", null ],
+    [ "chirpen", "uniongotgctl__data.html#a35a1c18cdf1fad6850228cd3d55b7cbd", null ],
+    [ "conidsts", "uniongotgctl__data.html#ae05c894982ca6eb983f7b23cce2e32fa", null ],
+    [ "d32", "uniongotgctl__data.html#adec8daf45057169e0fd9d34760e40a15", null ],
+    [ "dbnctime", "uniongotgctl__data.html#a71de0e3e98895cc8e5cbf0c5664591d4", null ],
+    [ "devhnpen", "uniongotgctl__data.html#afa2821c1cb40b23ea634140b532047b8", null ],
+    [ "hnpreq", "uniongotgctl__data.html#a55e21132d93b9ebe630e1951a7ed746c", null ],
+    [ "hstnegscs", "uniongotgctl__data.html#a037f619e76845d71986176985dcbf414", null ],
+    [ "hstsethnpen", "uniongotgctl__data.html#ab493226243dde9b5e9f05d8a86318f71", null ],
+    [ "multvalidbc", "uniongotgctl__data.html#ae19c8fdeb28674ddbe631d9e2818bc77", null ],
+    [ "otgver", "uniongotgctl__data.html#ae26fa88c92babb487a74cc6a12482100", null ],
+    [ "reserved1", "uniongotgctl__data.html#a99fa86ea3db755db9544a5bfeb319687", null ],
+    [ "reserved12_15", "uniongotgctl__data.html#a29e123296bf82b4409c2659341e14c34", null ],
+    [ "reserved28_31", "uniongotgctl__data.html#a87a4226187cfe0747d4afbaee9f2c1ef", null ],
+    [ "sesreq", "uniongotgctl__data.html#a74e630ed013e40119a5305c666bb3453", null ],
+    [ "sesreqscs", "uniongotgctl__data.html#a51bafb2f0fb88efe28cfd58bfa3a3d50", null ],
+    [ "vbvalidoven", "uniongotgctl__data.html#a20902e982943b223cd9590be046f042e", null ],
+    [ "vbvalidovval", "uniongotgctl__data.html#a58c74fd97ee6bdd91995416a6b6f7077", null ]
+];

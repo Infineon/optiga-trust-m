@@ -1,0 +1,7 @@
+<map id="optiga_util" name="optiga_util">
+<area shape="rect" id="node1" title="OPTIGA util instance structure." alt="" coords="237,213,319,240"/>
+<area shape="rect" id="node2" href="$unionoptiga__util__params.html" title="union for OPTIGA util parameters" alt="" coords="213,124,343,151"/>
+<area shape="rect" id="node3" href="$structoptiga__get__data__object.html" title="Specifies the data structure for data to be read from OPTIGA." alt="" coords="5,13,161,39"/>
+<area shape="rect" id="node4" href="$structoptiga__set__object__protected__params.html" title="Specifies the data structure for protected update." alt="" coords="185,5,371,47"/>
+<area shape="rect" id="node5" href="$structoptiga__set__data__object.html" title="Specifies the data structure for data to be written to OPTIGA." alt="" coords="399,13,555,39"/>
+</map>

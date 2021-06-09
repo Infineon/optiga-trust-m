@@ -1,0 +1,6 @@
+<map id="optiga_lib_return_codes.h" name="optiga_lib_return_codes.h">
+<area shape="rect" id="node1" title="This file defines the error codes for the all the layers and modules. &#160;OPTIGA host library return val..." alt="" coords="47,5,218,32"/>
+<area shape="rect" id="node2" href="$optiga__lib__common_8h.html" title="This file provides the prototypes for the commonly used functions and structures of OPTIGA Library." alt="" coords="5,80,151,107"/>
+<area shape="rect" id="node4" href="$optiga__comms_8h.html" title="This file implements Optiga comms abstraction layer for IFX I2C Protocol." alt="" coords="129,155,248,181"/>
+<area shape="rect" id="node3" href="$optiga__cmd_8h.html" title="This file defines APIs, types and data structures used in the Command (cmd) module implementation." alt="" coords="5,155,105,181"/>
+</map>

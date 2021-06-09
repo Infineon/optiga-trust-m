@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['d_1267',['D',['../structecc__key.html#a401e76037f04303d6847c2d677b990c0',1,'ecc_key::D()'],['../structrsa__key.html#a7b0f68ba650ff3eec7091bd0ddc54212',1,'rsa_key::D()']]],
+  ['d_5flength_1268',['D_length',['../structecc__key.html#adc41124b7170529e356f62ecea91c48a',1,'ecc_key::D_length()'],['../structrsa__key.html#a560fcdb35f104d19bb6ababa3ed7e5b9',1,'rsa_key::D_length()']]],
+  ['data_1269',['data',['../structdata__payload.html#aa4d9aaf0ed3ee50dffa60d6f395a4b18',1,'data_payload::data()'],['../structprotected__update__data__set.html#a9fc3e43248aa349681455010e8223d5e',1,'protected_update_data_set::data()']]],
+  ['data_5fconfig_1270',['data_config',['../structoptiga__protected__update__data__configuration.html#a09131b58e380c1c928bd4bff0b09c102',1,'optiga_protected_update_data_configuration']]],
+  ['data_5fintegrity_5fconfiguration_1271',['data_integrity_configuration',['../example__optiga__util__protected__update_8h.html#a312cba046e619c9aa4079d8ff9fe33f5',1,'example_optiga_util_protected_update.h']]],
+  ['data_5flength_1272',['data_length',['../structdata__payload.html#ac8b563a8c3afc75b527082a10e5fd216',1,'data_payload::data_length()'],['../structprotected__update__data__set.html#a4d4bc9d141420194a915f51309956f84',1,'protected_update_data_set::data_length()']]],
+  ['data_5for_5fmetadata_1273',['data_or_metadata',['../structoptiga__get__data__object.html#a6bf1d4db38bc5fc6ae4605daf83daaaf',1,'optiga_get_data_object::data_or_metadata()'],['../structoptiga__set__data__object.html#aae0b33ef366a0f0edae79769918d72ad',1,'optiga_set_data_object::data_or_metadata()']]],
+  ['data_5fpoll_5ftimeout_1274',['data_poll_timeout',['../structifx__i2c__dl.html#abb5b790ac449386f93ad0516a1fbed74',1,'ifx_i2c_dl']]],
+  ['data_5fptr_1275',['data_ptr',['../structdata__blob.html#ac23512f7142f7136c8a606c35b35762c',1,'data_blob']]],
+  ['data_5fsent_1276',['data_sent',['../structoptiga__calc__hash.html#a5db0d3234bfd2dc04f15126d342ca623',1,'optiga_calc_hash']]],
+  ['derived_5fkey_1277',['derived_key',['../structoptiga__derive__key.html#a5369254e1501ce6c9c9158bf15c6be67',1,'optiga_derive_key']]],
+  ['derived_5fkey_5flength_1278',['derived_key_length',['../structoptiga__derive__key.html#aa69257edca772248fcf986902d7ddf2e',1,'optiga_derive_key']]],
+  ['digest_5falgo_1279',['digest_algo',['../structmanifest.html#a83b39907d03144e1f37578386081c2f6',1,'manifest']]],
+  ['digest_5flength_1280',['digest_length',['../structoptiga__calc__sign.html#afad44d285d2212644e703a7d654f87f8',1,'optiga_calc_sign::digest_length()'],['../structoptiga__verify__sign.html#a5e65b73769729e2203d370dc40bb9cd4',1,'optiga_verify_sign::digest_length()']]],
+  ['dl_1281',['dl',['../structifx__i2c__context.html#a0f04da77c5b9af249686204400b53914',1,'ifx_i2c_context']]],
+  ['do_5fpal_5finit_1282',['do_pal_init',['../structifx__i2c__context.html#a2ea80ccfaae3884533a79f02b3ed223c',1,'ifx_i2c_context']]]
+];

@@ -1,0 +1,6 @@
+<map id="XMC_USIC_CH_SetFrameLength" name="XMC_USIC_CH_SetFrameLength">
+<area shape="rect" id="node1" title=" " alt="" coords="272,56,487,83"/>
+<area shape="rect" id="node2" href="$group__I2S.html#gac20383590a3f87478e16be5503b5474b" title=" " alt="" coords="13,5,216,32"/>
+<area shape="rect" id="node3" href="$group__SPI.html#ga52e6177c2885b2456cacbc26d2eaaaae" title=" " alt="" coords="12,56,217,83"/>
+<area shape="rect" id="node4" href="$group__UART.html#ga2c9c799602a222b33bdca80aab23e073" title=" " alt="" coords="5,107,224,133"/>
+</map>

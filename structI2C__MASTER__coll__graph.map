@@ -1,0 +1,7 @@
+<map id="I2C_MASTER" name="I2C_MASTER">
+<area shape="rect" id="node1" title="Handler structure with pointers to dynamic and static parameters." alt="" coords="200,184,303,211"/>
+<area shape="rect" id="node2" href="$structI2C__MASTER__RUNTIME.html" title="Structure to hold the dynamic variables for the I2C_MASTER communication." alt="" coords="5,95,172,121"/>
+<area shape="rect" id="node3" href="$structXMC__USIC__CH.html" title=" " alt="" coords="196,95,307,121"/>
+<area shape="rect" id="node4" href="$structI2C__MASTER__CONFIG.html" title="Structure for DMA configuration." alt="" coords="331,95,489,121"/>
+<area shape="rect" id="node5" href="$structXMC__I2C__CH__CONFIG.html" title="I2C_CH configuration structure." alt="" coords="332,5,488,32"/>
+</map>

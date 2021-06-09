@@ -1,0 +1,5 @@
+<map id="FPU Functions" name="FPU Functions">
+<area shape="rect" id="node1" href="$group__CMSIS__Core__NVICFunctions.html" title="Functions that manage interrupts and exceptions via the NVIC." alt="" coords="5,5,119,31"/>
+<area shape="rect" id="node2" title="Function that provides FPU type." alt="" coords="167,5,276,31"/>
+<area shape="rect" id="node3" href="$group__CMSIS__Core__SysTickFunctions.html" title="Functions that configure the System." alt="" coords="324,5,455,31"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="chachapoly.h" name="chachapoly.h">
+<area shape="rect" id="node1" title="This file contains the AEAD&#45;ChaCha20&#45;Poly1305 definitions and functions." alt="" coords="81,5,180,32"/>
+<area shape="rect" id="node2" href="$config_8h.html" title="Configuration options (set of defines)" alt="" coords="27,155,93,181"/>
+<area shape="rect" id="node4" href="$poly1305_8h.html" title="This file contains Poly1305 definitions and functions." alt="" coords="200,80,285,107"/>
+<area shape="rect" id="node7" href="$chacha20_8h.html" title="This file contains ChaCha20 definitions and functions." alt="" coords="86,80,175,107"/>
+<area shape="rect" id="node3" href="$check__config_8h.html" title="Consistency checks for configuration options." alt="" coords="5,229,115,256"/>
+<area shape="rect" id="node5" title=" " alt="" coords="210,155,275,181"/>
+<area shape="rect" id="node6" title=" " alt="" coords="118,155,186,181"/>
+</map>

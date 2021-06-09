@@ -1,0 +1,14 @@
+<map id="usb_mode.h" name="usb_mode.h">
+<area shape="rect" id="node1" title=" " alt="" coords="364,5,457,32"/>
+<area shape="rect" id="node2" href="$Generated_2USBD_2usb_2core_2device_8h.html" title=" " alt="" coords="499,229,568,256"/>
+<area shape="rect" id="node3" href="$Generated_2USBD_2usb_2core_2usb__task_8h.html" title=" " alt="" coords="449,304,535,331"/>
+<area shape="rect" id="node5" href="$Generated_2USBD__VCOM_2class__driver_2cdc__class_8h.html" title=" " alt="" coords="202,453,294,480"/>
+<area shape="rect" id="node6" href="$Generated_2USBD_2usb_2core_2endpoint_8h.html" title=" " alt="" coords="369,155,452,181"/>
+<area shape="rect" id="node8" href="$Generated_2USBD_2usb_2core_2endpoint__stream_8h.html" title=" " alt="" coords="745,304,874,331"/>
+<area shape="rect" id="node9" href="$Generated_2USBD_2usb_2core_2events_8h.html" title=" " alt="" coords="570,80,641,107"/>
+<area shape="rect" id="node10" href="$Generated_2USBD_2usb_2core_2std__descriptors_8h.html" title=" " alt="" coords="643,155,765,181"/>
+<area shape="rect" id="node11" href="$Generated_2USBD_2usb_2core_2std__request__type_8h.html" title=" " alt="" coords="141,80,275,107"/>
+<area shape="rect" id="node12" href="$Generated_2USBD_2usb_2core_2usb__controller_8h.html" title=" " alt="" coords="227,155,341,181"/>
+<area shape="rect" id="node4" href="$Generated_2USBD__VCOM_2class__driver_2device_2cdc__class__device_8h.html" title=" " alt="" coords="425,379,559,405"/>
+<area shape="rect" id="node7" href="$Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html" title=" " alt="" coords="195,229,373,256"/>
+</map>

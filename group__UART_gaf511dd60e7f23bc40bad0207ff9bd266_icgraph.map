@@ -1,0 +1,4 @@
+<map id="XMC_UART_CH_EnableEvent" name="XMC_UART_CH_EnableEvent">
+<area shape="rect" id="node1" title=" " alt="" coords="188,5,383,32"/>
+<area shape="rect" id="node2" href="$Generated_2UART_2uart_8h.html#a8e61eb828326e0c889665348e4107aa0" title="Enables the selected protocol events for interrupt generation." alt="" coords="5,5,140,32"/>
+</map>

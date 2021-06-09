@@ -1,0 +1,4 @@
+<map id="optiga_crypt_tls_prf_sha512" name="optiga_crypt_tls_prf_sha512">
+<area shape="rect" id="node1" title="Derives a key using TLS PRF SHA512." alt="" coords="5,5,140,47"/>
+<area shape="rect" id="node2" href="$optiga__crypt_8h.html#af88dedcdc999e9c558c1943650fb1694" title="Derives a key." alt="" coords="188,13,323,39"/>
+</map>

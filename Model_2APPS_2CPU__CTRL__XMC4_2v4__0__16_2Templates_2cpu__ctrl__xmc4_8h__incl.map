@@ -1,0 +1,12 @@
+<map id="cpu_ctrl_xmc4.h" name="cpu_ctrl_xmc4.h">
+<area shape="rect" id="node1" title=" " alt="" coords="392,5,511,32"/>
+<area shape="rect" id="node2" href="$xmc__common_8h.html" title=" " alt="" coords="167,80,282,107"/>
+<area shape="rect" id="node8" href="$DAVE__Common_8h.html" title=" " alt="" coords="306,80,434,107"/>
+<area shape="rect" id="node9" href="$cpu__ctrl__xmc4__conf_8h.html" title=" " alt="" coords="458,80,607,107"/>
+<area shape="rect" id="node10" href="$cpu__ctrl__xmc4__extern_8h.html" title=" " alt="" coords="632,80,793,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,155,73,181"/>
+<area shape="rect" id="node4" title=" " alt="" coords="97,155,163,181"/>
+<area shape="rect" id="node5" title=" " alt="" coords="187,155,262,181"/>
+<area shape="rect" id="node6" title=" " alt="" coords="287,155,352,181"/>
+<area shape="rect" id="node7" href="$xmc__device_8h.html" title=" " alt="" coords="377,155,478,181"/>
+</map>

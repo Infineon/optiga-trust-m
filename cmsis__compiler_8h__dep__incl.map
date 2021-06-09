@@ -1,0 +1,5 @@
+<map id="cmsis_compiler.h" name="cmsis_compiler.h">
+<area shape="rect" id="node1" title="CMSIS compiler generic header file." alt="" coords="5,5,129,32"/>
+<area shape="rect" id="node2" href="$core__cm4_8h.html" title="CMSIS Cortex&#45;M4 Core Peripheral Access Layer Header File." alt="" coords="22,80,113,107"/>
+<area shape="rect" id="node3" href="$XMC4800_8h.html" title="CMSIS Cortex&#45;M4 Peripheral Access Layer Header File for XMC4800 from Infineon." alt="" coords="23,155,111,181"/>
+</map>

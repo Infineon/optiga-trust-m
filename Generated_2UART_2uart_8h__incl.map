@@ -1,0 +1,12 @@
+<map id="uart.h" name="uart.h">
+<area shape="rect" id="node1" title=" " alt="" coords="305,5,359,32"/>
+<area shape="rect" id="node2" href="$xmc__scu_8h.html" title=" " alt="" coords="26,80,113,107"/>
+<area shape="rect" id="node5" href="$xmc__gpio_8h.html" title=" " alt="" coords="141,155,230,181"/>
+<area shape="rect" id="node6" href="$xmc__uart_8h.html" title=" " alt="" coords="223,80,310,107"/>
+<area shape="rect" id="node8" href="$DAVE__common_8h.html" title="This file contains all app related public data structures,enums and function prototypes." alt="" coords="334,80,461,107"/>
+<area shape="rect" id="node9" href="$uart__conf_8h.html" title=" " alt="" coords="485,80,571,107"/>
+<area shape="rect" id="node10" href="$uart__extern_8h.html" title=" " alt="" coords="596,80,695,107"/>
+<area shape="rect" id="node3" href="$xmc__common_8h.html" title=" " alt="" coords="128,229,243,256"/>
+<area shape="rect" id="node4" title=" " alt="" coords="23,155,116,181"/>
+<area shape="rect" id="node7" href="$xmc__usic_8h.html" title=" " alt="" coords="254,155,343,181"/>
+</map>

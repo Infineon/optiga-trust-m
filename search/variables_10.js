@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['seed_1459',['seed',['../structkdf.html#a3cc50ce5b8317dc05f8b2fe06f9188f4',1,'kdf']]],
+  ['seed_5flength_1460',['seed_length',['../structkdf.html#a2c32db3d5946019e0788d67b4a547fc8',1,'kdf']]],
+  ['sent_5fdata_5flength_1461',['sent_data_length',['../structoptiga__symmetric__enc__dec__params.html#a53d05c32b6b3f4e4367067704476bf83',1,'optiga_symmetric_enc_dec_params']]],
+  ['session_5fkey_1462',['session_key',['../structenc__params.html#aa2aeadfeaab190c6223261e3d9269e1a',1,'enc_params']]],
+  ['session_5fkey_5flength_1463',['session_key_length',['../structenc__params.html#a7a7df9055362f90772388802ab48cc30',1,'enc_params']]],
+  ['set_5fobj_5fprotected_5ftag_1464',['set_obj_protected_tag',['../structoptiga__set__object__protected__params.html#a0df5573ea8cd9261454a91aad1c493ef',1,'optiga_set_object_protected_params']]],
+  ['set_5fprot_5fexample_5fstring_1465',['set_prot_example_string',['../structoptiga__protected__update__data__configuration.html#a973c0530a90a6603008ce3e361cdee2c',1,'optiga_protected_update_data_configuration']]],
+  ['shared_5fsecret_1466',['shared_secret',['../structkdf.html#a9086c6005a78914a12f8903b079cfa64',1,'kdf::shared_secret()'],['../structoptiga__calc__ssec.html#ac07fa9cdcedd83a45b8b1a97efd16b68',1,'optiga_calc_ssec::shared_secret()']]],
+  ['shared_5fsecret_5flength_1467',['shared_secret_length',['../structkdf.html#a136b7bdf87ab5dadc0a278d28f2cc130',1,'kdf']]],
+  ['shared_5fsecret_5foid_1468',['shared_secret_oid',['../structkdf.html#a1f3cdeac31c18dd1f0591ea5a8bebd86',1,'kdf']]],
+  ['signature_5falgo_1469',['signature_algo',['../structmanifest.html#a91f0552969dc81407e0812da12741355',1,'manifest']]],
+  ['signature_5flength_1470',['signature_length',['../structoptiga__verify__sign.html#a830632bebc0b1c1b8afbfe4cadd4ead3',1,'optiga_verify_sign']]],
+  ['size_1471',['size',['../structoptiga__set__data__object.html#a4440e5fc59f36a22bf792734067eed9e',1,'optiga_set_data_object']]],
+  ['slave_5faddress_1472',['slave_address',['../structifx__i2c__context.html#a672b8a3da4f3de7d370cd30ef12a574d',1,'ifx_i2c_context::slave_address()'],['../structpal__i2c.html#a1ec71fb7e35a2b2bff86e93afe943922',1,'pal_i2c::slave_address()']]],
+  ['state_1473',['state',['../structoptiga__comms.html#a19ff6dc96cccde6ae2744e4284259c52',1,'optiga_comms::state()'],['../structifx__i2c__dl.html#a079c58de075ee835eeab43a6373dd495',1,'ifx_i2c_dl::state()'],['../structifx__i2c__tl.html#a1cc60f910ac66391c2376d5298551a22',1,'ifx_i2c_tl::state()'],['../structifx__i2c__context.html#ab70f78e0fec7177d1ae92ccf67de66fa',1,'ifx_i2c_context::state()']]],
+  ['status_1474',['status',['../structifx__i2c__context.html#aa30f155bed0b569983024568c53e8f28',1,'ifx_i2c_context']]],
+  ['store_5fin_5fsession_1475',['store_in_session',['../structoptiga__get__random.html#a0885b1cf84d84392b75cdc5cb0662364',1,'optiga_get_random']]],
+  ['symmetric_5fkey_1476',['symmetric_key',['../structoptiga__gen__symkey__params.html#a92eb194b86c2f9a1df5628597d319829',1,'optiga_gen_symkey_params']]],
+  ['symmetric_5fkey_5foid_1477',['symmetric_key_oid',['../structoptiga__symmetric__enc__dec__params.html#a4e44e415784fa5f7c3ca4bce1583501b',1,'optiga_symmetric_enc_dec_params']]]
+];

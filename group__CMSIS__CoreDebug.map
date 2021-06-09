@@ -1,0 +1,5 @@
+<map id="Core Debug Registers (CoreDebug)" name="Core Debug Registers (CoreDebug)">
+<area shape="rect" id="node1" title="Type definitions for the Core Debug Registers." alt="" coords="183,5,332,45"/>
+<area shape="rect" id="node2" href="$group__CMSIS__core__bitfield.html" title="Macros for use with bit field definitions (xxx_Pos, xxx_Msk)." alt="" coords="380,5,521,45"/>
+<area shape="rect" id="node3" href="$group__CMSIS__FPU.html" title="Type definitions for the Floating Point Unit (FPU)" alt="" coords="5,5,135,45"/>
+</map>

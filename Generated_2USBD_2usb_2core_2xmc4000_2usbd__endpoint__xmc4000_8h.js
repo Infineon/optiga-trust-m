@@ -1,0 +1,38 @@
+var Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h =
+[
+    [ "Endpoint_WaitUntilReady_ErrorCodes_t", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa42b7eb8d1be3afadb97097bf2605740", [
+      [ "ENDPOINT_READYWAIT_NoError", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa42b7eb8d1be3afadb97097bf2605740a5bd129a3bb182ecdcfe16549e175308a", null ],
+      [ "ENDPOINT_READYWAIT_EndpointStalled", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa42b7eb8d1be3afadb97097bf2605740ac395cfec6ba73cd76fd016e746b7dc74", null ],
+      [ "ENDPOINT_READYWAIT_DeviceDisconnected", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa42b7eb8d1be3afadb97097bf2605740a39bcc8c146680a1666f2eba6dccc0152", null ],
+      [ "ENDPOINT_READYWAIT_BusSuspended", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa42b7eb8d1be3afadb97097bf2605740a46004ca0aeabab26bf7fa723ab27999f", null ],
+      [ "ENDPOINT_READYWAIT_Timeout", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa42b7eb8d1be3afadb97097bf2605740aa6da793dddcd7512d2e92599052d04b5", null ],
+      [ "ENDPOINT_READYWAIT_NoError", "Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa42b7eb8d1be3afadb97097bf2605740a5bd129a3bb182ecdcfe16549e175308a", null ],
+      [ "ENDPOINT_READYWAIT_EndpointStalled", "Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa42b7eb8d1be3afadb97097bf2605740ac395cfec6ba73cd76fd016e746b7dc74", null ],
+      [ "ENDPOINT_READYWAIT_DeviceDisconnected", "Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa42b7eb8d1be3afadb97097bf2605740a39bcc8c146680a1666f2eba6dccc0152", null ],
+      [ "ENDPOINT_READYWAIT_BusSuspended", "Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa42b7eb8d1be3afadb97097bf2605740a46004ca0aeabab26bf7fa723ab27999f", null ],
+      [ "ENDPOINT_READYWAIT_Timeout", "Model_2APPS_2USBD_2v4__0__14_2Templates_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa42b7eb8d1be3afadb97097bf2605740aa6da793dddcd7512d2e92599052d04b5", null ]
+    ] ],
+    [ "Endpoint_BytesInEndpoint", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#ae7348c00fa611924af120bb17cb33019", null ],
+    [ "Endpoint_ClearIN", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a0485fb7679004d2d1844ab43c0dad344", null ],
+    [ "Endpoint_ClearOUT", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a535a0361355d18f7a406e81b29a2c75e", null ],
+    [ "Endpoint_ClearSETUP", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a5cb175c6c0f6f8777fbc21e6f2016a72", null ],
+    [ "Endpoint_ClearStall", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#ae47540878d639c8c82e80bc0abc1a862", null ],
+    [ "Endpoint_ClearStatusStage", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a55ee6932f9d254a84a7feda043960a1e", null ],
+    [ "Endpoint_ConfigureEndpointTable", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a6b39a9542d970d8c7aff7347783137ae", null ],
+    [ "Endpoint_GetCurrentEndpoint", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aeb16d0613fb742663f6fef589d143f45", null ],
+    [ "Endpoint_GetEndpointDirection", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#ad5c494e7504ece2015471bea9489219d", null ],
+    [ "Endpoint_IsINReady", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a0e833d7271daff76cfbb1d3c9611f460", null ],
+    [ "Endpoint_IsOUTReceived", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a65e194fd6c4592aac0885752e638cc96", null ],
+    [ "Endpoint_IsReadWriteAllowed", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aed9fa99a96784d058c66f4d795fb5a53", null ],
+    [ "Endpoint_IsSETUPReceived", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aa0cd742116651fdc71c63be76f8eee7f", null ],
+    [ "Endpoint_IsStalled", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#ac8f08361c1018a24a412e125c4ec3f65", null ],
+    [ "Endpoint_Read_32_LE", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a70d1578d63bf1d7bd14877110c5c2ec8", null ],
+    [ "Endpoint_Read_8", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a2cba4f302a862ad5a9d4da6fd8e190b0", null ],
+    [ "Endpoint_ResetDataToggle", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#adb1cbdb84d80aa2e09603b2b5a728399", null ],
+    [ "Endpoint_ResetEndpoint", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#aca7f04fd05ae78c406b69a3c1e8431ce", null ],
+    [ "Endpoint_SelectEndpoint", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a03ea96bc02c9945a62cb1f0c524bd0f6", null ],
+    [ "Endpoint_StallTransaction", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#af23043876cd01bc4d201aad983f0fe49", null ],
+    [ "Endpoint_WaitUntilReady", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a2ee0f0710d9f319a5d5d13f1b6019488", null ],
+    [ "Endpoint_Write_32_LE", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#ae69e588bf53051a7cbf1803637d599d0", null ],
+    [ "Endpoint_Write_8", "Generated_2USBD_2usb_2core_2xmc4000_2usbd__endpoint__xmc4000_8h.html#a78f5c62cb3d0abcfd5a58c5436d244e3", null ]
+];

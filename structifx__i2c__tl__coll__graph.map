@@ -1,0 +1,8 @@
+<map id="ifx_i2c_tl" name="ifx_i2c_tl">
+<area shape="rect" id="node1" title="Transport layer structure." alt="" coords="70,5,143,32"/>
+<area shape="rect" id="node2" href="$structifx__i2c__context.html" title="IFX I2C context structure." alt="" coords="166,109,276,136"/>
+<area shape="rect" id="node5" href="$structifx__i2c__pl.html" title="Physical layer structure." alt="" coords="99,199,175,225"/>
+<area shape="rect" id="node6" href="$structifx__i2c__dl.html" title="Datalink layer structure." alt="" coords="266,199,342,225"/>
+<area shape="rect" id="node3" href="$structpal__gpio.html" title="Structure defines the PAL GPIO configuration." alt="" coords="280,5,351,32"/>
+<area shape="rect" id="node4" href="$structpal__i2c.html" title="PAL I2C context structure." alt="" coords="423,5,486,32"/>
+</map>

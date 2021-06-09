@@ -1,0 +1,5 @@
+<map id="SysTick Functions" name="SysTick Functions">
+<area shape="rect" id="node1" href="$group__CMSIS__core__DebugFunctions.html" title="Functions that access the ITM debug interface." alt="" coords="341,5,445,31"/>
+<area shape="rect" id="node2" href="$group__CMSIS__Core__FpuFunctions.html" title="Function that provides FPU type." alt="" coords="5,5,115,31"/>
+<area shape="rect" id="node3" title="Functions that configure the System." alt="" coords="163,5,293,31"/>
+</map>

@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['kdf_242',['kdf',['../structkdf.html',1,'']]],
+  ['kdf_5falgo_243',['kdf_algo',['../protected__update__data__set_8h.html#a6e839beac2463e39071d48f8a735b051',1,'protected_update_data_set.h']]],
+  ['kdf_5falgo_5ft_244',['kdf_algo_t',['../protected__update__data__set_8h.html#a0069918434679bf7591da6fac1335c10',1,'protected_update_data_set.h']]],
+  ['kdf_5fdata_245',['kdf_data',['../structconfidentiality.html#a2b3046eef0330f2fb484dfaea0a30e97',1,'confidentiality']]],
+  ['kdf_5ft_246',['kdf_t',['../protected__update__data__set_8h.html#a2775c6744e8b5f75fa283610c71fdec0',1,'protected_update_data_set.h']]],
+  ['key_247',['key',['../structaes__key.html#a5280f0ae35f187cb472a1ef95b469f72',1,'aes_key::key()'],['../structoptiga__enc__dec__asym.html#afeec0ef779c2eaf6e98e32f9ad8ee25f',1,'optiga_enc_dec_asym::key()']]],
+  ['key_5falgorithm_248',['key_algorithm',['../structkey__payload.html#a9081dd17c09ee372261ba7c0f719c3d0',1,'key_payload::key_algorithm()'],['../protected__update__data__set_8h.html#a0a15189fe8a07b48fe136c4331cd08bf',1,'key_algorithm():&#160;protected_update_data_set.h']]],
+  ['key_5falgorithm_5ft_249',['key_algorithm_t',['../protected__update__data__set_8h.html#a2950d9d62f07333a1c450609a31667d2',1,'protected_update_data_set.h']]],
+  ['key_5fdata_5ffile_5fpath_250',['key_data_file_path',['../structkey__payload.html#aae2a8554e56657ad3110f2f75516ec2c',1,'key_payload']]],
+  ['key_5fderivation_5falgo_251',['key_derivation_algo',['../structkdf.html#ac8cd347810a60420e83cca1e020c855a',1,'kdf']]],
+  ['key_5flength_252',['key_length',['../structaes__key.html#abe0b2d441c8ff5a2a55033257414dbf8',1,'aes_key']]],
+  ['key_5fparams_253',['key_params',['../unionkey__params.html',1,'key_params'],['../structkey__payload.html#a4341d824de85bfac0bd4f7f2eeeae1a6',1,'key_payload::key_params()']]],
+  ['key_5fparams_5ft_254',['key_params_t',['../protected__update__data__set_8h.html#a56a10d94c0454582e4f4eee0c72e8621',1,'protected_update_data_set.h']]],
+  ['key_5fpayload_255',['key_payload',['../structkey__payload.html',1,'']]],
+  ['key_5fpayload_5ft_256',['key_payload_t',['../protected__update__data__set_8h.html#aaad9381e8f52552bbb914465c45bdac2',1,'protected_update_data_set.h']]],
+  ['key_5ftype_257',['key_type',['../structkey__payload.html#ad27e8a37d0564b8e7bd41bde238f2547',1,'key_payload::key_type()'],['../structpublic__key__from__host.html#a198d84869b1a2cd8a682b8a759aa2220',1,'public_key_from_host::key_type()'],['../protected__update__data__set_8h.html#ab56b05c2bb34d1168dc2576c83a1e287',1,'key_type():&#160;protected_update_data_set.h']]],
+  ['key_5ftype_5fd_258',['key_type_d',['../protected__update__data__set_8h.html#a9f4a00bd846f350730753eb7980e054d',1,'protected_update_data_set.h']]],
+  ['key_5fusage_259',['key_usage',['../structkey__payload.html#ab40a2c0763fc08b0f8bc19ee3acbf8de',1,'key_payload::key_usage()'],['../structoptiga__gen__keypair.html#ad1ca023926917fb51279a3fb4b088859',1,'optiga_gen_keypair::key_usage()'],['../structoptiga__gen__symkey__params.html#adaf1c80900dcfedf2905d630ff7ceaf0',1,'optiga_gen_symkey_params::key_usage()'],['../protected__update__data__set_8h.html#a5a703de2b0840a0fb3463132f8b0b8a1',1,'key_usage():&#160;protected_update_data_set.h']]],
+  ['key_5fusage_5ft_260',['key_usage_t',['../protected__update__data__set_8h.html#ac3cd75ce85026360bd4ae255e608ee96',1,'protected_update_data_set.h']]]
+];

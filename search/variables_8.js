@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['i2c_5fcmd_1309',['i2c_cmd',['../structifx__i2c__pl.html#a1bb7608dc00a3fffaa37836122b77972',1,'ifx_i2c_pl']]],
+  ['ifx_5fi2c_5fcontext_5f0_1310',['ifx_i2c_context_0',['../ifx__i2c__config_8h.html#ac9f5a449a7d73bc2ffb861975efdec27',1,'ifx_i2c_config.h']]],
+  ['in_5fdata_1311',['in_data',['../structoptiga__symmetric__enc__dec__params.html#ac4e6de6a5d9d195779e698e1f676c03f',1,'optiga_symmetric_enc_dec_params']]],
+  ['in_5fdata_5flength_1312',['in_data_length',['../structoptiga__symmetric__enc__dec__params.html#a4da0bbbffc42e19e87d6f4db8e1be373',1,'optiga_symmetric_enc_dec_params']]],
+  ['info_1313',['info',['../structoptiga__derive__key.html#add06af3d28c51d8bd0b9b0cb239353a1',1,'optiga_derive_key']]],
+  ['info_5flength_1314',['info_length',['../structoptiga__derive__key.html#a56281e44bfa8b26d7c3e6a9609612f6c',1,'optiga_derive_key']]],
+  ['initialization_5fstate_1315',['initialization_state',['../structifx__i2c__tl.html#a6ad828cfecf83872744f86ec11798574',1,'ifx_i2c_tl']]],
+  ['input_5fshared_5fsecret_5foid_1316',['input_shared_secret_oid',['../structoptiga__derive__key.html#a228808b36f5516fc173cb3744aca7198',1,'optiga_derive_key']]],
+  ['instance_5finit_5fstate_1317',['instance_init_state',['../structoptiga__comms.html#a505c5a31cd0b3c9bcbd10bbe293ae004',1,'optiga_comms']]],
+  ['instance_5fstate_1318',['instance_state',['../structoptiga__crypt.html#a181df485da81633ed861e47b5f3888c9',1,'optiga_crypt::instance_state()'],['../structoptiga__util.html#ad41608c5c3885b90c5301f4005766821',1,'optiga_util::instance_state()']]],
+  ['int_5fconf_5fcontinue_5ffragment_5farray_1319',['int_conf_continue_fragment_array',['../data__object__confidentiality_8h.html#a1b93aa17cdd294b066d9bf5ea8da5e5a',1,'data_object_confidentiality.h']]],
+  ['int_5fconf_5ffinal_5ffragment_5farray_1320',['int_conf_final_fragment_array',['../data__object__confidentiality_8h.html#a9172d3b2b58852a82bd1558c385152a8',1,'data_object_confidentiality.h']]],
+  ['int_5fcontinue_5ffragment_5farray_1321',['int_continue_fragment_array',['../data__object_8h.html#a64538fce7034fdc2b3346069f0a416ca',1,'data_object.h']]],
+  ['int_5ffinal_5ffragment_5farray_1322',['int_final_fragment_array',['../data__object_8h.html#ab235a1dc6cbcf296ca0f19a5f663e182',1,'data_object.h']]],
+  ['is_5fevent_5ftriggered_1323',['is_event_triggered',['../structpal__os__event.html#ae190d15f634db43f96d7c9ad1e355230',1,'pal_os_event']]],
+  ['iv_1324',['iv',['../structoptiga__symmetric__enc__dec__params.html#a39ee5d0b08739e734efce08ff86cdc0f',1,'optiga_symmetric_enc_dec_params']]],
+  ['iv_5flength_1325',['iv_length',['../structoptiga__symmetric__enc__dec__params.html#a19c036c21a0c9b49d6e52a19b2e87ec8',1,'optiga_symmetric_enc_dec_params']]]
+];

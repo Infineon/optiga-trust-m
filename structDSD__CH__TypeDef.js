@@ -1,0 +1,25 @@
+var structDSD__CH__TypeDef =
+[
+    [ "BOUNDSEL", "structDSD__CH__TypeDef.html#a601905f31498d56a6715d7c2aa1da181", null ],
+    [ "CGSYNC", "structDSD__CH__TypeDef.html#a4f45801b140b6a77fc173da5fd5336ad", null ],
+    [ "DICFG", "structDSD__CH__TypeDef.html#ab57250dd508518aade43d2b592205a1d", null ],
+    [ "FCFGA", "structDSD__CH__TypeDef.html#a8a212620c0e4234d23d1c7311d6720f8", null ],
+    [ "FCFGC", "structDSD__CH__TypeDef.html#aaee77710daa92647c6202a064cd53fd3", null ],
+    [ "IWCTR", "structDSD__CH__TypeDef.html#a5e03d71f78233f6d31d1940f4659b022", null ],
+    [ "MODCFG", "structDSD__CH__TypeDef.html#a02aec819663f731bd224c3591290b0a1", null ],
+    [ "OFFM", "structDSD__CH__TypeDef.html#a23dba5764d93c712e0dd14762aba3284", null ],
+    [ "RECTCFG", "structDSD__CH__TypeDef.html#ac75a73b3c0a26f9662617e2bdd9be954", null ],
+    [ "RESA", "structDSD__CH__TypeDef.html#abc7ca1c11349218c53477a4f41ed1268", null ],
+    [ "RESERVED", "structDSD__CH__TypeDef.html#a93786515b9746d84b841c7f6f97e1351", null ],
+    [ "RESERVED1", "structDSD__CH__TypeDef.html#a5dc5e694ceb11f8429d28cb64c164106", null ],
+    [ "RESERVED2", "structDSD__CH__TypeDef.html#a84dbfc949c2652145c94581fb7df73d7", null ],
+    [ "RESERVED3", "structDSD__CH__TypeDef.html#aa6468b35b9036468a35f3137baa69611", null ],
+    [ "RESERVED4", "structDSD__CH__TypeDef.html#a8fcdf7e06ec4fbdf15c46b59f6724419", null ],
+    [ "RESERVED5", "structDSD__CH__TypeDef.html#aea8b113c2b7bae70e383b21dcb1537ea", null ],
+    [ "RESERVED6", "structDSD__CH__TypeDef.html#ac49f8523fd36d00b95aa90b00e9492be", null ],
+    [ "RESERVED7", "structDSD__CH__TypeDef.html#a77b1d0a91c3fd86ddfaa34d93f138581", null ],
+    [ "RESERVED8", "structDSD__CH__TypeDef.html#a4dc846b8990f7efcdeeb4b88ab5c3360", null ],
+    [ "RESERVED9", "structDSD__CH__TypeDef.html#aa28c484fa9b83c111a7b0aade1762850", null ],
+    [ "RESM", "structDSD__CH__TypeDef.html#a2934e12634bf88aaaac9b96bc71750e1", null ],
+    [ "TSTMP", "structDSD__CH__TypeDef.html#adf4b3c7f87e2a22986c2ee8788f47805", null ]
+];

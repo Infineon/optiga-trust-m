@@ -1,0 +1,5 @@
+<map id="XMC_USIC_CH_DisableDelayCompensation" name="XMC_USIC_CH_DisableDelayCompensation">
+<area shape="rect" id="node1" title=" " alt="" coords="321,23,516,65"/>
+<area shape="rect" id="node2" href="$group__I2S.html#gab08158855b7be000ba40afe5b919d6ce" title=" " alt="" coords="6,5,273,32"/>
+<area shape="rect" id="node3" href="$group__SPI.html#ga6c263e10670df1c4662ec6090007989c" title=" " alt="" coords="5,56,273,83"/>
+</map>

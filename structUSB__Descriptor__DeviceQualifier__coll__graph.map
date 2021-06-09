@@ -1,0 +1,4 @@
+<map id="USB_Descriptor_DeviceQualifier" name="USB_Descriptor_DeviceQualifier">
+<area shape="rect" id="node1" title="Standard USB Device Qualifier Descriptor (LUFA naming conventions)." alt="" coords="5,95,212,121"/>
+<area shape="rect" id="node2" href="$structUSB__Descriptor__Header.html" title="Standard USB Descriptor Header (LUFA naming conventions)." alt="" coords="27,5,190,32"/>
+</map>

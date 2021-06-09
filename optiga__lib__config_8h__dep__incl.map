@@ -1,0 +1,15 @@
+<map id="optiga_lib_config.h" name="optiga_lib_config.h">
+<area shape="rect" id="node1" title="This file is defines the compilation switches to build code with required features." alt="" coords="325,5,455,32"/>
+<area shape="rect" id="node2" href="$optiga__example_8h.html" title="This file defines APIs, types and data structures used in the OPTIGA example." alt="" coords="5,87,129,114"/>
+<area shape="rect" id="node3" href="$example__optiga__util__protected__update_8h.html" title="This file provides the data set for protected update of ecc key object with confidentiality." alt="" coords="153,80,293,121"/>
+<area shape="rect" id="node4" href="$optiga__lib__common_8h.html" title="This file provides the prototypes for the commonly used functions and structures of OPTIGA Library." alt="" coords="317,87,463,114"/>
+<area shape="rect" id="node7" href="$optiga__lib__common__internal_8h.html" title="This file provides the prototypes for the commonly used internal functions and structures of OPTIGA L..." alt="" coords="487,87,682,114"/>
+<area shape="rect" id="node8" href="$ifx__i2c__config_8h.html" title="This file defines the structures and macros for the Infineon I2C Protocol." alt="" coords="744,87,855,114"/>
+<area shape="rect" id="node5" href="$optiga__cmd_8h.html" title="This file defines APIs, types and data structures used in the Command (cmd) module implementation." alt="" coords="207,177,307,203"/>
+<area shape="rect" id="node6" href="$optiga__comms_8h.html" title="This file implements Optiga comms abstraction layer for IFX I2C Protocol." alt="" coords="331,177,449,203"/>
+<area shape="rect" id="node9" href="$ifx__i2c_8h.html" title="This file defines the API prototype for IFX I2C protocol v2.00 wrapper." alt="" coords="473,177,544,203"/>
+<area shape="rect" id="node10" href="$ifx__i2c__data__link__layer_8h.html" title="This file defines the API prototype for data link layer of the Infineon I2C Protocol Stack library." alt="" coords="568,177,732,203"/>
+<area shape="rect" id="node11" href="$ifx__i2c__physical__layer_8h.html" title="This file defines the API prototype for physical layer of the Infineon I2C Protocol Stack library." alt="" coords="757,177,917,203"/>
+<area shape="rect" id="node12" href="$ifx__i2c__presentation__layer_8h.html" title="Module for the presentation layer of the Infineon I2C Protocol Stack library." alt="" coords="941,169,1079,211"/>
+<area shape="rect" id="node13" href="$ifx__i2c__transport__layer_8h.html" title="This file defines the API prototype for transport layer of the Infineon I2C Protocol Stack library." alt="" coords="1103,177,1266,203"/>
+</map>

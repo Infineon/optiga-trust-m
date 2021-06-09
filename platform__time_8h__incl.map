@@ -1,0 +1,6 @@
+<map id="platform_time.h" name="platform_time.h">
+<area shape="rect" id="node1" title="mbed TLS Platform time abstraction" alt="" coords="47,5,158,32"/>
+<area shape="rect" id="node2" href="$config_8h.html" title="Configuration options (set of defines)" alt="" coords="27,80,93,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="117,80,176,107"/>
+<area shape="rect" id="node3" href="$check__config_8h.html" title="Consistency checks for configuration options." alt="" coords="5,155,115,181"/>
+</map>

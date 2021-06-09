@@ -1,0 +1,6 @@
+<map id="NVIC Functions" name="NVIC Functions">
+<area shape="rect" id="node1" href="$group__CMSIS__Core__FunctionInterface.html" title=" " alt="" coords="5,5,180,45"/>
+<area shape="rect" id="node3" title="Functions that manage interrupts and exceptions via the NVIC." alt="" coords="228,42,341,67"/>
+<area shape="rect" id="node2" href="$group__CMSIS__core__base.html" title="Definitions for base addresses, unions, and structures." alt="" coords="36,70,149,95"/>
+<area shape="rect" id="node4" href="$group__CMSIS__Core__FpuFunctions.html" title="Function that provides FPU type." alt="" coords="389,42,499,67"/>
+</map>

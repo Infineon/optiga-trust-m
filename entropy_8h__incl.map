@@ -1,0 +1,8 @@
+<map id="entropy.h" name="entropy.h">
+<area shape="rect" id="node1" title="Entropy accumulator implementation." alt="" coords="113,5,189,32"/>
+<area shape="rect" id="node2" href="$config_8h.html" title="Configuration options (set of defines)" alt="" coords="27,155,93,181"/>
+<area shape="rect" id="node4" title=" " alt="" coords="207,155,275,181"/>
+<area shape="rect" id="node5" href="$sha256_8h.html" title="This file contains SHA&#45;224 and SHA&#45;256 definitions and functions." alt="" coords="113,80,188,107"/>
+<area shape="rect" id="node3" href="$check__config_8h.html" title="Consistency checks for configuration options." alt="" coords="5,229,115,256"/>
+<area shape="rect" id="node6" title=" " alt="" coords="118,155,183,181"/>
+</map>

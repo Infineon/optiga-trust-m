@@ -1,0 +1,5 @@
+<map id="optiga_cmd.h" name="optiga_cmd.h">
+<area shape="rect" id="node1" title="This file defines APIs, types and data structures used in the Command (cmd) module implementation." alt="" coords="69,5,169,32"/>
+<area shape="rect" id="node2" href="$optiga__crypt_8h.html" title="This file implements the prototype declarations of OPTIGA Crypt module." alt="" coords="5,80,109,107"/>
+<area shape="rect" id="node3" href="$optiga__util_8h.html" title="This file defines APIs, types and data structures used in the OPTIGA utility module." alt="" coords="134,80,226,107"/>
+</map>

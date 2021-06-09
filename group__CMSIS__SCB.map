@@ -1,0 +1,5 @@
+<map id="System Control Block (SCB)" name="System Control Block (SCB)">
+<area shape="rect" id="node1" href="$group__CMSIS__NVIC.html" title="Type definitions for the NVIC Registers." alt="" coords="5,5,176,45"/>
+<area shape="rect" id="node3" title="Type definitions for the System Control Block Registers." alt="" coords="224,5,373,45"/>
+<area shape="rect" id="node2" href="$group__CMSIS__SCnSCB.html" title="Type definitions for the System Control and ID Register not in the SCB." alt="" coords="421,5,563,45"/>
+</map>

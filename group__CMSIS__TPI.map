@@ -1,0 +1,5 @@
+<map id="Trace Port Interface (TPI)" name="Trace Port Interface (TPI)">
+<area shape="rect" id="node1" title="Type definitions for the Trace Port Interface (TPI)" alt="" coords="197,5,332,45"/>
+<area shape="rect" id="node3" href="$group__CMSIS__FPU.html" title="Type definitions for the Floating Point Unit (FPU)" alt="" coords="380,5,509,45"/>
+<area shape="rect" id="node2" href="$group__CMSIS__DWT.html" title="Type definitions for the Data Watchpoint and Trace (DWT)" alt="" coords="5,5,149,45"/>
+</map>

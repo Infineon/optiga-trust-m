@@ -1,0 +1,6 @@
+<map id="__ISB" name="__ISB">
+<area shape="rect" id="node1" title="Instruction Synchronization Barrier." alt="" coords="192,56,249,83"/>
+<area shape="rect" id="node2" href="$group__CMSIS__Core__NVICFunctions.html#gae016e4c1986312044ee768806537d52f" title="Disable Interrupt." alt="" coords="5,5,144,32"/>
+<area shape="rect" id="node3" href="$mpu__armv7_8h.html#a61814eba4652a0fdfb76bbe222086327" title=" " alt="" coords="6,56,143,83"/>
+<area shape="rect" id="node4" href="$mpu__armv7_8h.html#a5a3f40314553baccdeea551f86d9a997" title=" " alt="" coords="7,107,142,133"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="pal_os_timer.h" name="pal_os_timer.h">
+<area shape="rect" id="node1" title="This file provides the prototype declarations of PAL OS timer functionalities." alt="" coords="449,5,555,32"/>
+<area shape="rect" id="node2" href="$ifx__i2c__config_8h.html" title="This file defines the structures and macros for the Infineon I2C Protocol." alt="" coords="400,80,511,107"/>
+<area shape="rect" id="node7" href="$ifx__i2c__transport__layer_8h.html" title="This file defines the API prototype for transport layer of the Infineon I2C Protocol Stack library." alt="" coords="635,162,798,189"/>
+<area shape="rect" id="node3" href="$ifx__i2c_8h.html" title="This file defines the API prototype for IFX I2C protocol v2.00 wrapper." alt="" coords="5,162,76,189"/>
+<area shape="rect" id="node4" href="$ifx__i2c__data__link__layer_8h.html" title="This file defines the API prototype for data link layer of the Infineon I2C Protocol Stack library." alt="" coords="100,162,264,189"/>
+<area shape="rect" id="node5" href="$ifx__i2c__physical__layer_8h.html" title="This file defines the API prototype for physical layer of the Infineon I2C Protocol Stack library." alt="" coords="289,162,449,189"/>
+<area shape="rect" id="node6" href="$ifx__i2c__presentation__layer_8h.html" title="Module for the presentation layer of the Infineon I2C Protocol Stack library." alt="" coords="473,155,611,196"/>
+</map>

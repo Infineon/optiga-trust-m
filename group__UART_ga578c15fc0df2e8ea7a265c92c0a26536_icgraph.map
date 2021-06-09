@@ -1,0 +1,4 @@
+<map id="XMC_UART_CH_GetReceivedData" name="XMC_UART_CH_GetReceivedData">
+<area shape="rect" id="node1" title=" " alt="" coords="220,5,443,32"/>
+<area shape="rect" id="node2" href="$Generated_2UART_2uart_8h.html#a40a62156fce703abed728aea27acdecb" title="Provides the received data from receive buffer." alt="" coords="5,5,172,32"/>
+</map>

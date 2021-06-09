@@ -1,0 +1,10 @@
+<map id="USB_Descriptor_Configuration_t" name="USB_Descriptor_Configuration_t">
+<area shape="rect" id="node1" title=" " alt="" coords="653,173,861,199"/>
+<area shape="rect" id="node2" href="$structUSB__CDC__Descriptor__FunctionalUnion.html" title=" " alt="" coords="285,5,435,47"/>
+<area shape="rect" id="node3" href="$structUSB__Descriptor__Header.html" title="Standard USB Descriptor Header (LUFA naming conventions)." alt="" coords="5,170,168,197"/>
+<area shape="rect" id="node4" href="$structUSB__Descriptor__Configuration__Header.html" title="Standard USB Configuration Descriptor (LUFA naming conventions)." alt="" coords="261,71,459,112"/>
+<area shape="rect" id="node5" href="$structUSB__Descriptor__Endpoint.html" title="Standard USB Endpoint Descriptor (LUFA naming conventions)." alt="" coords="273,137,447,163"/>
+<area shape="rect" id="node6" href="$structUSB__CDC__Descriptor__FunctionalHeader.html" title=" " alt="" coords="285,188,435,229"/>
+<area shape="rect" id="node7" href="$structUSB__Descriptor__Interface.html" title="Standard USB Interface Descriptor (LUFA naming conventions)." alt="" coords="275,254,445,281"/>
+<area shape="rect" id="node8" href="$structUSB__CDC__Descriptor__FunctionalACM.html" title=" " alt="" coords="285,305,435,347"/>
+</map>

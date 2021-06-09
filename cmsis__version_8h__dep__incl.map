@@ -1,0 +1,5 @@
+<map id="cmsis_version.h" name="cmsis_version.h">
+<area shape="rect" id="node1" title="CMSIS Core(M) Version definitions." alt="" coords="5,5,120,32"/>
+<area shape="rect" id="node2" href="$core__cm4_8h.html" title="CMSIS Cortex&#45;M4 Core Peripheral Access Layer Header File." alt="" coords="17,80,108,107"/>
+<area shape="rect" id="node3" href="$XMC4800_8h.html" title="CMSIS Cortex&#45;M4 Peripheral Access Layer Header File for XMC4800 from Infineon." alt="" coords="19,155,107,181"/>
+</map>

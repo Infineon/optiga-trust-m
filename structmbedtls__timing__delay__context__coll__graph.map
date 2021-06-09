@@ -1,0 +1,4 @@
+<map id="mbedtls_timing_delay_context" name="mbedtls_timing_delay_context">
+<area shape="rect" id="node1" title="Context for mbedtls_timing_set/get_delay()" alt="" coords="11,95,159,136"/>
+<area shape="rect" id="node2" href="$structmbedtls__timing__hr__time.html" title="timer structure" alt="" coords="5,5,165,32"/>
+</map>

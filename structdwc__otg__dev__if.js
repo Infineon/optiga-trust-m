@@ -1,0 +1,25 @@
+var structdwc__otg__dev__if =
+[
+    [ "dev_global_regs", "structdwc__otg__dev__if.html#a42862542d7ddf8bb9df8ca8019cfd3a2", null ],
+    [ "dma_in_desc_addr", "structdwc__otg__dev__if.html#a2ec4eebf11e933dd12efd5809530f921", null ],
+    [ "dma_out_desc_addr", "structdwc__otg__dev__if.html#a5db3195ec63556367f15ba91f1e5b55d", null ],
+    [ "dma_setup_desc_addr", "structdwc__otg__dev__if.html#aa1fffd61535eeadf1d49871897b33100", null ],
+    [ "in_desc_addr", "structdwc__otg__dev__if.html#a737a9405a3a71011e4f0c4a4e1236622", null ],
+    [ "in_ep_regs", "structdwc__otg__dev__if.html#adc19a90bbb7bc40e1848f24791c368b9", null ],
+    [ "iso_tx_thr_en", "structdwc__otg__dev__if.html#a2aa7311c50260a9cdf8e670d2dcb40a5", null ],
+    [ "non_iso_tx_thr_en", "structdwc__otg__dev__if.html#a27ffbd3f216a57d312d692b4e2a80547", null ],
+    [ "num_in_eps", "structdwc__otg__dev__if.html#acd20475fcb16441e17d7a60cac9de8a5", null ],
+    [ "num_out_eps", "structdwc__otg__dev__if.html#a147c44ada2f4f10f0e82489730379e54", null ],
+    [ "out_desc_addr", "structdwc__otg__dev__if.html#a5858f05f46720d50ffc43911261152ed", null ],
+    [ "out_ep_regs", "structdwc__otg__dev__if.html#a78e4a96453bc378e9e12c3582b3f2e2c", null ],
+    [ "perio_tx_fifo_size", "structdwc__otg__dev__if.html#ad9128c79c3a126cb6bc4e526e06e1e78", null ],
+    [ "psetup", "structdwc__otg__dev__if.html#aae9da5e6400a564abd23701d63b9df55", null ],
+    [ "rx_thr_en", "structdwc__otg__dev__if.html#a0534059355ce45d764f2bc9a7fa322a8", null ],
+    [ "rx_thr_length", "structdwc__otg__dev__if.html#a352b60a7e7b8a4e221ff2adefb5cbe59", null ],
+    [ "setup_desc_addr", "structdwc__otg__dev__if.html#a4c8f377f14f62a98b09ae88fa9128224", null ],
+    [ "setup_desc_index", "structdwc__otg__dev__if.html#a82e57b48ade1e68d840f567e6145fc0c", null ],
+    [ "spd", "structdwc__otg__dev__if.html#aaeecf556585be9f353f289bf80b49cca", null ],
+    [ "speed", "structdwc__otg__dev__if.html#a5ebe7c5359b391e988a30edfe4289ed4", null ],
+    [ "tx_fifo_size", "structdwc__otg__dev__if.html#a1e0e1faed77802ef1c056b49d8457373", null ],
+    [ "tx_thr_length", "structdwc__otg__dev__if.html#ace9c5914f2a7d596e082b5a7a5593917", null ]
+];

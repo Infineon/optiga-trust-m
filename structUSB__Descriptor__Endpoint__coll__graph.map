@@ -1,0 +1,4 @@
+<map id="USB_Descriptor_Endpoint" name="USB_Descriptor_Endpoint">
+<area shape="rect" id="node1" title="Standard USB Endpoint Descriptor (LUFA naming conventions)." alt="" coords="5,95,179,121"/>
+<area shape="rect" id="node2" href="$structUSB__Descriptor__Header.html" title="Standard USB Descriptor Header (LUFA naming conventions)." alt="" coords="11,5,173,32"/>
+</map>

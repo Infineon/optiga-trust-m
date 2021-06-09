@@ -1,0 +1,6 @@
+<map id="XMC_USIC_CH_EnableInputInversion" name="XMC_USIC_CH_EnableInputInversion">
+<area shape="rect" id="node1" title=" " alt="" coords="293,56,529,83"/>
+<area shape="rect" id="node2" href="$group__I2S.html#ga9ec3634a6ce342fc73a93d8671178077" title=" " alt="" coords="13,5,238,32"/>
+<area shape="rect" id="node3" href="$group__SPI.html#ga564d521ad28281f2476c7e396b9c0e7a" title=" " alt="" coords="12,56,239,83"/>
+<area shape="rect" id="node4" href="$group__UART.html#ga43e655a939632f39559929dd3fb0116e" title=" " alt="" coords="5,107,245,133"/>
+</map>
