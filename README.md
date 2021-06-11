@@ -136,7 +136,7 @@ Get started with the [OPTIGA™ Trust M evaluation kit](https://www.infineon.com
 1. Secure Firmware Update and Secure Boot (link is pending)
 1. [Arduino library](https://github.com/Infineon/arduino-optiga-trust-m)
 1. [Personalize OPTIGA™ Trust](https://github.com/Infineon/personalize-optiga-trust)
-1. [OpenSSL Engine and Command Line Interface (for RPi3) and AWS IoT C SDK](https://github.com/Infineon/cli-optiga-trust-m)
+1. [OpenSSL Engine Command Line Interface and AWS IoT C SDK (for RPi3)](https://github.com/Infineon/cli-optiga-trust-m)
 1. [Python package](https://github.com/Infineon/python-optiga-trust)
 1. [I2C Utilities](https://github.com/Infineon/i2c-utils-optiga-trust)
 
