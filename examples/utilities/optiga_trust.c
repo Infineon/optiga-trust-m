@@ -106,8 +106,8 @@ void read_certificate_from_optiga(char * cert_pem, uint16_t * cert_pem_length)
         mbedtls_base64_encode((unsigned char *)ifx_cert_b64_temp, sizeof(ifx_cert_b64_temp),
                               &ifx_cert_b64_len,
         //in case of TLS chain format of ceritificate
-        //                    ifx_cert_hex + 9, ifx_cert_hex_len - 9);
-                              ifx_cert_hex , ifx_cert_hex_len);
+                              ifx_cert_hex + 9, ifx_cert_hex_len - 9);
+        //                      ifx_cert_hex , ifx_cert_hex_len);
 
         memcpy(cert_pem, "-----BEGIN CERTIFICATE-----\n", 28);
         offset_to_write += 28;
