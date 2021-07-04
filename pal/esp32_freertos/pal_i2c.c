@@ -90,6 +90,7 @@ pal_status_t pal_i2c_init(const pal_i2c_t* p_i2c_context)
     conf.scl_io_num = master_ctx->scl_io;
     conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
     conf.master.clk_speed = master_ctx->bitrate;
+    conf.clk_flags = 0;
     i2c_param_config(master_port, &conf);
     i2c_driver_install(master_port, conf.mode,
                        PAL_I2C_MASTER_TX_BUF_DISABLE,
