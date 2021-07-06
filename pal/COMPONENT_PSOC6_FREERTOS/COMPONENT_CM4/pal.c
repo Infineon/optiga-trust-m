@@ -42,13 +42,12 @@
 #include "optiga/pal/pal_os_timer.h"
 #include "pal_psoc_gpio_mapping.h"
 
-extern void pal_os_event_init(void);
 extern pal_gpio_t optiga_reset_0;
 
 
 pal_status_t pal_init(void)
 {
-	pal_gpio_init(&optiga_reset_0);
+    pal_gpio_init(&optiga_reset_0);
     return PAL_STATUS_SUCCESS;
 }
 
