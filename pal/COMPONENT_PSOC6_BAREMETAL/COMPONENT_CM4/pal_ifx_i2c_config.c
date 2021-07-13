@@ -35,7 +35,6 @@
 * @{
 */
 
-//#include <DAVE.h>
 #include "optiga/pal/pal_gpio.h"
 #include "optiga/pal/pal_i2c.h"
 #include "optiga/ifx_i2c/ifx_i2c_config.h"
@@ -49,24 +48,27 @@
 // i2c driver related
 cyhal_i2c_t i2c_master_obj;
 
-
+#ifdef OPTIGA_TRUSTM_VDD
 pal_psoc_gpio_t optiga_vdd_config =
 {
-    .port_num = P5_5,
+    .port_num = OPTIGA_TRUSTM_VDD,
     .init_state = false
 };
+#endif
 
+#ifdef OPTIGA_TRUSTM_RST
 pal_psoc_gpio_t optiga_reset_config =
 {
-    .port_num = P8_2,
+    .port_num = OPTIGA_TRUSTM_RST,
     .init_state = true
 };
+#endif
 
 pal_psoc_i2c_t optiga_i2c_master_config =
 {
     .i2c_master_channel = &i2c_master_obj,
-    .sca_port_num = CYBSP_I2C_SCL_OPTIGA,
-    .sda_port_num = CYBSP_I2C_SDA_OPTIGA
+    .sca_port_num = OPTIGA_TRUSTM_SCL,
+    .sda_port_num = OPTIGA_TRUSTM_SDA
 };
 
 /**
@@ -84,7 +86,7 @@ pal_gpio_t optiga_vdd_0 =
 pal_gpio_t optiga_reset_0 =
 {
     // Platform specific GPIO context for the pin used to toggle Reset.
-    (void*)&optiga_reset_config
+	NULL
 };
 
 /**
