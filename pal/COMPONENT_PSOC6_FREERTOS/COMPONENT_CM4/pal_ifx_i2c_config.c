@@ -76,8 +76,12 @@ pal_psoc_i2c_t optiga_i2c_master_config =
  */
 pal_gpio_t optiga_vdd_0 =
 {
-    // Platform specific GPIO context for the pin used to toggle Vdd.
+#ifdef OPTIGA_TRUSTM_VDD
+	// Platform specific GPIO context for the pin used to toggle Vdd.
+	(void * )&optiga_vdd_config
+#else
     NULL
+#endif
 };
 
 /**
@@ -85,8 +89,12 @@ pal_gpio_t optiga_vdd_0 =
  */
 pal_gpio_t optiga_reset_0 =
 {
+#ifdef OPTIGA_TRUSTM_RST
     // Platform specific GPIO context for the pin used to toggle Reset.
+	(void * )&optiga_reset_config
+#else
 	NULL
+#endif
 };
 
 /**

@@ -42,12 +42,27 @@
 #include "optiga/pal/pal_os_timer.h"
 #include "pal_psoc_gpio_mapping.h"
 
-extern pal_gpio_t optiga_reset_0;
+extern void pal_os_event_init(void);
+#ifdef OPTIGA_TRUSTM_VDD
+extern pal_gpio_t optiga_vdd_0;
+#endif
+
+#ifdef OPTIGA_TRUSTM_RST
+extern pal_gpio_t optiga_rst_0;
+#endif
 
 
 pal_status_t pal_init(void)
 {
-    pal_gpio_init(&optiga_reset_0);
+    pal_os_event_init();
+	#ifdef OPTIGA_TRUSTM_VDD
+    pal_gpio_init(&optiga_vdd_0);
+	#endif
+
+	#ifdef OPTIGA_TRUSTM_RST
+    pal_gpio_init(&optiga_rst_0);
+	#endif
+	pal_timer_init();
     return PAL_STATUS_SUCCESS;
 }
 
