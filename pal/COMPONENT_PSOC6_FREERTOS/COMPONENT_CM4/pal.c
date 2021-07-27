@@ -55,14 +55,13 @@ extern pal_gpio_t optiga_rst_0;
 pal_status_t pal_init(void)
 {
     pal_os_event_init();
-	#ifdef OPTIGA_TRUSTM_VDD
+    #ifdef OPTIGA_TRUSTM_VDD
     pal_gpio_init(&optiga_vdd_0);
-	#endif
+    #endif
 
-	#ifdef OPTIGA_TRUSTM_RST
+    #ifdef OPTIGA_TRUSTM_RST
     pal_gpio_init(&optiga_rst_0);
-	#endif
-	pal_timer_init();
+    #endif
     return PAL_STATUS_SUCCESS;
 }
 
