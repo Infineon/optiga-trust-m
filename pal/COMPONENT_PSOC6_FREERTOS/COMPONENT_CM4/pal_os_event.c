@@ -94,8 +94,8 @@ void pal_os_event_trigger_registered_callback(void)
     if ((pal_os_ts_0 != 0) && (pal_os_ts_0 < xTaskGetTickCount()) && pal_os_event_0.callback_registered)
     {
     	pal_os_ts_0 = 0;
-		callback = pal_os_event_0.callback_registered;
-		callback((void * )pal_os_event_0.callback_ctx);
+	callback = pal_os_event_0.callback_registered;
+	callback((void * )pal_os_event_0.callback_ctx);
     }
 }
 /// @endcond
@@ -115,15 +115,15 @@ void pal_os_event_trigger_registered_callback(void)
 *
 */
 void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
-											register_callback callback,
+                                            register_callback callback,
                                             void* callback_args,
                                             uint32_t time_us)
 {
 	pal_os_event_0.callback_registered = callback;
 	pal_os_event_0.callback_ctx = callback_args;
 
-    if (time_us < 1000)
-        time_us = 1000;
+        if (time_us < 1000)
+            time_us = 1000;
 
 	pal_os_ts_0 = xTaskGetTickCount() + pdMS_TO_TICKS(time_us/1000);
 }
