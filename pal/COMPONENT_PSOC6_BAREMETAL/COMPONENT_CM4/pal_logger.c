@@ -164,7 +164,7 @@ pal_status_t pal_logger_write(void * p_logger_context, const uint8_t * p_log_dat
         // Begin asynchronous TX transfer
     	pal_logger_uart_rst_events();
 
-    	cy_hal_status = cyhal_uart_write_async(&pal_logger_uart_obj, p_log_data, log_data_length);
+    	cy_hal_status = cyhal_uart_write_async(&pal_logger_uart_obj, (void*)p_log_data, log_data_length);
 
         if(CY_RSLT_SUCCESS != cy_hal_status)
         {

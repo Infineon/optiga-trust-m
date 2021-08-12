@@ -228,7 +228,6 @@ static size_t decode_asn1_uint(const uint8_t* asn1, size_t asn1_len,
     // fixed position fields
     const uint8_t* const tag_field = &asn1[ASN1_DER_TAG_OFFSET];
     const uint8_t* const length_field = &asn1[ASN1_DER_LEN_OFFSET];
-    const uint8_t* const integer_field_start = &asn1[ASN1_DER_VAL_OFFSET];
 
     if (*tag_field != DER_TAG_INTEGER) {
         // Not an DER INTEGER
