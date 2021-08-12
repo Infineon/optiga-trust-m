@@ -152,7 +152,7 @@ optiga_lib_status_t ifx_i2c_pl_init(ifx_i2c_context_t * p_ctx, ifx_i2c_event_han
     p_ctx->pl.frame_state = PL_STATE_UNINIT;
     p_ctx->pl.negotiate_state = PL_INIT_SET_FREQ_DEFAULT;
     p_ctx->p_pal_i2c_ctx->slave_address = p_ctx->slave_address;
-    p_ctx->p_pal_i2c_ctx->upper_layer_event_handler = ifx_i2c_pl_pal_event_handler;
+    p_ctx->p_pal_i2c_ctx->upper_layer_event_handler = (void *)ifx_i2c_pl_pal_event_handler;
     p_ctx->pl.retry_counter = PL_POLLING_MAX_CNT;
     if (TRUE == p_ctx->do_pal_init)
     {
