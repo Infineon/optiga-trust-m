@@ -39,6 +39,7 @@
 #include "optiga/pal/pal_i2c.h"
 #include "optiga/ifx_i2c/ifx_i2c_config.h"
 #include "optiga/pal/pal_ifx_i2c_config.h"
+#include "optiga_lib_config.h"
 #include "pal_psoc_i2c_mapping.h"
 #include "pal_psoc_gpio_mapping.h"
 #include "cy_pdl.h"
