@@ -196,7 +196,7 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t * p_i2c_context)
 {
 	g_pal_i2c_init_flag = 0;
 	cyhal_i2c_free(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel);
-    if (i2c_taskhandle != NULL)
+    if (i2c_taskhandle == NULL)
 	{
 	    vTaskDelete(i2c_taskhandle);
 	}
