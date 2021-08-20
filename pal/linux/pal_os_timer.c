@@ -57,35 +57,35 @@ LIBRARY_EXPORTS void pal_os_timer_delay_in_milliseconds(uint16_t milliseconds);
 
 /// @cond hidden 
 /**
-* Gets tick count value in milliseconds
+* Gets tick count value in microseconds
 *
 *\param[in] none
 *
 
-* \retval  uint32_t time in milliseconds 
+* \retval  uint32_t time in microseconds 
 */
 static uint32_t pal_os_get_clock_tick_count() 
 {
-    uint32_t       now_ms = 0;
+    long   us_since_epoch = 0;
     struct timeval tv;
 
     // gettimeofday() returns 0 for success, or -1 for failure
     if (0 == gettimeofday(&tv, NULL))
     {
-    	now_ms = ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+    	us_since_epoch = (tv.tv_sec * 1000) + tv.tv_usec;
     }
     else
     {
-    	now_ms = 0;
+    	us_since_epoch = 0;
     	exit(-1);
     }
     //LOG(LOG_PREFIX "pal_os_timer_get_time_in_milliseconds() <\n");
-    return now_ms;
+    return (us_since_epoch & 0xffff);
 }
 
 uint32_t pal_os_timer_get_time_in_microseconds(void)
 {
-	return pal_os_get_clock_tick_count()*1000;
+	return pal_os_get_clock_tick_count();
 }
 
 /**
@@ -95,7 +95,7 @@ uint32_t pal_os_timer_get_time_in_microseconds(void)
  */
 uint32_t pal_os_timer_get_time_in_milliseconds(void)
 {
-    return pal_os_get_clock_tick_count();
+    return (pal_os_get_clock_tick_count() / 1000);
 }
 
 /**
