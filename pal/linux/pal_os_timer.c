@@ -66,7 +66,7 @@ LIBRARY_EXPORTS void pal_os_timer_delay_in_milliseconds(uint16_t milliseconds);
 */
 static uint32_t pal_os_get_clock_tick_count() 
 {
-    long   us_since_epoch = 0;
+    uint64_t       us_since_epoch = 0;
     struct timeval tv;
 
     // gettimeofday() returns 0 for success, or -1 for failure
@@ -80,7 +80,7 @@ static uint32_t pal_os_get_clock_tick_count()
     	exit(-1);
     }
     //LOG(LOG_PREFIX "pal_os_timer_get_time_in_milliseconds() <\n");
-    return (us_since_epoch & 0xffff);
+    return (uint32_t)(us_since_epoch & 0xffff);
 }
 
 uint32_t pal_os_timer_get_time_in_microseconds(void)
