@@ -45,12 +45,12 @@
 #define CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT OPTIGA_KEY_ID_E0F0
 #endif
 
-optiga_lib_status_t crypt_event_completed_status;
+optiga_lib_status_t ecdsa_completed_status;
 
 //lint --e{818} suppress "argument "context" is not used in the sample provided"
 static void optiga_crypt_event_completed(void * context, optiga_lib_status_t return_status)
 {
-	crypt_event_completed_status = return_status;
+	ecdsa_completed_status = return_status;
     if (NULL != context)
     {
         // callback to upper layer here
@@ -91,7 +91,7 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
 	}
 #endif
 	// Reset the status variable (updated via callback, when requested operation is finiesh, or timeout)
-	crypt_event_completed_status = OPTIGA_LIB_BUSY;
+	ecdsa_completed_status = OPTIGA_LIB_BUSY;
 
 	// Signing data with the Secure Element
 	crypt_sync_status = optiga_crypt_ecdsa_sign(me, (unsigned char *)buf, blen, CONFIG_OPTIGA_TRUST_M_PRIVKEY_SLOT, der_signature, &dslen);
@@ -102,12 +102,12 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
 	}
 
 	//Wait until the optiga_crypt_ecdsa_verify is completed
-	while (OPTIGA_LIB_BUSY == crypt_event_completed_status)
+	while (OPTIGA_LIB_BUSY == ecdsa_completed_status)
 	{
 		pal_os_timer_delay_in_milliseconds(10);
 	}
 
-	if(crypt_event_completed_status!= OPTIGA_LIB_SUCCESS)
+	if(ecdsa_completed_status!= OPTIGA_LIB_SUCCESS)
 	{
 		return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
 		goto cleanup;
@@ -279,7 +279,7 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
 #undef pubk(a)
 #endif
 
-	crypt_event_completed_status = OPTIGA_LIB_BUSY;
+	ecdsa_completed_status = OPTIGA_LIB_BUSY;
 	crypt_sync_status = optiga_crypt_ecdsa_verify ( me, (uint8_t *) buf, blen,
 													 (uint8_t *) p, signature_len,
 													  OPTIGA_CRYPT_HOST_DATA, (void *)&public_key );
@@ -291,12 +291,12 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
 	}
 
 	//Wait until the optiga_crypt_ecdsa_verify is completed
-	while (OPTIGA_LIB_BUSY == crypt_event_completed_status)
+	while (OPTIGA_LIB_BUSY == ecdsa_completed_status)
 	{
 		pal_os_timer_delay_in_milliseconds(10);
 	}
 
-	if ( crypt_event_completed_status != OPTIGA_LIB_SUCCESS )
+	if ( ecdsa_completed_status != OPTIGA_LIB_SUCCESS )
 	{
 		return_status = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
 		goto cleanup;
@@ -366,7 +366,7 @@ int mbedtls_ecdsa_genkey( mbedtls_ecdsa_context *ctx, mbedtls_ecp_group_id gid,
 		curve_id = OPTIGA_ECC_CURVE_BRAIN_POOL_P_512R1;
 	}
     //invoke optiga command to generate a key pair.
-    crypt_event_completed_status = OPTIGA_LIB_BUSY;
+    ecdsa_completed_status = OPTIGA_LIB_BUSY;
     crypt_sync_status = optiga_crypt_ecc_generate_keypair( me, curve_id,
                                                 (optiga_key_usage_t)( OPTIGA_KEY_USAGE_KEY_AGREEMENT | OPTIGA_KEY_USAGE_AUTHENTICATION ),
                                                 FALSE,
@@ -379,7 +379,7 @@ int mbedtls_ecdsa_genkey( mbedtls_ecdsa_context *ctx, mbedtls_ecp_group_id gid,
         goto cleanup;
     }
 
-    while (OPTIGA_LIB_BUSY == crypt_event_completed_status)
+    while (OPTIGA_LIB_BUSY == ecdsa_completed_status)
     {
     	pal_os_timer_delay_in_milliseconds(5);
     }
