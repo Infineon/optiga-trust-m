@@ -127,6 +127,7 @@ void i2c_master_event_handler(void *callback_arg, cyhal_i2c_event_t event)
 pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context)
 {
     cy_rslt_t cy_hal_status;
+    pal_status_t result = PAL_STATUS_FAILURE;
     /* Define the I2C master configuration structure */
     cyhal_i2c_cfg_t i2c_master_config = {false,    // is slave?
                                          0,        // address of this resource; set to 0 for master
@@ -146,7 +147,7 @@ pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context)
 
             pal_i2c_release((void * )p_i2c_context);
 
-            return;
+            return PAL_STATUS_SUCCESS;
         }
     	if (g_pal_i2c_init_flag == 0)
     	{
@@ -185,11 +186,11 @@ pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context)
     	}
     	else
     	{
-    		cy_hal_status = (pal_status_t)PAL_STATUS_SUCCESS;
+    		result = (pal_status_t)PAL_STATUS_SUCCESS;
     	}
     } while (FALSE);
 
-    return (pal_status_t)cy_hal_status;
+    return result;
 }
 
 pal_status_t pal_i2c_deinit(const pal_i2c_t * p_i2c_context)

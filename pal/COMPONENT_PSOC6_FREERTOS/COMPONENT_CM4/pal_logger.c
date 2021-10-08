@@ -67,14 +67,18 @@ pal_status_t pal_logger_deinit(void * p_logger_context)
 
 pal_status_t pal_logger_write(void * p_logger_context, const uint8_t * p_log_data, uint32_t log_data_length)
 {
-    printf("%.*s",log_data_length, p_log_data);
+    printf("%.*s",(int)log_data_length, p_log_data);
 
     return (PAL_STATUS_SUCCESS);
 }
 
 pal_status_t pal_logger_read(void * p_logger_context, uint8_t * p_log_data, uint32_t log_data_length)
 {
-    scanf("%.*s",log_data_length, p_log_data);
+    char str[4] = "%";
+    char str_1[4];
+    sprintf(str_1, "%ds", (int)log_data_length);
+    strcat(str, str_1);
+    scanf(str, p_log_data);
 
     return (PAL_STATUS_SUCCESS);
 }

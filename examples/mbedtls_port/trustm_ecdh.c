@@ -170,7 +170,6 @@ int mbedtls_ecdh_compute_shared(mbedtls_ecp_group *grp, mbedtls_mpi *z,
 	size_t pk_size;
 	uint8_t pk_out[150];
 	uint8_t buf[150];
-	size_t public_key_len = 0;
 	uint8_t publickey_offset = 3;
 	optiga_crypt_t * me = NULL;
     optiga_lib_status_t crypt_sync_status = OPTIGA_CRYPT_ERROR;
