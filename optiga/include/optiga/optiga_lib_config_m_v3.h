@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -110,9 +110,7 @@ extern "C" {
      *         Warm Reset - (2) : This is applicable if the host platform doesn't have GPIO option for VDD. \n
      *         Any other value will lead to error
      */
-	#ifndef OPTIGA_COMMS_DEFAULT_RESET_TYPE
-        #define OPTIGA_COMMS_DEFAULT_RESET_TYPE     (0U)
-	#endif
+    #define OPTIGA_COMMS_DEFAULT_RESET_TYPE     (0U)
     
     /** @brief NULL parameter check.
      *         To disable the check, undefine the macro

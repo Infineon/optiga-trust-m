@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -60,6 +60,8 @@ extern "C" {
 /** @brief Optiga comms structure */
 typedef struct optiga_comms
 {
+    /// Pointer to the pal os event instance/context
+    void * p_pal_os_event_ctx;
     /// Comms structure pointer
     void * p_comms_ctx;
     /// Upper layer context
@@ -78,8 +80,6 @@ typedef struct optiga_comms
     /// To provide the option to save and restore the optiga comms presentation layer context
     uint8_t manage_context_operation;
 #endif
-    /// Pointer to the pal os event instance/context
-    void * p_pal_os_event_ctx;
 } optiga_comms_t;
 
 /** @brief optiga communication structure */

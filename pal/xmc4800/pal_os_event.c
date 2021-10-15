@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -105,7 +105,15 @@ void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
 //lint --e{818,715} suppress "As there is no implementation, pal_os_event is not used"
 void pal_os_event_destroy(pal_os_event_t * pal_os_event)
 {
+    pal_os_event->callback_ctx = NULL;
+    pal_os_event->callback_registered = NULL;
     
+    // !!!OPTIGA_LIB_PORTING_REQUIRED
+    // The following steps related to TIMER must be taken care while porting to different platform
+    TIMER_ClearEvent(&scheduler_timer);
+    //lint --e{534} suppress "Error handling is not required so return value is not checked"
+    TIMER_Stop(&scheduler_timer);
+    TIMER_Clear(&scheduler_timer);
 }
 
 /**

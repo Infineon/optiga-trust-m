@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -59,11 +59,11 @@ char performance_buffer_string[30];
                                 
 //lint --e{838} suppress "first time use of modulus_signed_bit_len and length_field_in_bytes"
 void example_util_encode_rsa_public_key_in_bit_string_format(const uint8_t * n_buffer,
-                                                        uint16_t n_length,
-                                                        const uint8_t * e_buffer,
-                                                        uint16_t e_length,
-                                                        uint8_t * pub_key_buffer,
-                                                        uint16_t * pub_key_length)
+                                                             uint16_t n_length,
+                                                             const uint8_t * e_buffer,
+                                                             uint16_t e_length,
+                                                             uint8_t * pub_key_buffer,
+                                                             uint16_t * pub_key_length)
 {
 #define OPTIGA_EXAMPLE_UTIL_RSA_DER_MIN_LEN_FIELD     (0x80)
 #define OPTIGA_EXAMPLE_UTIL_RSA_DER_SEQUENCE_TAG      (0x30)
@@ -120,9 +120,9 @@ void example_util_encode_rsa_public_key_in_bit_string_format(const uint8_t * n_b
 }
 
 void example_util_encode_ecc_public_key_in_bit_string_format(const uint8_t * q_buffer,
-                                                        uint8_t q_length,
-                                                        uint8_t * pub_key_buffer,
-                                                        uint16_t * pub_key_length)
+                                                             uint8_t q_length,
+                                                             uint8_t * pub_key_buffer,
+                                                             uint16_t * pub_key_length)
 {
 #define OPTIGA_EXAMPLE_UTIL_ECC_DER_ADDITIONAL_LENGTH (0x02)
 
@@ -141,20 +141,31 @@ void example_util_encode_ecc_public_key_in_bit_string_format(const uint8_t * q_b
 
 #undef OPTIGA_EXAMPLE_UTIL_ECC_DER_ADDITIONAL_LENGTH
 }
-optiga_lib_status_t example_check_tag_in_metadata(const uint8_t * buffer, const uint8_t tag)
+optiga_lib_status_t example_check_tag_in_metadata(const uint8_t * buffer, 
+                                                  const uint8_t buffer_length, 
+                                                  const uint8_t tag,
+                                                  bool_t * tag_available)
 {
-    optiga_lib_status_t return_status = OPTIGA_LIB_SUCCESS;
+    optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     uint8_t offset = 1;
-    uint8_t buffer_length = 0;
+    uint8_t expected_buffer_length = buffer[offset++] + 0x02; // 0x02 is length for tag and length
     uint8_t tag_length = 0;
     do
     {
-        buffer_length = buffer[offset++];
-        while(offset < buffer_length)
+        *tag_available = FALSE;
+        // Check if expected buffer length matches input buffer length
+        if (buffer_length != expected_buffer_length)
+        {
+            break;
+        }
+
+        return_status = OPTIGA_LIB_SUCCESS;
+        // Check for tag in the input buffer
+        while(offset < (buffer_length - 0x02))
         {
             if (tag == buffer[offset++])
             {
-                return_status = !OPTIGA_LIB_SUCCESS;
+                *tag_available = TRUE;                
                 break;
             }
             tag_length = buffer[offset];

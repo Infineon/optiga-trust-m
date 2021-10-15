@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -49,8 +49,10 @@ extern void example_optiga_deinit(void);
 uint32_t time_taken_to_generate_key = 0;
 
 #define METADATA_TAG_KEY_ALGO_ID     (0xE0)
-extern optiga_lib_status_t example_check_tag_in_metadata(const uint8_t * buffer, 
-                                                         const uint8_t tag);
+extern optiga_lib_status_t example_check_tag_in_metadata(const uint8_t * buffer,
+                                                         const uint8_t buffer_length,
+                                                         const uint8_t tag,
+                                                         bool_t * tag_available);
 
 /**
  * Callback when optiga_crypt_xxxx operation is completed asynchronously
@@ -91,6 +93,7 @@ optiga_lib_status_t generate_symmetric_key(void)
     optiga_key_id_t symmetric_key;
     uint16_t optiga_oid, bytes_to_read;
     uint8_t read_data_buffer[100];
+    bool_t tag_available = FALSE;
 
     optiga_crypt_t * crypt_me = NULL;
     optiga_util_t * util_me = NULL;    
@@ -127,10 +130,13 @@ optiga_lib_status_t generate_symmetric_key(void)
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
         
         return_status = example_check_tag_in_metadata(read_data_buffer,
-                                                      METADATA_TAG_KEY_ALGO_ID);
-        if (OPTIGA_LIB_SUCCESS != return_status)
+                                                      (uint8_t)bytes_to_read,
+                                                      METADATA_TAG_KEY_ALGO_ID,
+                                                      &tag_available);
+        // Check if tag is already available or other errors occurred
+        if (((TRUE == tag_available) && (OPTIGA_LIB_SUCCESS == return_status)) ||
+             (OPTIGA_LIB_SUCCESS != return_status))
         {
-            return_status = OPTIGA_LIB_SUCCESS;
             break;
         }
         

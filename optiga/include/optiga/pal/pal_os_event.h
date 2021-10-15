@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -52,14 +52,18 @@ typedef void ( * register_callback)(void * );
 /** \brief PAL os event structure */
 typedef struct pal_os_event
 {
-    /// event triggered status
-    bool_t is_event_triggered;
-    /// registered callback
-    register_callback callback_registered;
     /// context to be passed to callback
     void * callback_ctx;
     /// os timer
-    void * os_timer;
+    void * os_timer;	
+    /// event triggered status
+    bool_t is_event_triggered;
+    /// Holds the next event timeout value in microseconds 
+    uint32_t timeout_us;
+    /// To synchronize between events
+    uint8_t sync_flag;
+    /// registered callback
+    register_callback callback_registered;
 }pal_os_event_t;
 
 
@@ -76,7 +80,7 @@ typedef struct pal_os_event
  * - None
  *
  * \param[in] callback                      Callback function to be registered internally
- * \param[in] callback_args                 Arguement to be passed to registered callback
+ * \param[in] callback_args                 Argument to be passed to registered callback
  *
  */
 LIBRARY_EXPORTS pal_os_event_t * pal_os_event_create(register_callback callback,
@@ -86,7 +90,7 @@ LIBRARY_EXPORTS pal_os_event_t * pal_os_event_create(register_callback callback,
  * \brief Destroys an os event.
  *
  * \details
- * Starts an OS event.
+ * Destroys an OS event.
  *
  * \pre
  * - None

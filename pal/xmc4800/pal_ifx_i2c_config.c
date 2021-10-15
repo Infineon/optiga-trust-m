@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -47,12 +47,12 @@ pal_i2c_t optiga_pal_i2c_context_0 =
 {
     /// Pointer to I2C master platform specific context
     (void*)&i2c_master_0,
-    /// Slave address
-    0x30,
     /// Upper layer context
     NULL,
     /// Callback event handler
-    NULL
+    NULL,
+    /// Slave address
+    0x30
 };
 
 /**
@@ -61,7 +61,7 @@ pal_i2c_t optiga_pal_i2c_context_0 =
 pal_gpio_t optiga_vdd_0 =
 {
     // Platform specific GPIO context for the pin used to toggle Vdd.
-	(void*)&vdd_pin
+    (void*)&vdd_pin
 };
 
 /**

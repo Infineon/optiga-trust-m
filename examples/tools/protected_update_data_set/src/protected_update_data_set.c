@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -959,23 +959,9 @@ int32_t protected_update_create_manifest(   manifest_t * manifest_data,
         cbor_set_array_of_data(local_manifest_buffer, 2, &offset);
         if(NULL != manifest_data->couid)
         {
-			#define COUID_SIZE 25
-			uint8_t* couid = NULL;
-			const uint8_t *pos = manifest_data->couid;
-			couid = malloc(COUID_SIZE * sizeof(uint8_t));
-			if (couid == NULL)
-				break;
-			for (size_t count = 0; count < COUID_SIZE; count++) {
-				sscanf(pos, "%2hhx", &couid[count]);
-				pos += 2;
-			}
             cbor_set_byte_string(local_manifest_buffer, COUID_SIZE, &offset);
-            memcpy((local_manifest_buffer+offset), couid, COUID_SIZE);
-            offset += COUID_SIZE;
-			//pal_logger_print_message("Used CO-UID:");
-			//pal_logger_print_hex_data(couid, COUID_SIZE);
-			//pal_logger_print_message("\r\n");
-			free(couid);
+            memcpy((local_manifest_buffer+offset), manifest_data->couid, COUID_SIZE);
+            offset += (uint16_t )COUID_SIZE;
         }
         else
         {

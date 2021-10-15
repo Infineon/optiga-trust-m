@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 /// OPTIGA Library version information
-#define OPTIGA_LIB_VERSION "Ver 3.00.2490"
+#define OPTIGA_LIB_VERSION "Ver 3.01.2558"
 
 #ifdef __cplusplus
 }
