@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -354,6 +354,10 @@ typedef struct public_key_from_host
  */
 typedef struct optiga_get_data_object
 {
+    /// Pointer to the read buffer length
+    uint16_t * ref_bytes_to_read;
+    /// Read data buffer pointer
+    uint8_t * buffer;	
     /// Object ID to be read
     uint16_t oid;
     /// Offset of data with the object ID
@@ -366,10 +370,6 @@ typedef struct optiga_get_data_object
     uint16_t last_read_size;
     /// Read to data or metadata
     uint8_t data_or_metadata;
-    /// Pointer to the read buffer length
-    uint16_t * ref_bytes_to_read;
-    /// Read data buffer pointer
-    uint8_t * buffer;
 } optiga_get_data_object_params_t;
 
 /**
@@ -377,6 +377,8 @@ typedef struct optiga_get_data_object
  */
 typedef struct optiga_set_data_object
 {
+    /// Wrtie data buffer pointer
+    const uint8_t * buffer;	
     /// Object ID to be written
     uint16_t oid;
     /// Offset of data with the object ID
@@ -385,8 +387,6 @@ typedef struct optiga_set_data_object
     uint16_t size;
     /// Contains length of data written in across multiple transceive calls. Used for chaining purpose
     uint16_t written_size;
-    /// Wrtie data buffer pointer
-    const uint8_t * buffer;
     /// Write to data or metadata
     uint8_t data_or_metadata;
     /// Type of write - Write only or Erase and write
@@ -406,18 +406,18 @@ typedef struct optiga_calc_hash
     hash_data_from_host_t * p_hash_data;
     /// Context buffer pointer
     optiga_hash_context_t * p_hash_context;
+    ///Out digest
+    uint8_t * p_out_digest;	
+    ///Data length has been sent
+    uint32_t data_sent;
+    ///Possible context size to send in a fragment
+    uint32_t apparent_context_size;	
     ///Type of hash operation
     uint8_t hash_sequence;
     ///Current type of hash operation
     uint8_t current_hash_sequence;    
-    ///Data length has been sent
-    uint32_t data_sent;
-    ///Out digest
-    uint8_t * p_out_digest;
     ///export hash ctx
     bool_t export_hash_ctx;
-    ///Possible context size to send in a fragment
-    uint32_t apparent_context_size;
 } optiga_calc_hash_params_t;
 
 
@@ -426,14 +426,14 @@ typedef struct optiga_calc_hash
  */
 typedef struct optiga_get_random
 {
+    /// User buffer for storing random data
+    uint8_t * random_data;
+    /// User buffer which holds the optional data
+    const uint8_t * optional_data;	
     /// Random data length
     uint16_t random_data_length;
     /// Optional data length
     uint16_t optional_data_length; 
-    /// User buffer for storing random data
-    uint8_t * random_data;
-    /// User buffer which holds the optional data
-    const uint8_t * optional_data;
     /// Use to indicate to acquire session
     bool_t store_in_session;
 } optiga_get_random_params_t;
@@ -444,12 +444,6 @@ typedef struct optiga_get_random
  */
 typedef struct optiga_gen_keypair
 {
-    /// Key usage type
-    uint8_t key_usage;
-    /// Private key export option
-    bool_t export_private_key;
-    /// Type of public key OID
-    optiga_key_id_t private_key_oid;
     ///  Private key buffer pointer
     uint8_t * private_key;
     /// Private key length
@@ -458,6 +452,12 @@ typedef struct optiga_gen_keypair
     uint8_t * public_key;
     /// Public key length
     uint16_t * public_key_length;
+    /// Type of public key OID
+    optiga_key_id_t private_key_oid;	
+    /// Key usage type
+    uint8_t key_usage;
+    /// Private key export option
+    bool_t export_private_key;
 } optiga_gen_keypair_params_t;
 
 /**
@@ -484,18 +484,18 @@ typedef struct optiga_verify_sign
 {
     /// Digest buffer pointer
     const uint8_t * p_digest;
-    /// Digest data length
-    uint8_t digest_length;
     /// Signature buffer pointer
     const uint8_t * p_signature;
-    /// Signature data length
-    uint16_t signature_length;
-    /// Source of provided public key
-    uint8_t public_key_source_type;
     /// Public key provided by host
     public_key_from_host_t * public_key;
+    /// Signature data length
+    uint16_t signature_length;	
     /// Public key certificate OID
     uint16_t certificate_oid;
+    /// Digest data length
+    uint8_t digest_length;
+    /// Source of provided public key
+    uint8_t public_key_source_type;	
 } optiga_verify_sign_params_t;
 
 /**
@@ -544,20 +544,20 @@ typedef struct optiga_derive_key
  */
 typedef struct optiga_enc_dec_asym
 {
-    /// Length of message to be encrypted. Set 0 if data from session OID
-    uint16_t message_length;
     /// Pointer to the length of the encrypted or decrypted message
     uint16_t * processed_message_length;
-    /// Message to be encrypted. Set NULL if data from session OID
-    const uint8_t * message;
-    /// Source of provided public key for encryption and Private key for decryption
-    uint8_t public_key_source_type;
     /// Public key provided by host
     const void * key;
     /// Pointer to buffer where encrypted or decrypted message is stored
     uint8_t * processed_message;
+    /// Message to be encrypted. Set NULL if data from session OID
+    const uint8_t * message;	
+    /// Length of message to be encrypted. Set 0 if data from session OID
+    uint16_t message_length;
     /// Store private key OID
     optiga_key_id_t private_key_id;
+    /// Source of provided public key for encryption and Private key for decryption
+    uint8_t public_key_source_type;
 }optiga_encrypt_asym_params_t,optiga_decrypt_asym_params_t;
 #endif
 
@@ -582,38 +582,38 @@ typedef struct optiga_set_object_protected_params
  */
 typedef struct optiga_symmetric_enc_dec_params
 {
-    /// Symmetric key OID
-    uint16_t symmetric_key_oid;
     /// Pointer to plain text
     const uint8_t * in_data;
-    /// Length of plain text
-    uint32_t in_data_length;
     /// Pointer to initialization vector
-    const uint8_t * iv;
-    /// Length of initialization vector
-    uint16_t iv_length;
+    const uint8_t * iv;	
     /// Pointer to associated data
     const uint8_t * associated_data;
-    /// Length of associated data
-    uint16_t associated_data_length;
     /// Pointer to output data
     uint8_t * out_data;
     /// Length of output data
     uint32_t * out_data_length;
     /// Pointer to generated hmac
     const uint8_t * generated_hmac;
+    /// Length of sent data
+    uint32_t sent_data_length;
+    /// Length of received data
+    uint32_t received_data_length;	
+    /// Length of generated hmac
+    uint32_t generated_hmac_length;
+    /// Length of plain text
+    uint32_t in_data_length;
+    /// Symmetric key OID
+    uint16_t symmetric_key_oid;
+    /// Length of initialization vector
+    uint16_t iv_length;
+    /// Length of associated data
+    uint16_t associated_data_length;
+    /// Variable to indicate complete input data length required for CCM
+    uint16_t total_input_data_length;	
     /// Requested sequence
     uint8_t  original_sequence;
     /// Variable to store current encrypt decrypt sequence
     uint8_t  current_sequence;
-    /// Length of sent data
-    uint32_t sent_data_length;
-    /// Length of received data
-    uint32_t received_data_length;
-    /// Variable to indicate complete input data length required for CCM
-    uint16_t total_input_data_length;
-    /// Length of generated hmac
-    uint32_t generated_hmac_length;
     /// Encryption or hmac mode
     uint8_t mode;
     /// Symmetric mode of operation
@@ -626,12 +626,12 @@ typedef struct optiga_symmetric_enc_dec_params
  */
 typedef struct optiga_gen_symkey_params
 {
+    /// Symmetric key buffer pointer or oid pointer
+    void * symmetric_key;	
     /// Key usage type
     uint8_t key_usage;
     /// Symmetric key export option
     bool_t export_symmetric_key;
-    /// Symmetric key buffer pointer or oid pointer
-    void * symmetric_key;
 } optiga_gen_symkey_params_t;
 #endif
 /**

@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@
 #ifndef _PROTECTED_UPDATE_DATA_SET_VERSION_H_
 #define _PROTECTED_UPDATE_DATA_SET_VERSION_H_
 
-#define PROTECTED_UPDATE_VERSION    "3.00.2490"
+#define PROTECTED_UPDATE_VERSION    "3.01.2558"
 
 #endif //_PROTECTED_UPDATE_DATA_SET_VERSION_H_
 /**

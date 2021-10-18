@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -57,13 +57,12 @@ typedef struct pal_i2c
 {
     /// Pointer to I2C master platform specific context
     void * p_i2c_hw_config;
-    /// I2C slave address
-    uint8_t slave_address;
     /// Pointer to store the callers context information
     void * p_upper_layer_ctx;
     /// Pointer to store the callers handler
     void * upper_layer_event_handler;
-
+    /// I2C slave address
+    uint8_t slave_address;
 } pal_i2c_t;
 
 /**

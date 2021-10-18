@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -346,7 +346,10 @@ _STATIC_H optiga_lib_status_t ifx_i2c_init(ifx_i2c_context_t * p_ifx_i2c_context
         api_status = ifx_i2c_prl_init(p_ifx_i2c_context, ifx_i2c_tl_event_handler);
 #endif
     }
-
+    if (api_status != IFX_I2C_STACK_SUCCESS)
+    {
+        ifx_i2c_tl_event_handler(p_ifx_i2c_context, api_status, 0, 0);
+    }
     return (api_status);
 }
 /// @endcond

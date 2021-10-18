@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,7 @@
  #define OPTIGA_COMMS_FREE      (0x00)
 
 optiga_comms_t optiga_comms = {
+                               NULL,
                                (void *)&ifx_i2c_context_0,
                                NULL,
                                NULL,
@@ -58,7 +59,7 @@ optiga_comms_t optiga_comms = {
                                0,
                                0,
 #endif
-                               NULL};
+                               };
 
 _STATIC_H optiga_lib_status_t check_optiga_comms_state(optiga_comms_t *p_ctx);
 _STATIC_H void ifx_i2c_event_handler(void* p_ctx, optiga_lib_status_t event);
@@ -92,6 +93,18 @@ optiga_comms_t * optiga_comms_create(callback_handler_t callback, void * context
 //lint --e{818} suppress "Not declared as pointer as nothing needs to be updated in the pointer."
 void optiga_comms_destroy(optiga_comms_t * p_optiga_cmd)
 {
+    do
+    {
+        if (TRUE == p_optiga_cmd->instance_init_state)
+        {
+            p_optiga_cmd->instance_init_state = FALSE;
+            p_optiga_cmd->p_upper_layer_ctx = NULL;
+            p_optiga_cmd->upper_layer_handler = NULL;
+#ifdef OPTIGA_PAL_INIT_ENABLED
+            (void)pal_deinit();
+#endif
+        }
+    } while (FALSE);
 }
 
 optiga_lib_status_t optiga_comms_set_callback_handler(optiga_comms_t * p_optiga_comms, callback_handler_t handler)

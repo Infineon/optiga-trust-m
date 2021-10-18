@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -1690,6 +1690,8 @@ optiga_cmd_t * optiga_cmd_create(uint8_t optiga_instance_id, callback_handler_t 
 optiga_lib_status_t optiga_cmd_destroy(optiga_cmd_t * me)
 {
     optiga_lib_status_t return_status = OPTIGA_CMD_ERROR;
+
+    pal_os_lock_enter_critical_section();
     do
     {
         if (NULL != me)
@@ -1697,11 +1699,30 @@ optiga_lib_status_t optiga_cmd_destroy(optiga_cmd_t * me)
             return_status = optiga_cmd_release_session(me);
             // attach optiga cmd queue entry
             optiga_cmd_queue_deassign_slot(me);
+            // If all the slots are free, then destroy optiga comms and pal_os_event resources
+            if (OPTIGA_CMD_MAX_REGISTRATIONS == 
+               optiga_cmd_queue_get_count_of(g_optiga_list[0],
+                                             OPTIGA_CMD_QUEUE_SLOT_STATE,
+                                             OPTIGA_CMD_QUEUE_NOT_ASSIGNED))
+            {
+                if (TRUE == me->p_optiga->instance_init_state)
+                {
+                    pal_os_event_stop(me->p_optiga->p_optiga_comms->p_pal_os_event_ctx);
+                    me->p_optiga->instance_init_state = FALSE;
+                    me->p_optiga->p_optiga_comms->p_pal_os_event_ctx = NULL;
+                    optiga_comms_destroy(me->p_optiga->p_optiga_comms);
+                    me->p_optiga->p_optiga_comms = NULL;
+                    pal_os_event_destroy(me->p_optiga->p_pal_os_event_ctx);
+                }
+            }
+            
             pal_os_free(me);
             //lint --e{838} suppress "Release session API returns success. Status is checked for future enhancements"
             return_status = OPTIGA_LIB_SUCCESS;
         }
     } while (FALSE);
+    pal_os_lock_exit_critical_section();
+
     return (return_status);
 }
 

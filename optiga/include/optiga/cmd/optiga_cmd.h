@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ extern "C" {
 /** \brief OPTIGA command instance structure type*/
 typedef struct optiga_cmd optiga_cmd_t;
 
-/** \brief OPTIGA comms instance structure type*/
+/** \brief OPTIGA context instance structure type*/
 typedef struct optiga_context optiga_context_t;
 
 /**
@@ -84,6 +84,7 @@ optiga_cmd_t * optiga_cmd_create(uint8_t optiga_instance_id,
  * Destroys the instance of #optiga_cmd_t.
  * - Releases any OPTIGA cmd module lock utilized by the instance.<br>
  * - Releases any OPTIGA session acquired by the instance.<br>
+ * - Destroys optiga_comms and pal_os_event instances.<br>
  * - De-allocate the memory of the #optiga_cmd_t instance.<br>
  *
  * \pre

@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ extern "C" {
 
 
 #ifdef OPTIGA_LIB_EXTERNAL
-    #include OPTIGA_LIB_EXTERNAL
+    #include "optiga_lib_config_external.h"
 #else //Default Configuration
     // Default Configuration for OPTIGA Trust M V1
     #ifdef OPTIGA_TRUST_M_V1

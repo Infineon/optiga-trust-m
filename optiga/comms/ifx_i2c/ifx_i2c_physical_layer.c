@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -152,7 +152,7 @@ optiga_lib_status_t ifx_i2c_pl_init(ifx_i2c_context_t * p_ctx, ifx_i2c_event_han
     p_ctx->pl.frame_state = PL_STATE_UNINIT;
     p_ctx->pl.negotiate_state = PL_INIT_SET_FREQ_DEFAULT;
     p_ctx->p_pal_i2c_ctx->slave_address = p_ctx->slave_address;
-    p_ctx->p_pal_i2c_ctx->upper_layer_event_handler = (void *)ifx_i2c_pl_pal_event_handler;
+    p_ctx->p_pal_i2c_ctx->upper_layer_event_handler = ifx_i2c_pl_pal_event_handler;
     p_ctx->pl.retry_counter = PL_POLLING_MAX_CNT;
     if (TRUE == p_ctx->do_pal_init)
     {
@@ -227,7 +227,7 @@ optiga_lib_status_t ifx_i2c_pl_write_slave_address(ifx_i2c_context_t * p_ctx, ui
     //ifx i2c wrapper api for setting slave address in synchronous. hence the event handler is backed up.
     p_temp_upper_layer_event_handler = (upper_layer_callback_t * )(p_ctx->p_pal_i2c_ctx->upper_layer_event_handler);
     //since the lower level APIs are asynchronous, a temporary event handler for set slave address is assigned
-    p_ctx->p_pal_i2c_ctx->upper_layer_event_handler = (void *)ifx_i2c_pl_pal_slave_addr_event_handler;
+    p_ctx->p_pal_i2c_ctx->upper_layer_event_handler = ifx_i2c_pl_pal_slave_addr_event_handler;
 
     p_ctx->pl.buffer[BASE_ADDRESS_REG_OFFSET] = PL_REG_BASE_ADDR;
     p_ctx->pl.buffer[MODE_OFFSET] = PL_REG_BASE_ADDR_VOLATILE;
@@ -268,7 +268,7 @@ optiga_lib_status_t ifx_i2c_pl_write_slave_address(ifx_i2c_context_t * p_ctx, ui
         status = IFX_I2C_STACK_SUCCESS;
     }
     //restoring the backed up event handler
-    p_ctx->p_pal_i2c_ctx->upper_layer_event_handler = (void *)p_temp_upper_layer_event_handler;
+    p_ctx->p_pal_i2c_ctx->upper_layer_event_handler = p_temp_upper_layer_event_handler;
 
     /// @cond hidden
     #undef PAL_WRITE_INIT_STATUS

@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -192,35 +192,30 @@ typedef void ( * ifx_i2c_event_handler_t)(struct ifx_i2c_context * p_ctx,
 typedef struct ifx_i2c_pl
 {
     // Physical Layer low level interface variables
+    /// Pointer to data to be sent
+    uint8_t * p_tx_frame;
+    // Upper layer handler
+    ifx_i2c_event_handler_t upper_layer_event_handler;
 
-    /// Physical layer buffer
-    uint8_t buffer[IFX_I2C_FRAME_SIZE + 1];
+    /// Retry counter
+    uint16_t retry_counter;	
     /// Tx length
     uint16_t buffer_tx_len;
     /// Rx length
-    uint16_t buffer_rx_len;
+    uint16_t buffer_rx_len;    
+    /// Length of data to be sent
+    uint16_t  tx_frame_len;
+
+    /// Physical layer buffer
+    uint8_t buffer[IFX_I2C_FRAME_SIZE + 1];
     /// Action on register, read/write
     uint8_t  register_action;
     /// i2c read/i2c write
     uint8_t  i2c_cmd;
-    /// Retry counter
-    uint16_t retry_counter;
-
-    // Physical Layer high level interface variables
-
     /// Action of frame. Tx/Rx
     uint8_t   frame_action;
     /// Frame state
-    uint8_t   frame_state ;
-    /// Pointer to data to be sent
-    uint8_t * p_tx_frame;
-    /// Length of data to be sent
-    uint16_t  tx_frame_len;
-    // Upper layer handler
-    ifx_i2c_event_handler_t upper_layer_event_handler;
-
-    // Physical Layer negotiation/soft reset variables
-
+    uint8_t   frame_state ;	
     /// Negotiation state
     uint8_t   negotiate_state;
     /// Soft reset requested
@@ -230,7 +225,21 @@ typedef struct ifx_i2c_pl
 /** @brief Datalink layer structure */
 typedef struct ifx_i2c_dl
 {
-    // Data Link layer internal state variables
+    /// Pointer to main transmit buffers
+    uint8_t * p_tx_frame_buffer;
+    /// Pointer to main receive buffers
+    uint8_t * p_rx_frame_buffer;
+    ///Start time of sending frame
+    uint32_t frame_start_time;
+    // Upper layer Event handler
+    ifx_i2c_event_handler_t upper_layer_event_handler;	
+    /// Timeout value
+    uint32_t data_poll_timeout;
+
+    /// Transmit buffer size
+    uint16_t tx_buffer_size;
+    /// Receive buffer size
+    uint16_t rx_buffer_size;
 
     /// Datalink layer state
     uint8_t state;
@@ -246,31 +255,23 @@ typedef struct ifx_i2c_dl
     uint8_t error;
     /// Resynced
     uint8_t resynced;
-    /// Timeout value
-    uint32_t data_poll_timeout;
-    /// Transmit buffer size
-    uint16_t tx_buffer_size;
-    /// Receive buffer size
-    uint16_t rx_buffer_size;
-    /// Pointer to main transmit buffers
-    uint8_t * p_tx_frame_buffer;
-    /// Pointer to main receive buffers
-    uint8_t * p_rx_frame_buffer;
-    ///Start time of sending frame
-    uint32_t frame_start_time;
-    // Upper layer Event handler
-    ifx_i2c_event_handler_t upper_layer_event_handler;
 } ifx_i2c_dl_t;
 
 /** @brief Transport layer structure */
 typedef struct ifx_i2c_tl
 {
     // Transport Layer state and buffer
-
-    /// Transport layer state
-    uint8_t  state;
     /// Pointer to packet provided by user
     uint8_t * p_actual_packet;
+    /// Pointer to user provided receive buffer
+    uint8_t * p_recv_packet_buffer;
+    /// Length of receive buffer
+    uint16_t * p_recv_packet_buffer_length;
+    /// Upper layer event handler
+    ifx_i2c_event_handler_t upper_layer_event_handler;	
+    /// Start time of the transport layer API
+    uint32_t api_start_time;
+
     /// Total received data
     uint16_t total_recv_length;
     /// Actual length of user provided packet
@@ -279,12 +280,11 @@ typedef struct ifx_i2c_tl
     uint16_t packet_offset;
     /// Maximum length of packet at transport layer
     uint16_t max_packet_length;
-    /// Pointer to user provided receive buffer
-    uint8_t * p_recv_packet_buffer;
-    /// Length of receive buffer
-    uint16_t * p_recv_packet_buffer_length;
-    /// Start time of the transport layer API
-    uint32_t api_start_time;
+    /// Error event state
+    optiga_lib_status_t error_event;
+
+    /// Transport layer state
+    uint8_t  state;
     ///Chaining error count from slave
     uint8_t chaining_error_count;
     ///Chaining error count for master
@@ -293,17 +293,12 @@ typedef struct ifx_i2c_tl
     uint8_t previous_chaining;
     /// transmission done
     uint8_t transmission_completed;
-    /// Error event state
-    optiga_lib_status_t error_event;
     ///Tl rx payload copy offset
     uint8_t payload_offset;
     ///Tl tx payload copy offset
     uint8_t tx_payload_offset;
     ///Initial state check
     uint8_t initialization_state;
-
-    /// Upper layer event handler
-    ifx_i2c_event_handler_t upper_layer_event_handler;
 } ifx_i2c_tl_t;
 
 #if defined OPTIGA_COMMS_SHIELDED_CONNECTION
@@ -311,6 +306,11 @@ typedef struct ifx_i2c_tl
 /** @brief Presentation layer manage context structure */
 typedef struct ifx_i2c_prl_manage_context
 {
+    /// Master sequence number
+    uint32_t master_sequence_number;
+    ///Save slave sequence number
+    uint32_t save_slave_sequence_number;
+
     ///Buffer to store session key
     uint8_t session_key[IFX_I2C_SESSION_KEY_BUFFER_SIZE];
     /// Master retransmit counter
@@ -321,29 +321,62 @@ typedef struct ifx_i2c_prl_manage_context
     uint8_t negotiation_state;
     ///Stored context flag
     uint8_t stored_context_flag;
-   /// Master sequence number
-    uint32_t master_sequence_number;
-    ///Save slave sequence number
-    uint32_t save_slave_sequence_number;
 }ifx_i2c_prl_manage_context_t;
 
 /** @brief Data store configuration structure */
 typedef struct ifx_i2c_datastore_config
 {
-    /// Protocol version
-    uint8_t  protocol_version;
     /// ID to read and write the shared secret
     uint16_t datastore_shared_secret_id;
     /// ID to read and write the shielded connection context data
     uint16_t datastore_manage_context_id;
     /// Length of shared secret
     uint16_t shared_secret_length;
+
+    /// Protocol version
+    uint8_t  protocol_version;
 } ifx_i2c_datastore_config_t;
 
 
 /** @brief Presentation layer structure */
 typedef struct ifx_i2c_prl
 {
+    //Context to be stored
+    ifx_i2c_prl_manage_context_t prl_saved_ctx;
+
+    /// Pointer to packet provided by user
+    uint8_t * p_actual_payload;
+    /// Pointer to user provided receive buffer
+    uint8_t * p_recv_payload_buffer;
+    /// Length of receive buffer
+    uint16_t * p_recv_payload_buffer_length;
+    // Upper layer Event handler
+    ifx_i2c_event_handler_t upper_layer_event_handler;
+    /// Master sequence number
+    uint32_t master_sequence_number;
+    /// Slave sequence number
+    uint32_t slave_sequence_number;
+    ///Save slave sequence number
+    uint32_t save_slave_sequence_number;	
+
+    /// Total received data
+    uint16_t actual_payload_length;
+    /// Receive txrx buffer length
+    uint16_t prl_txrx_receive_length;
+    /// Receive buffer length
+    uint16_t prl_receive_length;
+    /// Return status
+    optiga_lib_status_t return_status;
+
+    ///Buffer to store prf
+    uint8_t session_key[IFX_I2C_SESSION_KEY_BUFFER_SIZE];
+    /// Random data
+    uint8_t random[32];
+    /// Associate data buffer
+    uint8_t associate_data[8];
+    /// Receive buffer
+    uint8_t prl_txrx_buffer[58];
+
     // Presentation layer state
     uint8_t state;
     // Handshake state
@@ -352,20 +385,6 @@ typedef struct ifx_i2c_prl
     uint8_t negotiation_state;
     ///Manage context state
     uint8_t mc_state;
-    /// Master sequence number
-    uint32_t master_sequence_number;
-    /// Slave sequence number
-    uint32_t slave_sequence_number;
-    ///Save slave sequence number
-    uint32_t save_slave_sequence_number;
-    /// Pointer to packet provided by user
-    uint8_t * p_actual_payload;
-    /// Total received data
-    uint16_t actual_payload_length;
-    /// Pointer to user provided receive buffer
-    uint8_t * p_recv_payload_buffer;
-    /// Length of receive buffer
-    uint16_t * p_recv_payload_buffer_length;
     ///SCTR status byte
     uint8_t sctr;
     ///Saved SCTR status byte
@@ -374,30 +393,13 @@ typedef struct ifx_i2c_prl
     uint8_t alert_type;
     ///Presentation header offset
     uint8_t prl_header_offset;
-    ///Buffer to store prf
-    uint8_t session_key[IFX_I2C_SESSION_KEY_BUFFER_SIZE];
-    /// Random data
-    uint8_t random[32];
-    /// Receive buffer
-    uint8_t prl_txrx_buffer[58];
-    /// Receive txrx buffer length
-    uint16_t prl_txrx_receive_length;
-    /// Associate data buffer
-    uint8_t associate_data[8];
-    /// Receive buffer length
-    uint16_t prl_receive_length;
     /// Master retransmit counter
     uint8_t decryption_failure_counter;
     /// Slave retransmit counter
     uint8_t data_retransmit_counter;
-    /// Return status
-    optiga_lib_status_t return_status;
     ///Restore context flag
     uint8_t restore_context_flag;
-    //Context to be stored
-    ifx_i2c_prl_manage_context_t prl_saved_ctx;
-    // Upper layer Event handler
-    ifx_i2c_event_handler_t upper_layer_event_handler;
+
     // Trans repeat status
     uint8_t trans_repeat_status;
 }ifx_i2c_prl_t;
@@ -406,22 +408,27 @@ typedef struct ifx_i2c_prl
 /** @brief IFX I2C context structure */
 typedef struct ifx_i2c_context
 {
-    /// I2C Slave address
-    uint8_t slave_address;
-    /// Frequency of i2c master
-    uint16_t frequency;
-    /// Data link layer frame size
-    uint16_t frame_size;
+#if defined OPTIGA_COMMS_SHIELDED_CONNECTION    
+    /// Presentation layer context
+    ifx_i2c_prl_t prl;
+#endif
+    /// Transport layer context
+    ifx_i2c_tl_t tl;
+    /// Datalink layer context
+    ifx_i2c_dl_t dl;
+    /// Physical layer context
+    ifx_i2c_pl_t pl;
+
+#if defined OPTIGA_COMMS_SHIELDED_CONNECTION
+    /// Datastore configuration instance for prl
+    ifx_i2c_datastore_config_t * ifx_i2c_datastore_config;
+#endif
     /// Pointer to pal gpio context for vdd
     pal_gpio_t * p_slave_vdd_pin;
     /// Pointer to pal gpio context for reset
     pal_gpio_t * p_slave_reset_pin;
     /// Pointer to pal i2c context
     pal_i2c_t * p_pal_i2c_ctx;
-#if defined OPTIGA_COMMS_SHIELDED_CONNECTION
-    /// Datastore configuration instance for prl
-    ifx_i2c_datastore_config_t * ifx_i2c_datastore_config;
-#endif
     /// Upper layer event handler
     upper_layer_callback_t upper_layer_event_handler;
     /// Upper layer context
@@ -430,16 +437,26 @@ typedef struct ifx_i2c_context
     uint8_t * p_upper_layer_rx_buffer;
     /// Pointer to length of upper layer rx buffer
     uint16_t * p_upper_layer_rx_buffer_len;
+    void * pal_os_event_ctx;
 
-    /// Protocol variables
+    /// Frequency of i2c master
+    uint16_t frequency;
+    /// Data link layer frame size
+    uint16_t frame_size;
+    /// Close states
+    optiga_lib_status_t close_state;
+    /// IFX I2C tx frame of max length
+    uint8_t tx_frame_buffer[IFX_I2C_FRAME_SIZE+1];
+    /// IFX I2C rx frame of max length
+    uint8_t rx_frame_buffer[IFX_I2C_FRAME_SIZE+1];
+    /// I2C Slave address
+    uint8_t slave_address;
     /// ifx i2c wrapper apis state
     uint8_t state;
     /// ifx i2c wrapper api status
     uint8_t status;
     /// reset states
     uint8_t reset_state;
-    /// Close states
-    optiga_lib_status_t close_state;
     /// type of reset
     uint8_t reset_type;
     /// init pal
@@ -455,22 +472,6 @@ typedef struct ifx_i2c_context
     ///Variable to indicate manage context operation
     uint8_t manage_context_operation;
 #endif
-    /// Transport layer context
-    ifx_i2c_tl_t tl;
-    /// Datalink layer context
-    ifx_i2c_dl_t dl;
-    /// Physical layer context
-    ifx_i2c_pl_t pl;
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
-    /// Presentation layer context
-    ifx_i2c_prl_t prl;
-#endif
-    /// IFX I2C tx frame of max length
-    uint8_t tx_frame_buffer[IFX_I2C_FRAME_SIZE+1];
-    /// IFX I2C rx frame of max length
-    uint8_t rx_frame_buffer[IFX_I2C_FRAME_SIZE+1];
-    void * pal_os_event_ctx;
-
 } ifx_i2c_context_t;
 
 /** @brief IFX I2C Instance */

@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2020 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -163,7 +163,8 @@
 #define DETAIL_DATASET_TO_FILE              "(4) : To write dataset to file, \"dataset_to_file\" should be the file path "
 
 #define _NEXT_		"\n\t\t\t\t      :  "
-
+//lint --e{843} suppress buffer not to keep it as const"
+//uint8_t couid_buffer[COUID_SIZE] = {0};
 /* Short name*/
 static struct options
 {
@@ -223,7 +224,7 @@ opt_prop_t option_table[] =
     { DESC_PAYLOAD_VERSION ,SHORT_NAME_PAYLOAD_VERSION, &opt.payload_version, DEFAULT_PAYLOAD_VERSION, 0, "","Input is a decimal string.E.g. 10" },
     { DESC_TRUST_ANCHOR_OID, SHORT_NAME_TRUST_ANCHOR_OID, &opt.trust_anchor_oid, DEFAULT_TRUST_ANCHOR_OID, 0, "", "Input is a hexadecimal string.E.g. E0E8" },
     { DESC_TARGET_OID, SHORT_NAME_TARGET_OID, &opt.target_oid, DEFAULT_TARGET_OID, 0, "", "Input is a hexadecimal string.E.g. E0E2" },
-    { DESC_COUID, SHORT_NAME_COUID, &opt.couid, DEFAULT_COUID, 0, "", "Unicast gets enabled if \"couid\" is provided otherwise it is broadcast."_NEXT_"Input is a hexadecimal string.E.g. A1DE34" },
+    { DESC_COUID, SHORT_NAME_COUID, &opt.couid, DEFAULT_COUID, 0, "", "Unicast gets enabled if first 25 bytes of \"couid\" is provided otherwise it is broadcast."_NEXT_"Input is a hexadecimal string.E.g. A1DE34" },
     { DESC_SIGN_ALGO, SHORT_NAME_SIGN_ALGO, &opt.signature_algo, DEFAULT_SIGN_ALGO, 0, "ES_256 , RSA-SSA-PKCS1-V1_5-SHA-256","" },
     { DESC_PRIV_KEY, SHORT_NAME_PRIV_KEY, &opt.private_key, DEFAULT_PRIV_KEY, 0, "private key file (pem format)", "Refer : samples/integrity/sample_ec_256_priv.pem" },
     { DESC_DIGEST_ALGO, SHORT_NAME_DIGEST_ALGO, &opt.digest_algo, DEFAULT_DIGEST_ALGO, 0, "SHA256", "" },
@@ -431,7 +432,9 @@ _STATIC_H int32_t _tool_set_option(int8_t * p_option, int8_t * p_user_value)
 _STATIC_H int32_t _tool_set_manifest_info(manifest_t* p_manifest_data)
 {
     int32_t status = -1;
-
+	size_t count;
+    const uint8_t* pos = opt.couid;
+	static uint8_t couid_buffer[COUID_SIZE] = {0};
     do
     {
         //MANIFEST
@@ -474,10 +477,27 @@ _STATIC_H int32_t _tool_set_manifest_info(manifest_t* p_manifest_data)
         p_manifest_data->couid = NULL;
         if (NULL != opt.couid)
         {
-            p_manifest_data->couid = opt.couid;
-            sprintf(buffer, TOOL_DISPLAY_FORMAT_STRING, DESC_COUID, p_manifest_data->couid);
-            pal_logger_print_message(buffer);
+            
+            if ((COUID_SIZE * 2) != strlen(opt.couid))
+            {
+                pal_logger_print_message("Error : Invalid input provided for couid\n");
+                break;
+            }
+            else
+            {
+                p_manifest_data->couid = couid_buffer;
+
+                for (count = 0; count < COUID_SIZE; count++) 
+				{
+                    sscanf(pos, "%2hhx", (unsigned char*)&p_manifest_data->couid[count]);
+                    pos += 2;
+                }
+                pal_logger_print_message("User CO-UID:");
+                pal_logger_print_hex_data(p_manifest_data->couid, COUID_SIZE);
+                pal_logger_print_message("\r\n");
+            }
         }
+		
         if (strcmp("ES_256", opt.signature_algo) == 0)
         {
             p_manifest_data->signature_algo = eES_SHA;
