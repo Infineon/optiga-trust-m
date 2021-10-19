@@ -45,7 +45,7 @@ extern "C" {
 
 
 #ifdef OPTIGA_LIB_EXTERNAL
-    #include "optiga_lib_config_external.h"
+    #include OPTIGA_LIB_EXTERNAL
 #else //Default Configuration
     // Default Configuration for OPTIGA Trust M V1
     #ifdef OPTIGA_TRUST_M_V1
