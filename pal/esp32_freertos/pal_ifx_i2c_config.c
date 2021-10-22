@@ -103,12 +103,12 @@ pal_i2c_t optiga_pal_i2c_context_0 =
 {
     /// Pointer to I2C master platform specific context
     (void*)&esp32_i2c_ctx_0,
-    /// Slave address
-    0x30,
     /// Upper layer context
     NULL,
     /// Callback event handler
-    NULL
+    NULL,
+    /// Slave address
+    0x30,
 };
 
 /**

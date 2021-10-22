@@ -53,12 +53,12 @@ pal_i2c_t optiga_pal_i2c_context_0 =
 {
     /// Pointer to I2C master platform specific context
     (void*)&usb_events,
-    /// Slave address
-    0x30,
     /// Upper layer context
     NULL,
     /// Callback event handler
-    NULL
+    NULL,
+    /// Slave address
+    0x30
 };
 
 /*********************************************************************************************************************
