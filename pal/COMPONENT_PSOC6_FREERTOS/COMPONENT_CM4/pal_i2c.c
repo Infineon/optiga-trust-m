@@ -149,45 +149,45 @@ pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context)
 
             return PAL_STATUS_SUCCESS;
         }
-    	if (g_pal_i2c_init_flag == 0)
-    	{
-			// Init I2C driver
-			cy_hal_status = cyhal_i2c_init(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel,
-						((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->sda_port_num,
-						((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->sca_port_num,
-						NULL);
 
-			if (CY_RSLT_SUCCESS != cy_hal_status)
-			{
-				break;
-			}
+        if (g_pal_i2c_init_flag == 0)
+        {
+            // Init I2C driver
+            cy_hal_status = cyhal_i2c_init(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel,
+                                            ((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->sda_port_num,
+                                            ((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->sca_port_num,
+                                            NULL);
 
-			//Configure the I2C resource to be master
-			cy_hal_status = cyhal_i2c_configure(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel,
-						  	  	  	  	  	  	&i2c_master_config);
-			if (CY_RSLT_SUCCESS != cy_hal_status)
-			{
-				break;
-			}
+            if (CY_RSLT_SUCCESS != cy_hal_status)
+            {
+                break;
+            }
 
-			// Register i2c master callback
-			cyhal_i2c_register_callback(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel,
-						  (cyhal_i2c_event_callback_t) i2c_master_event_handler,
-						  NULL);
+            //Configure the I2C resource to be master
+            cy_hal_status = cyhal_i2c_configure(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel,
+                                                &i2c_master_config);
+            if (CY_RSLT_SUCCESS != cy_hal_status)
+            {
+                break;
+            }
 
-			// Enable interrupts for I2C master
-			cyhal_i2c_enable_event(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel,
-						 (cyhal_i2c_event_t)(CYHAL_I2C_MASTER_WR_CMPLT_EVENT \
-						 | CYHAL_I2C_MASTER_RD_CMPLT_EVENT \
-						 | CYHAL_I2C_MASTER_ERR_EVENT),    \
-						 PAL_I2C_MASTER_INTR_PRIO ,
-						 true);
-			g_pal_i2c_init_flag = 1;
-    	}
-    	else
-    	{
-    		result = (pal_status_t)PAL_STATUS_SUCCESS;
-    	}
+            // Register i2c master callback
+            cyhal_i2c_register_callback(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel,
+                                        (cyhal_i2c_event_callback_t) i2c_master_event_handler,
+                                        NULL);
+
+            // Enable interrupts for I2C master
+            cyhal_i2c_enable_event(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel,
+                                    (cyhal_i2c_event_t)(CYHAL_I2C_MASTER_WR_CMPLT_EVENT \
+                                    | CYHAL_I2C_MASTER_RD_CMPLT_EVENT \
+                                    | CYHAL_I2C_MASTER_ERR_EVENT),    \
+                                    PAL_I2C_MASTER_INTR_PRIO ,
+                                    true);
+            g_pal_i2c_init_flag = 1;
+        }
+
+        result = (pal_status_t)PAL_STATUS_SUCCESS;
+
     } while (FALSE);
 
     return result;
