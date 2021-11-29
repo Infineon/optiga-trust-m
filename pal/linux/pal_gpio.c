@@ -45,128 +45,142 @@
 #include "optiga/pal/pal_ifx_i2c_config.h"
 #include "pal_linux.h"
 
-#define IN  0
-#define OUT 1
+#define PAL_GPIO_LOG(...) fprintf(stderr, __VA_ARGS__)
 
-#define LOW  0
-#define HIGH 1
+static const char *IN = "in";
+static const char *OUT = "out";
+static const char *LOW = "0";
+static const char *HIGH = "1";
 
-
-static int
-GPIOExport(int pin)
+static pal_status_t pal_gpio_export_unexport(const char *op, int pin)
 {
-#define BUFFER_MAX 4
-    char buffer[BUFFER_MAX];
-    ssize_t bytes_written;
-    int fd;
-
-    fd = open("/sys/class/gpio/export", O_WRONLY);
-    if (-1 == fd) {
-        fprintf(stderr, "Failed to open export for writing!\n");
-        return(-1);
+    char buffer[32];
+    int ret = snprintf(buffer, sizeof(buffer), "/sys/class/gpio/%s", op);
+    if (ret < 0 || ret == sizeof(buffer))
+    {
+        PAL_GPIO_LOG("Failed to format GPIO %s file\n", op);
+        return PAL_STATUS_FAILURE;
     }
 
-    bytes_written = snprintf(buffer, BUFFER_MAX, "%d", pin);
-    write(fd, buffer, bytes_written);
-    close(fd);
-    usleep(100000);
-    return(0);
-}
-
-static int
-GPIOUnexport(int pin)
-{
-    char buffer[BUFFER_MAX];
-    ssize_t bytes_written;
-    int fd;
-
-    fd = open("/sys/class/gpio/unexport", O_WRONLY);
-    if (-1 == fd) {
-        fprintf(stderr, "Failed to open unexport for writing!\n");
-        return(-1);
+    int fd = open(buffer, O_WRONLY);
+    if (fd == -1)
+    {
+        PAL_GPIO_LOG("Failed to open GPIO %s file for writing: %s\n", op, strerror(errno));
+        return PAL_STATUS_FAILURE;
     }
 
-    bytes_written = snprintf(buffer, BUFFER_MAX, "%d", pin);
-    write(fd, buffer, bytes_written);
-    close(fd);
-    usleep(100000);
-    return(0);
-}
-
-static int
-GPIODirection(int pin, int dir)
-{
-    static const char s_directions_str[]  = "in\0out";
-
-#define DIRECTION_MAX 34
-    char path[DIRECTION_MAX];
-    int fd;
-
-    snprintf(path, DIRECTION_MAX, "/sys/class/gpio/gpio%d/direction", pin);
-    fd = open(path, O_WRONLY);
-    if (-1 == fd) {
-        fprintf(stderr, "Failed to open gpio direction for writing!\n");
-        return(-1);
+    ret = snprintf(buffer, sizeof(buffer), "%d", pin);
+    if (ret < 0 || ret == sizeof(buffer))
+    {
+        PAL_GPIO_LOG("Failed to format string for GPIO %s\n", op);
+        close(fd);
+        return PAL_STATUS_FAILURE;
     }
 
-    if (-1 == write(fd, &s_directions_str[IN == dir ? 0 : 3], IN == dir ? 2 : 3)) {
-        fprintf(stderr, "Failed to set direction!\n");
-        return(-1);
+    ssize_t written = write(fd, buffer, ret);
+    if (written == -1)
+    {
+        PAL_GPIO_LOG("Failed to %s GPIO #%d: %s\n", op, pin, strerror(errno));
+        close(fd);
+        return PAL_STATUS_FAILURE;
     }
 
     close(fd);
-    usleep(100000);
-    return(0);
+    return PAL_STATUS_SUCCESS;
 }
 
-static int
-GPIOWrite(pal_linux_gpio_t* pin, int value)
+static pal_status_t pal_gpio_export(int pin)
 {
-    if (write(pin->fd, value == LOW ? "0" : "1", 1) != 1) 
+    char path[48];
+    int ret = snprintf(path, sizeof(path), "/sys/class/gpio/gpio%d/value", pin);
+    if (ret < 0 || ret == sizeof(path))
+    {
+        PAL_GPIO_LOG("Failed to format GPIO value file\n");
+        return PAL_STATUS_FAILURE;
+    }
+
+    // test if already exported
+    if (access(path, F_OK) == 0)
+        return PAL_STATUS_SUCCESS;
+
+    return pal_gpio_export_unexport("export", pin);
+}
+
+static pal_status_t pal_gpio_unexport(int pin)
+{
+    return pal_gpio_export_unexport("unexport", pin);
+}
+
+static pal_status_t pal_gpio_direction(int pin, const char *dir)
+{
+    char path[48];
+    int ret = snprintf(path, sizeof(path), "/sys/class/gpio/gpio%d/direction", pin);
+    if (ret <= 0 || ret == sizeof(path))
+    {
+        PAL_GPIO_LOG("Failed to format GPIO direction file\n");
+        return PAL_STATUS_FAILURE;
+    }
+
+    int fd = open(path, O_WRONLY);
+    if (fd == -1)
+    {
+        PAL_GPIO_LOG("Failed to open GPIO #%d direction file for writing: %s\n", pin, strerror(errno));
+        return PAL_STATUS_FAILURE;
+    }
+
+    ssize_t written = write(fd, dir, strnlen(dir, 3));
+    if (written == -1)
+    {
+        PAL_GPIO_LOG("Failed to write GPIO #%d direction file: %s\n", pin, strerror(errno));
+        close(fd);
+        return PAL_STATUS_FAILURE;
+    }
+
+    close(fd);
+    return PAL_STATUS_SUCCESS;
+}
+
+static pal_status_t pal_gpio_write(pal_linux_gpio_t *pin, const char *value)
+{
+    ssize_t written = write(pin->fd, value, 1);
+    if (written == -1)
 	{
-        // can't use printf, because it may execute in signal handler
-		int errsv = errno;
-		char err_msg[100];
-		sprintf(err_msg, "Failed to write value! Erro code = %d, fd = %d\n", errsv, pin->fd);
-        write(STDERR_FILENO, err_msg, strlen(err_msg));
-        return(-1);
+        PAL_GPIO_LOG("Failed to write GPIO pin #%d: %s\n", pin->pin_nr, strerror(errno));
+        return PAL_STATUS_FAILURE;
     }
-    return(0);
+    return PAL_STATUS_SUCCESS;
 }
-
-#define GPIO_VALUE_FMT_STR "/sys/class/gpio/gpio%d/value"
 
 //lint --e{714,715} suppress "This function is used for to support multiple platforms "
-pal_status_t pal_gpio_init(const pal_gpio_t * p_gpio_context)
+pal_status_t pal_gpio_init(const pal_gpio_t *p_gpio_context)
 {
-#define VALUE_MAX 30
-    char path[VALUE_MAX] = {0};
-
-    if (p_gpio_context->p_gpio_hw != NULL)
+    pal_linux_gpio_t *gpio = (pal_linux_gpio_t *) p_gpio_context->p_gpio_hw;
+    if (gpio != NULL)
     {
-        pal_linux_gpio_t* gpio = p_gpio_context->p_gpio_hw;
-        int res_pin = gpio->pin_nr;
-        
-		/*
-         * Enable GPIO pins
-         */
-        if (-1 == GPIOExport(res_pin))
-            return(1);
+        int pin = gpio->pin_nr;
 
-        /*
-         * Set GPIO directions
-         */
-        if (-1 == GPIODirection(res_pin, OUT))
-            return(2);
+        pal_status_t status = pal_gpio_export(pin);
+        if (status != PAL_STATUS_SUCCESS)
+            return status;
 
-        snprintf(path, VALUE_MAX, GPIO_VALUE_FMT_STR, res_pin);
-        int fd = open(path, O_WRONLY);
-        if (fd < 0) {
-            fprintf(stderr, "Failed to open gpio value for writing!\n");
-            return(2);
+        status = pal_gpio_direction(pin, OUT);
+        if (status != PAL_STATUS_SUCCESS)
+            return status;
+
+        char path[48];
+        int ret = snprintf(path, sizeof(path), "/sys/class/gpio/gpio%d/value", pin);
+        if (ret < 0 || ret == sizeof(path))
+        {
+            PAL_GPIO_LOG("Failed to format GPIO value file\n");
+            return PAL_STATUS_FAILURE;
         }
 
-        // store fd
+        int fd = open(path, O_WRONLY);
+        if (fd == -1)
+        {
+            PAL_GPIO_LOG("Failed to open GPIO value file for writing: %s\n", strerror(errno));
+            return PAL_STATUS_I2C_BUSY;
+        }
         gpio->fd = fd;
     }
 
@@ -174,43 +188,33 @@ pal_status_t pal_gpio_init(const pal_gpio_t * p_gpio_context)
 }
 
 //lint --e{714,715} suppress "This function is used for to support multiple platforms "
-pal_status_t pal_gpio_deinit(const pal_gpio_t * p_gpio_context)
+pal_status_t pal_gpio_deinit(const pal_gpio_t *p_gpio_context)
 {
-    if (p_gpio_context->p_gpio_hw != NULL)
+    pal_linux_gpio_t *gpio = (pal_linux_gpio_t *) p_gpio_context->p_gpio_hw;
+    if (gpio != NULL)
     {
-        pal_linux_gpio_t* gpio = (pal_linux_gpio_t*)(p_gpio_context->p_gpio_hw);
-        /*
-         * Disable GPIO pins
-         */
-        if (-1 == GPIOUnexport(gpio->pin_nr))
-            return(1);
+        pal_status_t status = pal_gpio_unexport(gpio->pin_nr);
+        if (status != PAL_STATUS_SUCCESS)
+            return status;
 
         close(gpio->fd);
     }
-        
+
     return PAL_STATUS_SUCCESS;
 }
 
-void pal_gpio_set_high(const pal_gpio_t * p_gpio_context)
+void pal_gpio_set_high(const pal_gpio_t *p_gpio_context)
 {
-    if ((p_gpio_context != NULL) && (p_gpio_context->p_gpio_hw != NULL))
-    {
-        /*
-        * Write GPIO value
-        */
-        GPIOWrite((pal_linux_gpio_t*)(p_gpio_context->p_gpio_hw), HIGH );
-    }
+    pal_linux_gpio_t *gpio = (pal_linux_gpio_t *) p_gpio_context->p_gpio_hw;
+    if (gpio != NULL)
+        pal_gpio_write(gpio, HIGH);
 }
 
-void pal_gpio_set_low(const pal_gpio_t* p_gpio_context)
+void pal_gpio_set_low(const pal_gpio_t *p_gpio_context)
 {
-    if ((p_gpio_context != NULL) && (p_gpio_context->p_gpio_hw != NULL))
-    {
-        /*
-        * Write GPIO value
-        */
-        GPIOWrite((pal_linux_gpio_t*)(p_gpio_context->p_gpio_hw), LOW);
-    }
+    pal_linux_gpio_t *gpio = (pal_linux_gpio_t *) p_gpio_context->p_gpio_hw;
+    if (gpio != NULL)
+        pal_gpio_write(gpio, LOW);
 }
 
 /**
