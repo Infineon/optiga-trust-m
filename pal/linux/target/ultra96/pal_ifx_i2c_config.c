@@ -41,7 +41,7 @@
 
 #include "pal_linux.h"
 
-pal_linux_t linux_events = {"/dev/i2c-1", 0};
+pal_linux_t linux_events = {"/dev/i2c-1", 0,NULL};
 
 // If you use Raspberry Pi, you can uncomment the following lines
 // gpio_pin_t gpio_pin_vdd = 27;
@@ -54,12 +54,12 @@ pal_i2c_t optiga_pal_i2c_context_0 =
 {
     /// Pointer to I2C master platform specific context
     (void*)&linux_events,
-    /// Slave address
-    0x30,
     /// Upper layer context
     NULL,
     /// Callback event handler
-    NULL
+    NULL,
+    /// Slave address
+    0x30
 };
 
 /**
