@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2018 Infineon Technologies AG
+* Copyright (c) 2021 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -43,12 +43,12 @@
 
 pal_linux_t linux_events = {"/dev/i2c-1", 0,NULL};
 
-// If you use Raspberry Pi, you can uncomment the following lines
-// gpio_pin_t gpio_pin_vdd = 27;
-// gpio_pin_t gpio_pin_reset = 17;
+#define GPIO_PIN_RESET 16
+#define GPIO_PIN_VDD 27
+#define GPIO_CHIP "/dev/gpiochip0"
 
 /**
- * \brief PAL I2C configuration for OPTIGA. 
+ * \brief PAL I2C configuration for OPTIGA.
  */
 pal_i2c_t optiga_pal_i2c_context_0 =
 {
@@ -62,15 +62,16 @@ pal_i2c_t optiga_pal_i2c_context_0 =
     0x30
 };
 
+static struct pal_linux_gpio_gpiod pin_reset = {GPIO_CHIP, GPIO_PIN_RESET};
+static struct pal_linux_gpio_gpiod pin_vdd = {GPIO_CHIP, GPIO_PIN_VDD};
+
 /**
-* \brief PAL vdd pin configuration for OPTIGA. 
+* \brief PAL vdd pin configuration for OPTIGA.
  */
 pal_gpio_t optiga_vdd_0 =
 {
     // Platform specific GPIO context for the pin used to toggle Vdd.
-    (void*)NULL 
-    // If you use Raspberry Pi, you can uncomment the following line and comment out the previous
-    //(void*)&gpio_pin_vdd 
+    (void*)&pin_vdd
 };
 
 /**
@@ -79,12 +80,11 @@ pal_gpio_t optiga_vdd_0 =
 pal_gpio_t optiga_reset_0 =
 {
     // Platform specific GPIO context for the pin used to toggle Reset.
-    (void*)NULL
-    // If you use Raspberry Pi, you can uncomment the following line and comment out the previous
-    //(void*)&gpio_pin_reset 
+    (void*)&pin_reset
 };
 
 /**
 * @}
 */
+
 
