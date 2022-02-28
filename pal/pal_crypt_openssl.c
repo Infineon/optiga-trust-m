@@ -61,6 +61,7 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
     uint8_t md_hmac_temp_array[PAL_CRYPT_MAX_LABEL_SEED_LENGTH];
     uint16_t final_seed_length = 0;
 	EVP_PKEY_CTX *ctx;
+    size_t derived_key_len_conv=(size_t)derived_key_length;
 	
     do
     {
@@ -93,7 +94,7 @@ pal_status_t pal_crypt_tls_prf_sha256(pal_crypt_t* p_pal_crypt,
 		{
 			break;
 		}
-		if (!(EVP_PKEY_derive(ctx, p_derived_key, (size_t *)&derived_key_length)))
+		if (!(EVP_PKEY_derive(ctx, p_derived_key, (size_t *)&derived_key_len_conv)))
 		{
 			break;
 		}
