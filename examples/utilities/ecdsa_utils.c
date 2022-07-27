@@ -247,17 +247,17 @@ static size_t decode_asn1_uint(const uint8_t* asn1, size_t asn1_len,
         return 0;
     }
 
-    // one byte can never be a stuffing byte
-    if (integer_length > 1) {
-        if (*integer_field_cur == 0x00) {
+    // It could happen, that the first byte right after the size is 0x00, so only in case if the follow up byte is negative (> 127)
+    if (integer_length > 2) {
+        if ((*integer_field_cur == 0x00) && ((*(integer_field_cur + 1) & DER_UINT_MASK) >> 7)) {
             // remove stuffing byte
             integer_length--;
             integer_field_cur++;
-        }
 
-        if (*integer_field_cur == 0x00) {
-            // second zero byte is an encoding error
-            return 0;
+            if (*integer_field_cur == 0x00) {
+                // second zero byte is an encoding error
+                return 0;
+            }
         }
     }
 
