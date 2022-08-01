@@ -302,10 +302,9 @@ pal_status_t pal_i2c_set_bitrate(const pal_i2c_t * p_i2c_context, uint16_t bitra
         }
 
         setDataRate = _cyhal_i2c_set_peri_divider(i2cObj->base,
-                                                  i2cObj->resource.block_num,
-                                                  &(i2cObj->clock),
-                                                  (bitrate * 1000),
-                                                  false);
+                                                 1,
+                                                 (bitrate * 1000),
+                                                 false);
         if (0 == setDataRate)
         {
 
