@@ -53,7 +53,7 @@ cyhal_i2c_t i2c_master_obj;
 pal_psoc_gpio_t optiga_vdd_config =
 {
     .port_num = OPTIGA_TRUSTM_VDD,
-    .init_state = false
+    .init_state = true
 };
 #endif
 
