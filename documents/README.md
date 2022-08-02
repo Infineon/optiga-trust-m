@@ -18,3 +18,4 @@
     * Application areas
     * External and host side API
     * And many more other details related to the product and its application
+* Some of the most frequent questions and topics like: "Why I can't call signature too often?", or "What is a Protected Update?" are duplicated from the SRM in the dedicated [Wiki articles](https://github.com/Infineon/optiga-trust-m/wiki)
