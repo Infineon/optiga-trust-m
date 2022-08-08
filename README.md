@@ -1,4 +1,4 @@
-# OPTIGA&trade; Trust M Software Framework
+# Infineon OPTIGA&trade; Trust M
 
 ## Quick navigation
 
@@ -25,7 +25,7 @@
 
 <img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_uson10.png" width="300" >
 
-This repository contains a target-agnostic Software Framework for the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) security chip. It is a base for other application notes. **Be aware that this software comes without any security claims and shall be used for evaluation purpose.**
+This repository contains a target-agnostic Software Framework for the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) security solution. It is a base for other application notes. **Be aware that this software comes without any security claims and shall be used for evaluation purpose.**
 
 ### Key Features and Benefits
 * High-end security controller
