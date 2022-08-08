@@ -138,8 +138,8 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
 There are three main provisioning options/confgiurations availble:
 
 1. **OPTIGA&trade; Trust M V1/V3** - a provisioning configuration which comes as a standard for all shipped devices. Unless mentioned differently all OPTIGA Trust M chips on the market have this configuration. 
-    * [Sample OPTIGA&trade; Trust M1 Certificate](https://github.com/Infineon/optiga-trust-m/files/9281936/trust_m1_json.txt)
-    * [Sample OPTIGA&trade; Trust M3 Certificate](https://github.com/Infineon/optiga-trust-m/files/9281926/trust_m3_json.txt)
+    * [Sample OPTIGA&trade; Trust M V1 Certificate](https://github.com/Infineon/optiga-trust-m/files/9281936/trust_m1_json.txt)
+    * [Sample OPTIGA&trade; Trust M V3 Certificate](https://github.com/Infineon/optiga-trust-m/files/9281926/trust_m3_json.txt)
 2. **Custom** - a custom provisioning option done on demand upon reaching a MoQ. Fully customisable solution including Security Monitor Configuration  
 3. **Express** - a provisioning configuration which can be ordered standalone. Credentials and unique data can be downlaoded through CIRRENT™ Cloud ID
     * [Sample OPTIGA Trust M Express Certificate](https://github.com/Infineon/optiga-trust-m/files/9281778/trust_express_sample2_json.txt)
