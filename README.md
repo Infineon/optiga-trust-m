@@ -2,7 +2,7 @@
 
 ## Quick navigation
 
-1. [Security Chip](#security-chip)
+1. [Security Solution](#security-solution)
     * [Description](#description)
     * [Key Features and benefits](#key-features-and-benefits)
     * [Features table](#features-table)
