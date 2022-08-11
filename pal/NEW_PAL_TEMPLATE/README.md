@@ -146,89 +146,130 @@ void pal_os_event_trigger_registered_callback(void)
 }
 ```
 
-## Reference code on XMC4800 for communicating with OPTIGA™ Trust M
+## Initalisation hints
+
+This is a code sample demonstrating initialization routine for the security chip, as well as a hibernation example
 ```c
-static volatile uint32_t optiga_pal_event_status;
-static void optiga_pal_i2c_event_handler(void* upper_layer_ctx, uint8_t event);
-
-pal_i2c_t optiga_pal_i2c_context_0 =
+#include "optiga/optiga_util.h"
+#include "optiga/pal/pal_os_event.h"
+#include "optiga/pal/pal.h"
+#include "optiga/pal/pal_os_timer.h"
+/**
+ * Callback when optiga_util_xxxx operation is completed asynchronously
+ */
+static volatile optiga_lib_status_t optiga_lib_status;
+static void optiga_util_callback(void * context, optiga_lib_status_t return_status)
 {
-    /// Pointer to I2C master platform specific context
-    (void*)&i2c_master_0,
-    /// Slave address
-    0x30,
-    /// Upper layer context
-    NULL,
-    /// Callback event handler
-    NULL,
-};
-
-// OPTIGA pal i2c event handler
-static void optiga_pal_i2c_event_handler(void* upper_layer_ctx, uint8_t event)
-{
-    optiga_pal_event_status = event;
+    optiga_lib_status = return_status;
 }
 
-/* Function to verify I2C communication with OPTIGA */
-pal_status_t test_optiga_communication(void)
-{
-    pal_status_t pal_return_status;
-    uint8_t data_buffer[10] = {0x82};
-    
-    // set callback handler for pal i2c
-    optiga_pal_i2c_context_0.upper_layer_event_handler =
-    optiga_pal_i2c_event_handler;
-    
-    // Send 0x82 to read I2C_STATE from optiga
-    do
-    {
-        optiga_pal_event_status = PAL_I2C_EVENT_BUSY;
-        pal_return_status = pal_i2c_write(&optiga_pal_i2c_context_0, data_buffer, 1);
-        if (PAL_STATUS_FAILURE == pal_return_status)
-        {
-            // Pal I2C write failed due to I2C busy is in busy
-            // state or low level driver failures
-            break;
-        }
-
-    // Wait until writing to optiga is completed
-    } while (PAL_I2C_EVENT_SUCCESS != optiga_pal_event_status);
-
-
-    // Read the I2C_STATE from OPTIGA
-    do
-    {
-        optiga_pal_event_status = PAL_I2C_EVENT_BUSY;
-        pal_return_status = pal_i2c_read(&optiga_pal_i2c_context_0, data_buffer, 4);
-        // Pal I2C read failed due to I2C busy is in busy
-        // state or low level driver failures
-        if (PAL_STATUS_FAILURE == pal_return_status)
-        {
-            break;
-        }
-        // Wait until reading from optiga is completed
-    } while (PAL_I2C_EVENT_SUCCESS != optiga_pal_event_status);
-
-    return pal_return_status;
-}
-
-/* Main Function */
 int32_t main(void)
 {
-    DAVE_STATUS_t status;
-    pal_status_t pal_return_status;
-    
-    // Initialisation of DAVE Apps
-    status = DAVE_Init();
-    
-    // Stop if DAVE init fails
-    if (DAVE_STATUS_FAILURE == status)
+    uint8_t return_value = 0;
+
+    optiga_lib_status_t return_status;
+
+    optiga_util_t * me_util;
+
+    do
     {
-        while (1U)
-        {;}
-    }
-     pal_return_status = test_optiga_communication();
-    
-     return (int32_t)pal_return_status;
+        //Create an instance of optiga_util to open the application on OPTIGA.
+        me_util = optiga_util_create(0, optiga_util_callback, NULL);
+
+        /**
+         * Open the application on OPTIGA which is a precondition to perform any other operations
+         * using optiga_util_open_application
+         */        
+        optiga_lib_status = OPTIGA_LIB_BUSY;
+        return_status = optiga_util_open_application(me_util, 0);
+
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            break;
+        }
+        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+        {
+            //Wait until the optiga_util_open_application is completed
+        }
+        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
+        {
+            //optiga util open application failed
+            break;
+        }
+        /**
+         * Hibernate the application on OPTIGA 
+         * using optiga_util_close_application
+         */
+        optiga_lib_status = OPTIGA_LIB_BUSY;
+        return_status = optiga_util_close_application(me_util, 1);
+        
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            break;
+        }
+
+        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+        {
+            //Wait until the optiga_util_close_application is completed
+        }
+        
+        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
+        {
+            //optiga util close application failed
+            break;
+        }
+        /**
+         * Restore the application on OPTIGA
+         * using optiga_util_open_application
+         */
+        optiga_lib_status = OPTIGA_LIB_BUSY;
+        return_status = optiga_util_open_application(me_util, 1);
+
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            break;
+        }
+        while (OPTIGA_LIB_BUSY == optiga_lib_status)
+        {
+            //Wait until the optiga_util_open_application is completed
+        }
+        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
+        {
+            //optiga util open application failed
+            break;
+        }
+
+        /*
+         Paste your code is here
+        */
+
+                /**
+         * Close the application on OPTIGA after all the operations are executed
+         * using optiga_util_close_application
+         */
+        optiga_lib_status = OPTIGA_LIB_BUSY;
+        return_status = optiga_util_close_application(me_util, 0);
+        
+        if (OPTIGA_LIB_SUCCESS != return_status)
+        {
+            break;
+        }
+
+        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+        {
+            //Wait until the optiga_util_close_application is completed
+        }
+        
+        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
+        {
+            //optiga util close application failed
+            break;
+        }
+
+        // destroy util and crypt instances
+        optiga_util_destroy(me_util);
+    }while (FALSE);
+
+    return return_value;
 }
 ```
