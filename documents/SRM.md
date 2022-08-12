@@ -1,4 +1,4 @@
-**OPTIGA™ Trust M **
+# OPTIGA™ Trust M Solution Reference Manual v3.30
 
 **About this document**
 
