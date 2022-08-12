@@ -740,9 +740,9 @@ is:
 
   - blue: platform specific provided by a third party.
 
-|                                        |
-| -------------------------------------- |
-| ![728,6](srm_figures/media/image4.tmp) |
+|                                      |
+| ------------------------------------ |
+| ![728,6](srm_files/media/image4.tmp) |
 
 Figure 1 - OPTIGA Trust Communication Protection - toolbox - View
 
@@ -823,9 +823,9 @@ invocation of the *optiga\_cmd* module will interrupt the execution).
   - The necessary access conditions for reading the target data object
     are satisfied.
 
-|                                        |
-| -------------------------------------- |
-| ![728,6](srm_figures/media/image5.tmp) |
+|                                      |
+| ------------------------------------ |
+| ![728,6](srm_files/media/image5.tmp) |
 
 Figure 2 - Use Case: Read General Purpose Data - data object
 
@@ -843,9 +843,9 @@ the execution).
 
   - The OPTIGA™ application is already launched
 
-|                                        |
-| -------------------------------------- |
-| ![728,6](srm_figures/media/image6.tmp) |
+|                                      |
+| ------------------------------------ |
+| ![728,6](srm_files/media/image6.tmp) |
 
 Figure 3 - Use Case: Read General Purpose Data - metadata
 
@@ -870,9 +870,9 @@ invocation of the *optiga\_cmd* module will interrupt the execution).
 
   - The target data object is updated
 
-|                                        |
-| -------------------------------------- |
-| ![728,6](srm_figures/media/image7.tmp) |
+|                                      |
+| ------------------------------------ |
+| ![728,6](srm_files/media/image7.tmp) |
 
 Figure 4 - Use Case: Write General Purpose Data - data object
 
@@ -895,9 +895,9 @@ updating metadata associated to a data object.
 
   - The metadata associated to the target data/key object is updated
 
-|                                        |
-| -------------------------------------- |
-| ![728,6](srm_figures/media/image8.tmp) |
+|                                      |
+| ------------------------------------ |
+| ![728,6](srm_files/media/image8.tmp) |
 
 Figure 5 - Use Case: Write General Purpose Data - metadata
 
@@ -923,9 +923,9 @@ object.
 
   - The target data object is updated.
 
-|                                        |
-| -------------------------------------- |
-| ![728,6](srm_figures/media/image9.tmp) |
+|                                      |
+| ------------------------------------ |
+| ![728,6](srm_files/media/image9.tmp) |
 
 Figure 6 - Use Case: Integrity Protected Update of a data object
 
@@ -957,9 +957,9 @@ updates the target data/key object.
 
   - The target data / key object is updated.
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image10.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image10.tmp) |
 
 Figure 7 - Use Case: Confidentiality Protected Update of key or a data
 object
@@ -998,16 +998,16 @@ is authenticated as well.
   - The Client knows the session keys (write\_key) to run the
     application protocol without the help of the OPTIGA™.
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image11.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image11.tmp) |
 
 Figure 8 - Use Case: Mutual Authentication establish session -toolbox-
 (TLS-Client)
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image12.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image12.tmp) |
 
 Figure 9 - Use Case: Mutual Auth establish session -toolbox-
 (TLS-Client) cont'd
@@ -1040,9 +1040,9 @@ with further commands.*
   - The Client knows the session keys (write\_key) to run the
     application protocol without the help of the OPTIGA™.
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image13.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image13.tmp) |
 
 Figure 10 - Use Case: Abbreviated Handshake -toolbox- (TLS-Client)
 
@@ -1074,9 +1074,9 @@ diagram is provided to show the functions involved in performing.
 
   - The FW-image decryption secret is returned to the Host
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image14.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image14.tmp) |
 
 Figure 11 - Use Case: Host Firmware Update
 
@@ -1098,9 +1098,9 @@ comprises at least of the Host and the OPTIGA™.
   - The pre-shared secret is available and locked (read/write = NEV or
     read = NEV).
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image15.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image15.tmp) |
 
 Figure 12 - Use Case: Pair OPTIGA™ with Host (Pre-Shared Secret based)
 
@@ -1123,9 +1123,9 @@ integrated in the boot process and the OPTIGA™.
 
   - The Host software image is proven being integrity correct.
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image16.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image16.tmp) |
 
 Figure 13 - Use Case: Verified Boot
 -toolbox-
@@ -1149,9 +1149,9 @@ comprises the Host and the OPTIGA™.
 
   - The pre-shared secret is updated with the new secret.
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image17.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image17.tmp) |
 
 Figure 14 - Use Case: Update Platform Binding Secret during runtime
 (Pre-Shared Secret based)
@@ -1185,9 +1185,9 @@ local data by the Host.
 
   - The local secret for encryption is known by the Host
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image18.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image18.tmp) |
 
 Figure 15 - Use Case: Local "data-at-rest" protection
 
@@ -1212,9 +1212,9 @@ the metadata associated with the target data objects.
   - The plain payload read or written was traveling on the I2C bus
     confidentiality protected.
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image19.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image19.tmp) |
 
 Figure 16 - Use Case: Local "data-at-rest" and "data-in-transit"
 protection
@@ -1241,9 +1241,9 @@ Note: OPTIGA™ Trust M V1 doesn’t support symmetric algorithms.
   - The plain payload read or written was traveling on the I2C bus
     confidentiality protected.
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image20.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image20.tmp) |
 
 Figure 17 - Use Case: Host "data-at-rest" and "data-in-transit"
 protection
@@ -1265,9 +1265,9 @@ Note: OPTIGA™ Trust M V1 doesn’t support HMAC based operations.
   - The generated MAC is available for Local Host Application for
     further usage.
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image21.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image21.tmp) |
 
 Figure 18 - Use Case: Generate MAC (HMAC with SHA2)
 
@@ -1288,9 +1288,9 @@ input data using the secret installed at OPTIGA™.
   - The satisfied access condition is available at Local Host
     Application for further usage.
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image22.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image22.tmp) |
 
 Figure 19 - Use Case: Verify Authorization (HMAC with SHA2)
 
@@ -1308,9 +1308,9 @@ input data using OPTIGA™.
   - The generated Hash is available for Local Host Application for
     further usage.
 
-|                                         |
-| --------------------------------------- |
-| ![728,6](srm_figures/media/image23.tmp) |
+|                                       |
+| ------------------------------------- |
+| ![728,6](srm_files/media/image23.tmp) |
 
 Figure 20 - Use Case: Generate Hash
 
@@ -1343,9 +1343,9 @@ party*.
   - *Third Party* components (light blue) need to be ported to platform
     agnostic APIs.
 
-|                                          |
-| ---------------------------------------- |
-| ![481,95](srm_figures/media/image24.png) |
+|                                        |
+| -------------------------------------- |
+| ![481,95](srm_files/media/image24.png) |
 
 Figure 21 – OPTIGA™ Trust Enabler Software Overview
 
@@ -1355,9 +1355,9 @@ The [Service Layer Decomposition](#service-layer-decomposition) diagram
 shows the components providing the services at the main application
 interface.
 
-|                                          |
-| ---------------------------------------- |
-| ![481,95](srm_figures/media/image25.tmp) |
+|                                        |
+| -------------------------------------- |
+| ![481,95](srm_files/media/image25.tmp) |
 
 Figure 22 - Service Layer Decomposition
 
@@ -1975,9 +1975,9 @@ diagram shows the components providing an agnostic interface to the
 underlying HW and SW platform functionality used by the higher-level
 components of the architecture.
 
-|                                          |
-| ---------------------------------------- |
-| ![481,95](srm_figures/media/image26.tmp) |
+|                                        |
+| -------------------------------------- |
+| ![481,95](srm_files/media/image26.tmp) |
 
 Figure 23 - Abstraction Layer Decomposition
 
@@ -2363,9 +2363,9 @@ procedure.
 (e.g. counting down the SEC). In case all idle tasks are finished and no
 command is pending, the OPTIGA™ enters sleep mode.
 
-|                                         |
-| --------------------------------------- |
-| ![550,8](srm_figures/media/image27.wmf) |
+|                                       |
+| ------------------------------------- |
+| ![550,8](srm_files/media/image27.wmf) |
 
 Figure 24 - Go-to-Sleep diagram
 
@@ -5676,15 +5676,15 @@ Identifier](#linka946a953_def2_41cf_850a_74fb7899fe11).
 
 *Note: there is no ordering rule for metadata tags*
 
-|                                    |
-| ---------------------------------- |
-| ![](srm_figures/media/image36.png) |
+|                                  |
+| -------------------------------- |
+| ![](srm_files/media/image36.png) |
 
 Figure 33 - Metadata sample
 
-|                                    |
-| ---------------------------------- |
-| ![](srm_figures/media/image37.png) |
+|                                  |
+| -------------------------------- |
+| ![](srm_files/media/image37.png) |
 
 Figure 34 - SetDataObject (Metadata) examples
 
@@ -5940,9 +5940,9 @@ object
 For Example, The GetDataObject command to read 5 bytes of Coprocessor
 UID data object starting from offset 2 is as shown below.
 
-|                                    |
-| ---------------------------------- |
-| ![](srm_figures/media/image38.png) |
+|                                  |
+| -------------------------------- |
+| ![](srm_files/media/image38.png) |
 
 Figure 35 - GetDataObject \[Read data\] example
 
@@ -5953,9 +5953,9 @@ Figure 35 - GetDataObject \[Read data\] example
 For Example, The SetDataObject command to write 8 bytes of data to
 arbitrary data object 0xF1D0 starting from offset 9 is as shown below.
 
-|                                    |
-| ---------------------------------- |
-| ![](srm_figures/media/image39.png) |
+|                                  |
+| -------------------------------- |
+| ![](srm_files/media/image39.png) |
 
 Figure 36 - GetDataObject \[Read data\] example
 
@@ -6751,9 +6751,9 @@ the same data object to authenticate OPTIGA™ and to ensure the freshness
   - The local\_host\_application considers the OPTIGA™ as an authentic
     member of the target platform.
 
-|                                    |
-| ---------------------------------- |
-| ![](srm_figures/media/image41.emf) |
+|                                  |
+| -------------------------------- |
+| ![](srm_files/media/image41.emf) |
 
 Figure 38 - Write and read nonce to/from a data object
 
@@ -6780,9 +6780,9 @@ side) in shielded connection.
   - The local\_host\_application considers the OPTIGA™ as an authentic
     member of the target platform.
 
-|                                    |
-| ---------------------------------- |
-| ![](srm_figures/media/image42.emf) |
+|                                  |
+| -------------------------------- |
+| ![](srm_files/media/image42.emf) |
 
 Figure 39 - Derive keys using nonce during run time
 
@@ -6819,9 +6819,9 @@ freshness (at host side) in shielded connection.
   - The local\_host\_application considers the OPTIGA™ as an authentic
     member of the target platform.
 
-|                                    |
-| ---------------------------------- |
-| ![](srm_figures/media/image43.emf) |
+|                                  |
+| -------------------------------- |
+| ![](srm_files/media/image43.emf) |
 
 Figure 40 - Derive keys using nonce and a static (additional) pre-shared
 secret
@@ -6836,9 +6836,9 @@ The figure below shows the high level structure of the update data set
 for data or key objects. It consists of a manifest and the connected
 binary data.
 
-|                                    |
-| ---------------------------------- |
-| ![](srm_figures/media/image44.emf) |
+|                                  |
+| -------------------------------- |
+| ![](srm_files/media/image44.emf) |
 
 Figure 41 – Protected update – high level structure
 
