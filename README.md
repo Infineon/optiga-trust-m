@@ -140,8 +140,8 @@ There are three main provisioning options/confgiurations availble:
 1. **OPTIGA&trade; Trust M V1/V3** - a provisioning configuration which comes as a standard for all shipped devices. Unless mentioned differently all OPTIGA Trust M chips on the market have this configuration. 
     * [Sample OPTIGA&trade; Trust M V1 Open Objects Dump](https://github.com/Infineon/optiga-trust-m/files/9281936/trust_m1_json.txt)
     * [Sample OPTIGA&trade; Trust M V3 Open Objects Dump](https://github.com/Infineon/optiga-trust-m/files/9281926/trust_m3_json.txt)
-2. **Custom** - a custom provisioning option done on demand upon reaching a MoQ. Fully customisable solution including Security Monitor Configuration  
-3. **Express** - a provisioning configuration which can be ordered standalone. Credentials and unique data can be downlaoded through CIRRENT™ Cloud ID
+2. **OPTIGA&trade; Trust M Custom** - a custom provisioning option done on demand upon reaching a MoQ. Fully customisable solution including Security Monitor Configuration  
+3. **OPTIGA&trade; Trust M Express** - a provisioning configuration which can be ordered standalone. Credentials and unique data can be downlaoded through CIRRENT™ Cloud ID
     * [Sample OPTIGA Trust M Express Certificate](https://github.com/Infineon/optiga-trust-m/files/9281778/trust_express_sample2_json.txt)
 
 #### Comparison Table
@@ -150,96 +150,70 @@ There are three main provisioning options/confgiurations availble:
 <thead>
   <tr>
     <th></th>
-    <th>OPTIGA™ Trust M V1</th>
-    <th>OPTIGA™ Trust M V3</th>
-    <th colspan="5">OPTIGA™ </br>Trust M Express</th>
+    <th>V1</th>
+    <th>V3</th>
+    <th colspan="3">Express</th>
   </tr>
 </thead>
 <tbody>
   <tr>
     <td></td>
-    <th>Certificate - Private Key</th>
-    <th>Certificate - Private Key</th>
-    <th colspan="3">Certificate - </br>Private Key*</th>
-    <th>Platform Binding Secret*</th>
-    <th>Authorization Reference*</th>
+    <th>Certificate - </br>Private Key</th>
+    <th>Certificate - </br>Private Key</th>
+    <th colspan="3">Certificate* - Private Key</th>
   </tr>
   <tr>
-    <th>Object IDs</th>
+    <td><a href="https://github.com/Infineon/optiga-trust-m/wiki/Data-and-Key-Store-Overview" target="_blank" rel="noopener noreferrer">Object IDs</a></td>
     <td>E0E0 - E0F0</td>
     <td>E0E0 - E0F0</td>
     <td>E0E0 - E0F0</td>
     <td>E0E1 - E0F1</td>
     <td>E0E2 - E0FC</td>
-    <td>E140</td>
-    <td>F1D0</td>
   </tr>
   <tr>
-    <th>Encoding</th>
-    <td>X509 ASN.1 DER</td>
-    <td>X509 ASN.1 DER</td>
-    <td>X509 ASN.1 DER</td>
-    <td>X509 ASN.1 DER</td>
-    <td>X509 ASN.1 DER</td>
-    <td>64 random bytes</td>
-    <td>64 random bytes</td>
-  </tr>
-  <tr>
-    <th>Level 0: Root CA</th>
+    <td><a href="https://github.com/Infineon/optiga-trust-m/blob/develop/documents/OPTIGA_Trust_M_Keys_And_Certificates_v3.10.pdf" target="_blank" rel="noopener noreferrer">PKI</a> Top Level</td>
     <td><a href="https://github.com/Infineon/optiga-trust-m/raw/support/m1/certificates/Infineon%20ECC%20Root%20CA%20C%20v01%2000.crt" target="_blank" rel="noopener noreferrer">ECC Root CA1</a></td>
     <td><a href="https://pki.infineon.com/OptigaECCRootCA2/OptigaECCRootCA2.crt" target="_blank" rel="noopener noreferrer">ECC Root CA2</a></td>
     <td><a href="https://pki.infineon.com/OptigaECCRootCA2/OptigaECCRootCA2.crt" target="_blank" rel="noopener noreferrer">ECC Root CA2</a></td>
     <td><a href="https://pki.infineon.com/OptigaECCRootCA2/OptigaECCRootCA2.crt" target="_blank" rel="noopener noreferrer">ECC Root  CA2</a></td>
     <td><a href="https://pki.infineon.com/OptigaRSARootCA2/OptigaRSARootCA2.crt" target="_blank" rel="noopener noreferrer">RSA Root CA2</a></td>
-    <td>N/A</td>
-    <td>N/A</td>
   </tr>
   <tr>
-    <th>Level 1: Intermediate CA</th>
+    <td><a href="https://github.com/Infineon/optiga-trust-m/blob/develop/documents/OPTIGA_Trust_M_Keys_And_Certificates_v3.10.pdf" target="_blank" rel="noopener noreferrer">PKI</a> Intermediate Level</td>
     <td><a href="https://github.com/Infineon/optiga-trust-m/raw/support/m1/certificates/Infineon%20OPTIGA(TM)%20Trust%20M%20CA%20101.crt" target="_blank" rel="noopener noreferrer">Int. CA 101</a></td>
     <td><a href="https://github.com/Infineon/optiga-trust-m/blob/develop/certificates/Infineon%20OPTIGA(TM)%20Trust%20M%20CA%20300.crt" target="_blank" rel="noopener noreferrer">Int. CA 300</a></td>
     <td><a href="https://pki.infineon.com/OptigaTrustEccCA306/OptigaTrustEccCA306.crt" target="_blank" rel="noopener noreferrer">Int. CA 306</a></td>
     <td><a href="https://pki.infineon.com/OptigaTrustEccCA306/OptigaTrustEccCA306.crt" target="_blank" rel="noopener noreferrer">Int. CA 306</a></td>
     <td><a href="https://pki.infineon.com/OptigaTrustRsaCA309/OptigaTrustRsaCA309.crt" target="_blank" rel="noopener noreferrer">Int. CA 309</a></td>
-    <td>N/A</td>
-    <td>N/A</td>
   </tr>
   <tr>
-    <th>Level 2: Certificate Key Algorithm</th>
-    <td>NIST P-256 (secp256r1)</td>
-    <td>NIST P-256 (secp256r1)</td>
-    <td>NIST P-256 (secp256r1)</td>
-    <td>NIST P-256 (secp256r1)</td>
+    <td><a href="https://github.com/Infineon/optiga-trust-m/blob/develop/documents/OPTIGA_Trust_M_Keys_And_Certificates_v3.10.pdf" target="_blank" rel="noopener noreferrer">PKI</a> Bottom Level: Key Algorithm</td>
+    <td>NIST P-256</td>
+    <td>NIST P-256</td>
+    <td>NIST P-256</td>
+    <td>NIST P-256</td>
     <td>RSA2048</td>
-    <td>N/A</td>
-    <td>N/A</td>
   </tr>
   <tr>
-    <th>Possible to Readout</th>
+    <td>Possible to Readout</td>
     <td>Yes</td>
     <td>Yes</td>
     <td>Yes</td>
     <td>With Shielded Connection</td>
     <td>Yes</td>
-    <td>No</td>
-    <td>No</td>
   </tr>
   <tr>
-    <th>Possible to Update</th>
+    <td>Possible to Update</td>
     <td>Only Cert</td>
     <td>Only Cert</td>
     <td>Only Cert</td>
     <td>Only Cert</td>
     <td>Only Cert</td>
-    <td>Yes</td>
-    <td>Yes</td>
   </tr>
   <tr>
-    <th>Default Lifecycle State</th>
+    <td>Default Lifecycle State</td>
     <td>Creation</td>
     <td>Creation</td>
-    <td>Operational</td>
-    <td>Operational</td>
     <td>Operational</td>
     <td>Operational</td>
     <td>Operational</td>
@@ -247,7 +221,11 @@ There are three main provisioning options/confgiurations availble:
 </tbody>
 </table>
 
-\* Can be downloaded from CIRRENT™ Cloud ID by claiming a Reel QR Code 
+In addition to the certificates and private keys each OPTIGA&trade; Trust M Express comes with a chip unique Platform Binding Secret* and an Authorization Reference*. The latter are two unique per chip 64 bytes long data objects which serve the following purposes:
+- Platform Binding Secret (PBS) used to establish a Shielded Connection between a Host MCU and OPTIGA&trade; Trust M. Should be transfered from CIRRENT™ Cloud ID to the respective MCU to run a protected I2C connection; e.g. readout a protected Certificate located in the 0xE0E1 Object ID (see table above). For more details about  Shielded Connection read [here](https://github.com/Infineon/optiga-trust-m/wiki/Shielded-Connection-101).
+- Authorization Reference. Used to update/change Certificate, PBS and the Authorization Reference itself. Shall be used only together with the shielded connection. Find more details in the [Solution Reference Manual](documents/OPTIGA™%20Trust%20M%20Solution%20Reference%20Manual%20v3.30.md)
+
+\* Certificate, Platform Binding Secret and the Authorization Reference can be downloaded from CIRRENT™ Cloud ID by claiming a Reel QR Code 
 
 ## Get Started
 
