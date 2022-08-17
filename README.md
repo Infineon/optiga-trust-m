@@ -199,16 +199,16 @@ There are three main provisioning options/confgiurations availble:
     <td>Yes</td>
     <td>Yes</td>
     <td>Yes</td>
-    <td>With Shielded Connection</td>
+    <td>With PBS*</td>
     <td>Yes</td>
   </tr>
   <tr>
     <td>Possible to Update</td>
-    <td>Only Cert</td>
-    <td>Only Cert</td>
-    <td>Only Cert</td>
-    <td>Only Cert</td>
-    <td>Only Cert</td>
+    <td>Only Certificate</td>
+    <td>Only Certificate</td>
+    <td>Only Certificate with PBS* and Auth.Ref.*</td>
+    <td>Only Certertificate with PBS* and Auth.Ref.*</td>
+    <td>Only Certificate with PBS* and Auth.Ref.*</td>
   </tr>
   <tr>
     <td>Default Lifecycle State</td>
@@ -221,11 +221,12 @@ There are three main provisioning options/confgiurations availble:
 </tbody>
 </table>
 
+\* Certificate, Platform Binding Secret (PBS) and the Authorization Reference (Auth.Ref.) can be downloaded from CIRRENT™ Cloud ID by claiming a Reel QR Code 
+
 In addition to the certificates and private keys each OPTIGA&trade; Trust M Express comes with a chip unique Platform Binding Secret* and an Authorization Reference*. The latter are two unique per chip 64 bytes long data objects which serve the following purposes:
 - Platform Binding Secret (PBS) used to establish a Shielded Connection between a Host MCU and OPTIGA&trade; Trust M. Should be transfered from CIRRENT™ Cloud ID to the respective MCU to run a protected I2C connection; e.g. readout a protected Certificate located in the 0xE0E1 Object ID (see table above). For more details about  Shielded Connection read [here](https://github.com/Infineon/optiga-trust-m/wiki/Shielded-Connection-101).
-- Authorization Reference. Used to update/change Certificate, PBS and the Authorization Reference itself. Shall be used only together with the shielded connection. Find more details in the [Solution Reference Manual](documents/OPTIGA™%20Trust%20M%20Solution%20Reference%20Manual%20v3.30.md)
+- Authorization Reference (Auth. Ref.). Used to update/change Certificate, PBS and the Authorization Reference itself. Similar to the PBS shall be tranfered to the Host MCU to be used. Find more details in the [Solution Reference Manual](documents/OPTIGA™%20Trust%20M%20Solution%20Reference%20Manual%20v3.30.md)
 
-\* Certificate, Platform Binding Secret and the Authorization Reference can be downloaded from CIRRENT™ Cloud ID by claiming a Reel QR Code 
 
 ## Get Started
 
