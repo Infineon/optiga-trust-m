@@ -19,319 +19,142 @@ in solution details.
 
 # Table of Contents
 
-[Table of Contents 2](#table-of-contents)
-
-[1 Introduction 6](#_Toc83280025)
-
-[1.1 Abbreviations 6](#abbreviations)
-
-[1.2 Naming Conventions 7](#naming-conventions)
-
-[1.3 References 7](#references)
-
-[1.4 Overview 10](#overview)
-
-[2 Supported use cases 11](#_Toc83280030)
-
-[2.1 Architecture Decomposition 11](#architecture-decomposition)
-
-[2.1.1 Host code size 14](#host-code-size)
-
-[2.2 Sequence Diagrams utilizing basic functionality
-15](#sequence-diagrams-utilizing-basic-functionality)
-
-[2.2.1 Use Case: Read General Purpose Data - data object
-15](#use-case-read-general-purpose-data---data-object)
-
-[2.2.2 Use Case: Read General Purpose Data - metadata
-16](#use-case-read-general-purpose-data---metadata)
-
-[2.2.3 Use Case: Write General Purpose Data - data object
-17](#use-case-write-general-purpose-data---data-object)
-
-[2.2.4 Use Case: Write General Purpose Data - metadata
-18](#use-case-write-general-purpose-data---metadata)
-
-[2.2.5 Use Case: Integrity Protected Update of a data object
-19](#use-case-integrity-protected-update-of-a-data-object)
-
-[2.2.6 Use Case: Confidentiality Protected Update of key or a data
-object
-20](#use-case-confidentiality-protected-update-of-key-or-a-data-object)
-
-[2.3 Sequence Diagrams utilizing cryptographic toolbox functionality
-22](#sequence-diagrams-utilizing-cryptographic-toolbox-functionality)
-
-[2.3.1 Use Case: Mutual Authentication establish session -toolbox-
-(TLS-Client)
-22](#use-case-mutual-authentication-establish-session--toolbox--tls-client)
-
-[2.3.2 Use Case: Abbreviated Handshake -toolbox- (TLS-Client)
-25](#use-case-abbreviated-handshake--toolbox--tls-client)
-
-[2.3.3 Use Case: Host Firmware Update
-26](#use-case-host-firmware-update)
-
-[2.3.4 Use Case: Pair OPTIGA™ with Host (Pre-Shared Secret based)
-27](#use-case-pair-optiga-with-host-pre-shared-secret-based)
-
-[2.3.5 Use Case: Verified Boot -toolbox-
-28](#use-case-verified-boot--toolbox-)
-
-[2.3.6 Use Case: Update Platform Binding Secret during runtime
-(Pre-Shared Secret based)
-29](#use-case-update-platform-binding-secret-during-runtime-pre-shared-secret-based)
-
-[2.3.7 Use Case: Local "data-at-rest" protection
-30](#use-case-local-data-at-rest-protection)
-
-[2.3.8 Use Case: Local "data-at-rest" and "data-in-transit" protection
-32](#use-case-local-data-at-rest-and-data-in-transit-protection)
-
-[2.3.9 Use Case: Host "data-at-rest" and "data-in-transit" protection
-33](#use-case-host-data-at-rest-and-data-in-transit-protection)
-
-[2.3.10 Use Case: Generate MAC (HMAC with SHA2)
-34](#use-case-generate-mac-hmac-with-sha2)
-
-[2.3.11 Use Case: Verify Authorization (HMAC with SHA2)
-35](#use-case-verify-authorization-hmac-with-sha2)
-
-[2.3.12 Use Case: Generate Hash 36](#use-case-generate-hash)
-
-[3 Enabler APIs 37](#enabler-apis)
-
-[3.1 Service Layer Decomposition 38](#service-layer-decomposition)
-
-[3.1.1 optiga\_crypt 38](#optiga_crypt)
-
-[3.1.1.1 Basic (e.g. initialization, shielded connection settings)
-operations
-38](#basic-e.g.-initialization-shielded-connection-settings-operations)
-
-[3.1.1.2 Random generation operations 39](#_Toc83280057)
-
-[3.1.1.3 Hash operations 39](#hash-operations)
-
-[3.1.1.4 ECC based operations 39](#ecc-based-operations)
-
-[3.1.1.5 RSA based operations 40](#_Toc83280060)
-
-[3.1.1.6 Symmetric based operations 42](#symmetric-based-operations)
-
-[3.1.1.7 Hmac, key derivation based operations
-44](#hmac-key-derivation-based-operations)
-
-[3.1.2 optiga\_util 46](#optiga_util)
-
-[3.1.2.1 Basic (e.g. initialization, shielded connection settings)
-operations
-46](#basic-e.g.-initialization-shielded-connection-settings-operations-1)
-
-[3.1.2.2 Open and Close operations 47](#open-and-close-operations)
-
-[3.1.2.3 Read and Write operations 47](#read-and-write-operations)
-
-[3.1.2.4 Protected update operations 48](#protected-update-operations)
-
-[3.2 Abstraction Layer Decomposition
-49](#abstraction-layer-decomposition)
-
-[3.2.1 pal 49](#pal)
-
-[3.2.2 pal\_crypt 49](#pal_crypt)
-
-[3.2.3 pal\_gpio 50](#pal_gpio)
-
-[3.2.4 pal\_i2c 50](#pal_i2c)
-
-[3.2.5 pal\_os 51](#_Toc83280073)
-
-[3.3 Data Types 52](#_Toc83280074)
-
-[3.3.1 Enumerations 52](#enumerations)
-
-[4 OPTIGA™ Trust M External Interface 56](#_Toc83280076)
-
-[4.1 Warm Reset 56](#warm-reset)
-
-[4.2 Power Consumption 56](#power-consumption)
-
-[4.2.1 Sleep Mode 56](#sleep-mode)
-
-[4.3 Protocol Stack 56](#protocol-stack)
-
-[4.4 Commands 58](#commands)
-
-[4.4.1 Command definitions 58](#command-definitions)
-
-[4.4.1.1 OpenApplication 62](#openapplication)
-
-[4.4.1.2 CloseApplication 63](#closeapplication)
-
-[4.4.1.3 GetDataObject 64](#getdataobject)
-
-[4.4.1.4 SetDataObject 65](#setdataobject)
-
-[4.4.1.5 SetObjectProtected 66](#setobjectprotected)
-
-[4.4.1.6 GetRandom 68](#getrandom)
-
-[4.4.1.7 EncryptSym 69](#encryptsym)
-
-[4.4.1.8 DecryptSym 71](#decryptsym)
-
-[4.4.1.9 EncryptAsym 73](#encryptasym)
-
-[4.4.1.10 DecryptAsym 74](#decryptasym)
-
-[4.4.1.11 CalcHash 75](#calchash)
-
-[4.4.1.12 CalcSign 77](#calcsign)
-
-[4.4.1.13 VerifySign 78](#verifysign)
-
-[4.4.1.14 GenKeyPair 79](#genkeypair)
-
-[4.4.1.15 GenSymKey 80](#gensymkey)
-
-[4.4.1.16 CalcSSec 81](#calcssec)
-
-[4.4.1.17 DeriveKey 82](#derivekey)
-
-[4.4.2 Command Parameter Identifier 83](#command-parameter-identifier)
-
-[4.4.3 Command Performance 85](#command-performance)
-
-[4.5 Security Policy 86](#security-policy)
-
-[4.5.1 Overview 86](#overview-1)
-
-[4.5.2 Policy Attributes 87](#policy-attributes)
-
-[4.5.3 Policy Enforcement Point 87](#policy-enforcement-point)
-
-[4.6 Security Monitor 89](#security-monitor)
-
-[4.6.1 Security Events 89](#security-events)
-
-[4.6.2 Security Monitor Policy 89](#security-monitor-policy)
-
-[4.6.3 Security Monitor Configurations
-90](#security-monitor-configurations)
-
-[4.6.4 Security Monitor Characteristics
-91](#security-monitor-characteristics)
-
-[5 OPTIGA™ Trust M Data Structures 93](#optiga-trust-m-data-structures)
-
-[5.1 Overview Data and Key Store 93](#overview-data-and-key-store)
-
-[5.2 Access Conditions (ACs) 96](#access-conditions-acs)
-
-[5.3 Life Cycle State 101](#life-cycle-state)
-
-[5.4 Common and application specific objects and ACs
-102](#common-and-application-specific-objects-and-acs)
-
-[5.5 Metadata expression 105](#metadata-expression)
-
-[5.6 Common data structures 111](#common-data-structures)
-
-[5.7 Application-specific data structures
-115](#application-specific-data-structures)
-
-[6 Appendix 117](#_Toc83280119)
-
-[6.1 Command Coding Examples 117](#command-coding-examples)
-
-[6.2 Data encoding format examples 117](#data-encoding-format-examples)
-
-[6.2.1 ECC Private Key 117](#ecc-private-key)
-
-[6.2.2 ECC Public Key 118](#ecc-public-key)
-
-[6.2.3 ECDSA Signature 118](#ecdsa-signature)
-
-[6.2.4 RSA Private Key 119](#rsa-private-key)
-
-[6.2.5 RSA Public Key 120](#rsa-public-key)
-
-[6.2.6 RSA Signature 121](#rsa-signature)
-
-[6.3 Limitations 121](#limitations)
-
-[6.3.1 Memory Constraints 121](#memory-constraints)
-
-[6.4 Certificate Parser Details 121](#certificate-parser-details)
-
-[6.4.1 Parameter Validation 121](#parameter-validation)
-
-[6.5 Security Guidance 122](#security-guidance)
-
-[6.5.1 Use Case: Mutual Authentication -toolbox-
-122](#use-case-mutual-authentication--toolbox-)
-
-[6.5.2 Use Case: Host Firmware Update -toolbox-
-122](#use-case-host-firmware-update--toolbox-)
-
-[6.5.3 Key usage associated to toolbox functionality
-123](#key-usage-associated-to-toolbox-functionality)
-
-[6.5.4 Key pair generation associated to toolbox functionality
-123](#key-pair-generation-associated-to-toolbox-functionality)
-
-[6.5.5 Static key generation associated to toolbox functionality
-123](#static-key-generation-associated-to-toolbox-functionality)
-
-[6.5.6 Shared secret for key derivation or MAC generation associated to
-toolbox and protected update functionalities
-123](#shared-secret-for-key-derivation-or-mac-generation-associated-to-toolbox-and-protected-update-functionalities)
-
-[6.5.7 Auto states 124](#auto-states)
-
-[6.5.8 Shielded Connection 124](#shielded-connection)
-
-[6.5.9 Algorithm usage 124](#algorithm-usage)
-
-[6.6 Shielded Connection V1 Guidance
-124](#shielded-connection-v1-guidance)
-
-[6.6.1 Setup 125](#setup)
-
-[6.6.2 Usage 125](#usage)
-
-[6.6.3 Host authenticates OPTIGA™ 126](#host-authenticates-optiga)
-
-[6.6.3.1 Write and read nonce to/from a data object
-126](#write-and-read-nonce-tofrom-a-data-object)
-
-[6.6.3.2 Derive keys using nonce during run time
-126](#derive-keys-using-nonce-during-run-time)
-
-[6.6.3.3 Derive keys using nonce and a static (additional) pre-shared
-secret
-127](#derive-keys-using-nonce-and-a-static-additional-pre-shared-secret)
-
-[6.7 Protected Update 128](#protected-update)
-
-[6.7.1 Payload Confidentiality 129](#payload-confidentiality)
-
-[6.7.2 Format of keys in Payload 131](#format-of-keys-in-payload)
-
-[6.7.2.1 ECC 131](#ecc)
-
-[6.7.2.2 RSA 131](#rsa)
-
-[6.7.2.3 AES 132](#aes)
-
-[6.7.3 Metadata update 132](#metadata-update)
-
-[6.7.4 CDDL Tool 133](#cddl-tool)
-
-[6.8 Glossary 133](#glossary)
-
-[Revision history 135](#revision-history)
+[Table of Contents](#table-of-contents)
+
+- [1 Introduction](#introduction)
+  - [1.1 Abbreviations](#abbreviations)
+  - [1.2 Naming Conventions](#naming-conventions)
+  - [1.3 References](#references)
+  - [1.4 Overview](#overview)
+- [2 Supported use cases](#supported-use-cases)
+  - [2.1 Architecture Decomposition](#architecture-decomposition)
+    - [2.1.1 Host code size](#host-code-size)
+  - [2.2 Sequence Diagrams utilizing basic functionality](#sequence-diagrams-utilizing-basic-functionality)
+    - [2.2.1 Use Case: Read General Purpose Data - data object](#use-case-read-general-purpose-data---data-object)
+    - [2.2.2 Use Case: Read General Purpose Data - metadata](#use-case-read-general-purpose-data---metadata)
+    - [2.2.3 Use Case: Write General Purpose Data - data object](#use-case-write-general-purpose-data---data-object)
+    - [2.2.4 Use Case: Write General Purpose Data - metadata](#use-case-write-general-purpose-data---metadata)
+    - [2.2.5 Use Case: Integrity Protected Update of a data object](#use-case-integrity-protected-update-of-a-data-object)
+    - [2.2.6 Use Case: Confidentiality Protected Update of key or a data object](#use-case-confidentiality-protected-update-of-key-or-a-data-object)
+  - [2.3 Sequence Diagrams utilizing cryptographic toolbox functionality](#sequence-diagrams-utilizing-cryptographic-toolbox-functionality)
+    - [2.3.1 Use Case: Mutual Authentication establish session -toolbox-(TLS-Client)](#use-case-mutual-authentication-establish-session--toolbox--tls-client)
+    - [2.3.2 Use Case: Abbreviated Handshake -toolbox- (TLS-Client)](#use-case-abbreviated-handshake--toolbox--tls-client)
+    - [2.3.3 Use Case: Host Firmware Update](#use-case-host-firmware-update)
+    - [2.3.4 Use Case: Pair OPTIGA™ with Host (Pre-Shared Secret based)](#use-case-pair-optiga-with-host-pre-shared-secret-based)
+    - [2.3.5 Use Case: Verified Boot -toolbox-](#use-case-verified-boot--toolbox-)
+    - [2.3.6 Use Case: Update Platform Binding Secret during runtime(Pre-Shared Secret based)](#use-case-update-platform-binding-secret-during-runtime-pre-shared-secret-based)
+    - [2.3.7 Use Case: Local "data-at-rest" protection](#use-case-local-data-at-rest-protection)
+    - [2.3.8 Use Case: Local "data-at-rest" and "data-in-transit" protection](#use-case-local-data-at-rest-and-data-in-transit-protection)
+    - [2.3.9 Use Case: Host "data-at-rest" and "data-in-transit" protection](#use-case-host-data-at-rest-and-data-in-transit-protection)
+    - [2.3.10 Use Case: Generate MAC (HMAC with SHA2)](#use-case-generate-mac-hmac-with-sha2)
+    - [2.3.11 Use Case: Verify Authorization (HMAC with SHA2)](#use-case-verify-authorization-hmac-with-sha2)
+    - [2.3.12 Use Case: Generate Hash 36](#use-case-generate-hash)
+- [3 Enabler APIs](#enabler-apis)
+  - [3.1 Service Layer Decomposition](#service-layer-decomposition)
+    - [3.1.1 optiga\_crypt](#optiga_crypt)
+      - [3.1.1.1 Basic (e.g. initialization, shielded connection settings) operations](#basic-eg-initialization-shielded-connection-settings-operations)
+      - [3.1.1.2 Random generation operations](#random-generation-operations)
+      - [3.1.1.3 Hash operations](#hash-operations)
+      - [3.1.1.4 ECC based operations](#ecc-based-operations)
+      - [3.1.1.5 RSA based operations](#rsa-based-operations)
+      - [3.1.1.6 Symmetric based operations](#symmetric-based-operations)
+      - [3.1.1.7 Hmac, key derivation based operations](#hmac-key-derivation-based-operations)
+    - [3.1.2 optiga\_util](#optiga_util)
+      - [3.1.2.1 Basic (e.g. initialization, shielded connection settings)operations](#basic-eg-initialization-shielded-connection-settings-operations-1)
+      - [3.1.2.2 Open and Close operations](#open-and-close-operations)
+      - [3.1.2.3 Read and Write operations](#read-and-write-operations)
+      - [3.1.2.4 Protected update operations](#protected-update-operations)
+  - [3.2 Abstraction Layer Decomposition](#abstraction-layer-decomposition)
+    - [3.2.1 pal](#pal)
+    - [3.2.2 pal\_crypt](#pal_crypt)
+    - [3.2.3 pal\_gpio](#pal_gpio)
+    - [3.2.4 pal\_i2c](#pal_i2c)
+    - [3.2.5 pal\_os](#pal_os)
+  - [3.3 Data Types](#data-types)
+    - [3.3.1 Enumerations](#enumerations)
+- [4 OPTIGA™ Trust M External Interface](#optiga-trust-m-external-interface)
+  - [4.1 Warm Reset](#warm-reset)
+  - [4.2 Power Consumption](#power-consumption)
+    - [4.2.1 Sleep Mode](#sleep-mode)
+  - [4.3 Protocol Stack](#protocol-stack)
+  - [4.4 Commands](#commands)
+    - [4.4.1 Command definitions](#command-definitions)
+      - [4.4.1.1 OpenApplication](#openapplication)
+      - [4.4.1.2 CloseApplication](#closeapplication)
+      - [4.4.1.3 GetDataObject](#getdataobject)
+      - [4.4.1.4 SetDataObject](#setdataobject)
+      - [4.4.1.5 SetObjectProtected](#setobjectprotected)
+      - [4.4.1.6 GetRandom](#getrandom)
+      - [4.4.1.7 EncryptSym](#encryptsym)
+      - [4.4.1.8 DecryptSym](#decryptsym)
+      - [4.4.1.9 EncryptAsym](#encryptasym)
+      - [4.4.1.10 DecryptAsym](#decryptasym)
+      - [4.4.1.11 CalcHash](#calchash)
+      - [4.4.1.12 CalcSign](#calcsign)
+      - [4.4.1.13 VerifySign](#verifysign)
+      - [4.4.1.14 GenKeyPair](#genkeypair)
+      - [4.4.1.15 GenSymKey](#gensymkey)
+      - [4.4.1.16 CalcSSec](#calcssec)
+      - [4.4.1.17 DeriveKey](#derivekey)
+    - [4.4.2 Command Parameter Identifier](#command-parameter-identifier)
+    - [4.4.3 Command Performance](#command-performance)
+  - [4.5 Security Policy](#security-policy)
+    - [4.5.1 Overview](#overview-1)
+    - [4.5.2 Policy Attributes](#policy-attributes)
+    - [4.5.3 Policy Enforcement Point](#policy-enforcement-point)
+  - [4.6 Security Monitor](#security-monitor)
+    - [4.6.1 Security Events](#security-events)
+    - [4.6.2 Security Monitor Policy](#security-monitor-policy)
+    - [4.6.3 Security Monitor Configurations](#security-monitor-configurations)
+    - [4.6.4 Security Monitor Characteristics](#security-monitor-characteristics)
+- [5 OPTIGA™ Trust M Data Structures](#optiga-trust-m-data-structures)
+  - [5.1 Overview Data and Key Store](#overview-data-and-key-store)
+  - [5.2 Access Conditions (ACs)](#access-conditions-acs)
+  - [5.3 Life Cycle State](#life-cycle-state)
+  - [5.4 Common and application specific objects and ACs](#common-and-application-specific-objects-and-acs)
+  - [5.5 Metadata expression](#metadata-expression)
+  - [5.6 Common data structures](#common-data-structures)
+  - [5.7 Application-specific data structures](#application-specific-data-structures)
+- [6 Appendix](#appendix)
+  - [6.1 Command Coding Examples](#command-coding-examples)
+  - [6.2 Data encoding format examples](#data-encoding-format-examples)
+    - [6.2.1 ECC Private Key](#ecc-private-key)
+    - [6.2.2 ECC Public Key](#ecc-public-key)
+    - [6.2.3 ECDSA Signature](#ecdsa-signature)
+    - [6.2.4 RSA Private Key](#rsa-private-key)
+    - [6.2.5 RSA Public Key](#rsa-public-key)
+    - [6.2.6 RSA Signature](#rsa-signature)
+  - [6.3 Limitations](#limitations)
+    - [6.3.1 Memory Constraints](#memory-constraints)
+  - [6.4 Certificate Parser Details](#certificate-parser-details)
+    - [6.4.1 Parameter Validation](#parameter-validation)
+  - [6.5 Security Guidance](#security-guidance)
+    - [6.5.1 Use Case: Mutual Authentication -toolbox-](#use-case-mutual-authentication--toolbox-)
+    - [6.5.2 Use Case: Host Firmware Update -toolbox-](#use-case-host-firmware-update--toolbox-)
+    - [6.5.3 Key usage associated to toolbox functionality](#key-usage-associated-to-toolbox-functionality)
+    - [6.5.4 Key pair generation associated to toolbox functionality](#key-pair-generation-associated-to-toolbox-functionality)
+    - [6.5.5 Static key generation associated to toolbox functionality](#static-key-generation-associated-to-toolbox-functionality)
+    - [6.5.6 Shared secret for key derivation or MAC generation associated to toolbox and protected update functionalities](#shared-secret-for-key-derivation-or-mac-generation-associated-to-toolbox-and-protected-update-functionalities)
+    - [6.5.7 Auto states](#auto-states)
+    - [6.5.8 Shielded Connection](#shielded-connection)
+    - [6.5.9 Algorithm usage](#algorithm-usage)
+  - [6.6 Shielded Connection V1 Guidance](#shielded-connection-v1-guidance)
+    - [6.6.1 Setup](#setup)
+    - [6.6.2 Usage](#usage)
+    - [6.6.3 Host authenticates OPTIGA™](#host-authenticates-optiga)
+      - [6.6.3.1 Write and read nonce to/from a data object](#write-and-read-nonce-tofrom-a-data-object)
+      - [6.6.3.2 Derive keys using nonce during run time](#derive-keys-using-nonce-during-run-time)
+      - [6.6.3.3 Derive keys using nonce and a static (additional) pre-shared secret](#derive-keys-using-nonce-and-a-static-additional-pre-shared-secret)
+  - [6.7 Protected Update](#protected-update)
+    - [6.7.1 Payload Confidentiality](#payload-confidentiality)
+    - [6.7.2 Format of keys in Payload](#format-of-keys-in-payload)
+      - [6.7.2.1 ECC](#ecc)
+      - [6.7.2.2 RSA](#rsa)
+      - [6.7.2.3 AES](#aes)
+    - [6.7.3 Metadata update](#metadata-update)
+    - [6.7.4 CDDL Tool](#cddl-tool)
+  - [6.8 Glossary](#glossary)
+- [Revision history](#revision-history)
 
 # Introduction
 
