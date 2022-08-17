@@ -7050,9 +7050,7 @@ Vocabulary
 </tbody>
 </table>
 
-1.  All references regarding the OPTIGA™ Trust M version 1 (V1) and
-    version 3 (V3) are given generically without indicating the
-    dedicated version
+1.  All references regarding the OPTIGA™ Trust M version 1 (V1) and version 3 (V3) are given generically without indicating the dedicated version
 
 2.  The default setting is 400 KHz
 
