@@ -12,7 +12,7 @@
 * **OPTIGA_Trust_M_Host_Library_Documentation.chm** - A Windows Help file with the API description
 * **OPTIGA_Trust_M_Keys_And_Certificates_vX.XX.pdf** - A document which describes default PKI infrustructure, in which worm and what exactly do we store on chip in regards to Private Keys and Certificates. You might find the [Personalize OPTIGA™ Trust](https://github.com/Infineon/personalize-optiga-trust) Application Note usefull as well
 * **OPTIGA_Trust_M_Release_Notes_vX.XX.pdf** - A history of changes for all the releases the product had
-* **OPTIGA_Trust_M_Solution_Reference_Manual_vX.XX.pdf** - A document which describes in more details:
+* **OPTIGA_Trust_M_Solution_Reference_Manual_vX.XX.md** - A document which describes in more details:
     * Features and properties of the security chip in more details
     * Use cases
     * Application areas
