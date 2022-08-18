@@ -1,4 +1,4 @@
-# OPTIGA™ Trust M Solution Reference Manual v3.30 ([pdf](https://github.com/Infineon/optiga-trust-m/raw/develop/documents/srm_files/media/OPTIGA%E2%84%A2_Trust_M_Solution_Reference_Manual_v3.30.pdf))
+# OPTIGA™ Trust M Solution Reference Manual v3.30 ([pdf](OPTIGA%E2%84%A2_Trust_M_Solution_Reference_Manual_v3.30.pdf))
 
 
 **About this document**
@@ -566,12 +566,10 @@ is:
 
 |                                      |
 | ------------------------------------ |
-| ![728,6](srm_files/media/image4.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image4.tmp) |
 
 Figure 1 - OPTIGA Trust Communication Protection - toolbox - View
 
-**  
-**
 
 ### Host code size
 
@@ -649,7 +647,7 @@ invocation of the *optiga\_cmd* module will interrupt the execution).
 
 |                                      |
 | ------------------------------------ |
-| ![728,6](srm_files/media/image5.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image5.tmp) |
 
 Figure 2 - Use Case: Read General Purpose Data - data object
 
@@ -669,7 +667,7 @@ the execution).
 
 |                                      |
 | ------------------------------------ |
-| ![728,6](srm_files/media/image6.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image6.tmp) |
 
 Figure 3 - Use Case: Read General Purpose Data - metadata
 
@@ -696,7 +694,7 @@ invocation of the *optiga\_cmd* module will interrupt the execution).
 
 |                                      |
 | ------------------------------------ |
-| ![728,6](srm_files/media/image7.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image7.tmp) |
 
 Figure 4 - Use Case: Write General Purpose Data - data object
 
@@ -721,7 +719,7 @@ updating metadata associated to a data object.
 
 |                                      |
 | ------------------------------------ |
-| ![728,6](srm_files/media/image8.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image8.tmp) |
 
 Figure 5 - Use Case: Write General Purpose Data - metadata
 
@@ -749,7 +747,7 @@ object.
 
 |                                      |
 | ------------------------------------ |
-| ![728,6](srm_files/media/image9.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image9.tmp) |
 
 Figure 6 - Use Case: Integrity Protected Update of a data object
 
@@ -783,7 +781,7 @@ updates the target data/key object.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image10.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image10.tmp) |
 
 Figure 7 - Use Case: Confidentiality Protected Update of key or a data
 object
@@ -824,14 +822,14 @@ is authenticated as well.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image11.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image11.tmp) |
 
 Figure 8 - Use Case: Mutual Authentication establish session -toolbox-
 (TLS-Client)
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image12.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image12.tmp) |
 
 Figure 9 - Use Case: Mutual Auth establish session -toolbox-
 (TLS-Client) cont'd
@@ -866,7 +864,7 @@ with further commands.*
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image13.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image13.tmp) |
 
 Figure 10 - Use Case: Abbreviated Handshake -toolbox- (TLS-Client)
 
@@ -900,7 +898,7 @@ diagram is provided to show the functions involved in performing.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image14.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image14.tmp) |
 
 Figure 11 - Use Case: Host Firmware Update
 
@@ -924,7 +922,7 @@ comprises at least of the Host and the OPTIGA™.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image15.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image15.tmp) |
 
 Figure 12 - Use Case: Pair OPTIGA™ with Host (Pre-Shared Secret based)
 
@@ -949,7 +947,7 @@ integrated in the boot process and the OPTIGA™.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image16.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image16.tmp) |
 
 Figure 13 - Use Case: Verified Boot
 -toolbox-
@@ -975,7 +973,7 @@ comprises the Host and the OPTIGA™.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image17.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image17.tmp) |
 
 Figure 14 - Use Case: Update Platform Binding Secret during runtime
 (Pre-Shared Secret based)
@@ -1011,7 +1009,7 @@ local data by the Host.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image18.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image18.tmp) |
 
 Figure 15 - Use Case: Local "data-at-rest" protection
 
@@ -1038,7 +1036,7 @@ the metadata associated with the target data objects.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image19.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image19.tmp) |
 
 Figure 16 - Use Case: Local "data-at-rest" and "data-in-transit"
 protection
@@ -1067,7 +1065,7 @@ Note: OPTIGA™ Trust M V1 doesn’t support symmetric algorithms.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image20.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image20.tmp) |
 
 Figure 17 - Use Case: Host "data-at-rest" and "data-in-transit"
 protection
@@ -1091,7 +1089,7 @@ Note: OPTIGA™ Trust M V1 doesn’t support HMAC based operations.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image21.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image21.tmp) |
 
 Figure 18 - Use Case: Generate MAC (HMAC with SHA2)
 
@@ -1114,7 +1112,7 @@ input data using the secret installed at OPTIGA™.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image22.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image22.tmp) |
 
 Figure 19 - Use Case: Verify Authorization (HMAC with SHA2)
 
@@ -1134,7 +1132,7 @@ input data using OPTIGA™.
 
 |                                       |
 | ------------------------------------- |
-| ![728,6](srm_files/media/image23.tmp) |
+| ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image23.tmp) |
 
 Figure 20 - Use Case: Generate Hash
 
@@ -1169,7 +1167,7 @@ party*.
 
 |                                        |
 | -------------------------------------- |
-| ![481,95](srm_files/media/image24.png) |
+| ![481,95](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image24.png) |
 
 Figure 21 – OPTIGA™ Trust Enabler Software Overview
 
@@ -1181,7 +1179,7 @@ interface.
 
 |                                        |
 | -------------------------------------- |
-| ![481,95](srm_files/media/image25.tmp) |
+| ![481,95](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image25.tmp) |
 
 Figure 22 - Service Layer Decomposition
 
@@ -1801,7 +1799,7 @@ components of the architecture.
 
 |                                        |
 | -------------------------------------- |
-| ![481,95](srm_files/media/image26.tmp) |
+| ![481,95](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image26.tmp) |
 
 Figure 23 - Abstraction Layer Decomposition
 
@@ -1815,8 +1813,7 @@ platform\_socket, ...) to allow the modules calling it being platform
 agnostic. The [pal](#pal) is composed of hardware, software and an
 operating system abstraction part.
 
-19. pal
-APIs
+19. pal APIs
 
 | API Name    | Description                                                                                                                                |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -1830,8 +1827,7 @@ platform-specific cryptographic functionality (either SW libraries or
 HW) and is exposing cryptographic primitives invoked by platform
 agnostic modules.
 
-20. pal\_crypt
-APIs
+20. pal\_crypt APIs
 
 | API Name                         | Description                                                                                                                                                                                          |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1869,8 +1865,7 @@ platform agnostic modules. It is assumed that multiple callers are
 invoking its API concurrently. Therefore, the implementation of each API
 function is atomic and stateless (except the initialization).
 
-22. pal\_i2c
-APIs
+22. pal\_i2c APIs
 
 | API Name               | Description                                                  |
 | ---------------------- | ------------------------------------------------------------ |
@@ -1886,8 +1881,7 @@ The pal\_os module provides the platform specific migration of operating
 system (e.g. RTOS) based functionality, which is invoked by platform
 agnostic modules.
 
-23. pal\_os
-APIs
+23. pal\_os APIs
 
 | API Name                                      | Description                                                                                                                                                                |
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -2189,7 +2183,7 @@ command is pending, the OPTIGA™ enters sleep mode.
 
 |                                       |
 | ------------------------------------- |
-| ![550,8](srm_files/media/image27.wmf) |
+| ![550,8](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image27.png) |
 
 Figure 24 - Go-to-Sleep diagram
 
@@ -2206,9 +2200,9 @@ flow control, chaining and optional communication protection.
 The used ISO/OSI layers are Physical, Data Link, Network, Transport,
 Presentation and Application layer as the figure below depicts.
 
-|  |
-|  |
-|  |
+|                                       |
+| ------------------------------------- |
+| ![550,8](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image28.png) |
 
 Figure 25 - Overview protocol stack used
 
@@ -2277,8 +2271,7 @@ behave.
 '[Command Codes](#link545fc126_9458_4808_8513_3a502bdb4c75)' lists the
 command codes for the functionality provided by the OPTIGA™.
 
-14. > Command
-codes
+14. > Command codes
 
 | Command code | Command                                   | Short description                                                                          |
 | ------------ | ----------------------------------------- | ------------------------------------------------------------------------------------------ |
@@ -2308,8 +2301,7 @@ commands.
 '[APDU Fields](#linkfb81c6eb_37d0_4dc9_b9bc_7bc31b175f9a)' lists the
 fields contained in a command and response APDU.
 
-15. > APDU
-Fields
+15. > APDU Fields
 
 | Name    | Description                                                                                                  |
 | ------- | ------------------------------------------------------------------------------------------------------------ |
@@ -4323,9 +4315,9 @@ combines the [Policy Attributes](#policy-attributes) with the access
 conditions associated with each key or data object and finally judges
 whether the intended access is permitted or not.
 
-|  |
-|  |
-|  |
+|                                       |
+| ------------------------------------- |
+| ![550,8](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image29.png) |
 
 Figure 26 - Security Policy Architecture
 
@@ -4355,9 +4347,9 @@ dedicated key or data object, which is addressed by its unique object
 identifier (OID). The diagram below depicts the flow, which leads to
 granting or denying the respective access.
 
-|  |
-|  |
-|  |
+|                                       |
+| ------------------------------------- |
+| ![550,8](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image30.png) |
 
 Figure 27 - Policy Enforcement Flow
 
@@ -4382,8 +4374,7 @@ accordingly.
 the definition of not permitted security events considered by the
 OPTIGA™ implementation.
 
-43. > Security
-Events
+43. > Security Events
 
 | Name                    | Description                                                                                                                                                                                                                            |
 | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -4511,9 +4502,9 @@ The offset details of above specified configurations in Security Monitor
 Configurations data object are specified in [Security Monitor
 Configurations](#link7f56e886_b92e_4abe_a5ef_e282eb2b24c2) table.
 
-|  |
-|  |
-|  |
+|                                       |
+| ------------------------------------- |
+| ![550,8](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image31.png) |
 
 Figure 28 - Security Monitor flow diagram
 
@@ -4543,9 +4534,9 @@ t<sub>max</sub> period. With other words, the delay starts as soon as
 SEC reaches the value of 128 and will be t<sub>max</sub> in case the SEC
 reaches its maximum value of 255.
 
-|  |
-|  |
-|  |
+|                                       |
+| ------------------------------------- |
+| ![550,8](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image32.png) |
 
 Figure 29 - Power profile
 
@@ -4571,9 +4562,9 @@ profile*") for functionalities which potentially triggering [Security
 Events](#security-events). However, the method of switching VCC off and
 on is limited to 200.000 times over lifetime.
 
-|  |
-|  |
-|  |
+|                                       |
+| ------------------------------------- |
+| ![550,8](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image33.png) |
 
 Figure 30 - Throttling down profile
 
@@ -4660,15 +4651,15 @@ are meet and for higher cycled data objects the homogeneous distributed
 of applied programming cycles across lifetime are respected, the data
 integrity over lifetime could be considered being safe.
 
-|  |
-|  |
-|  |
+|                                       |
+| ------------------------------------- |
+| ![550,8](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image34.png) |
 
 Figure 31 – OPTIGA™ Trust M (V1) : Overview Data and Key Store
 
-|  |
-|  |
-|  |
+|                                       |
+| ------------------------------------- |
+| ![550,8](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image35.png) |
 
 Figure 32 – OPTIGA™ Trust M (V3) : Overview Data and Key Store
 
@@ -5502,13 +5493,13 @@ Identifier](#linka946a953_def2_41cf_850a_74fb7899fe11).
 
 |                                  |
 | -------------------------------- |
-| ![](srm_files/media/image36.png) |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image36.png) |
 
 Figure 33 - Metadata sample
 
 |                                  |
 | -------------------------------- |
-| ![](srm_files/media/image37.png) |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image37.png) |
 
 Figure 34 - SetDataObject (Metadata) examples
 
@@ -5766,7 +5757,7 @@ UID data object starting from offset 2 is as shown below.
 
 |                                  |
 | -------------------------------- |
-| ![](srm_files/media/image38.png) |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image38.png) |
 
 Figure 35 - GetDataObject \[Read data\] example
 
@@ -5779,7 +5770,7 @@ arbitrary data object 0xF1D0 starting from offset 9 is as shown below.
 
 |                                  |
 | -------------------------------- |
-| ![](srm_files/media/image39.png) |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image39.png) |
 
 Figure 36 - GetDataObject \[Read data\] example
 
@@ -6450,9 +6441,9 @@ The OPTIGA™ Shielded Connection enables a protected (Integrity and
 Confidentiality) communication between the OPTIGA™ and a corresponding
 Host platform as depicted in figure below.
 
-|  |
-|  |
-|  |
+|                                  |
+| -------------------------------- |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image40.png) |
 
 Figure 37 - Overview OPTIGA™ Shielded Connection
 
@@ -6577,7 +6568,7 @@ the same data object to authenticate OPTIGA™ and to ensure the freshness
 
 |                                  |
 | -------------------------------- |
-| ![](srm_files/media/image41.emf) |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image41.png) |
 
 Figure 38 - Write and read nonce to/from a data object
 
@@ -6606,7 +6597,7 @@ side) in shielded connection.
 
 |                                  |
 | -------------------------------- |
-| ![](srm_files/media/image42.emf) |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image42.png) |
 
 Figure 39 - Derive keys using nonce during run time
 
@@ -6645,7 +6636,7 @@ freshness (at host side) in shielded connection.
 
 |                                  |
 | -------------------------------- |
-| ![](srm_files/media/image43.emf) |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image43.png) |
 
 Figure 40 - Derive keys using nonce and a static (additional) pre-shared
 secret
@@ -6662,7 +6653,7 @@ binary data.
 
 |                                  |
 | -------------------------------- |
-| ![](srm_files/media/image44.emf) |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image44.png) |
 
 Figure 41 – Protected update – high level structure
 
@@ -6730,9 +6721,9 @@ encryption algorithm details are specified in the manifest.
 
 The below figure depicts the derivation of encryption key.
 
-|  |
-|  |
-|  |
+|                                  |
+| -------------------------------- |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image45.png) |
 
 Figure 42 – Protected Update - Derivation for Payload Encryption Key
 
@@ -6746,18 +6737,18 @@ algorithm chosen.
 The below figure depicts the components (input and output) involved as
 part of encryption
 
-|  |
-|  |
-|  |
+|                                  |
+| -------------------------------- |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image46.png) |
 
 Figure 43 – Protected Update - Payload Encryption
 
 The below figure depicts the components (input and output) involved as
 part of decryption
 
-|  |
-|  |
-|  |
+|                                  |
+| -------------------------------- |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image47.png) |
 
 Figure 44 – Protected Update - Payload Decryption
 
@@ -6802,9 +6793,9 @@ As part of protected update data set, the keys (e.g. ECC, RSA, AES,
 etc.) are provided in specific format as part of payload based on the
 key type as given below.
 
-|  |
-|  |
-|  |
+|                                  |
+| -------------------------------- |
+| ![](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image48.png) |
 
 Figure 45 – Protected Update – Encoding of keys in Payload
 
