@@ -1,20 +1,33 @@
-# OPTIGA&trade; Trust M Software Framework
+# Infineon OPTIGA&trade; Trust M
 
 ## Quick navigation
 
-<a href="https://github.com/Infineon/optiga-trust-m#description"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_1.jpg" width="256" height="192"></a> <a href="https://github.com/Infineon/optiga-trust-m#examples"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_2.jpg" width="256" height="192"></a>  <a href="https://github.com/Infineon/optiga-trust-m#get-started"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_3.jpg" width="256" height="192"></a>
+1. [Security Solution](#security-solution)
+    * [Description](#description)
+    * [Key Features and benefits](#key-features-and-benefits)
+    * [Features table](#features-table)
+    * [Provisioning Options](#provisioning-options)
+2. [Get Started](#get-started)
+    * [Boards](#boards)
+    * [Examples](#examples)
+    * [Software Framework overview](#software-framework-overview)
+    * [Evaluation and developement kits](#evaluation-and-developement-kits)
+3. [Documentation](#documentation)
+    * [Usefull articles](#usefull-articles)
+    * [Datasheet and Co.](#datasheet-and-co)
+    * [Board assembly recommendations](#board-assembly-recommendations)
+4. [Contributing](#contributing)
+5. [License](#license)
 
-<a href="https://github.com/Infineon/optiga-trust-m#documentation"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_4.jpg" width="256" height="192"></a> <a href="https://github.com/Infineon/optiga-trust-m/wiki/Crypto-Performance"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_5.jpg" width="256" height="192"></a>  <a href="https://github.com/Infineon/optiga-trust-m/wiki/Trust-M-Crypt-API"><img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_x_gitrepo_tile_6.jpg" width="256" height="192"></a>
+## Security Solution
 
-## Security Chip
-
-### <a name="description"></a>Description
+### Description
 
 <img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_uson10.png" width="300" >
 
-This repository contains a target-agnostic Software Framework for the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) security chip. It is a base for other application notes. **Be aware that this software comes without any security claims and shall be used for evaluation purpose.**
+This repository contains a target-agnostic Software Framework for the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) security solution. It is a base for other application notes. **Be aware that this software comes without any security claims and shall be used for evaluation purpose.**
 
-### <a name="key_features_and_benefits"></a>Key Features and Benefits
+### Key Features and Benefits
 * High-end security controller
 * Common Criteria Certified EAL6+ (high) hardware
 * Turnkey solution
@@ -33,7 +46,7 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
 * Hibernate for zero power consumption
 * Lifetime for Industrial Automation and Infrastructure is 20 years and 15 years for other Application Profiles  
 
-### OPTIGA&trade; Trust M features table
+### Features table
 
 <table class="tg">
   <tr>
@@ -118,6 +131,103 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
   </tr>
 </table>
 
+### Provisioning Options
+
+#### Confgiurations
+
+There are three main provisioning options/confgiurations availble:
+
+1. **OPTIGA&trade; Trust M V1/V3** - a provisioning configuration which comes as a standard for all shipped devices. Unless mentioned differently all OPTIGA Trust M chips on the market have this configuration. 
+    * [Sample OPTIGA&trade; Trust M V1 Open Objects Dump](https://github.com/Infineon/optiga-trust-m/files/9281936/trust_m1_json.txt)
+    * [Sample OPTIGA&trade; Trust M V3 Open Objects Dump](https://github.com/Infineon/optiga-trust-m/files/9281926/trust_m3_json.txt)
+2. **OPTIGA&trade; Trust M Custom** - a custom provisioning option done on demand upon reaching a MoQ. Fully customisable solution including Security Monitor Configuration  
+3. **OPTIGA&trade; Trust M Express** - a provisioning configuration which can be ordered standalone. Credentials and unique data can be downlaoded through CIRRENT™ Cloud ID
+    * [Sample OPTIGA Trust M Express Certificate](https://github.com/Infineon/optiga-trust-m/files/9281778/trust_express_sample2_json.txt)
+
+#### Comparison Table
+
+<table>
+<thead>
+  <tr>
+    <th></th>
+    <th>V1</th>
+    <th>V3</th>
+    <th colspan="3">Express</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td></td>
+    <th>Certificate - </br>Private Key</th>
+    <th>Certificate - </br>Private Key</th>
+    <th colspan="3">Certificate* - Private Key</th>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/Infineon/optiga-trust-m/wiki/Data-and-Key-Store-Overview" target="_blank" rel="noopener noreferrer">Object IDs</a></td>
+    <td>E0E0 - E0F0</td>
+    <td>E0E0 - E0F0</td>
+    <td>E0E0 - E0F0</td>
+    <td>E0E1 - E0F1</td>
+    <td>E0E2 - E0FC</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/Infineon/optiga-trust-m/blob/develop/documents/OPTIGA_Trust_M_Keys_And_Certificates_v3.10.pdf" target="_blank" rel="noopener noreferrer">PKI</a> Top Level</td>
+    <td><a href="https://github.com/Infineon/optiga-trust-m/raw/support/m1/certificates/Infineon%20ECC%20Root%20CA%20C%20v01%2000.crt" target="_blank" rel="noopener noreferrer">ECC Root CA1</a></td>
+    <td><a href="https://pki.infineon.com/OptigaECCRootCA2/OptigaECCRootCA2.crt" target="_blank" rel="noopener noreferrer">ECC Root CA2</a></td>
+    <td><a href="https://pki.infineon.com/OptigaECCRootCA2/OptigaECCRootCA2.crt" target="_blank" rel="noopener noreferrer">ECC Root CA2</a></td>
+    <td><a href="https://pki.infineon.com/OptigaECCRootCA2/OptigaECCRootCA2.crt" target="_blank" rel="noopener noreferrer">ECC Root  CA2</a></td>
+    <td><a href="https://pki.infineon.com/OptigaRSARootCA2/OptigaRSARootCA2.crt" target="_blank" rel="noopener noreferrer">RSA Root CA2</a></td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/Infineon/optiga-trust-m/blob/develop/documents/OPTIGA_Trust_M_Keys_And_Certificates_v3.10.pdf" target="_blank" rel="noopener noreferrer">PKI</a> Intermediate Level</td>
+    <td><a href="https://github.com/Infineon/optiga-trust-m/raw/support/m1/certificates/Infineon%20OPTIGA(TM)%20Trust%20M%20CA%20101.crt" target="_blank" rel="noopener noreferrer">Int. CA 101</a></td>
+    <td><a href="https://github.com/Infineon/optiga-trust-m/blob/develop/certificates/Infineon%20OPTIGA(TM)%20Trust%20M%20CA%20300.crt" target="_blank" rel="noopener noreferrer">Int. CA 300</a></td>
+    <td><a href="https://pki.infineon.com/OptigaTrustEccCA306/OptigaTrustEccCA306.crt" target="_blank" rel="noopener noreferrer">Int. CA 306</a></td>
+    <td><a href="https://pki.infineon.com/OptigaTrustEccCA306/OptigaTrustEccCA306.crt" target="_blank" rel="noopener noreferrer">Int. CA 306</a></td>
+    <td><a href="https://pki.infineon.com/OptigaTrustRsaCA309/OptigaTrustRsaCA309.crt" target="_blank" rel="noopener noreferrer">Int. CA 309</a></td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/Infineon/optiga-trust-m/blob/develop/documents/OPTIGA_Trust_M_Keys_And_Certificates_v3.10.pdf" target="_blank" rel="noopener noreferrer">PKI</a> Bottom Level: Key Algorithm</td>
+    <td>NIST P-256</td>
+    <td>NIST P-256</td>
+    <td>NIST P-256</td>
+    <td>NIST P-256</td>
+    <td>RSA2048</td>
+  </tr>
+  <tr>
+    <td>Possible to Readout</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>With PBS*</td>
+    <td>Yes</td>
+  </tr>
+  <tr>
+    <td>Possible to Update</td>
+    <td>Only Certificate</td>
+    <td>Only Certificate</td>
+    <td>Only Certificate with PBS* and Auth.Ref.*</td>
+    <td>Only Certertificate with PBS* and Auth.Ref.*</td>
+    <td>Only Certificate with PBS* and Auth.Ref.*</td>
+  </tr>
+  <tr>
+    <td>Default Lifecycle State</td>
+    <td>Creation</td>
+    <td>Creation</td>
+    <td>Operational</td>
+    <td>Operational</td>
+    <td>Operational</td>
+  </tr>
+</tbody>
+</table>
+
+\* Certificate, Platform Binding Secret (PBS) and the Authorization Reference (Auth.Ref.) can be downloaded from CIRRENT™ Cloud ID by claiming a Reel QR Code 
+
+In addition to the certificates and private keys each OPTIGA&trade; Trust M Express comes with a chip unique Platform Binding Secret* and an Authorization Reference*. The latter are two unique per chip 64 bytes long data objects which serve the following purposes:
+- Platform Binding Secret (PBS) used to establish a Shielded Connection between a Host MCU and OPTIGA&trade; Trust M. Should be transfered from CIRRENT™ Cloud ID to the respective MCU to run a protected I2C connection; e.g. readout a protected Certificate located in the 0xE0E1 Object ID (see table above). For more details about  Shielded Connection read [here](https://github.com/Infineon/optiga-trust-m/wiki/Shielded-Connection-101).
+- Authorization Reference (Auth. Ref.). Used to update/change Certificate, PBS and the Authorization Reference itself. Similar to the PBS shall be tranfered to the Host MCU to be used. Find more details in the [Solution Reference Manual](documents/OPTIGA™%20Trust%20M%20Solution%20Reference%20Manual%20v3.30.md)
+
+
 ## Get Started
 
 ### Boards
@@ -128,10 +238,15 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
 
 Get started with the [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/) or with the [OPTIGA™ Trust IoT Security Development kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-iot-kit/) using [this](https://github.com/Infineon/getstarted-optiga-trust-m) Application Note
 
-### <a name="examples"></a>Examples
+### Examples
 
 1. [Get started guide](https://github.com/Infineon/getstarted-optiga-trust-m)
+1. ModusToolbox™ Code Examples
+    - [OPTIGA™ Trust M: Cryptography](https://github.com/Infineon/mtb-example-optiga-crypto)
+    - [OPTIGA™ Trust M: MQTT Client](https://github.com/Infineon/mtb-example-optiga-mqtt-client)
+    - [OPTIGA™ Trust M: Power management](https://github.com/Infineon/mtb-example-optiga-power-management)
 1. [Off-Chip TLS example (mbedTLS)](https://github.com/Infineon/mbedtls-optiga-trust-m)
+1. [Linux Command Line Interface](https://github.com/Infineon/linux-optiga-trust-m)
 1. Cloud:
     1. [AWS FreeRTOS example](https://github.com/Infineon/amazon-freertos-optiga-trust)
     1. [Microsoft Azure IoT example](https://github.com/Infineon/azure-optiga-trust-m)
@@ -139,11 +254,10 @@ Get started with the [OPTIGA™ Trust M evaluation kit](https://www.infineon.com
 1. Secure Firmware Update and Secure Boot (link is pending)
 1. [Arduino library](https://github.com/Infineon/arduino-optiga-trust-m)
 1. [Personalize OPTIGA™ Trust](https://github.com/Infineon/personalize-optiga-trust)
-1. [OpenSSL Engine Command Line Interface and AWS IoT C SDK (for RPi3)](https://github.com/Infineon/cli-optiga-trust-m)
 1. [Python package](https://github.com/Infineon/python-optiga-trust)
 1. [I2C Utilities](https://github.com/Infineon/i2c-utils-optiga-trust)
 
-### <a name="software_framework_oveview"></a>Software Framework overview
+### Software Framework overview
 
 ![](https://github.com/Infineon/Assets/raw/master/Pictures/optiga_trust_m_system_block_diagram_v3.png)
 
@@ -155,7 +269,7 @@ Get started with the [OPTIGA™ Trust M evaluation kit](https://www.infineon.com
 
 For more information please refer to the [Wiki page](https://github.com/Infineon/optiga-trust-m/wiki) of this project
 
-### <a name="evaluation_development_kits"></a>Evaluation and developement kits
+### Evaluation and developement kits
 
 External links, open in the same tab.
 * [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/)
@@ -176,7 +290,7 @@ External links, open in the same tab.
   <img src="https://github.com/Infineon/Assets/blob/master/Pictures/optiga_trust_m_shield2go_schematics.png" alt="drawing"/>
   </details>
 
-## <a name="documentation"></a>Documentation
+## Documentation
 
 ### Usefull articles
 
@@ -209,9 +323,9 @@ Other downloadable PDF documents can be found below:
 If you are planning to integrate OPTIGA™ Trust M in your PCB design have a look at the recommendations found [here (external, opens in the same tab)](https://www.infineon.com/dgdl/Infineon-Additional_product_information_SON_packages-AN-v00_01-EN.pdf?fileId=db3a30433e82b1cf013e82faab2000e5).
 
 
-## <a name="contributing"></a>Contributing
+## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## <a name="license"></a>License
+## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
