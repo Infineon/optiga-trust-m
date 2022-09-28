@@ -6,7 +6,7 @@
     * [Description](#description)
     * [Key Features and benefits](#key-features-and-benefits)
     * [Features table](#features-table)
-    * [Provisioning Options](#provisioning-options)
+    * [Provisioning Options (V1, V3, Express)](#provisioning-options-v1-v3-express)
 2. [Get Started](#get-started)
     * [Boards](#boards)
     * [Examples](#examples)
@@ -131,11 +131,13 @@ This repository contains a target-agnostic Software Framework for the [OPTIGA™
   </tr>
 </table>
 
-### Provisioning Options
+### Provisioning Options (V1, V3, Express)
 
 #### Confgiurations
 
 There are three main provisioning options/confgiurations availble:
+
+**Note: All three configuration options have no effect on the corresponding features. For example, OPTIGA&trade; Trust M Express has the same features as OPTIGA&trade; Trust M V3, also the same API and hostcode can be used to work with all three solutions.**
 
 1. **OPTIGA&trade; Trust M V1/V3** - a provisioning configuration which comes as a standard for all shipped devices. Unless mentioned differently all OPTIGA Trust M chips on the market have this configuration. 
     * [Sample OPTIGA&trade; Trust M V1 Open Objects Dump](https://github.com/Infineon/optiga-trust-m/files/9281936/trust_m1_json.txt)
