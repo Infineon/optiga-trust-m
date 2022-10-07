@@ -144,7 +144,7 @@ There are three main provisioning options/confgiurations availble:
     * [Sample OPTIGA&trade; Trust M V3 Open Objects Dump](https://github.com/Infineon/optiga-trust-m/files/9281926/trust_m3_json.txt)
 2. **OPTIGA&trade; Trust M Custom** - a custom provisioning option done on demand upon reaching a MoQ. Fully customisable solution including Security Monitor Configuration  
 3. **OPTIGA&trade; Trust M Express** - a provisioning configuration which can be ordered standalone. Credentials and unique data can be downlaoded through CIRRENT™ Cloud ID
-    * [Sample OPTIGA Trust M Express Certificate](https://github.com/Infineon/optiga-trust-m/files/9281778/trust_express_sample2_json.txt)
+    * [Sample OPTIGA Trust M Express Open Objects Dump](https://github.com/Infineon/optiga-trust-m/files/9281778/trust_express_sample2_json.txt)
 
 #### Comparison Table
 
