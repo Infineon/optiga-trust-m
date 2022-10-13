@@ -257,6 +257,7 @@ Get started with the [OPTIGA™ Trust M evaluation kit](https://www.infineon.com
     - [OPTIGA™ Trust M: Cryptography](https://github.com/Infineon/mtb-example-optiga-crypto)
     - [OPTIGA™ Trust M: MQTT Client](https://github.com/Infineon/mtb-example-optiga-mqtt-client)
     - [OPTIGA™ Trust M: Power management](https://github.com/Infineon/mtb-example-optiga-power-management)
+    - [OPTIGA™ Trust M: Data management](https://github.com/Infineon/mtb-example-optiga-data-management)
 1. [Off-Chip TLS example (mbedTLS)](https://github.com/Infineon/mbedtls-optiga-trust-m)
 1. [Linux Command Line Interface](https://github.com/Infineon/linux-optiga-trust-m)
 1. Cloud:
