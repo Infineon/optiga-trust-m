@@ -270,10 +270,7 @@ pal_status_t pal_i2c_set_bitrate(const pal_i2c_t * p_i2c_context, uint16_t bitra
             bitrate = PAL_I2C_MASTER_MAX_BITRATE;
         }
 
-        setDataRate = _cyhal_i2c_set_peri_divider(i2cObj->base,
-                                                 1,
-                                                 (bitrate * 1000),
-                                                 false);
+        setDataRate = _cyhal_i2c_set_peri_divider(i2cObj, 1, (bitrate * 1000), false);
         if (0 == setDataRate)
         {
 
