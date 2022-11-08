@@ -2,7 +2,7 @@
 * \copyright
 * MIT License
 *
-* Copyright (c) 2021 Infineon Technologies AG
+* Copyright (c) 2022 Infineon Technologies AG
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -55,6 +55,7 @@ extern pal_gpio_t optiga_reset_0;
 
 pal_status_t pal_init(void)
 {
+    pal_os_event_init();
     #ifdef OPTIGA_TRUSTM_VDD
     pal_gpio_init(&optiga_vdd_0);
     #endif
