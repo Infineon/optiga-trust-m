@@ -327,7 +327,7 @@ For high level description and some important excerpts from the documentation pl
 
 Other downloadable PDF documents can be found below:
 1. [OPTIGA™ Trust M Datasheet v3.40](documents/OPTIGA_Trust_M_Datasheet_v3.40.pdf) (PDF)
-2. [OPTIGA™ Trust M Solution Reference Manual v3.30](documents/OPTIGA_Trust_M_Solution_Reference_Manual_v3.30.pdf) (PDF)
+2. [OPTIGA™ Trust M Solution Reference Manual v3.50](documents/OPTIGA_Trust_M_Solution_Reference_Manual_v3.50.pdf) (PDF)
 3. [OPTIGA™ Trust M Keys and Certificates v3.10](documents/OPTIGA_Trust_M_Keys_And_Certificates_v3.10.pdf) (PDF)
 4. [Infineon I2C protocol specification v2.03](documents/Infineon_I2C_Protocol_v2.03.pdf) (PDF)
 
