@@ -1,4 +1,4 @@
-# OPTIGA™ Trust M Solution Reference Manual v3.30 ([pdf](https://github.com/Infineon/optiga-trust-m/raw/develop/documents/OPTIGA_Trust_M_Solution_Reference_Manual_v3.50.pdf))
+# OPTIGA™ Trust M Solution Reference Manual v3.50 ([pdf](https://github.com/Infineon/optiga-trust-m/raw/develop/documents/OPTIGA_Trust_M_Solution_Reference_Manual_v3.50.pdf))
 
 
 **About this document**
