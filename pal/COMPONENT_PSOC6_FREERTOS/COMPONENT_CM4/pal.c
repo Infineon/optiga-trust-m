@@ -43,7 +43,6 @@
 #include "pal_psoc_gpio_mapping.h"
 #include "optiga_lib_config.h"
 
-extern void pal_os_event_init(void);
 #ifdef OPTIGA_TRUSTM_VDD
 extern pal_gpio_t optiga_vdd_0;
 #endif

@@ -50,6 +50,8 @@
 static pal_os_event_t pal_os_event_0 = {0};
 /* Timer object used */
 cyhal_timer_t pal_os_event_timer_obj;
+/* An internal timer initialisation function */
+void pal_os_event_init(void);
 
 void pal_os_event_start(pal_os_event_t * p_pal_os_event, register_callback callback, void * callback_args)
 {
