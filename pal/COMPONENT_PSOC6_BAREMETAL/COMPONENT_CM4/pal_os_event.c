@@ -50,6 +50,8 @@
 static pal_os_event_t pal_os_event_0 = {0};
 /* Timer object used */
 cyhal_timer_t pal_os_event_timer_obj;
+/* Funciton to initialise the timer for the internal FSM */
+void pal_os_event_init(void);
 
 void pal_os_event_start(pal_os_event_t * p_pal_os_event, register_callback callback, void * callback_args)
 {
@@ -72,6 +74,7 @@ pal_os_event_t * pal_os_event_create(register_callback callback, void * callback
 
     if (( NULL != callback )&&( NULL != callback_args ))
     {
+        pal_os_event_init();
         pal_os_event_start(&pal_os_event_0,callback,callback_args);
     }
     return (&pal_os_event_0);
