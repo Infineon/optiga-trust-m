@@ -55,7 +55,6 @@ extern pal_gpio_t optiga_reset_0;
 
 pal_status_t pal_init(void)
 {
-    pal_os_event_init();
     #ifdef OPTIGA_TRUSTM_VDD
     pal_gpio_init(&optiga_vdd_0);
     #endif

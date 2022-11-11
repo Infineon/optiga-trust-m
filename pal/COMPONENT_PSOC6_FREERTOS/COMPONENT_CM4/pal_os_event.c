@@ -72,6 +72,7 @@ pal_os_event_t * pal_os_event_create(register_callback callback, void * callback
 
     if (( NULL != callback )&&( NULL != callback_args ))
     {
+        pal_os_event_init();
         pal_os_event_start(&pal_os_event_0,callback,callback_args);
     }
     return (&pal_os_event_0);
@@ -141,7 +142,7 @@ void pal_os_event_init(void)
     {
         /* Initialize the timer object. Does not use pin output ('pin' is NC) and
          * does not use a pre-configured clock source ('clk' is NULL). */
-          cy_hal_status = cyhal_timer_init(&pal_os_event_timer_obj, NC, NULL);
+        cy_hal_status = cyhal_timer_init(&pal_os_event_timer_obj, NC, NULL);
         if(CY_RSLT_SUCCESS != cy_hal_status)
         {
           break;
