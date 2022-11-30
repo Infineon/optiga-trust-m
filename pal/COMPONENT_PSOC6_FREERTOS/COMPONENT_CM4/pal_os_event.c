@@ -37,9 +37,9 @@
 
 #include "optiga/pal/pal_os_event.h"
 #include "optiga/pal/pal.h"
-#include "cy_pdl.h"
-#include "cyhal.h"
-#include "cybsp.h"
+
+#include "FreeRTOS.h"
+#include "timers.h"
 
 
 /// @cond hidden
@@ -47,11 +47,21 @@
 #define PAL_OS_EVENT_INTR_PRIO    (4U)
 #define CYHAL_TIMER_SCALING 10
 
-static pal_os_event_t pal_os_event_0 = {0};
 /* Timer object used */
 cyhal_timer_t pal_os_event_timer_obj;
 /* An internal timer initialisation function */
-void pal_os_event_init(void);
+pal_os_event_t * pal_os_event_init(register_callback callback, void * callback_args);
+
+void pal_os_event_trigger_registered_callback(void) { }
+
+static void pal_os_event_timer_callback(TimerHandle_t xTimer)
+{
+    /* Optionally do something if the pxTimer parameter is NULL. */
+    configASSERT(xTimer);
+
+    pal_os_event_t *p_pal_os_event = (pal_os_event_t *)pvTimerGetTimerID( xTimer );
+    p_pal_os_event->callback_registered(p_pal_os_event->callback_ctx);
+}
 
 void pal_os_event_start(pal_os_event_t * p_pal_os_event, register_callback callback, void * callback_args)
 {
@@ -71,104 +81,73 @@ void pal_os_event_stop(pal_os_event_t * p_pal_os_event)
 
 pal_os_event_t * pal_os_event_create(register_callback callback, void * callback_args)
 {
-
+    pal_os_event_t * p_pal_os_event;
     if (( NULL != callback )&&( NULL != callback_args ))
     {
-        pal_os_event_init();
-        pal_os_event_start(&pal_os_event_0,callback,callback_args);
+        p_pal_os_event = pal_os_event_init(callback, callback_args);
+        pal_os_event_start(p_pal_os_event, callback, callback_args);
     }
-    return (&pal_os_event_0);
+    return (p_pal_os_event);
 }
 
-void pal_os_event_trigger_registered_callback(void)
+//lint --e{818,715} suppress "As there is no implementation, pal_os_event is not used"
+void pal_os_event_destroy(pal_os_event_t * p_pal_os_event)
 {
-    register_callback callback;
-
-    // !!!OPTIGA_LIB_PORTING_REQUIRED
-    // The following steps related to TIMER must be taken care while porting to different platform
-    cyhal_timer_stop(&pal_os_event_timer_obj);
-    cyhal_timer_reset(&pal_os_event_timer_obj);
-    /// If callback_ctx is NULL then callback function will have unexpected behavior 
-    if (pal_os_event_0.callback_registered)
+    if (p_pal_os_event != NULL)
     {
-        callback = pal_os_event_0.callback_registered;
-        callback((void * )pal_os_event_0.callback_ctx);
+        pal_os_event_stop(p_pal_os_event);
+        xTimerDelete(p_pal_os_event->os_timer, 1000);
+        vPortFree(p_pal_os_event);
     }
 }
-/// @endcond
 
 void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
                                              register_callback callback,
                                              void * callback_args,
                                              uint32_t time_us)
 {
-  cyhal_timer_cfg_t timer_cfg =
+    if (p_pal_os_event != NULL)
     {
-        .compare_value = 0,                       /* Timer compare value, not used */
-        .period = time_us * CYHAL_TIMER_SCALING,  /* Defines the timer period */
-        .direction = CYHAL_TIMER_DIR_UP,          /* Timer counts up */
-        .is_compare = false,                      /* Don't use compare mode */
-        .is_continuous = false,                   /* Run the timer indefinitely */
-        .value = 0                                /* Initial value of counter */
-    };
-    p_pal_os_event->callback_registered = callback;
-    p_pal_os_event->callback_ctx = callback_args;
+        p_pal_os_event->callback_registered = callback;
+        p_pal_os_event->callback_ctx = callback_args;
 
-    // !!!OPTIGA_LIB_PORTING_REQUIRED
-    // The following steps related to TIMER must be taken care while porting to different platform
-    //lint --e{534} suppress "Error handling is not required so return value is not checked"
-    cyhal_timer_configure(&pal_os_event_timer_obj, &timer_cfg);
-    cyhal_timer_start(&pal_os_event_timer_obj);
+        if (time_us < 1000)
+        {
+        time_us = 1000;
+        }
+
+        xTimerChangePeriod((TimerHandle_t)p_pal_os_event->os_timer, pdMS_TO_TICKS(time_us / 1000), 0);
+    }
 }
 
-//lint --e{818,715} suppress "As there is no implementation, pal_os_event is not used"
-void pal_os_event_destroy(pal_os_event_t * pal_os_event)
+pal_os_event_t * pal_os_event_init(register_callback callback, void * callback_args)
 {
-    cyhal_timer_free (&pal_os_event_timer_obj);
-}
+    TimerHandle_t xTimer;
 
-void pal_os_event_init(void)
-{
-    cy_rslt_t cy_hal_status;
-    const cyhal_timer_cfg_t timer_cfg =
+    pal_os_event_t *p_pal_os_event = pvPortMalloc(sizeof(pal_os_event_t));
+    if (p_pal_os_event != NULL)
     {
-        .compare_value = 0,                 /* Timer compare value, not used */
-        .period = 1000,                     /* Defines the timer period */
-        .direction = CYHAL_TIMER_DIR_UP,    /* Timer counts up */
-        .is_compare = false,                /* Don't use compare mode */
-        .is_continuous = false,             /* Run the timer indefinitely */
-        .value = 0                          /* Initial value of counter */
-    };
+        p_pal_os_event->callback_registered = callback;
+        p_pal_os_event->callback_ctx = callback_args;
+        p_pal_os_event->is_event_triggered = false;
 
-    do
-    {
-        /* Initialize the timer object. Does not use pin output ('pin' is NC) and
-         * does not use a pre-configured clock source ('clk' is NULL). */
-        cy_hal_status = cyhal_timer_init(&pal_os_event_timer_obj, NC, NULL);
-        if(CY_RSLT_SUCCESS != cy_hal_status)
+        xTimer = xTimerCreate(NULL, 1, pdFALSE, p_pal_os_event, pal_os_event_timer_callback);
+        if (xTimer != NULL)
         {
-          break;
+            p_pal_os_event->os_timer = xTimer;
         }
-        /* Apply timer configuration such as period, count direction, run mode, etc. */
-        cy_hal_status = cyhal_timer_configure(&pal_os_event_timer_obj, &timer_cfg);
-        if(CY_RSLT_SUCCESS != cy_hal_status)
+        else
         {
-          break;
+            return NULL;
         }
-        /* Set the frequency of timer to 10^7 Hz */
-        cy_hal_status = cyhal_timer_set_frequency(&pal_os_event_timer_obj, 10000000);
-        if(CY_RSLT_SUCCESS != cy_hal_status)
-        {
-          break;
-        }
-        /* Assign the ISR to execute on timer interrupt */
-        cyhal_timer_register_callback(&pal_os_event_timer_obj, 
-                                     (cyhal_timer_event_callback_t)pal_os_event_trigger_registered_callback, 
-                                      NULL);
-        /* Set the event on which timer interrupt occurs and enable it */
-        cyhal_timer_enable_event(&pal_os_event_timer_obj, CYHAL_TIMER_IRQ_ALL, PAL_OS_EVENT_INTR_PRIO, true);
 
-    } while (false);
+        if ((callback != NULL) && (callback_args != NULL))
+        {
+            pal_os_event_start(p_pal_os_event, callback, callback_args);
+        }
+    }
+
+    return p_pal_os_event;
 }
 
 

@@ -54,6 +54,9 @@ extern pal_gpio_t optiga_reset_0;
 
 pal_status_t pal_init(void)
 {
+    // This function call is used to create a semaphore outside of the ISR
+    pal_i2c_init(NULL);
+
     #ifdef OPTIGA_TRUSTM_VDD
     pal_gpio_init(&optiga_vdd_0);
     #endif
@@ -67,6 +70,8 @@ pal_status_t pal_init(void)
 
 pal_status_t pal_deinit(void)
 {
+    // This function call is used to destroy a semaphore outside of the ISR
+    pal_i2c_deinit(NULL);
     return PAL_STATUS_SUCCESS;
 }
 

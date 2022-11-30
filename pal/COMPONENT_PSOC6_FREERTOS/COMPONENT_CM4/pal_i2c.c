@@ -198,11 +198,15 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t * p_i2c_context)
     if ((g_pal_i2c_init_flag == 1) && (p_i2c_context != NULL))
     {
         cyhal_i2c_free(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel);
+
+        return (PAL_STATUS_SUCCESS);
     }
     
-    if (i2c_taskhandle != NULL)
+    if (i2c_taskhandle != NULL && (p_i2c_context == NULL))
     {
         vTaskDelete(i2c_taskhandle);
+        i2c_taskhandle = NULL;
+        vSemaphoreDelete(xIicSemaphoreHandle);
     }
     return (PAL_STATUS_SUCCESS);
 }
