@@ -209,7 +209,7 @@ There are three main provisioning options/confgiurations availble:
     <td>Only Certificate</td>
     <td>Only Certificate</td>
     <td>Only Certificate with PBS* and Auth.Ref.*</td>
-    <td>Only Certertificate with PBS* and Auth.Ref.*</td>
+    <td>Only Certificate with PBS* and Auth.Ref.*</td>
     <td>Only Certificate with PBS* and Auth.Ref.*</td>
   </tr>
   <tr>
@@ -220,20 +220,11 @@ There are three main provisioning options/confgiurations availble:
     <td>Operational</td>
     <td>Operational</td>
   </tr>
-  <tr>
-    <td>Common Name**</td>
-    <td>Static</td>
-    <td>Static</td>
-    <td>Unique</td>
-    <td>Unique</td>
-    <td>Unique</td>
-  </tr>
 </tbody>
 </table>
 
 \* Certificate, Platform Binding Secret (PBS) and the Authorization Reference (Auth.Ref.) can be downloaded from CIRRENT™ Cloud ID by claiming a Reel QR Code 
 
-\** End Device Certificate Common Name has either the same value across all devices (Static), or has a chip-unique value (Dynamic)
 
 In addition to the certificates and private keys each OPTIGA&trade; Trust M Express comes with a chip unique Platform Binding Secret* and an Authorization Reference*. The latter are two unique per chip 64 bytes long data objects which serve the following purposes:
 - Platform Binding Secret (PBS) used to establish a Shielded Connection between a Host MCU and OPTIGA&trade; Trust M. Should be transfered from CIRRENT™ Cloud ID to the respective MCU to run a protected I2C connection; e.g. readout a protected Certificate located in the 0xE0E1 Object ID (see table above). For more details about  Shielded Connection read [here](https://github.com/Infineon/optiga-trust-m/wiki/Shielded-Connection-101).
