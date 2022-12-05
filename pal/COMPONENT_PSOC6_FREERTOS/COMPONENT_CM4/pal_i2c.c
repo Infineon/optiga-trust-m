@@ -61,21 +61,21 @@ _STATIC_H SemaphoreHandle_t xIicSemaphoreHandle;
 //lint --e{715} suppress the unused p_i2c_context variable lint error , since this is kept for future enhancements
 static pal_status_t pal_i2c_acquire(const void* p_i2c_context)
 {
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-	if ( xSemaphoreTakeFromISR(xIicSemaphoreHandle, &xHigherPriorityTaskWoken) == pdTRUE )
-		return PAL_STATUS_SUCCESS;
-	else
-		return PAL_STATUS_FAILURE;
+    if ( xSemaphoreTakeFromISR(xIicSemaphoreHandle, &xHigherPriorityTaskWoken) == pdTRUE )
+        return PAL_STATUS_SUCCESS;
+    else
+        return PAL_STATUS_FAILURE;
 }
 
 // I2C release bus function
 //lint --e{715} suppress the unused p_i2c_context variable lint, since this is kept for future enhancements
 static void pal_i2c_release(const void* p_i2c_context)
 {
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-	xSemaphoreGiveFromISR(xIicSemaphoreHandle, &xHigherPriorityTaskWoken);
+    xSemaphoreGiveFromISR(xIicSemaphoreHandle, &xHigherPriorityTaskWoken);
 }
 
 
@@ -86,9 +86,9 @@ static void i2c_task(void *pvParameters)
 
   while(1)
   {
-	xTaskNotifyWait(0, 0xffffffff, &event, portMAX_DELAY);
+    xTaskNotifyWait(0, 0xffffffff, &event, portMAX_DELAY);
 
-	upper_layer_handler = (upper_layer_callback_t)gp_pal_i2c_current_ctx->upper_layer_event_handler;
+    upper_layer_handler = (upper_layer_callback_t)gp_pal_i2c_current_ctx->upper_layer_event_handler;
     
     if (0UL != (CYHAL_I2C_MASTER_ERR_EVENT & event))
     {
@@ -195,12 +195,19 @@ pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context)
 
 pal_status_t pal_i2c_deinit(const pal_i2c_t * p_i2c_context)
 {
-	g_pal_i2c_init_flag = 0;
-	cyhal_i2c_free(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel);
-    if (i2c_taskhandle == NULL)
-	{
-	    vTaskDelete(i2c_taskhandle);
-	}
+    if ((g_pal_i2c_init_flag == 1) && (p_i2c_context != NULL))
+    {
+        cyhal_i2c_free(((pal_psoc_i2c_t *)(p_i2c_context->p_i2c_hw_config))->i2c_master_channel);
+
+        return (PAL_STATUS_SUCCESS);
+    }
+    
+    if (i2c_taskhandle != NULL && (p_i2c_context == NULL))
+    {
+        vTaskDelete(i2c_taskhandle);
+        i2c_taskhandle = NULL;
+        vSemaphoreDelete(xIicSemaphoreHandle);
+    }
     return (PAL_STATUS_SUCCESS);
 }
 
