@@ -11,9 +11,9 @@ TLS handshake and record exchange using RSA and ECC algorithm with mbedTLS
 <details>
 <summary><font size="+1">Expand Image for RSA</font></summary>
 <br>
-<img src="https://github.com/Infineon/mbedtls-optiga-trust-m/raw/master/extra/pictures/TLS_RSA_with_TLS_ECDHE_RSA_WITH_AES_128.jpg" height="" width="">
+<img src="https://github.com/Infineon/mbedtls-optiga-trust-m/blob/feature/rsa/extra/pictures/TLS_RSA_with_TLS_ECDHE_RSA_WITH_AES_128.jpg" height="" width="">
 <summary>TLS handhake using cipher as MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 with OPTIGA TrustM V1</summary>
-<img src="https://github.com/Infineon/mbedtls-optiga-trust-m/raw/master/extra/pictures/TLS_RSA_with_TLS_RSA_WITH_AES_128.jpg" height="" width="">
+<img src="https://github.com/Infineon/mbedtls-optiga-trust-m/raw/feature/rsa/extra/pictures/TLS_RSA_with_TLS_RSA_WITH_AES_128.jpg" height="" width="">
 <summary>TLS handhake using cipher as MBEDTLS_TLS_RSA_WITH_AES_128_GCM_SHA256 with OPTIGA TrustM V1</summary>
 </details>					 
 <details>

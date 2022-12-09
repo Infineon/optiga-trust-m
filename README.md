@@ -209,7 +209,7 @@ There are three main provisioning options/confgiurations availble:
     <td>Only Certificate</td>
     <td>Only Certificate</td>
     <td>Only Certificate with PBS* and Auth.Ref.*</td>
-    <td>Only Certertificate with PBS* and Auth.Ref.*</td>
+    <td>Only Certificate with PBS* and Auth.Ref.*</td>
     <td>Only Certificate with PBS* and Auth.Ref.*</td>
   </tr>
   <tr>
@@ -220,20 +220,11 @@ There are three main provisioning options/confgiurations availble:
     <td>Operational</td>
     <td>Operational</td>
   </tr>
-  <tr>
-    <td>Common Name**</td>
-    <td>Static</td>
-    <td>Static</td>
-    <td>Unique</td>
-    <td>Unique</td>
-    <td>Unique</td>
-  </tr>
 </tbody>
 </table>
 
 \* Certificate, Platform Binding Secret (PBS) and the Authorization Reference (Auth.Ref.) can be downloaded from CIRRENT™ Cloud ID by claiming a Reel QR Code 
 
-\** End Device Certificate Common Name has either the same value across all devices (Static), or has a chip-unique value (Dynamic)
 
 In addition to the certificates and private keys each OPTIGA&trade; Trust M Express comes with a chip unique Platform Binding Secret* and an Authorization Reference*. The latter are two unique per chip 64 bytes long data objects which serve the following purposes:
 - Platform Binding Secret (PBS) used to establish a Shielded Connection between a Host MCU and OPTIGA&trade; Trust M. Should be transfered from CIRRENT™ Cloud ID to the respective MCU to run a protected I2C connection; e.g. readout a protected Certificate located in the 0xE0E1 Object ID (see table above). For more details about  Shielded Connection read [here](https://github.com/Infineon/optiga-trust-m/wiki/Shielded-Connection-101).
@@ -244,9 +235,9 @@ In addition to the certificates and private keys each OPTIGA&trade; Trust M Expr
 
 ### Boards
 
-| [OPTIGA&trade; Trust M Evaluation Kit](https://github.com/Infineon/getstarted-optiga-trust-m/wiki/Get-Started-with-OPTIGA%E2%84%A2-Trust-M-Evaluation-Kit) | [OPTIGA&trade; Trust IoT Security Development Kit](https://github.com/Infineon/getstarted-optiga-trust-m/wiki/Get-Started-with-OPTIGA%E2%84%A2-Trust-M-IoT-Security-Development-Kit) |
+| [OPTIGA&trade; Trust M Evaluation Kit](https://github.com/Infineon/getstarted-optiga-trust-m/tree/main/xmc4800_evaluation_kit) | [OPTIGA&trade; Trust IoT Security Development Kit](https://github.com/Infineon/getstarted-optiga-trust-m/tree/main/psoc62_secure_development_kit) |
 |     :---:      |     :---:      |
-| <a href="https://github.com/Infineon/getstarted-optiga-trust-m/wiki/Get-Started-with-OPTIGA%E2%84%A2-Trust-M-IoT-Security-Development-Kit"><img src="https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M_Eval_Kit%2002.jpg" width="480" height="326"></a>   | <a href="https://github.com/Infineon/getstarted-optiga-trust-m/wiki/Get-Started-with-OPTIGA%E2%84%A2-Trust-IoT-Security-Development-Kit"><img src="https://github.com/Infineon/Assets/raw/master/Pictures/optiga_trust_iot_secdevkit.png" width="480" height="318"></a>     |
+| <a href="https://github.com/Infineon/getstarted-optiga-trust-m/tree/main/xmc4800_evaluation_kit"><img src="https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M_Eval_Kit%2002.jpg" width="480" height="326"></a>   | <a href="https://github.com/Infineon/getstarted-optiga-trust-m/tree/main/psoc62_secure_development_kit"><img src="https://github.com/Infineon/Assets/raw/master/Pictures/optiga_trust_iot_secdevkit.png" width="480" height="318"></a>     |
 
 Get started with the [OPTIGA™ Trust M evaluation kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-eval-kit/) or with the [OPTIGA™ Trust IoT Security Development kit](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-m-iot-kit/) using [this](https://github.com/Infineon/getstarted-optiga-trust-m) Application Note
 
