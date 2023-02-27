@@ -16,7 +16,6 @@ The list of available Application Notes and Examples is following:
     1. [AWS FreeRTOS example](https://github.com/Infineon/amazon-freertos-optiga-trust)
     1. [Microsoft Azure IoT example](https://github.com/Infineon/azure-optiga-trust-m)
 1. [Zephyr OS driver](https://github.com/Infineon/zephyr)
-1. Secure Firmware Update and Secure Boot (link is pending)
 1. [Arduino library](https://github.com/Infineon/arduino-optiga-trust-m)
 1. [Personalize OPTIGA™ Trust](https://github.com/Infineon/personalize-optiga-trust)
 1. [Python package](https://github.com/Infineon/python-optiga-trust)
