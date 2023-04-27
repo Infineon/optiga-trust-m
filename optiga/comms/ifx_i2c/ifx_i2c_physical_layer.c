@@ -565,9 +565,10 @@ _STATIC_H void ifx_i2c_pl_frame_event_handler(ifx_i2c_context_t * p_ctx, optiga_
                 if (PL_ACTION_READ_FRAME == p_ctx->pl.frame_action)
                 {
                     ifx_i2c_pl_read_register(p_ctx, PL_REG_I2C_STATE, PL_REG_LEN_I2C_STATE);
-                    break;
+                   // break;
                 }
             }
+            break;
             //lint -fallthrough "For write frame, polling of i2c status register is skipped"
             // Do read/write frame
             case PL_STATE_DATA_AVAILABLE:
