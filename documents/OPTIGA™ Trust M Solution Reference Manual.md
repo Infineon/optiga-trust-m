@@ -3988,8 +3988,7 @@ Identifier](#link802b37cf_4b04_492b_b8e7_f81b3242a6cd)' lists the
 supported asymmetric cipher suites used in public key schemes and their
 coding.
 
-37. > Asymmetric Cipher Suite
-Identifier
+37. > Asymmetric Cipher Suite Identifier
 
 | Value | Description                                                                                                                                            |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -3999,8 +3998,7 @@ Identifier
 '[Key Agreement Schemes](#link7a2ff52b_867b_4d68_9401_2db0e0613de5)'
 lists the key agreement schemes supported by the OPTIGA™.
 
-38. > Key Agreement
-Schemes
+38. > Key Agreement Schemes
 
 | Value | Description                                                                                                                     |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------- |
@@ -4015,8 +4013,7 @@ derivation method supported by the OPTIGA™.
 *Note: OPTIGA™ Trust M V1 doesn’t support HKDF (SHA256/384/512) and PRF
 (SHA384/512).*
 
-39. > Key Derivation
-Method
+39. > Key Derivation Method
 
 | Value | Description                                                                          |
 | ----- | ------------------------------------------------------------------------------------ |
@@ -4031,8 +4028,7 @@ Method
 '[Signature Schemes](#link3fff1f1f_80be_423f_8267_949de680e0b6)' lists
 the signature schemes supported by the OPTIGA™.
 
-40. > Signature
-Schemes
+40. > Signature Schemes
 
 | Value | Description                                                                                                          |
 | ----- | -------------------------------------------------------------------------------------------------------------------- |
