@@ -315,7 +315,7 @@ optiga_lib_status_t ifx_i2c_prl_transceive(ifx_i2c_context_t * p_ctx,
 _STATIC_H optiga_lib_status_t ifx_i2c_prl_prf(ifx_i2c_context_t * p_ctx)
 {
     optiga_lib_status_t return_status = IFX_I2C_HANDSHAKE_ERROR;
-    //uint8_t label_input[] = PRL_LABEL;
+    uint8_t label_input[]             = PRL_LABEL;
     uint8_t secret_input[OPTIGA_SHARED_SECRET_MAX_LENGTH];
     uint16_t shared_secret_length;
     do
@@ -329,14 +329,10 @@ _STATIC_H optiga_lib_status_t ifx_i2c_prl_prf(ifx_i2c_context_t * p_ctx)
             return_status = IFX_I2C_HANDSHAKE_ERROR;
             break;
         }
-        //if (PAL_STATUS_SUCCESS != pal_crypt_tls_prf_sha256(NULL, secret_input,
-        //                                                   shared_secret_length,
-        //                                                   label_input,
-        //                                                   sizeof(label_input) - 1,
-        //                                                   p_ctx->prl.random,
-        //                                                   sizeof(p_ctx->prl.random),
-        //                                                   p_ctx->prl.session_key,
-        //                                                   sizeof(p_ctx->prl.session_key)))
+        if (PAL_STATUS_SUCCESS !=
+            pal_crypt_tls_prf_sha256(NULL, secret_input, shared_secret_length, label_input, sizeof(label_input) - 1,
+                                     p_ctx->prl.random, sizeof(p_ctx->prl.random), p_ctx->prl.session_key,
+                                     sizeof(p_ctx->prl.session_key)))
         {
             return_status = IFX_I2C_HANDSHAKE_ERROR;
         }
@@ -373,17 +369,10 @@ _STATIC_H optiga_lib_status_t ifx_i2c_prl_encrypt_msg(ifx_i2c_context_t * p_ctx,
         memcpy(nonce_data, &p_ctx->prl.session_key[PRL_MASTER_ENCRYPTION_NONCE_OFFSET], PRL_MASTER_NONCE_LENGTH);
         optiga_common_set_uint32(&nonce_data[PRL_MASTER_NONCE_LENGTH], seq_number);
 
-        /*if (PAL_STATUS_SUCCESS != (pal_crypt_encrypt_aes128_ccm(NULL,
-                                                                p_data,
-                                                                data_len,
-                                                                &p_ctx->prl.
-                                                                session_key[PRL_MASTER_ENCRYPTION_KEY_OFFSET],
-                                                                nonce_data, PRL_MASTER_NONCE_LENGTH + 
-                                                                PRL_SEQ_NUMBER_LENGTH,
-                                                                p_ctx->prl.associate_data,
-                                                                sizeof(p_ctx->prl.associate_data),
-                                                                IFX_I2C_PRL_MAC_SIZE,
-                                                                p_data))) */
+        if (PAL_STATUS_SUCCESS !=
+            (pal_crypt_encrypt_aes128_ccm(NULL, p_data, data_len, &p_ctx->prl.session_key[PRL_MASTER_ENCRYPTION_KEY_OFFSET],
+                                          nonce_data, PRL_MASTER_NONCE_LENGTH + PRL_SEQ_NUMBER_LENGTH, p_ctx->prl.associate_data,
+                                          sizeof(p_ctx->prl.associate_data), IFX_I2C_PRL_MAC_SIZE, p_data)))
         {
             break;
         }
@@ -411,16 +400,11 @@ _STATIC_H optiga_lib_status_t ifx_i2c_prl_decrypt_msg(ifx_i2c_context_t * p_ctx,
         memcpy(nonce_data, &p_ctx->prl.session_key[decrypt_nonce_offset], PRL_MASTER_NONCE_LENGTH);
         optiga_common_set_uint32(&nonce_data[PRL_MASTER_NONCE_LENGTH], seq_number);
 
-        /*if (PAL_STATUS_SUCCESS != (pal_crypt_decrypt_aes128_ccm(NULL,
-                                                                p_data,
-                                                                (data_len + IFX_I2C_PRL_MAC_SIZE),
-                                                                &p_ctx->prl.session_key[decrypt_key_offset],
-                                                                nonce_data,
-                                                                PRL_MASTER_NONCE_LENGTH + PRL_SEQ_NUMBER_LENGTH,
-                                                                p_ctx->prl.associate_data,
-                                                                sizeof(p_ctx->prl.associate_data),
-                                                                IFX_I2C_PRL_MAC_SIZE,
-                                                                out_data))) */
+        if (PAL_STATUS_SUCCESS !=
+            (pal_crypt_decrypt_aes128_ccm(NULL, p_data, (data_len + IFX_I2C_PRL_MAC_SIZE),
+                                          &p_ctx->prl.session_key[decrypt_key_offset], nonce_data,
+                                          PRL_MASTER_NONCE_LENGTH + PRL_SEQ_NUMBER_LENGTH, p_ctx->prl.associate_data,
+                                          sizeof(p_ctx->prl.associate_data), IFX_I2C_PRL_MAC_SIZE, out_data)))
         {
             break;
         }
