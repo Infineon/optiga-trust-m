@@ -568,6 +568,7 @@ _STATIC_H void ifx_i2c_pl_frame_event_handler(ifx_i2c_context_t * p_ctx, optiga_
                     break;
                 }
             }
+            [[fallthrough]];
             //lint -fallthrough "For write frame, polling of i2c status register is skipped"
             // Do read/write frame
             case PL_STATE_DATA_AVAILABLE:
