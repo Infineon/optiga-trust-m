@@ -61,7 +61,7 @@ Usage : <.exe> input1=<value> input2=<value> ..
                              note     :  Input is a hexadecimal string.E.g. E3
                                       :  The values in "options" can be bitwise ORED and provided ( Refer SRM )
         key_algo             default  :
-                             options  :  ECC-NIST-P-256 (3) , ECC-NIST-P-384 (4), ECC-NIST-P-521 (5), ECC-BRAINPOOL-P-256-R1 (19) , ECC-BRAINPOOL-P-384-R1 (21), ECC-BRAINPOOL-P-512-R1 (22), RSA-1024-Exp (65) , RSA-2048-Exp (66), AES-128 (129), AES-192 (129), AES-256 (131)
+                             options  :  ECC-NIST-P-256 (3) , ECC-NIST-P-384 (4), ECC-NIST-P-521 (5), ECC-BRAINPOOL-P-256-R1 (19) , ECC-BRAINPOOL-P-384-R1 (21), ECC-BRAINPOOL-P-512-R1 (22), RSA-1024-Exp (65) , RSA-2048-Exp (66), AES-128 (129), AES-192 (130), AES-256 (131)
                              note     :  Input is a decimal string.E.g. 129
         key_data             default  :  (null)
                              options  :  ECC / RSA key in .pem format or AES key in txt file as hexadecimal string

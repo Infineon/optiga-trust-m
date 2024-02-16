@@ -249,7 +249,7 @@ opt_prop_t option_table[] =
     // PAYLOAD : KEYS
     { "Details", DETAIL_KEY_OBJ, NULL, "", 0, "", "" },
     { DESC_KEY_USAGE, SHORT_NAME_KEY_USAGE, &opt.key_usage, DEFAULT_KEY_USAGE, 0, "AUTH (0x01) , ENC (0x02) , SIGN (0x10) , KEY_AGREE (0x20)", "Input is a hexadecimal string.E.g. E3"_NEXT_"The values in \"options\" can be bitwise ORED and provided ( Refer SRM )" },
-    { DESC_KEY_ALGO, SHORT_NAME_KEY_ALGO, &opt.key_algo, DEFAULT_KEY_ALGO, 0, "ECC-NIST-P-256 (3) , ECC-NIST-P-384 (4), ECC-NIST-P-521 (5), ECC-BRAINPOOL-P-256-R1 (19) , ECC-BRAINPOOL-P-384-R1 (21), ECC-BRAINPOOL-P-512-R1 (22), RSA-1024-Exp (65) , RSA-2048-Exp (66), AES-128 (129), AES-192 (129), AES-256 (131)", "Input is a decimal string.E.g. 129" },
+    { DESC_KEY_ALGO, SHORT_NAME_KEY_ALGO, &opt.key_algo, DEFAULT_KEY_ALGO, 0, "ECC-NIST-P-256 (3) , ECC-NIST-P-384 (4), ECC-NIST-P-521 (5), ECC-BRAINPOOL-P-256-R1 (19) , ECC-BRAINPOOL-P-384-R1 (21), ECC-BRAINPOOL-P-512-R1 (22), RSA-1024-Exp (65) , RSA-2048-Exp (66), AES-128 (129), AES-192 (130), AES-256 (131)", "Input is a decimal string.E.g. 129" },
     { DESC_PAYLOAD_KEY, SHORT_NAME_PAYLOAD_KEY, &opt.key_data, DEFAULT_PAYLOAD_KEY, 0, "ECC / RSA key in .pem format or AES key in txt file as hexadecimal string", "Refer : samples/payload/key/sample_ec_256_priv.pem for ECC or RSA key"_NEXT_"Refer : samples/payload/key/aes_key.txt for AES key" },
     
     // PAYLOAD : METADATA
