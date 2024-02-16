@@ -78,6 +78,8 @@ typedef enum key_algorithm
     eRSA_1024_EXP       = 0x41,
     eRSA_2048_EXP       = 0x42,
     eAES_128            = 0x81,
+    eAES_192            = 0x82,
+    eAES_256            = 0x83,
 } key_algorithm_t;
 
 typedef enum key_usage
