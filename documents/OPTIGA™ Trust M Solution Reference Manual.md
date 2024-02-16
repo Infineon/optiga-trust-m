@@ -469,7 +469,7 @@ like to integrate the OPTIGA™ with their solution.
 ## Architecture Decomposition
 
 The architecture components contained in the shown solution architecture
-view (OPTIGA Trust Communication Protection - toolbox - View) are listed
+view (OPTIGA&trade;Trust Communication Protection - toolbox - View) are listed
 and briefly described in the table below.
 
 4.  Architecture components
@@ -544,7 +544,7 @@ and briefly described in the table below.
 </tbody>
 </table>
 
-The class diagram OPTIGA Trust Communication Protection - toolbox - View
+The class diagram OPTIGA&trade;Trust Communication Protection - toolbox - View
 shows the Communication Protection Solution Architecture in case the
 local host is invoking a third\_party\_crypto library (e.g. WolfSSL,
 OpenSSL, mbedTLS, ...) containing its main functional blocks. The
@@ -568,7 +568,7 @@ is:
 | ------------------------------------ |
 | ![728,6](https://github.com/Infineon/Assets/raw/master/Pictures/OPTIGA_Trust_M/SRM/image4.tmp) |
 
-Figure 1 - OPTIGA Trust Communication Protection - toolbox - View
+Figure 1 - OPTIGA&trade;Trust Communication Protection - toolbox - View
 
 
 ### Host code size
@@ -1143,7 +1143,7 @@ enabler components, which gets provided by the OPTIGA™ solution. The
 target platforms for those enabler components are embedded systems,
 Linux and Windows.
 
-The class diagram OPTIGA Trust Enabler Software Overview shows host side
+The class diagram OPTIGA&trade;Trust Enabler Software Overview shows host side
 library architecture and it’s main functional blocks.
 
 The color coding provides information of whether the function blocks are
@@ -6377,7 +6377,12 @@ conditions.
   - If the shared secret gets updated on field either by protected
     update (integrity and confidentiality) or shielded connection, the
     regarded usage counter must be updated accordingly to allow the
-    usage of shared secret further for the required number of times.
+    usage of shared secret further for the required number of times
+  
+  - Without the use of an Integrity and Confidentiality Protected Update, 
+    OPTIGA™ cannot support use cases based on PRESSEC that require more 
+    restrictive access rights for READ than for CHANGE
+
 
 ### Auto states
 
