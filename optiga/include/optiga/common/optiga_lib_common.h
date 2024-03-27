@@ -96,6 +96,14 @@ typedef enum optiga_key_id
     OPTIGA_KEY_ID_E0FC = 0xE0FC,
     /// Key from key store for RSA (non-volatile)
     OPTIGA_KEY_ID_E0FD = 0xE0FD,
+    /// Session Context 1
+    OPTIGA_KEY_ID_E100 = 0xE100,
+    /// Session Context 2
+    OPTIGA_KEY_ID_E101 = 0xE101,
+    /// Session Context 3
+    OPTIGA_KEY_ID_E102 = 0xE102,
+    /// Session Context 4
+    OPTIGA_KEY_ID_E103 = 0xE103,
     /// Key from session (volatile)
     OPTIGA_KEY_ID_SESSION_BASED = 0x0000,
 #ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
