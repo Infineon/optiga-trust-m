@@ -36,8 +36,8 @@
 * @{
 */
 
-#include "optiga/optiga_crypt.h"
-#include "optiga/optiga_util.h"
+#include "optiga_crypt.h"
+#include "optiga_util.h"
 #include "optiga_example.h"
 
 #if defined (OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED)

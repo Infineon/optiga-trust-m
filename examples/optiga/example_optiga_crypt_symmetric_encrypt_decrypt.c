@@ -39,7 +39,7 @@
 * @{
 */
 
-#include "optiga/optiga_crypt.h"
+#include "optiga_crypt.h"
 #include "optiga_example.h"
 
 #if defined (OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) && defined (OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)

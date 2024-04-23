@@ -36,7 +36,7 @@
 * @{
 */
 
-#include "optiga/optiga_util.h"
+#include "optiga_util.h"
 #include "optiga_example.h"
 
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY

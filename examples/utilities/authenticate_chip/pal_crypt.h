@@ -33,7 +33,7 @@
 #define _PAL_CRYPT_H_
 
 #include <stdint.h>
-#include "optiga/common/optiga_lib_types.h"
+#include "optiga_lib_types.h"
 
 ///Requested operation completed without any error
 #define CRYPTO_LIB_OK                               OPTIGA_LIB_SUCCESS

@@ -24,9 +24,9 @@
 * @{
 */
 
-#include "optiga/optiga_crypt.h"
-#include "optiga/optiga_util.h"
-#include "optiga/pal/pal_os_timer.h"
+#include "optiga_crypt.h"
+#include "optiga_util.h"
+#include "pal_os_timer.h"
 
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
@@ -40,9 +40,9 @@
 
 #if defined(MBEDTLS_ENTROPY_HARDWARE_ALT)
 
-#include "optiga/optiga_crypt.h"
-#include "optiga/optiga_util.h"
-#include "optiga/common/optiga_lib_common.h"
+#include "optiga_crypt.h"
+#include "optiga_util.h"
+#include "optiga_lib_common.h"
 
 optiga_lib_status_t crypt_event_completed_status;
 

@@ -35,7 +35,7 @@
 * @{
 */
 
-#include "optiga/optiga_crypt.h"
+#include "optiga_crypt.h"
 #include "optiga_example.h"
 
 #ifdef OPTIGA_CRYPT_ECDSA_SIGN_ENABLED

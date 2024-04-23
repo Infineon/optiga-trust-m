@@ -42,8 +42,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "optiga/optiga_lib_config.h"
-#include "optiga/common/optiga_lib_logger.h"
+#include "optiga_lib_config.h"
+#include "optiga_lib_logger.h"
 
 extern char performance_buffer_string[30];
 extern void example_performance_measurement(uint32_t* time_value, uint8_t time_reset_flag);

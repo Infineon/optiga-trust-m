@@ -27,12 +27,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "optiga/optiga_util.h"
-#include "optiga/ifx_i2c/ifx_i2c_config.h"
-#include "optiga/comms/optiga_comms.h"
-#include "optiga/optiga_crypt.h"
+#include "optiga_util.h"
+#include "ifx_i2c_config.h"
+#include "optiga_comms.h"
+#include "optiga_crypt.h"
 #include "trustm_chipinfo.h"
-#include "optiga/common/optiga_lib_types.h"
+#include "optiga_lib_types.h"
 
 
 /* Callback when for optiga_util_read_data operation

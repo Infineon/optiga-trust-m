@@ -36,7 +36,7 @@
 * @{
 */
 
-#include "optiga/optiga_util.h"
+#include "optiga_util.h"
 #include "optiga_example.h"
 #include "protected_update_data_set/example_optiga_util_protected_update.h"
 

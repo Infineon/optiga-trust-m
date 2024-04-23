@@ -36,7 +36,7 @@
 * @{
 */
 
-#include "optiga/optiga_util.h"
+#include "optiga_util.h"
 #include "optiga_example.h"
 
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
@@ -101,7 +101,7 @@ static const uint8_t metadata [] = {
         //Read tag in the metadata
         0xD1, 0x03,
             //LcsO < Operation
-            0xE1 , 0xFB, 0x03,
+            0xE1 , 0xFC, 0x07,
 };
 
 /**

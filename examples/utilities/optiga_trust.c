@@ -37,12 +37,12 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "optiga/optiga_util.h"
-#include "optiga/common/optiga_lib_logger.h"
-#include "optiga/pal/pal_os_event.h"
-#include "optiga/pal/pal_gpio.h"
-#include "optiga/ifx_i2c/ifx_i2c_config.h"
-#include "optiga/pal/pal_ifx_i2c_config.h"
+#include "optiga_util.h"
+#include "optiga_lib_logger.h"
+#include "pal_os_event.h"
+#include "pal_gpio.h"
+#include "ifx_i2c_config.h"
+#include "pal_ifx_i2c_config.h"
 #include "mbedtls/base64.h"
 
 #ifndef CONFIG_OPTIGA_TRUST_M_CERT_SLOT

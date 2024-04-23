@@ -31,9 +31,9 @@
 * @{
 */
 
-#include "optiga/pal/pal_os_timer.h"
-#include "optiga/pal/pal_os_memory.h"
-#include "optiga/optiga_crypt.h"
+#include "pal_os_timer.h"
+#include "pal_os_memory.h"
+#include "optiga_crypt.h"
 
 #include "ecdsa_utils.h"
 #include "pal_crypt.h"

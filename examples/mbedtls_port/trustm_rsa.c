@@ -57,11 +57,11 @@
 
 #if defined(MBEDTLS_RSA_ALT)
 
-#include "optiga/optiga_crypt.h"
-#include "optiga/optiga_util.h"
-#include "optiga/common/optiga_lib_common.h"
-#include "optiga/pal/pal_os_memory.h"
-#include "optiga/pal/pal_os_timer.h"
+#include "optiga_crypt.h"
+#include "optiga_util.h"
+#include "optiga_lib_common.h"
+#include "pal_os_memory.h"
+#include "pal_os_timer.h"
 
 /* Parameter validation macros */
 #define RSA_VALIDATE_RET( cond )                                       \

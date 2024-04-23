@@ -35,9 +35,9 @@
 * @{
 */
 
-#include "optiga/optiga_util.h"
-#include "optiga/optiga_crypt.h"
-#include "optiga/pal/pal_os_timer.h"
+#include "optiga_util.h"
+#include "optiga_crypt.h"
+#include "pal_os_timer.h"
 #include "optiga_example.h"
 
 #if defined (OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) && defined (OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) && defined (OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED) 

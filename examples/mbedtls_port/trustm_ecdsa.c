@@ -32,10 +32,10 @@
 #include "mbedtls/asn1write.h"
 
 #include <string.h>
-#include "optiga/optiga_crypt.h"
-#include "optiga/optiga_util.h"
-#include "optiga/pal/pal_os_timer.h"
-#include "optiga/common/optiga_lib_common.h"
+#include "optiga_crypt.h"
+#include "optiga_util.h"
+#include "pal_os_timer.h"
+#include "optiga_lib_common.h"
 
 #define PRINT_SIGNATURE   0
 #define PRINT_HASH        0

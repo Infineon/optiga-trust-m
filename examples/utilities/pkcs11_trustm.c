@@ -38,14 +38,14 @@
 #include <limits.h>
 
 /* OPTIGA(TM) Trust M Includes */
-#include "optiga/optiga_crypt.h"
-#include "optiga/optiga_util.h"
+#include "optiga_crypt.h"
+#include "optiga_util.h"
 #include "ecdsa_utils.h"
-#include "optiga/pal/pal_os_lock.h"
-#include "optiga/pal/pal_os_event.h"
-#include "optiga/pal/pal_i2c.h"
-#include "optiga/ifx_i2c/ifx_i2c_config.h"
-#include "optiga/pal/pal_ifx_i2c_config.h"
+#include "pal_os_lock.h"
+#include "pal_os_event.h"
+#include "pal_i2c.h"
+#include "ifx_i2c_config.h"
+#include "pal_ifx_i2c_config.h"
 
 
 #include "pkcs11_optiga_trustm.h"

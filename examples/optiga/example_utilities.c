@@ -35,10 +35,10 @@
 * @{
 */
 
-#include "optiga/pal/pal_os_memory.h"
-#include "optiga/pal/pal_os_timer.h"
-#include "optiga/common/optiga_lib_logger.h"
-#include "optiga/common/optiga_lib_return_codes.h"
+#include "pal_os_memory.h"
+#include "pal_os_timer.h"
+#include "optiga_lib_logger.h"
+#include "optiga_lib_return_codes.h"
 
 char performance_buffer_string[30];
 

@@ -36,14 +36,14 @@
 */
 
 #include <DAVE.h>
-#include "optiga/optiga_crypt.h"
-#include "optiga/optiga_util.h"
-#include "optiga/common/optiga_lib_logger.h"
-#include "optiga/pal/pal_os_event.h"
-#include "optiga/pal/pal.h"
-#include "optiga/pal/pal_os_timer.h"
+#include "optiga_crypt.h"
+#include "optiga_util.h"
+#include "optiga_lib_logger.h"
+#include "pal_os_event.h"
+#include "pal.h"
+#include "pal_os_timer.h"
 #include "optiga_example.h"
-#include "optiga/pal/pal_logger.h"
+#include "pal_logger.h"
 
 #define OPTIGA_SHELL_MODULE "[optiga shell]  : "
 #define OPTIGA_SHELL_LOG_MESSAGE(msg) \

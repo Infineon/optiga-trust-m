@@ -36,11 +36,11 @@
 //#include "../include/trustm_rsa.h"
 
 #include <string.h>
-#include "optiga/optiga_crypt.h"
-#include "optiga/optiga_util.h"
-#include "optiga/common/optiga_lib_common.h"
-#include "optiga/pal/pal_os_timer.h"
-#include "optiga/pal/pal_os_memory.h"
+#include "optiga_crypt.h"
+#include "optiga_util.h"
+#include "optiga_lib_common.h"
+#include "pal_os_timer.h"
+#include "pal_os_memory.h"
 
 static const uint8_t digest521[] = {
     0x5C, 0xB4, 0x9C, 0x2E, 0x18, 0xAF, 0xC5, 0x8A, 0xF4, 0xBF, 0x36, 0xE4, 0x79, 0x8E, 0xC0, 0xED, 
