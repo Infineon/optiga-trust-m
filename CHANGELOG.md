@@ -4,7 +4,7 @@
 * Added support for Zehpyr OS.
 * README.md update.
 * Fix Metadata configuration for OID 0xE0E8.
-* fix buffer length when reading PBS for shielded I2C connection.
+* Fix buffer length when reading PBS for shielded I2C connection.
 
 ## 4.2.0 (2024-02-16)
 * Update Documentation to match the launch of OPTIGA™ Trust M MTR
