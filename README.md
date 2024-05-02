@@ -1,3 +1,4 @@
+
 # Infineon OPTIGA™ Trust M Host Library for C
 
 This is the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) Host Library for C. It is a reference implementation that allows the use of the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) via a high-level API and serves as a basis of our example host applications.
@@ -44,13 +45,13 @@ Examples to demonstrate basic functionality of the security chip can be found [h
 
 The following documentation is available for the host library.
 
-| Topic | Link to PDF documentation                                                                                                                                              |
+| Topic | Link to documentation                                                                                                                                              |
 | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CRYPT | [OPTIGA™ Trust M Crypt API](https://github.com/Infineon/optiga-trust-m-overview/blob/main/docs/pdf/OPTIGA_Trust_M_ConfigGuide_v2.2.pdf)                                |
-| UTIL  | [OPTIGA™ Trust M Util API](https://github.com/Infineon/optiga-trust-m-overview/blob/main/docs/pdf/optiga-trust-m/wiki/Trust-M-Util-API)                                |
-| CMD   | [OPTIGA™ Trust M Solution Reference Manual](https://github.com/Infineon/optiga-trust-m-overview/blob/main/docs/pdf/OPTIGA_Trust_M_Solution_Reference_Manual_v3.60.pdf) |
-| PAL   | [OPTIGA™ Trust M Porting Guide](extras/pal/README.md)                                                                                                                  |
-| COMMS | [Infineon I2C Protocol](https://github.com/Infineon/optiga-trust-m-overview/blob/main/docs/pdf/Infineon_I2C_Protocol_v2.03.pdf)                                        |
+| API Documentation (High Level) | [OPTIGA™ Trust M API - High Level](https://github.com/Infineon/optiga-trust-m-overview/blob/main/docs/pdf/OPTIGA_Trust_M_Solution_Reference_Manual_v3.60.pdf)                           |
+| API Documentation (Code)  | [OPTIGA™ Trust M API - Code](https://infineon.github.io/optiga-trust-m/index.html)                                |
+| I2C Interface Documenation   | [I2C Interface Documenation](https://github.com/Infineon/optiga-trust-m-overview/blob/main/docs/pdf/Infineon_I2C_Protocol_v2.03.pdf) |
+
+
 
 For more information please refer to the [Wiki page](https://github.com/Infineon/optiga-trust-m/wiki) of this project
 
@@ -66,8 +67,8 @@ For more information please refer to the [Wiki page](https://github.com/Infineon
 | [OPTIGA™ Trust M AWS FreeRTOS](https://github.com/Infineon/amazon-freertos-optiga-trust)                                                                 | CMake         | Active |
 | [OPTIGA™ Trust M Microsoft Azure IoT](https://github.com/Infineon/azure-esp32-optiga-trust/)                                                             | Make          | Active |
 | [OPTIGA™ Trust M PKCS#11 interface](https://github.com/Infineon/pkcs11-optiga-trust-m)                                                                   | CMake         | Active |
-| [OPTIGA™ Trust M Matter integration](https://github.com/project-chip/connectedhomeip/tree/v1.1-branch/examples/lock-app/infineon/psoc6#build-trustm-hsm) | Ninja         | Active |
-| [OPTIGA™ Trust M Zephyr PAL & Application](https://gitlab.intra.infineon.com/koeberl/zephyr-optiga-trust-m-app)                                          | CMake         | Active |
+| [OPTIGA™ Trust M Matter integration](https://github.com/project-chip/connectedhomeip/tree/master/examples/lock-app/infineon/psoc6#building-with-optiga-trust-m-as-hsm) | Ninja         | Active |
+| [OPTIGA™ Trust M Zephyr PAL & Application](https://github.com/Infineon/optiga-trust-m-zephyr)                                          | CMake         | Active |
 
 
 ## Contributing
