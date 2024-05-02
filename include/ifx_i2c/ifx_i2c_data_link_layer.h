@@ -1,39 +1,17 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2021 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file ifx_i2c_data_link_layer.h
-*
-* \brief   This file defines the API prototype for data link layer of the Infineon I2C Protocol Stack library.
-*
-* \ingroup  grIFXI2C
-*
-* @{
-*/
+ * SPDX-FileCopyrightText: 2021-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file ifx_i2c_data_link_layer.h
+ *
+ * \brief   This file defines the API prototype for data link layer of the Infineon I2C Protocol Stack library.
+ *
+ * \ingroup  grIFXI2C
+ *
+ * @{
+ */
 
 #ifndef _IFX_I2C_DATA_LINK_LAYER_H_
 #define _IFX_I2C_DATA_LINK_LAYER_H_
@@ -45,11 +23,11 @@ extern "C" {
 #include "ifx_i2c_config.h"
 
 /** @brief Error event propagated to upper layer */
-#define IFX_I2C_DL_EVENT_ERROR              (0x01)
+#define IFX_I2C_DL_EVENT_ERROR (0x01)
 /** @brief Transmit success event propagated to upper layer (bit field 1) */
-#define IFX_I2C_DL_EVENT_TX_SUCCESS         (0x02)
+#define IFX_I2C_DL_EVENT_TX_SUCCESS (0x02)
 /** @brief Receive success event propagated to upper layer (bit field 3)*/
-#define IFX_I2C_DL_EVENT_RX_SUCCESS         (0x04)
+#define IFX_I2C_DL_EVENT_RX_SUCCESS (0x04)
 
 /**
  * \brief Function for initializing the module
@@ -69,8 +47,7 @@ extern "C" {
  * \retval        IFX_I2C_STACK_SUCCESS    If initialization was successful.
  * \retval        IFX_I2C_STACK_ERROR      If the module is already initialized.
  */
-optiga_lib_status_t ifx_i2c_dl_init(ifx_i2c_context_t * p_ctx,
-                                    ifx_i2c_event_handler_t handler);
+optiga_lib_status_t ifx_i2c_dl_init(ifx_i2c_context_t *p_ctx, ifx_i2c_event_handler_t handler);
 
 /**
  * \brief Function for sending a frame
@@ -92,8 +69,7 @@ optiga_lib_status_t ifx_i2c_dl_init(ifx_i2c_context_t * p_ctx,
  * \retval          IFX_I2C_STACK_SUCCESS   If function was successful.
  * \retval          IFX_I2C_STACK_ERROR     If the module is busy.
  */
-optiga_lib_status_t ifx_i2c_dl_send_frame(ifx_i2c_context_t * p_ctx,
-                                          uint16_t frame_len);
+optiga_lib_status_t ifx_i2c_dl_send_frame(ifx_i2c_context_t *p_ctx, uint16_t frame_len);
 
 /**
  * \brief Function for receiving a frame
@@ -114,14 +90,13 @@ optiga_lib_status_t ifx_i2c_dl_send_frame(ifx_i2c_context_t * p_ctx,
  * \retval        IFX_I2C_STACK_SUCCESS   If function was successful.
  * \retval        IFX_I2C_STACK_ERROR     If the module is busy.
  */
-optiga_lib_status_t ifx_i2c_dl_receive_frame(ifx_i2c_context_t * p_ctx);
+optiga_lib_status_t ifx_i2c_dl_receive_frame(ifx_i2c_context_t *p_ctx);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* _IFX_I2C_DATA_LINK_LAYER_H_ */
-
 
 /**
  * @}

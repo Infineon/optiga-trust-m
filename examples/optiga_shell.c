@@ -1,62 +1,41 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2021 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file optiga_shell.c
-*
-* \brief   This file provides the shell prompt implementation.
-*
-* \ingroup grOptigaExamples
-*
-* @{
-*/
+ * SPDX-FileCopyrightText: 2021-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file optiga_shell.c
+ *
+ * \brief   This file provides the shell prompt implementation.
+ *
+ * \ingroup grOptigaExamples
+ *
+ * @{
+ */
 
 #include <DAVE.h>
+
 #include "optiga_crypt.h"
-#include "optiga_util.h"
-#include "optiga_lib_logger.h"
-#include "pal_os_event.h"
-#include "pal.h"
-#include "pal_os_timer.h"
 #include "optiga_example.h"
+#include "optiga_lib_logger.h"
+#include "optiga_util.h"
+#include "pal.h"
 #include "pal_logger.h"
+#include "pal_os_event.h"
+#include "pal_os_timer.h"
 
 #define OPTIGA_SHELL_MODULE "[optiga shell]  : "
 #define OPTIGA_SHELL_LOG_MESSAGE(msg) \
-                            optiga_lib_print_message(msg, OPTIGA_SHELL_MODULE, OPTIGA_LIB_LOGGER_COLOR_LIGHT_GREEN);
-                            
+    optiga_lib_print_message(msg, OPTIGA_SHELL_MODULE, OPTIGA_LIB_LOGGER_COLOR_LIGHT_GREEN);
+
 #define OPTIGA_SHELL_LOG_ERROR_MESSAGE(msg) \
-                            optiga_lib_print_message(msg, OPTIGA_SHELL_MODULE, OPTIGA_LIB_LOGGER_COLOR_YELLOW);
+    optiga_lib_print_message(msg, OPTIGA_SHELL_MODULE, OPTIGA_LIB_LOGGER_COLOR_YELLOW);
 
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
 extern optiga_lib_status_t pair_host_and_optiga_using_pre_shared_secret(void);
 #endif
 
-extern void example_optiga_crypt_hash (void);
+extern void example_optiga_crypt_hash(void);
 extern void example_optiga_crypt_ecc_generate_keypair(void);
 extern void example_optiga_crypt_ecdsa_sign(void);
 extern void example_optiga_crypt_ecdsa_verify(void);
@@ -76,7 +55,7 @@ extern void example_optiga_util_update_count(void);
 extern void example_optiga_util_protected_update(void);
 extern void example_read_coprocessor_id(void);
 extern void example_optiga_crypt_hash_data(void);
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION 
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
 extern void example_pair_host_and_optiga_using_pre_shared_secret(void);
 #endif
 extern void example_optiga_util_hibernate_restore(void);
@@ -94,36 +73,30 @@ extern pal_logger_t logger_console;
  * Callback when optiga_util_xxxx operation is completed asynchronously
  */
 static volatile optiga_lib_status_t optiga_lib_status;
-//lint --e{818,715} suppress "argument "context" is not used in the sample provided"
-static void optiga_util_callback(void * context, optiga_lib_status_t return_status)
-{
+// lint --e{818,715} suppress "argument "context" is not used in the sample provided"
+static void optiga_util_callback(void *context, optiga_lib_status_t return_status) {
     optiga_lib_status = return_status;
 }
 
-optiga_util_t * me_util = NULL;
+optiga_util_t *me_util = NULL;
 
-typedef struct optiga_example_cmd
-{
-    const char_t * cmd_description;
-    const char_t * cmd_options;
+typedef struct optiga_example_cmd {
+    const char_t *cmd_description;
+    const char_t *cmd_options;
     void (*cmd_handler)(void);
-}optiga_example_cmd_t;
+} optiga_example_cmd_t;
 
-static void optiga_shell_init(void)
-{
+static void optiga_shell_init(void) {
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     uint32_t time_taken = 0;
     uint16_t optiga_oid = 0xE0C4;
     uint8_t required_current[] = {0x0F};
 
-    do
-    {
-        if (NULL == me_util)
-        {
-            //Create an instance of optiga_util to open the application on OPTIGA.
+    do {
+        if (NULL == me_util) {
+            // Create an instance of optiga_util to open the application on OPTIGA.
             me_util = optiga_util_create(0, optiga_util_callback, NULL);
-            if (NULL == me_util)
-            {
+            if (NULL == me_util) {
                 break;
             }
         }
@@ -134,118 +107,107 @@ static void optiga_shell_init(void)
          * using optiga_util_open_application
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        
+
         START_PERFORMANCE_MEASUREMENT(time_taken);
-        
+
         return_status = optiga_util_open_application(me_util, 0);
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
+        if (OPTIGA_LIB_SUCCESS != return_status) {
             break;
         }
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
-        {
-            //Wait until the optiga_util_open_application is completed
+        while (optiga_lib_status == OPTIGA_LIB_BUSY) {
+            // Wait until the optiga_util_open_application is completed
         }
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
+        if (OPTIGA_LIB_SUCCESS != optiga_lib_status) {
             return_status = optiga_lib_status;
-            //optiga util open application failed
+            // optiga util open application failed
             break;
         }
-        
+
         READ_PERFORMANCE_MEASUREMENT(time_taken);
-        
+
         OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA completed...\n\n");
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION 
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
         OPTIGA_EXAMPLE_LOG_MESSAGE("pair_host_and_optiga_using_pre_shared_secret");
         // Usercase: Generate the pre-shared secret on host and write it to OPTIGA
         return_status = pair_host_and_optiga_using_pre_shared_secret();
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            //Pairing of host and optiga failed
+        if (OPTIGA_LIB_SUCCESS != return_status) {
+            // Pairing of host and optiga failed
             break;
         }
         OPTIGA_SHELL_LOG_MESSAGE("Pairing of host and OPTIGA completed...");
 #endif
         // Setting current limitation to maximum supported value(15)
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_util_write_data(me_util,
-                                               optiga_oid,
-                                               OPTIGA_UTIL_ERASE_AND_WRITE,
-                                               0,
-                                               required_current,
-                                               1);
+        return_status = optiga_util_write_data(
+            me_util,
+            optiga_oid,
+            OPTIGA_UTIL_ERASE_AND_WRITE,
+            0,
+            required_current,
+            1
+        );
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
+        if (OPTIGA_LIB_SUCCESS != return_status) {
             break;
         }
 
-        while (OPTIGA_LIB_BUSY == optiga_lib_status)
-        {
-            //Wait until the optiga_util_write_data operation is completed
+        while (OPTIGA_LIB_BUSY == optiga_lib_status) {
+            // Wait until the optiga_util_write_data operation is completed
         }
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
+        if (OPTIGA_LIB_SUCCESS != optiga_lib_status) {
             return_status = optiga_lib_status;
             break;
         }
         OPTIGA_SHELL_LOG_MESSAGE("Setting current limitation to maximum...");
         OPTIGA_SHELL_LOG_MESSAGE("Starting OPTIGA example demonstration..\n");
-    }while(FALSE);
+    } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
     OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
 }
 
-static void optiga_shell_deinit(void)
-{
+static void optiga_shell_deinit(void) {
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
     uint32_t time_taken = 0;
-    
-    do
-    {
+
+    do {
         OPTIGA_EXAMPLE_LOG_MESSAGE("Deinitializing OPTIGA for example demonstration...\n");
         /**
          * Close the application on OPTIGA after all the operations are executed
          * using optiga_util_close_application
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        
+
         START_PERFORMANCE_MEASUREMENT(time_taken);
-        
+
         return_status = optiga_util_close_application(me_util, 0);
 
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
+        if (OPTIGA_LIB_SUCCESS != return_status) {
             break;
         }
 
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
-        {
-            //Wait until the optiga_util_close_application is completed
+        while (optiga_lib_status == OPTIGA_LIB_BUSY) {
+            // Wait until the optiga_util_close_application is completed
         }
 
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
+        if (OPTIGA_LIB_SUCCESS != optiga_lib_status) {
             return_status = optiga_lib_status;
-            //optiga util close application failed
+            // optiga util close application failed
             break;
         }
 
         READ_PERFORMANCE_MEASUREMENT(time_taken);
-        
+
         // destroy util and crypt instances
-        //lint --e{534} suppress "Error handling is not required so return value is not checked"
+        // lint --e{534} suppress "Error handling is not required so return value is not checked"
         optiga_util_destroy(me_util);
         me_util = NULL;
-    }while(FALSE);
+    } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
     OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
 }
 
-static void optiga_shell_util_read_data(void)
-{
+static void optiga_shell_util_read_data(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -258,8 +220,7 @@ static void optiga_shell_util_read_data(void)
     example_optiga_util_read_data();
 }
 
-static void optiga_shell_util_write_data(void)
-{
+static void optiga_shell_util_write_data(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -272,21 +233,21 @@ static void optiga_shell_util_write_data(void)
     example_optiga_util_write_data();
 }
 
-static void optiga_shell_util_read_coprocessor_id(void)
-{
+static void optiga_shell_util_read_coprocessor_id(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
-    OPTIGA_SHELL_LOG_MESSAGE("Starting reading of Coprocessor ID and displaying it's individual components Example");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "Starting reading of Coprocessor ID and displaying it's individual components Example"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("1 Step: Read Coprocessor UID from OID(0xE0C2) ");
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Close the application on OPTIGA");
 #endif
     example_read_coprocessor_id();
 }
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION 
-static void optiga_shell_pair_host_optiga(void)
-{
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
+static void optiga_shell_pair_host_optiga(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -301,27 +262,35 @@ static void optiga_shell_pair_host_optiga(void)
     example_pair_host_and_optiga_using_pre_shared_secret();
 }
 #endif
-#if defined (OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) && defined (OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) && defined (OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED) 
-static void optiga_shell_util_hibernate_restore(void)
-{
+#if defined(OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) && defined(OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) \
+    && defined(OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED)
+static void optiga_shell_util_hibernate_restore(void) {
     OPTIGA_SHELL_LOG_MESSAGE("Starting Hibernate and Restore Example");
     OPTIGA_SHELL_LOG_MESSAGE("1 Step: Open Application on the security chip");
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Pair the host and the security chip");
     OPTIGA_SHELL_LOG_MESSAGE("3 Step: Select Protected I2C Connection");
-    OPTIGA_SHELL_LOG_MESSAGE("4 Step: Generate ECC NIST P-256 Key pair and store it in Session Data Object, export the public key");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "4 Step: Generate ECC NIST P-256 Key pair and store it in Session Data Object, export the public key"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("5 Step: Check Security Event Counter and wait till it reaches 0");
-    OPTIGA_SHELL_LOG_MESSAGE("6 Step: Perform Close application with Hibernate parameter set to True");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "6 Step: Perform Close application with Hibernate parameter set to True"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("7 Step: Open Application on the security chip");
-    OPTIGA_SHELL_LOG_MESSAGE("8 Step: Sign prepared data with private key stored in Session Data Object");
-    OPTIGA_SHELL_LOG_MESSAGE("9 Step: Verify the signature with the public key generated previously");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "8 Step: Sign prepared data with private key stored in Session Data Object"
+    );
+    OPTIGA_SHELL_LOG_MESSAGE("9 Step: Verify the signature with the public key generated previously"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("10 Step: Close Applicaiton on the chip");
-    OPTIGA_SHELL_LOG_MESSAGE("Important note: To continue with other examples you need to call the init parameter once again");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "Important note: To continue with other examples you need to call the init parameter once again"
+    );
     example_optiga_util_hibernate_restore();
 }
 #endif
 
-static void optiga_shell_util_update_count(void)
-{
+static void optiga_shell_util_update_count(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -334,13 +303,14 @@ static void optiga_shell_util_update_count(void)
     example_optiga_util_update_count();
 }
 
-static void optiga_shell_util_protected_update(void)
-{
+static void optiga_shell_util_protected_update(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
     OPTIGA_SHELL_LOG_MESSAGE("Starting Protected Update Example");
-    OPTIGA_SHELL_LOG_MESSAGE("1 Step: Update Metadata for the Object to be updated and the Trust Anchor used to verify the update");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "1 Step: Update Metadata for the Object to be updated and the Trust Anchor used to verify the update"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Write Trust Anchor used by the Trust M to verify the update");
     OPTIGA_SHELL_LOG_MESSAGE("3 Step: Start Protected update with prepared manifest and fragments");
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
@@ -350,8 +320,7 @@ static void optiga_shell_util_protected_update(void)
 }
 
 #ifdef OPTIGA_CRYPT_HASH_ENABLED
-static void optiga_shell_crypt_hash(void)
-{
+static void optiga_shell_crypt_hash(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -363,8 +332,7 @@ static void optiga_shell_crypt_hash(void)
     example_optiga_crypt_hash();
 }
 
-static void optiga_shell_crypt_hash_data(void)
-{
+static void optiga_shell_crypt_hash_data(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -378,15 +346,18 @@ static void optiga_shell_crypt_hash_data(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
-static void optiga_shell_crypt_tls_prf_sha256(void)
-{
+static void optiga_shell_crypt_tls_prf_sha256(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
     OPTIGA_SHELL_LOG_MESSAGE("Starting TLS PRF SHA256 (Key Deriviation) Example");
     OPTIGA_SHELL_LOG_MESSAGE("1 Step: Write prepared Shared Secret into an Arbitrary Data Object");
-    OPTIGA_SHELL_LOG_MESSAGE("2 Step: Update Metadata of the Object to use the Arbitrary Data Object only via Shielded I2C Connection");
-    OPTIGA_SHELL_LOG_MESSAGE("3 Step: Generate Shared Secret using the Shared Secret from the Arbitrary Data Object");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "2 Step: Update Metadata of the Object to use the Arbitrary Data Object only via Shielded I2C Connection"
+    );
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "3 Step: Generate Shared Secret using the Shared Secret from the Arbitrary Data Object"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("4 Step: Restore Metadata of the Arbitrary Data Object");
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("5 Step: Close the application on OPTIGA");
@@ -396,8 +367,7 @@ static void optiga_shell_crypt_tls_prf_sha256(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_RANDOM_ENABLED
-static void optiga_shell_crypt_random(void)
-{
+static void optiga_shell_crypt_random(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -411,8 +381,7 @@ static void optiga_shell_crypt_random(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED
-static void optiga_shell_crypt_ecc_generate_keypair(void)
-{
+static void optiga_shell_crypt_ecc_generate_keypair(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -426,12 +395,13 @@ static void optiga_shell_crypt_ecc_generate_keypair(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_ECDH_ENABLED
-static void optiga_shell_crypt_ecdh(void)
-{
+static void optiga_shell_crypt_ecdh(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
-    OPTIGA_SHELL_LOG_MESSAGE("Starting Elliptic-curve Diffie–Hellman (ECDH) Key Agreement Protocol Example");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "Starting Elliptic-curve Diffie–Hellman (ECDH) Key Agreement Protocol Example"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("1 Step: Select Protected I2C Connection");
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Generate new ECC NIST P-256 Key Pair");
     OPTIGA_SHELL_LOG_MESSAGE("3 Step: Select Protected I2C Connection");
@@ -444,12 +414,13 @@ static void optiga_shell_crypt_ecdh(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
-static void optiga_shell_crypt_ecdsa_sign(void)
-{
+static void optiga_shell_crypt_ecdsa_sign(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
-    OPTIGA_SHELL_LOG_MESSAGE("Starting signing example for Elliptic-curve Digital Signature Algorithm (ECDSA)");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "Starting signing example for Elliptic-curve Digital Signature Algorithm (ECDSA)"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("1 Step: Sign prepared Data and export the signature");
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Close the application on OPTIGA");
@@ -459,13 +430,16 @@ static void optiga_shell_crypt_ecdsa_sign(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED
-static void optiga_shell_crypt_ecdsa_verify(void)
-{
+static void optiga_shell_crypt_ecdsa_verify(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
-    OPTIGA_SHELL_LOG_MESSAGE("Starting verification example for Elliptic-curve Digital Signature Algorithm (ECDSA)");
-    OPTIGA_SHELL_LOG_MESSAGE("1 Step: Verify prepared signature, with prepared public key and digest");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "Starting verification example for Elliptic-curve Digital Signature Algorithm (ECDSA)"
+    );
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "1 Step: Verify prepared signature, with prepared public key and digest"
+    );
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Close the application on OPTIGA");
 #endif
@@ -474,12 +448,13 @@ static void optiga_shell_crypt_ecdsa_verify(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_RSA_SIGN_ENABLED
-static void optiga_shell_crypt_rsa_sign(void)
-{
+static void optiga_shell_crypt_rsa_sign(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
-    OPTIGA_SHELL_LOG_MESSAGE("Starting signing example for PKCS#1 Ver1.5 SHA256 Signature scheme (RSA)");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "Starting signing example for PKCS#1 Ver1.5 SHA256 Signature scheme (RSA)"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("1 Step: Sign prepared Data and export the signature");
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Close the application on OPTIGA");
@@ -489,13 +464,16 @@ static void optiga_shell_crypt_rsa_sign(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_RSA_VERIFY_ENABLED
-static void optiga_shell_crypt_rsa_verify(void)
-{
+static void optiga_shell_crypt_rsa_verify(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
-    OPTIGA_SHELL_LOG_MESSAGE("Starting signing example for PKCS#1 Ver1.5 SHA256 Signature scheme (RSA)");
-    OPTIGA_SHELL_LOG_MESSAGE("1 Step: Verify prepared signature, with prepared public key and digest");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "Starting signing example for PKCS#1 Ver1.5 SHA256 Signature scheme (RSA)"
+    );
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "1 Step: Verify prepared signature, with prepared public key and digest"
+    );
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Close the application on OPTIGA");
 #endif
@@ -504,8 +482,7 @@ static void optiga_shell_crypt_rsa_verify(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED
-static void optiga_shell_crypt_rsa_generate_keypair(void)
-{
+static void optiga_shell_crypt_rsa_generate_keypair(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -519,8 +496,7 @@ static void optiga_shell_crypt_rsa_generate_keypair(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
-static void optiga_shell_crypt_rsa_decrypt_and_export(void)
-{
+static void optiga_shell_crypt_rsa_decrypt_and_export(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -528,27 +504,31 @@ static void optiga_shell_crypt_rsa_decrypt_and_export(void)
     OPTIGA_SHELL_LOG_MESSAGE("1 Step: Generate RSA 1024 Key Pair and export the public key");
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Encrypt a message with RSAES PKCS#1 Ver1.5 Scheme");
     OPTIGA_SHELL_LOG_MESSAGE("3 Step: Select Protected I2C Connection");
-    OPTIGA_SHELL_LOG_MESSAGE("4 Step: Decrypt the message with RSAES PKCS#1 Ver1.5 Scheme and export it");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "4 Step: Decrypt the message with RSAES PKCS#1 Ver1.5 Scheme and export it"
+    );
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("5 Step: Close the application on OPTIGA");
 #endif
-    example_optiga_crypt_rsa_decrypt_and_export();   
+    example_optiga_crypt_rsa_decrypt_and_export();
 }
 #endif
 
 #ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
-static void optiga_shell_crypt_rsa_decrypt_and_store(void)
-{
-
+static void optiga_shell_crypt_rsa_decrypt_and_store(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
     OPTIGA_SHELL_LOG_MESSAGE("Starting Decrypt and Store Data on the chip with RSA Key Example");
     OPTIGA_SHELL_LOG_MESSAGE("1 Step: Generate RSA 1024 Key Pair and export the public key");
-    OPTIGA_SHELL_LOG_MESSAGE("2 Step: Generate 70 bytes RSA Pre master secret which is stored in acquired session OID");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "2 Step: Generate 70 bytes RSA Pre master secret which is stored in acquired session OID"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("3 Step: Select Protected I2C Connection");
     OPTIGA_SHELL_LOG_MESSAGE("4 Step: Encrypt Session Data with RSA Public Key");
-    OPTIGA_SHELL_LOG_MESSAGE("5 Step: Decrypt the message with RSAES PKCS#1 Ver1.5 Scheme and store it on chip");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "5 Step: Decrypt the message with RSAES PKCS#1 Ver1.5 Scheme and store it on chip"
+    );
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("6 Step: Close the application on OPTIGA");
 #endif
@@ -556,8 +536,7 @@ static void optiga_shell_crypt_rsa_decrypt_and_store(void)
 }
 #endif
 #ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
-static void optiga_shell_crypt_rsa_encrypt_message(void)
-{
+static void optiga_shell_crypt_rsa_encrypt_message(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -571,13 +550,15 @@ static void optiga_shell_crypt_rsa_encrypt_message(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
-static void optiga_shell_crypt_rsa_encrypt_session(void)
-{
+static void optiga_shell_crypt_rsa_encrypt_session(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
-    OPTIGA_SHELL_LOG_MESSAGE("Starting Encrypt Data in Session Object on chip with RSA Key Example");
-    OPTIGA_SHELL_LOG_MESSAGE("1 Step: Encrypt a message with RSAES PKCS#1 Ver1.5 Scheme stored on chip in Session Object");
+    OPTIGA_SHELL_LOG_MESSAGE("Starting Encrypt Data in Session Object on chip with RSA Key Example"
+    );
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "1 Step: Encrypt a message with RSAES PKCS#1 Ver1.5 Scheme stored on chip in Session Object"
+    );
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Close the application on OPTIGA");
 #endif
@@ -585,14 +566,15 @@ static void optiga_shell_crypt_rsa_encrypt_session(void)
 }
 #endif
 
-#if defined (OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) && defined (OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)
-static void optiga_shell_crypt_symmetric_encrypt_decrypt_ecb(void)
-{
+#if defined(OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) && defined(OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)
+static void optiga_shell_crypt_symmetric_encrypt_decrypt_ecb(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
     OPTIGA_SHELL_LOG_MESSAGE("Starting symmetric Encrypt and Decrypt Data for ECB mode Example");
-    OPTIGA_SHELL_LOG_MESSAGE("1 Step: Generate and store the AES 128 Symmetric key in OPTIGA Key store OID(E200)");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "1 Step: Generate and store the AES 128 Symmetric key in OPTIGA Key store OID(E200)"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Encrypt the plain data with ECB mode");
     OPTIGA_SHELL_LOG_MESSAGE("3 Step: Decrypt the encrypted data from step 2");
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
@@ -601,13 +583,14 @@ static void optiga_shell_crypt_symmetric_encrypt_decrypt_ecb(void)
     example_optiga_crypt_symmetric_encrypt_decrypt_ecb();
 }
 
-static void optiga_shell_crypt_symmetric_encrypt_decrypt_cbc(void)
-{
+static void optiga_shell_crypt_symmetric_encrypt_decrypt_cbc(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
     OPTIGA_SHELL_LOG_MESSAGE("Starting symmetric Encrypt and Decrypt Data for CBC mode Example");
-    OPTIGA_SHELL_LOG_MESSAGE("1 Step: Generate and store the AES 128 Symmetric key in OPTIGA Key store OID(E200)");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "1 Step: Generate and store the AES 128 Symmetric key in OPTIGA Key store OID(E200)"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Encrypt the plain data with CBC mode");
     OPTIGA_SHELL_LOG_MESSAGE("3 Step: Decrypt the encrypted data from step 2");
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
@@ -616,13 +599,14 @@ static void optiga_shell_crypt_symmetric_encrypt_decrypt_cbc(void)
     example_optiga_crypt_symmetric_encrypt_decrypt_cbc();
 }
 
-static void optiga_shell_crypt_symmetric_encrypt_cbcmac(void)
-{
+static void optiga_shell_crypt_symmetric_encrypt_cbcmac(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
     OPTIGA_SHELL_LOG_MESSAGE("Starting symmetric Encrypt Data for CBCMAC mode Example");
-    OPTIGA_SHELL_LOG_MESSAGE("1 Step: Generate and store the AES 128 Symmetric key in OPTIGA Key store OID(E200)");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "1 Step: Generate and store the AES 128 Symmetric key in OPTIGA Key store OID(E200)"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Encrypt the plain data with CBCMAC mode");
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("3 Step: Close the application on OPTIGA");
@@ -632,13 +616,14 @@ static void optiga_shell_crypt_symmetric_encrypt_cbcmac(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_HMAC_ENABLED
-static void optiga_shell_crypt_hmac(void)
-{
+static void optiga_shell_crypt_hmac(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
     OPTIGA_SHELL_LOG_MESSAGE("Starting HMAC-SHA256 generation Example");
-    OPTIGA_SHELL_LOG_MESSAGE("1 Step: Change metadata for OID(0xF1D0) as Execute access condition = Always and Data object type  =  Pre-shared secret");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "1 Step: Change metadata for OID(0xF1D0) as Execute access condition = Always and Data object type  =  Pre-shared secret"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Generate HMAC");
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("3 Step: Close the application on OPTIGA");
@@ -648,14 +633,15 @@ static void optiga_shell_crypt_hmac(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_HKDF_ENABLED
-static void optiga_shell_crypt_hkdf(void)
-{
+static void optiga_shell_crypt_hkdf(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
     OPTIGA_SHELL_LOG_MESSAGE("Starting HKDF-SHA256 key derivation Example");
     OPTIGA_SHELL_LOG_MESSAGE("1 Step: Write the shared secret to the Arbitrary data object F1D0");
-    OPTIGA_SHELL_LOG_MESSAGE("2 Step: Change metadata of OID(0xF1D0) Data object type  =  Pre-shared secret");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "2 Step: Change metadata of OID(0xF1D0) Data object type  =  Pre-shared secret"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("3 Step: Derive HKDF");
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("4 Step: Close the application on OPTIGA");
@@ -665,8 +651,7 @@ static void optiga_shell_crypt_hkdf(void)
 #endif
 
 #ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
-static void optiga_shell_crypt_symmetric_generate_key(void)
-{
+static void optiga_shell_crypt_symmetric_generate_key(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -679,9 +664,8 @@ static void optiga_shell_crypt_symmetric_generate_key(void)
 }
 #endif
 
-#if defined (OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined (OPTIGA_CRYPT_HMAC_VERIFY_ENABLED)
-static void optiga_shell_crypt_hmac_verify_with_authorization_reference(void)
-{
+#if defined(OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined(OPTIGA_CRYPT_HMAC_VERIFY_ENABLED)
+static void optiga_shell_crypt_hmac_verify_with_authorization_reference(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
@@ -698,14 +682,16 @@ static void optiga_shell_crypt_hmac_verify_with_authorization_reference(void)
 }
 #endif
 
-#if defined (OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined (OPTIGA_CRYPT_HMAC_VERIFY_ENABLED) && defined (OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED)
-static void optiga_shell_crypt_clear_auto_state(void)
-{
+#if defined(OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined(OPTIGA_CRYPT_HMAC_VERIFY_ENABLED) \
+    && defined(OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED)
+static void optiga_shell_crypt_clear_auto_state(void) {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     OPTIGA_SHELL_LOG_MESSAGE("Initializing OPTIGA for example demonstration...");
 #endif
     OPTIGA_SHELL_LOG_MESSAGE("Starting clear auto state Example");
-    OPTIGA_SHELL_LOG_MESSAGE("1 Step: Change metadata of OID(0xF1D0) Data object type  =  Pre-shared secret");
+    OPTIGA_SHELL_LOG_MESSAGE(
+        "1 Step: Change metadata of OID(0xF1D0) Data object type  =  Pre-shared secret"
+    );
     OPTIGA_SHELL_LOG_MESSAGE("2 Step: Get the User Secret and store it in OID(0xF1D0)");
     OPTIGA_SHELL_LOG_MESSAGE("3 Step: Generate auth code with optional data");
     OPTIGA_SHELL_LOG_MESSAGE("4 Step: Calculate HMAC on host using mbedtls");
@@ -718,15 +704,13 @@ static void optiga_shell_crypt_clear_auto_state(void)
 }
 #endif
 
-void run_example(void (*test_case)(void)) 
-{ 
-    test_case();  
-    optiga_lib_print_string_with_newline(""); 
+void run_example(void (*test_case)(void)) {
+    test_case();
+    optiga_lib_print_string_with_newline("");
     pal_os_timer_delay_in_milliseconds(2000);
 }
 
-static void optiga_shell_selftest(void)
-{
+static void optiga_shell_selftest(void) {
     run_example(optiga_shell_init);
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     run_example(optiga_shell_deinit);
@@ -734,7 +718,7 @@ static void optiga_shell_selftest(void)
     run_example(optiga_shell_util_read_data);
     run_example(optiga_shell_util_write_data);
     run_example(optiga_shell_util_read_coprocessor_id);
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION 
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
     run_example(optiga_shell_pair_host_optiga);
 #endif
     run_example(optiga_shell_util_update_count);
@@ -745,8 +729,8 @@ static void optiga_shell_selftest(void)
 #endif
 #ifdef OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
     run_example(optiga_shell_crypt_tls_prf_sha256);
-#endif    
-#ifdef OPTIGA_CRYPT_RANDOM_ENABLED    
+#endif
+#ifdef OPTIGA_CRYPT_RANDOM_ENABLED
     run_example(optiga_shell_crypt_random);
 #endif
 #ifdef OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED
@@ -777,202 +761,237 @@ static void optiga_shell_selftest(void)
 #ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
     run_example(optiga_shell_crypt_rsa_decrypt_and_store);
     run_example(optiga_shell_crypt_rsa_decrypt_and_export);
-#endif    
-#if defined (OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) && defined (OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)
+#endif
+#if defined(OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) && defined(OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)
     run_example(optiga_shell_crypt_symmetric_encrypt_decrypt_ecb);
     run_example(optiga_shell_crypt_symmetric_encrypt_decrypt_cbc);
     run_example(optiga_shell_crypt_symmetric_encrypt_cbcmac);
 #endif
-#ifdef OPTIGA_CRYPT_HMAC_ENABLED   
+#ifdef OPTIGA_CRYPT_HMAC_ENABLED
     run_example(optiga_shell_crypt_hmac);
 #endif
-#ifdef OPTIGA_CRYPT_HKDF_ENABLED        
+#ifdef OPTIGA_CRYPT_HKDF_ENABLED
     run_example(optiga_shell_crypt_hkdf);
-#endif    
-#ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED      
+#endif
+#ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
     run_example(optiga_shell_crypt_symmetric_generate_key);
-#endif    
-#if defined (OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined (OPTIGA_CRYPT_HMAC_VERIFY_ENABLED) && defined (OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED)
+#endif
+#if defined(OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined(OPTIGA_CRYPT_HMAC_VERIFY_ENABLED) \
+    && defined(OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED)
     run_example(optiga_shell_crypt_clear_auto_state);
-#endif    
-#if defined (OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined (OPTIGA_CRYPT_HMAC_VERIFY_ENABLED)
+#endif
+#if defined(OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined(OPTIGA_CRYPT_HMAC_VERIFY_ENABLED)
     run_example(optiga_shell_crypt_hmac_verify_with_authorization_reference);
-#endif 
+#endif
 #ifdef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     run_example(optiga_shell_deinit);
 #endif
 }
 
-
 static void optiga_shell_show_usage(void);
 
-
-optiga_example_cmd_t optiga_cmds [] =
-{
-        {"",                                            "help",            optiga_shell_show_usage},
-        {"    initialize optiga                        : optiga --","init",            optiga_shell_init},
-        {"    de-initialize optiga                     : optiga --","deinit",          optiga_shell_deinit},
-        {"    run all tests at once                    : optiga --","selftest",        optiga_shell_selftest},
-        {"    read data                                : optiga --","readdata",        optiga_shell_util_read_data},
-        {"    write data                               : optiga --","writedata",       optiga_shell_util_write_data},
-        {"    read coprocessor id                      : optiga --","coprocid",        optiga_shell_util_read_coprocessor_id},
-#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION 
-        {"    binding host with optiga                 : optiga --","bind",            optiga_shell_pair_host_optiga},
+optiga_example_cmd_t optiga_cmds[] = {
+    {"", "help", optiga_shell_show_usage},
+    {"    initialize optiga                        : optiga --", "init", optiga_shell_init},
+    {"    de-initialize optiga                     : optiga --", "deinit", optiga_shell_deinit},
+    {"    run all tests at once                    : optiga --", "selftest", optiga_shell_selftest},
+    {"    read data                                : optiga --",
+     "readdata",
+     optiga_shell_util_read_data},
+    {"    write data                               : optiga --",
+     "writedata",
+     optiga_shell_util_write_data},
+    {"    read coprocessor id                      : optiga --",
+     "coprocid",
+     optiga_shell_util_read_coprocessor_id},
+#ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
+    {"    binding host with optiga                 : optiga --",
+     "bind",
+     optiga_shell_pair_host_optiga},
 #endif
-#if defined (OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) && defined (OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) && defined (OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED) 
-        {"    hibernate and restore                    : optiga --","hibernate",       optiga_shell_util_hibernate_restore},
-#endif        
-        {"    update counter                           : optiga --","counter",         optiga_shell_util_update_count},
-        {"    protected update                         : optiga --","protected",       optiga_shell_util_protected_update},
+#if defined(OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) && defined(OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) \
+    && defined(OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED)
+    {"    hibernate and restore                    : optiga --",
+     "hibernate",
+     optiga_shell_util_hibernate_restore},
+#endif
+    {"    update counter                           : optiga --",
+     "counter",
+     optiga_shell_util_update_count},
+    {"    protected update                         : optiga --",
+     "protected",
+     optiga_shell_util_protected_update},
 #ifdef OPTIGA_CRYPT_HASH_ENABLED
-        {"    hashing of data                          : optiga --","hash",            optiga_shell_crypt_hash},
-        {"    hash single function                     : optiga --","hashsha256",      optiga_shell_crypt_hash_data},
+    {"    hashing of data                          : optiga --", "hash", optiga_shell_crypt_hash},
+    {"    hash single function                     : optiga --",
+     "hashsha256",
+     optiga_shell_crypt_hash_data},
 #endif
 #ifdef OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
-        {"    tls prf sha256                           : optiga --","prf",             optiga_shell_crypt_tls_prf_sha256},
-#endif    
-#ifdef OPTIGA_CRYPT_RANDOM_ENABLED    
-        {"    random number generation                 : optiga --","random",          optiga_shell_crypt_random},
+    {"    tls prf sha256                           : optiga --",
+     "prf",
+     optiga_shell_crypt_tls_prf_sha256},
+#endif
+#ifdef OPTIGA_CRYPT_RANDOM_ENABLED
+    {"    random number generation                 : optiga --",
+     "random",
+     optiga_shell_crypt_random},
 #endif
 #ifdef OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED
-        {"    ecc key pair generation                  : optiga --","ecckeygen",       optiga_shell_crypt_ecc_generate_keypair},
+    {"    ecc key pair generation                  : optiga --",
+     "ecckeygen",
+     optiga_shell_crypt_ecc_generate_keypair},
 #endif
 #ifdef OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
-        {"    ecdsa sign                               : optiga --","ecdsasign",       optiga_shell_crypt_ecdsa_sign},
+    {"    ecdsa sign                               : optiga --",
+     "ecdsasign",
+     optiga_shell_crypt_ecdsa_sign},
 #endif
-#ifdef OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED        
-        {"    ecdsa verify sign                        : optiga --","ecdsaverify",     optiga_shell_crypt_ecdsa_verify},
+#ifdef OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED
+    {"    ecdsa verify sign                        : optiga --",
+     "ecdsaverify",
+     optiga_shell_crypt_ecdsa_verify},
 #endif
-#ifdef OPTIGA_CRYPT_ECDH_ENABLED        
-        {"    ecc diffie hellman                       : optiga --","ecdh",            optiga_shell_crypt_ecdh},
+#ifdef OPTIGA_CRYPT_ECDH_ENABLED
+    {"    ecc diffie hellman                       : optiga --", "ecdh", optiga_shell_crypt_ecdh},
 #endif
 #ifdef OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED
-        {"    rsa key pair generation                  : optiga --","rsakeygen",       optiga_shell_crypt_rsa_generate_keypair},
+    {"    rsa key pair generation                  : optiga --",
+     "rsakeygen",
+     optiga_shell_crypt_rsa_generate_keypair},
 #endif
-#ifdef OPTIGA_CRYPT_RSA_SIGN_ENABLED        
-        {"    rsa sign                                 : optiga --","rsasign",         optiga_shell_crypt_rsa_sign},
+#ifdef OPTIGA_CRYPT_RSA_SIGN_ENABLED
+    {"    rsa sign                                 : optiga --",
+     "rsasign",
+     optiga_shell_crypt_rsa_sign},
 #endif
-#ifdef OPTIGA_CRYPT_RSA_VERIFY_ENABLED        
-        {"    rsa verify sign                          : optiga --","rsaverify",       optiga_shell_crypt_rsa_verify},
+#ifdef OPTIGA_CRYPT_RSA_VERIFY_ENABLED
+    {"    rsa verify sign                          : optiga --",
+     "rsaverify",
+     optiga_shell_crypt_rsa_verify},
 #endif
-#ifdef OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED        
-        {"    rsa encrypt message                      : optiga --","rsaencmsg",       optiga_shell_crypt_rsa_encrypt_message},
-        {"    rsa encrypt session                      : optiga --","rsaencsession",   optiga_shell_crypt_rsa_encrypt_session},
+#ifdef OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
+    {"    rsa encrypt message                      : optiga --",
+     "rsaencmsg",
+     optiga_shell_crypt_rsa_encrypt_message},
+    {"    rsa encrypt session                      : optiga --",
+     "rsaencsession",
+     optiga_shell_crypt_rsa_encrypt_session},
 #endif
-#ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED        
-        {"    rsa decrypt and store                    : optiga --","rsadecstore",     optiga_shell_crypt_rsa_decrypt_and_store},
-        {"    rsa decrypt and export                   : optiga --","rsadecexp",       optiga_shell_crypt_rsa_decrypt_and_export},
-#endif         
-#if defined (OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) && defined (OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)
-        {"    symmetric ecb encrypt and decrypt        : optiga --","ecbencdec",       optiga_shell_crypt_symmetric_encrypt_decrypt_ecb},
-        {"    symmetric cbc encrypt and decrypt        : optiga --","cbcencdec",       optiga_shell_crypt_symmetric_encrypt_decrypt_cbc},
-        {"    symmetric cbcmac encrypt                 : optiga --","cbcmacenc",       optiga_shell_crypt_symmetric_encrypt_cbcmac},
+#ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
+    {"    rsa decrypt and store                    : optiga --",
+     "rsadecstore",
+     optiga_shell_crypt_rsa_decrypt_and_store},
+    {"    rsa decrypt and export                   : optiga --",
+     "rsadecexp",
+     optiga_shell_crypt_rsa_decrypt_and_export},
 #endif
-#ifdef OPTIGA_CRYPT_HMAC_ENABLED          
-        {"    hmac-sha256 generation                   : optiga --","hmac",            optiga_shell_crypt_hmac},
+#if defined(OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) && defined(OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)
+    {"    symmetric ecb encrypt and decrypt        : optiga --",
+     "ecbencdec",
+     optiga_shell_crypt_symmetric_encrypt_decrypt_ecb},
+    {"    symmetric cbc encrypt and decrypt        : optiga --",
+     "cbcencdec",
+     optiga_shell_crypt_symmetric_encrypt_decrypt_cbc},
+    {"    symmetric cbcmac encrypt                 : optiga --",
+     "cbcmacenc",
+     optiga_shell_crypt_symmetric_encrypt_cbcmac},
 #endif
-#ifdef OPTIGA_CRYPT_HKDF_ENABLED           
-        {"    hkdf-sha256 key derivation               : optiga --","hkdf",            optiga_shell_crypt_hkdf},
+#ifdef OPTIGA_CRYPT_HMAC_ENABLED
+    {"    hmac-sha256 generation                   : optiga --", "hmac", optiga_shell_crypt_hmac},
 #endif
-#ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED 
-        {"    generate symmetric aes-128 key           : optiga --","aeskeygen",       optiga_shell_crypt_symmetric_generate_key},
-#endif    
-#if defined (OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined (OPTIGA_CRYPT_HMAC_VERIFY_ENABLED) && defined (OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED)        
-        {"    clear auto state                         : optiga --","clrautostate",    optiga_shell_crypt_clear_auto_state},
-#endif    
-#if defined (OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined (OPTIGA_CRYPT_HMAC_VERIFY_ENABLED)        
-        {"    hmac verify                              : optiga --","hmacverify",      optiga_shell_crypt_hmac_verify_with_authorization_reference},
-#endif        
+#ifdef OPTIGA_CRYPT_HKDF_ENABLED
+    {"    hkdf-sha256 key derivation               : optiga --", "hkdf", optiga_shell_crypt_hkdf},
+#endif
+#ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
+    {"    generate symmetric aes-128 key           : optiga --",
+     "aeskeygen",
+     optiga_shell_crypt_symmetric_generate_key},
+#endif
+#if defined(OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined(OPTIGA_CRYPT_HMAC_VERIFY_ENABLED) \
+    && defined(OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED)
+    {"    clear auto state                         : optiga --",
+     "clrautostate",
+     optiga_shell_crypt_clear_auto_state},
+#endif
+#if defined(OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED) && defined(OPTIGA_CRYPT_HMAC_VERIFY_ENABLED)
+    {"    hmac verify                              : optiga --",
+     "hmacverify",
+     optiga_shell_crypt_hmac_verify_with_authorization_reference},
+#endif
 };
 
-#define OPTIGA_SIZE_OF_CMDS            (sizeof(optiga_cmds)/sizeof(optiga_example_cmd_t))
+#define OPTIGA_SIZE_OF_CMDS (sizeof(optiga_cmds) / sizeof(optiga_example_cmd_t))
 
-static void optiga_shell_show_usage()
-{
+static void optiga_shell_show_usage() {
     uint8_t number_of_cmds = OPTIGA_SIZE_OF_CMDS;
     uint8_t index;
-    optiga_example_cmd_t * current_cmd;
+    optiga_example_cmd_t *current_cmd;
     optiga_lib_print_string_with_newline("");
     optiga_lib_print_string_with_newline("    usage                : optiga -<cmd>");
-    for(index = 0; index < number_of_cmds; index++)
-    {
+    for (index = 0; index < number_of_cmds; index++) {
         current_cmd = &optiga_cmds[index];
-        if(0 != strcmp("help",current_cmd->cmd_options))
-        {
+        if (0 != strcmp("help", current_cmd->cmd_options)) {
             optiga_lib_print_string(current_cmd->cmd_description);
             optiga_lib_print_string_with_newline(current_cmd->cmd_options);
         }
     }
 }
 
-static void optiga_shell_trim_cmd(char_t * user_cmd)
-{
-    char_t* i = user_cmd;
-    char_t* j = user_cmd;
-    while(*j != 0)
-    {
+static void optiga_shell_trim_cmd(char_t *user_cmd) {
+    char_t *i = user_cmd;
+    char_t *j = user_cmd;
+    while (*j != 0) {
         *i = *j++;
-        if(*i != ' ')
+        if (*i != ' ')
             i++;
     }
     *i = 0;
-    if(strlen(user_cmd)>strlen("optiga --"))
-    {
-        strcpy(user_cmd,user_cmd+strlen("optiga --")-1);
+    if (strlen(user_cmd) > strlen("optiga --")) {
+        strcpy(user_cmd, user_cmd + strlen("optiga --") - 1);
     }
 }
 
-static void optiga_shell_execute_example(char_t * user_cmd)
-{
+static void optiga_shell_execute_example(char_t *user_cmd) {
     uint8_t number_of_cmds = OPTIGA_SIZE_OF_CMDS;
-    uint8_t index,cmd_found = 0;
-    char_t * optiga_cmd_option = "optiga --";
-    optiga_example_cmd_t * current_cmd;
+    uint8_t index, cmd_found = 0;
+    char_t *optiga_cmd_option = "optiga --";
+    optiga_example_cmd_t *current_cmd;
 
-    
-    do
-    {
-        if (0 != strncmp(user_cmd,optiga_cmd_option,9))
-        {
+    do {
+        if (0 != strncmp(user_cmd, optiga_cmd_option, 9)) {
             break;
         }
         optiga_shell_trim_cmd(user_cmd);
-        for(index = 0; index < number_of_cmds; index++)
-        {
+        for (index = 0; index < number_of_cmds; index++) {
             current_cmd = &optiga_cmds[index];
-            if(0 == strcmp(user_cmd,current_cmd->cmd_options))
-            {
-                if(NULL != current_cmd->cmd_handler)
-                {
+            if (0 == strcmp(user_cmd, current_cmd->cmd_options)) {
+                if (NULL != current_cmd->cmd_handler) {
                     current_cmd->cmd_handler();
                     optiga_lib_print_string_with_newline("");
                     cmd_found = 1;
                     break;
-                }
-                else
-                {
+                } else {
                     optiga_lib_print_string_with_newline("No example exists for this request");
                     break;
                 }
             }
         }
     } while (FALSE);
-    if(!cmd_found)
-    {
+    if (!cmd_found) {
         optiga_lib_print_string_with_newline("");
-        optiga_lib_print_string_with_newline("No example exists for this request chose below options");
+        optiga_lib_print_string_with_newline(
+            "No example exists for this request chose below options"
+        );
         optiga_shell_show_usage();
     }
-
 }
 
-static void optiga_shell_show_prompt()
-{
+static void optiga_shell_show_prompt() {
     optiga_lib_print_string("$");
 }
 
-void optiga_shell_begin(void)
-{
+void optiga_shell_begin(void) {
     uint8_t ch = 0;
     char_t user_cmd[50];
     uint8_t index = 0;
@@ -981,25 +1000,19 @@ void optiga_shell_begin(void)
     optiga_shell_show_usage();
     optiga_shell_show_prompt();
 
-    //lint --e{716} Suppress the infinite loop
-    while(TRUE)
-    {
-        if (0 == pal_logger_read(&logger_console,&ch,1))
-        {
-
-            if(ch == 0x0d || ch == 0x0a)
-            {
+    // lint --e{716} Suppress the infinite loop
+    while (TRUE) {
+        if (0 == pal_logger_read(&logger_console, &ch, 1)) {
+            if (ch == 0x0d || ch == 0x0a) {
                 user_cmd[index++] = 0;
                 index = 0;
                 optiga_lib_print_string_with_newline("");
-                //start cmd parsing
-                optiga_shell_execute_example((char_t * )user_cmd);
+                // start cmd parsing
+                optiga_shell_execute_example((char_t *)user_cmd);
                 optiga_shell_show_prompt();
-            }
-            else
-            {
-                //keep adding
-                //lint --e{534,713} The return value is not used hence not checked*/
+            } else {
+                // keep adding
+                // lint --e{534,713} The return value is not used hence not checked*/
                 pal_logger_write(&logger_console, &ch, 1);
                 user_cmd[index++] = ch;
             }
@@ -1007,22 +1020,17 @@ void optiga_shell_begin(void)
     }
 }
 
-void optiga_shell_wait_for_user(void)
-{
+void optiga_shell_wait_for_user(void) {
     uint16_t bytes = 0;
     uint8_t ch = 0;
-    //lint --e{716} Suppress the infinite loop
-    while(TRUE)
-    {
+    // lint --e{716} Suppress the infinite loop
+    while (TRUE) {
         bytes = USBD_VCOM_BytesReceived();
-        if (bytes)
-        {
-            //lint --e{534} The return value is not used hence not checked*/
-            pal_logger_read(&logger_console,&ch,1);
+        if (bytes) {
+            // lint --e{534} The return value is not used hence not checked*/
+            pal_logger_read(&logger_console, &ch, 1);
             break;
-        }
-        else
-        {
+        } else {
             optiga_lib_print_string_with_newline("Press any key to start optiga mini shell");
             pal_os_timer_delay_in_milliseconds(2000);
         }

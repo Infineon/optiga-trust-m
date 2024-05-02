@@ -1,39 +1,17 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2021 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file optiga_cmd.h
-*
-* \brief   This file defines APIs, types and data structures used in the Command (cmd) module implementation.
-*
-* \ingroup  grOptigaCmd
-*
-* @{
-*/
+ * SPDX-FileCopyrightText: 2021-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file optiga_cmd.h
+ *
+ * \brief   This file defines APIs, types and data structures used in the Command (cmd) module implementation.
+ *
+ * \ingroup  grOptigaCmd
+ *
+ * @{
+ */
 
 #ifndef _OPTIGA_CMD_H_
 #define _OPTIGA_CMD_H_
@@ -73,9 +51,8 @@ typedef struct optiga_context optiga_context_t;
  * \retval    NULL                Memory allocation failure.
  *                                Already, OPTIGA_CMD_MAX_REGISTRATIONS number of instances is created.
  */
-optiga_cmd_t * optiga_cmd_create(uint8_t optiga_instance_id,
-                                 callback_handler_t handler,
-                                 void * caller_context);
+optiga_cmd_t *
+optiga_cmd_create(uint8_t optiga_instance_id, callback_handler_t handler, void *caller_context);
 
 /**
  * \brief Destroys the instance of #optiga_cmd_t.
@@ -97,8 +74,7 @@ optiga_cmd_t * optiga_cmd_create(uint8_t optiga_instance_id,
  *
  * \retval    #OPTIGA_LIB_SUCCESS     Successful destruction of instance.
  */
-optiga_lib_status_t optiga_cmd_destroy(optiga_cmd_t * me);
-
+optiga_lib_status_t optiga_cmd_destroy(optiga_cmd_t *me);
 
 /**
  * \brief Releases the OPTIGA cmd lock.
@@ -118,8 +94,7 @@ optiga_lib_status_t optiga_cmd_destroy(optiga_cmd_t * me);
  *
  * \retval    #OPTIGA_CMD_SUCCESS     Successful release of the access layer lock.
  */
-optiga_lib_status_t optiga_cmd_release_lock(const optiga_cmd_t * me);
-
+optiga_lib_status_t optiga_cmd_release_lock(const optiga_cmd_t *me);
 
 /**
  * \brief Opens the OPTIGA Application
@@ -149,9 +124,7 @@ optiga_lib_status_t optiga_cmd_release_lock(const optiga_cmd_t * me);
  *                                                        Error in the asynchronous state machine.
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT       APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
-optiga_lib_status_t optiga_cmd_open_application(optiga_cmd_t * me,
-                                                uint8_t cmd_param,
-                                                void * params);
+optiga_lib_status_t optiga_cmd_open_application(optiga_cmd_t *me, uint8_t cmd_param, void *params);
 
 /**
  * \brief Closes the OPTIGA Application
@@ -180,9 +153,7 @@ optiga_lib_status_t optiga_cmd_open_application(optiga_cmd_t * me,
  *                                                        Error in the asynchronous state machine.
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT       APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
-optiga_lib_status_t optiga_cmd_close_application(optiga_cmd_t * me,
-                                                 uint8_t cmd_param,
-                                                 void * params);
+optiga_lib_status_t optiga_cmd_close_application(optiga_cmd_t *me, uint8_t cmd_param, void *params);
 
 /**
  * \brief Reads data or metadata of the specified data object
@@ -214,9 +185,11 @@ optiga_lib_status_t optiga_cmd_close_application(optiga_cmd_t * me,
  *                                                        - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  *                                                        - Data received from OPTIGA is greater than the buffer size provided by user.
  */
-optiga_lib_status_t optiga_cmd_get_data_object(optiga_cmd_t * me,
-                                               uint8_t cmd_param,
-                                               optiga_get_data_object_params_t * params);
+optiga_lib_status_t optiga_cmd_get_data_object(
+    optiga_cmd_t *me,
+    uint8_t cmd_param,
+    optiga_get_data_object_params_t *params
+);
 
 /**
  * \brief Writes data or metadata to the specified data object
@@ -248,11 +221,13 @@ optiga_lib_status_t optiga_cmd_get_data_object(optiga_cmd_t * me,
  *                                                        Error in the asynchronous state machine.
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT       APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
-optiga_lib_status_t optiga_cmd_set_data_object(optiga_cmd_t * me,
-                                               uint8_t cmd_param,
-                                               optiga_set_data_object_params_t * params);
+optiga_lib_status_t optiga_cmd_set_data_object(
+    optiga_cmd_t *me,
+    uint8_t cmd_param,
+    optiga_set_data_object_params_t *params
+);
 
-#if defined (OPTIGA_CRYPT_RANDOM_ENABLED) || defined (OPTIGA_CRYPT_RSA_PRE_MASTER_SECRET_ENABLED)
+#if defined(OPTIGA_CRYPT_RANDOM_ENABLED) || defined(OPTIGA_CRYPT_RSA_PRE_MASTER_SECRET_ENABLED)
 /**
  * \brief Generates random data or pre-master secret for RSA key exchange.
  *
@@ -280,10 +255,9 @@ optiga_lib_status_t optiga_cmd_set_data_object(optiga_cmd_t * me,
  *                                                        Error in the asynchronous state machine.
  * \retval   #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT        APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
-optiga_lib_status_t optiga_cmd_get_random(optiga_cmd_t * me,
-                                          uint8_t cmd_param,
-                                          optiga_get_random_params_t * params);
-#endif //OPTIGA_CRYPT_RANDOM_ENABLED || OPTIGA_CRYPT_RSA_PRE_MASTER_SECRET_ENABLED
+optiga_lib_status_t
+optiga_cmd_get_random(optiga_cmd_t *me, uint8_t cmd_param, optiga_get_random_params_t *params);
+#endif  // OPTIGA_CRYPT_RANDOM_ENABLED || OPTIGA_CRYPT_RSA_PRE_MASTER_SECRET_ENABLED
 
 #ifdef OPTIGA_CRYPT_HASH_ENABLED
 /**
@@ -314,12 +288,11 @@ optiga_lib_status_t optiga_cmd_get_random(optiga_cmd_t * me,
  *                                                        - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  *                                                        - Data received from OPTIGA is greater than the buffer size provided by user.
  */
-optiga_lib_status_t optiga_cmd_calc_hash(optiga_cmd_t * me,
-                                         uint8_t cmd_param,
-                                         optiga_calc_hash_params_t * params);
-#endif //OPTIGA_CRYPT_HASH_ENABLED
+optiga_lib_status_t
+optiga_cmd_calc_hash(optiga_cmd_t *me, uint8_t cmd_param, optiga_calc_hash_params_t *params);
+#endif  // OPTIGA_CRYPT_HASH_ENABLED
 
-#if defined (OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) || defined (OPTIGA_CRYPT_RSA_SIGN_ENABLED)
+#if defined(OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) || defined(OPTIGA_CRYPT_RSA_SIGN_ENABLED)
 /**
  * \brief Calculate signature on digest.
  *
@@ -349,12 +322,11 @@ optiga_lib_status_t optiga_cmd_calc_hash(optiga_cmd_t * me,
  *                                                    - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  *                                                    - Length of the buffer to copy the signature is less than actual length of signature.
  */
-optiga_lib_status_t optiga_cmd_calc_sign(optiga_cmd_t * me,
-                                         uint8_t cmd_param,
-                                         optiga_calc_sign_params_t * params);
-#endif //OPTIGA_CRYPT_ECDSA_SIGN_ENABLED || OPTIGA_CRYPT_RSA_SIGN_ENABLED
+optiga_lib_status_t
+optiga_cmd_calc_sign(optiga_cmd_t *me, uint8_t cmd_param, optiga_calc_sign_params_t *params);
+#endif  // OPTIGA_CRYPT_ECDSA_SIGN_ENABLED || OPTIGA_CRYPT_RSA_SIGN_ENABLED
 
-#if defined (OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED) || defined (OPTIGA_CRYPT_RSA_VERIFY_ENABLED)
+#if defined(OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED) || defined(OPTIGA_CRYPT_RSA_VERIFY_ENABLED)
 /**
  * \brief Verifies the signature over the given digest.
  *
@@ -380,10 +352,9 @@ optiga_lib_status_t optiga_cmd_calc_sign(optiga_cmd_t * me,
  *                                                        Error in the asynchronous state machine.
  * \retval   #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT        APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
-optiga_lib_status_t optiga_cmd_verify_sign(optiga_cmd_t * me,
-                                           uint8_t cmd_param,
-                                           optiga_verify_sign_params_t * params);
-#endif //OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED || OPTIGA_CRYPT_RSA_VERIFY_ENABLED
+optiga_lib_status_t
+optiga_cmd_verify_sign(optiga_cmd_t *me, uint8_t cmd_param, optiga_verify_sign_params_t *params);
+#endif  // OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED || OPTIGA_CRYPT_RSA_VERIFY_ENABLED
 
 #ifdef OPTIGA_CRYPT_ECDH_ENABLED
 /**
@@ -416,12 +387,12 @@ optiga_lib_status_t optiga_cmd_verify_sign(optiga_cmd_t * me,
  * \retval   #OPTIGA_CMD_ERROR_INVALID_INPUT              Instance invoked for session oid, without acquiring the session (from #optiga_cmd_gen_keypair).
  * \retval   #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT        APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
-optiga_lib_status_t optiga_cmd_calc_ssec(optiga_cmd_t * me,
-                                         uint8_t cmd_param,
-                                         optiga_calc_ssec_params_t * params);
-#endif //OPTIGA_CRYPT_ECDH_ENABLED
+optiga_lib_status_t
+optiga_cmd_calc_ssec(optiga_cmd_t *me, uint8_t cmd_param, optiga_calc_ssec_params_t *params);
+#endif  // OPTIGA_CRYPT_ECDH_ENABLED
 
-#if defined (OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED) || defined (OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED) || defined (OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED) || defined (OPTIGA_CRYPT_HKDF_ENABLED)
+#if defined(OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED) || defined(OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED) \
+    || defined(OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED) || defined(OPTIGA_CRYPT_HKDF_ENABLED)
 /**
  * \brief Derives a key.
  *
@@ -451,12 +422,12 @@ optiga_lib_status_t optiga_cmd_calc_ssec(optiga_cmd_t * me,
  * \retval    #OPTIGA_CMD_ERROR_INVALID_INPUT             Instance invoked for session oid, without acquiring the session(from #optiga_cmd_calc_ssec).
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT       APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
-optiga_lib_status_t optiga_cmd_derive_key(optiga_cmd_t * me,
-                                          uint8_t cmd_param,
-                                          optiga_derive_key_params_t * params);
-#endif //OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED || OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED || OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED || OPTIGA_CRYPT_HKDF_ENABLED
+optiga_lib_status_t
+optiga_cmd_derive_key(optiga_cmd_t *me, uint8_t cmd_param, optiga_derive_key_params_t *params);
+#endif  // OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED || OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED || OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED || OPTIGA_CRYPT_HKDF_ENABLED
 
-#if defined (OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) || defined (OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED)
+#if defined(OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) \
+    || defined(OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED)
 /**
  * \brief Generates ECC or RSA key-pair.
  *
@@ -485,10 +456,9 @@ optiga_lib_status_t optiga_cmd_derive_key(optiga_cmd_t * me,
  *                                                    - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  *                                                    - Length of the buffer to copy the key is less than actual length of key.
  */
-optiga_lib_status_t optiga_cmd_gen_keypair(optiga_cmd_t * me,
-                                           uint8_t cmd_param,
-                                           optiga_gen_keypair_params_t * params);
-#endif //(OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) || (OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED)
+optiga_lib_status_t
+optiga_cmd_gen_keypair(optiga_cmd_t *me, uint8_t cmd_param, optiga_gen_keypair_params_t *params);
+#endif  //(OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED) || (OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED)
 
 #ifdef OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
 /**
@@ -520,10 +490,9 @@ optiga_lib_status_t optiga_cmd_gen_keypair(optiga_cmd_t * me,
  *                                                    - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  *                                                    - Length of the buffer to copy the encrypted data is less than buffer to copy it into.
  */
-optiga_lib_status_t optiga_cmd_encrypt_asym(optiga_cmd_t * me,
-                                            uint8_t cmd_param,
-                                            optiga_encrypt_asym_params_t * params);
-#endif // OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
+optiga_lib_status_t
+optiga_cmd_encrypt_asym(optiga_cmd_t *me, uint8_t cmd_param, optiga_encrypt_asym_params_t *params);
+#endif  // OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
 
 #ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
 /**
@@ -554,10 +523,9 @@ optiga_lib_status_t optiga_cmd_encrypt_asym(optiga_cmd_t * me,
  *                                                    - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  *                                                    - Length of the buffer to copy the decrypted data is less than buffer to copy it into.
  */
-optiga_lib_status_t optiga_cmd_decrypt_asym(optiga_cmd_t * me,
-                                            uint8_t cmd_param,
-                                            optiga_decrypt_asym_params_t * params);
-#endif // OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
+optiga_lib_status_t
+optiga_cmd_decrypt_asym(optiga_cmd_t *me, uint8_t cmd_param, optiga_decrypt_asym_params_t *params);
+#endif  // OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
 
 /**
  * \brief Writes protected object fragments to OPTIGA.
@@ -586,11 +554,13 @@ optiga_lib_status_t optiga_cmd_decrypt_asym(optiga_cmd_t * me,
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT       APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  * \retval    #OPTIGA_CMD_ERROR_INVALID_INPUT             Continue and final APDU command invoked without strict lock acquired for the instance.
  */
-optiga_lib_status_t optiga_cmd_set_object_protected(optiga_cmd_t * me,
-                                                    uint8_t cmd_param,
-                                                    optiga_set_object_protected_params_t * params);
-                                                    
-#if defined (OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) || defined (OPTIGA_CRYPT_HMAC_ENABLED)
+optiga_lib_status_t optiga_cmd_set_object_protected(
+    optiga_cmd_t *me,
+    uint8_t cmd_param,
+    optiga_set_object_protected_params_t *params
+);
+
+#if defined(OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) || defined(OPTIGA_CRYPT_HMAC_ENABLED)
 /**
  * \brief Encrypt data using #optiga_symmetric_encryption_mode_t encryption scheme.
  *
@@ -619,13 +589,12 @@ optiga_lib_status_t optiga_cmd_set_object_protected(optiga_cmd_t * me,
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT   Error due to insufficient buffer size.
  *                                                    - Length of the buffer to copy the encrypted data is less than buffer to copy it into.
  */
-optiga_lib_status_t optiga_cmd_encrypt_sym(optiga_cmd_t * me,
-                                           uint8_t cmd_param,
-                                           optiga_encrypt_sym_params_t * params);
+optiga_lib_status_t
+optiga_cmd_encrypt_sym(optiga_cmd_t *me, uint8_t cmd_param, optiga_encrypt_sym_params_t *params);
 #endif
 
-#if defined (OPTIGA_CRYPT_SYM_DECRYPT_ENABLED) || defined (OPTIGA_CRYPT_HMAC_VERIFY_ENABLED) ||\
-    defined (OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED)
+#if defined(OPTIGA_CRYPT_SYM_DECRYPT_ENABLED) || defined(OPTIGA_CRYPT_HMAC_VERIFY_ENABLED) \
+    || defined(OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED)
 /**
  * \brief Decrypt data using #optiga_symmetric_encryption_mode_t encryption scheme.
  *
@@ -654,9 +623,8 @@ optiga_lib_status_t optiga_cmd_encrypt_sym(optiga_cmd_t * me,
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT   Error due to insufficient buffer size.
  *                                                    - Length of the buffer to copy the encrypted data is less than buffer to copy it into.
  */
-optiga_lib_status_t optiga_cmd_decrypt_sym(optiga_cmd_t * me,
-                                           uint8_t cmd_param,
-                                           optiga_decrypt_sym_params_t * params);
+optiga_lib_status_t
+optiga_cmd_decrypt_sym(optiga_cmd_t *me, uint8_t cmd_param, optiga_decrypt_sym_params_t *params);
 #endif
 
 #ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
@@ -665,7 +633,7 @@ optiga_lib_status_t optiga_cmd_decrypt_sym(optiga_cmd_t * me,
  *
  * \details
  * Generate symmetric key by issuing Generate Symmetric Key command to OPTIGA.
- * - Acquires the OPTIGA lock for #optiga_crypt_symmetric_generate_key.<br> 
+ * - Acquires the OPTIGA lock for #optiga_crypt_symmetric_generate_key.<br>
  * - Forms the Generate Symmetric Key command based on inputs.
  * - Issues the Generate Symmetric Key command through #optiga_comms_transceive.
  * - Releases the OPTIGA lock on successful completion of asynchronous operation.<br>
@@ -688,10 +656,9 @@ optiga_lib_status_t optiga_cmd_decrypt_sym(optiga_cmd_t * me,
  * \retval    #OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT   Error due to insufficient buffer size.
  *                                                    - APDU length formed is greater than <b>OPTIGA_MAX_COMMS_BUFFER_SIZE</b>.
  */
-optiga_lib_status_t optiga_cmd_gen_symkey(optiga_cmd_t * me,
-                                          uint8_t cmd_param,
-                                          optiga_gen_symkey_params_t * params);
-#endif // OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
+optiga_lib_status_t
+optiga_cmd_gen_symkey(optiga_cmd_t *me, uint8_t cmd_param, optiga_gen_symkey_params_t *params);
+#endif  // OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
 
 #ifdef __cplusplus
 }
@@ -700,5 +667,5 @@ optiga_lib_status_t optiga_cmd_gen_symkey(optiga_cmd_t * me,
 #endif /*_OPTIGA_CMD_H_ */
 
 /**
-* @}
-*/
+ * @}
+ */

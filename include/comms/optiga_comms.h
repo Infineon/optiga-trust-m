@@ -1,40 +1,17 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2021 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file optiga_comms.h
-*
-* \brief   This file implements Optiga comms abstraction layer for IFX I2C Protocol.
-*
-* \ingroup  grOptigaComms
-*
-* @{
-*/
-
+ * SPDX-FileCopyrightText: 2021-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file optiga_comms.h
+ *
+ * \brief   This file implements Optiga comms abstraction layer for IFX I2C Protocol.
+ *
+ * \ingroup  grOptigaComms
+ *
+ * @{
+ */
 
 #ifndef _OPTIGA_COMMS_H_
 #define _OPTIGA_COMMS_H_
@@ -43,29 +20,28 @@
 extern "C" {
 #endif
 
-#include "optiga_lib_types.h"
-#include "optiga_lib_return_codes.h"
 #include "optiga_lib_common.h"
+#include "optiga_lib_return_codes.h"
+#include "optiga_lib_types.h"
 
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
 // Offset for data
-#define OPTIGA_COMMS_DATA_OFFSET         (0x05)
+#define OPTIGA_COMMS_DATA_OFFSET (0x05)
 // Overhead buffer size for user buffer
-#define OPTIGA_COMMS_PRL_OVERHEAD        (0x0D)
+#define OPTIGA_COMMS_PRL_OVERHEAD (0x0D)
 #else
-#define OPTIGA_COMMS_DATA_OFFSET         (0x00)
-#define OPTIGA_COMMS_PRL_OVERHEAD        (0x00)
+#define OPTIGA_COMMS_DATA_OFFSET (0x00)
+#define OPTIGA_COMMS_PRL_OVERHEAD (0x00)
 #endif
 
 /** @brief Optiga comms structure */
-typedef struct optiga_comms
-{
+typedef struct optiga_comms {
     /// Pointer to the pal os event instance/context
-    void * p_pal_os_event_ctx;
+    void *p_pal_os_event_ctx;
     /// Comms structure pointer
-    void * p_comms_ctx;
+    void *p_comms_ctx;
     /// Upper layer context
-    void * p_upper_layer_ctx;
+    void *p_upper_layer_ctx;
     /// Upper layer handler
     upper_layer_callback_t upper_layer_handler;
     /// Holds the instance initialization state
@@ -106,8 +82,7 @@ extern optiga_comms_t optiga_comms;
  * \retval    #optiga_comms_t *   On successful instance creation
  * \retval    NULL                Memory allocation failure
  */
-optiga_comms_t * optiga_comms_create(callback_handler_t callback,
-                                     void * context);
+optiga_comms_t *optiga_comms_create(callback_handler_t callback, void *context);
 
 /**
  * \brief Deinitializes the OPTIGA comms instance
@@ -127,7 +102,7 @@ optiga_comms_t * optiga_comms_create(callback_handler_t callback,
  * \param[in] optiga_comms         Valid instance of #optiga_comms_t created using #optiga_comms_create
  *
  */
-void optiga_comms_destroy(optiga_comms_t * optiga_comms);
+void optiga_comms_destroy(optiga_comms_t *optiga_comms);
 
 /**
  * \brief Sets the callers context to OPTIGA comms instance
@@ -145,8 +120,8 @@ void optiga_comms_destroy(optiga_comms_t * optiga_comms);
  * \param[in] context                Pointer to callers context
  *
  */
-optiga_lib_status_t optiga_comms_set_callback_context(optiga_comms_t * p_optiga_comms,
-                                                      void *context);
+optiga_lib_status_t
+optiga_comms_set_callback_context(optiga_comms_t *p_optiga_comms, void *context);
 
 /**
  * \brief Sets the callback handler to OPTIGA comms instance
@@ -163,8 +138,8 @@ optiga_lib_status_t optiga_comms_set_callback_context(optiga_comms_t * p_optiga_
  * \param[in] p_optiga_comms         Valid instance of #optiga_comms_t created using #optiga_comms_create
  * \param[in] handler                Pointer to callback handler
  */
-optiga_lib_status_t optiga_comms_set_callback_handler(optiga_comms_t * p_optiga_comms,
-                                                      callback_handler_t handler);
+optiga_lib_status_t
+optiga_comms_set_callback_handler(optiga_comms_t *p_optiga_comms, callback_handler_t handler);
 /**
  * \brief Opens the communication channel with OPTIGA.
  *
@@ -209,8 +184,7 @@ optiga_lib_status_t optiga_comms_set_callback_handler(optiga_comms_t * p_optiga_
  * \retval        #OPTIGA_COMMS_SUCCESS
  * \retval        #OPTIGA_COMMS_ERROR
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_open(optiga_comms_t * p_ctx);
-
+LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_open(optiga_comms_t *p_ctx);
 
 /**
  * \brief Resets the OPTIGA
@@ -236,7 +210,7 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_open(optiga_comms_t * p_ctx);
  * \retval        #OPTIGA_COMMS_SUCCESS
  * \retval        #OPTIGA_COMMS_ERROR
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_reset(optiga_comms_t * p_ctx, uint8_t reset_type);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_reset(optiga_comms_t *p_ctx, uint8_t reset_type);
 
 /**
  * \brief Sends and receives the APDU.
@@ -298,11 +272,13 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_reset(optiga_comms_t * p_ctx, u
  * \retval        #OPTIGA_COMMS_ERROR_HANDSHAKE
  * \retval        #OPTIGA_COMMS_ERROR_SESSION
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_transceive(optiga_comms_t * p_ctx,
-                                                            const uint8_t * p_tx_data,
-                                                            uint16_t tx_data_length,
-                                                            uint8_t * p_rx_data,
-                                                            uint16_t * p_rx_data_len);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_transceive(
+    optiga_comms_t *p_ctx,
+    const uint8_t *p_tx_data,
+    uint16_t tx_data_length,
+    uint8_t *p_rx_data,
+    uint16_t *p_rx_data_len
+);
 
 /**
  * \brief Closes the communication channel with OPTIGA.
@@ -326,9 +302,7 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_transceive(optiga_comms_t * p_c
  * \retval        #OPTIGA_COMMS_SUCCESS
  * \retval        #OPTIGA_COMMS_ERROR
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_close(optiga_comms_t * p_ctx);
-
-
+LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_close(optiga_comms_t *p_ctx);
 
 #ifdef __cplusplus
 }
@@ -337,6 +311,5 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_comms_close(optiga_comms_t * p_ctx);
 #endif /*_OPTIGA_COMMS_H_*/
 
 /**
-* @}
-*/
-
+ * @}
+ */

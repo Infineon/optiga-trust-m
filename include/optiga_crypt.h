@@ -1,39 +1,17 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2021 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file optiga_crypt.h
-*
-* \brief   This file implements the prototype declarations of OPTIGA Crypt module.
-*
-* \ingroup  grOptigaCrypt
-*
-* @{
-*/
+ * SPDX-FileCopyrightText: 2021-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file optiga_crypt.h
+ *
+ * \brief   This file implements the prototype declarations of OPTIGA Crypt module.
+ *
+ * \ingroup  grOptigaCrypt
+ *
+ * @{
+ */
 
 #ifndef _OPTIGA_CRYPT_H_
 #define _OPTIGA_CRYPT_H_
@@ -45,8 +23,7 @@ extern "C" {
 #include "optiga_cmd.h"
 
 /** \brief union for OPTIGA crypt parameters */
-typedef union optiga_crypt_params
-{
+typedef union optiga_crypt_params {
     /// get random params
     optiga_get_random_params_t optiga_get_random_params;
     /// get key pair params
@@ -55,46 +32,44 @@ typedef union optiga_crypt_params
     optiga_calc_sign_params_t optiga_calc_sign_params;
     /// verify sign params
     optiga_verify_sign_params_t optiga_verify_sign_params;
-#if defined (OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED) || defined (OPTIGA_CRYPT_RSA_DECRYPT_ENABLED)    
+#if defined(OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED) || defined(OPTIGA_CRYPT_RSA_DECRYPT_ENABLED)
     /// asymmetric encryption params
     optiga_encrypt_asym_params_t optiga_encrypt_asym_params;
-#endif    
+#endif
     /// calc hash params
     optiga_calc_hash_params_t optiga_calc_hash_params;
     /// calc ssec params
     optiga_calc_ssec_params_t optiga_calc_ssec_params;
     /// derive key params
     optiga_derive_key_params_t optiga_derive_key_params;
-#if defined (OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) && defined (OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)
+#if defined(OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) && defined(OPTIGA_CRYPT_SYM_DECRYPT_ENABLED)
     /// derive key params
     optiga_encrypt_sym_params_t optiga_symmetric_enc_dec_params;
-#endif    
-#ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED    
+#endif
+#ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
     /// generate symmetric key params
-    optiga_gen_symkey_params_t optiga_gen_sym_key_params;   
-#endif    
-}optiga_crypt_params_t;
+    optiga_gen_symkey_params_t optiga_gen_sym_key_params;
+#endif
+} optiga_crypt_params_t;
 
 /** \brief OPTIGA crypt instance structure */
-struct optiga_crypt
-{
+struct optiga_crypt {
     /// Details/references (pointers) to the Application Inputs
     optiga_crypt_params_t params;
     /// Command module instance
-    optiga_cmd_t * my_cmd;
+    optiga_cmd_t *my_cmd;
     /// Caller context
-    void * caller_context;
+    void *caller_context;
     /// Callback handler
     callback_handler_t handler;
-    ///To provide the busy/free status of the crypt instance
+    /// To provide the busy/free status of the crypt instance
     uint16_t instance_state;
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
     /// To provide the encryption and decryption need for command and response
     uint8_t protection_level;
     /// To provide the presentation layer protocol version to be used
     uint8_t protocol_version;
-#endif //OPTIGA_COMMS_SHIELDED_CONNECTION
-
+#endif  // OPTIGA_COMMS_SHIELDED_CONNECTION
 };
 
 /** \brief OPTIGA crypt instance structure type*/
@@ -127,9 +102,7 @@ typedef struct optiga_crypt optiga_crypt_t;
  * <b>Example</b><br>
  *
  */
-void optiga_crypt_set_comms_params(optiga_crypt_t * me,
-                                   uint8_t parameter_type,
-                                   uint8_t value);
+void optiga_crypt_set_comms_params(optiga_crypt_t *me, uint8_t parameter_type, uint8_t value);
 #endif
 
 /**
@@ -159,9 +132,8 @@ void optiga_crypt_set_comms_params(optiga_crypt_t * me,
  *                                  Low layer function fails.<br>
  *                                  OPTIGA_CMD_MAX_REGISTRATIONS number of instances are already created.
  */
-LIBRARY_EXPORTS optiga_crypt_t * optiga_crypt_create(uint8_t optiga_instance_id,
-                                                     callback_handler_t handler,
-                                                     void * caller_context);
+LIBRARY_EXPORTS optiga_crypt_t *
+optiga_crypt_create(uint8_t optiga_instance_id, callback_handler_t handler, void *caller_context);
 
 /**
  * \brief Destroys an instance of #optiga_crypt_t.
@@ -184,7 +156,7 @@ LIBRARY_EXPORTS optiga_crypt_t * optiga_crypt_create(uint8_t optiga_instance_id,
  * \retval    #OPTIGA_CRYPT_ERROR_INSTANCE_IN_USE     The previous operation with the same instance is not complete.
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_destroy(optiga_crypt_t * me);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_destroy(optiga_crypt_t *me);
 
 #ifdef OPTIGA_CRYPT_RANDOM_ENABLED
 /**
@@ -222,11 +194,13 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_destroy(optiga_crypt_t * me);
  * example_optiga_crypt_random.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_random(optiga_crypt_t * me,
-                                                        optiga_rng_type_t rng_type,
-                                                        uint8_t * random_data,
-                                                        uint16_t random_data_length);
-#endif //OPTIGA_CRYPT_RANDOM_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_random(
+    optiga_crypt_t *me,
+    optiga_rng_type_t rng_type,
+    uint8_t *random_data,
+    uint16_t random_data_length
+);
+#endif  // OPTIGA_CRYPT_RANDOM_ENABLED
 
 #ifdef OPTIGA_CRYPT_HASH_ENABLED
 /**
@@ -262,13 +236,15 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_random(optiga_crypt_t * me,
  * example_optiga_crypt_hash.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash(optiga_crypt_t * me,
-                                                      optiga_hash_type_t hash_algorithm,
-                                                      uint8_t source_of_data_to_hash,
-                                                      const void * data_to_hash, 
-                                                      uint8_t * hash_output);
-                                      
- /**
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash(
+    optiga_crypt_t *me,
+    optiga_hash_type_t hash_algorithm,
+    uint8_t source_of_data_to_hash,
+    const void *data_to_hash,
+    uint8_t *hash_output
+);
+
+/**
  *
  * \brief Initializes a hash context.
  *
@@ -303,11 +279,10 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash(optiga_crypt_t * me,
  * example_optiga_crypt_hash.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash_start(optiga_crypt_t * me,
-                                                            optiga_hash_context_t * hash_ctx);
+LIBRARY_EXPORTS optiga_lib_status_t
+optiga_crypt_hash_start(optiga_crypt_t *me, optiga_hash_context_t *hash_ctx);
 
-
- /**
+/**
  * \brief Updates a hash context with the input data.
  *
  * \details
@@ -344,12 +319,14 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash_start(optiga_crypt_t * me,
  * example_optiga_crypt_hash.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash_update(optiga_crypt_t * me,
-                                                             optiga_hash_context_t * hash_ctx,
-                                                             uint8_t source_of_data_to_hash,
-                                                             const void * data_to_hash);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash_update(
+    optiga_crypt_t *me,
+    optiga_hash_context_t *hash_ctx,
+    uint8_t source_of_data_to_hash,
+    const void *data_to_hash
+);
 
- /**
+/**
  *
  * \brief Finalizes and exports the hash output.
  *
@@ -385,12 +362,13 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash_update(optiga_crypt_t * me
  * example_optiga_crypt_hash.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash_finalize(optiga_crypt_t * me,
-                                                               optiga_hash_context_t * hash_ctx,
-                                                               uint8_t * hash_output);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash_finalize(
+    optiga_crypt_t *me,
+    optiga_hash_context_t *hash_ctx,
+    uint8_t *hash_output
+);
 
-#endif //OPTIGA_CRYPT_HASH_ENABLED
-
+#endif  // OPTIGA_CRYPT_HASH_ENABLED
 
 #ifdef OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED
 
@@ -436,17 +414,19 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hash_finalize(optiga_crypt_t * 
  * example_optiga_crypt_ecc_generate_keypair.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecc_generate_keypair(optiga_crypt_t * me,
-                                                                      optiga_ecc_curve_t curve_id,
-                                                                      uint8_t key_usage,
-                                                                      bool_t export_private_key,
-                                                                      void * private_key,
-                                                                      uint8_t * public_key,
-                                                                      uint16_t * public_key_length);
-#endif //OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecc_generate_keypair(
+    optiga_crypt_t *me,
+    optiga_ecc_curve_t curve_id,
+    uint8_t key_usage,
+    bool_t export_private_key,
+    void *private_key,
+    uint8_t *public_key,
+    uint16_t *public_key_length
+);
+#endif  // OPTIGA_CRYPT_ECC_GENERATE_KEYPAIR_ENABLED
 
 #ifdef OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
- /**
+/**
  * \brief Generates a signature for the given digest.
  *
  * \details
@@ -483,13 +463,15 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecc_generate_keypair(optiga_cry
  * example_optiga_crypt_ecdsa_sign.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdsa_sign(optiga_crypt_t * me,
-                                                            const uint8_t * digest,
-                                                            uint8_t digest_length,
-                                                            optiga_key_id_t private_key,
-                                                            uint8_t * signature,
-                                                            uint16_t * signature_length);
-#endif //OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdsa_sign(
+    optiga_crypt_t *me,
+    const uint8_t *digest,
+    uint8_t digest_length,
+    optiga_key_id_t private_key,
+    uint8_t *signature,
+    uint16_t *signature_length
+);
+#endif  // OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
 
 #ifdef OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED
 /**
@@ -531,17 +513,19 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdsa_sign(optiga_crypt_t * me,
  * example_optiga_crypt_ecdsa_verify.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdsa_verify(optiga_crypt_t * me,
-                                                              const uint8_t * digest,
-                                                              uint8_t digest_length,
-                                                              const uint8_t * signature,
-                                                              uint16_t signature_length,
-                                                              uint8_t public_key_source_type,
-                                                              const void * public_key);
-#endif //OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdsa_verify(
+    optiga_crypt_t *me,
+    const uint8_t *digest,
+    uint8_t digest_length,
+    const uint8_t *signature,
+    uint16_t signature_length,
+    uint8_t public_key_source_type,
+    const void *public_key
+);
+#endif  // OPTIGA_CRYPT_ECDSA_VERIFY_ENABLED
 
 #ifdef OPTIGA_CRYPT_ECDH_ENABLED
- /**
+/**
  * \brief Calculates the shared secret using ECDH algorithm.<br>
  *
  * \details
@@ -584,14 +568,17 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdsa_verify(optiga_crypt_t * m
  * <b>Example</b><br>
  * example_optiga_crypt_ecdh.c
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdh(optiga_crypt_t * me,
-                                                      optiga_key_id_t private_key,
-                                                      public_key_from_host_t * public_key,
-                                                      bool_t export_to_host,
-                                                      uint8_t * shared_secret);
-#endif //OPTIGA_CRYPT_ECDH_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdh(
+    optiga_crypt_t *me,
+    optiga_key_id_t private_key,
+    public_key_from_host_t *public_key,
+    bool_t export_to_host,
+    uint8_t *shared_secret
+);
+#endif  // OPTIGA_CRYPT_ECDH_ENABLED
 
-#if defined (OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED) || defined (OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED) || defined (OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED)
+#if defined(OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED) || defined(OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED) \
+    || defined(OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED)
 /**
  * \brief Derives a key.<br>
  *
@@ -612,7 +599,7 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdh(optiga_crypt_t * me,
  * - Error codes from lower layers is returned as it is to the application.<br>
  *
  * \param[in]         me                                       Valid instance of #optiga_crypt_t created using #optiga_crypt_create.
- * \param[in]         type                                     Type of scheme to be used for TLS PRF as #optiga_tls_prf_type_t. 
+ * \param[in]         type                                     Type of scheme to be used for TLS PRF as #optiga_tls_prf_type_t.
  * \param[in]         secret                                   Object ID where the secret is stored in OPTIGA.
  *                                                             - #OPTIGA_KEY_ID_SESSION_BASED from #optiga_key_id_t, indicates the secret is available
  *                                                               in the session context acquired by the instance.
@@ -642,19 +629,21 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_ecdh(optiga_crypt_t * me,
  * example_optiga_crypt_tls_prf_sha256.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf(optiga_crypt_t * me,
-                                                         optiga_tls_prf_type_t type,
-                                                         uint16_t secret,
-                                                         const uint8_t * label,
-                                                         uint16_t label_length,
-                                                         const uint8_t * seed,
-                                                         uint16_t seed_length,
-                                                         uint16_t derived_key_length,
-                                                         bool_t export_to_host,
-                                                         uint8_t * derived_key); 
-#endif // OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED || OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED || OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED                                                         
-                                                
-#ifdef OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED                                                         
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf(
+    optiga_crypt_t *me,
+    optiga_tls_prf_type_t type,
+    uint16_t secret,
+    const uint8_t *label,
+    uint16_t label_length,
+    const uint8_t *seed,
+    uint16_t seed_length,
+    uint16_t derived_key_length,
+    bool_t export_to_host,
+    uint8_t *derived_key
+);
+#endif  // OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED || OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED || OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED
+
+#ifdef OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
 /**
  * \brief Derives a key using TLS PRF SHA256.<br>
  *
@@ -703,28 +692,31 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf(optiga_crypt_t * me,
  * example_optiga_crypt_tls_prf_sha256.c
  *
  */
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha256(optiga_crypt_t * me,
-                                                                               uint16_t secret,
-                                                                               const uint8_t * label,
-                                                                               uint16_t label_length,
-                                                                               const uint8_t * seed,
-                                                                               uint16_t seed_length,
-                                                                               uint16_t derived_key_length,
-                                                                               bool_t export_to_host,
-                                                                               uint8_t * derived_key)
-{
-    return (optiga_crypt_tls_prf(me,
-                                 OPTIGA_TLS12_PRF_SHA_256,
-                                 secret,
-                                 label,
-                                 label_length,
-                                 seed,
-                                 seed_length,
-                                 derived_key_length,
-                                 export_to_host,
-                                 derived_key));    
+_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha256(
+    optiga_crypt_t *me,
+    uint16_t secret,
+    const uint8_t *label,
+    uint16_t label_length,
+    const uint8_t *seed,
+    uint16_t seed_length,
+    uint16_t derived_key_length,
+    bool_t export_to_host,
+    uint8_t *derived_key
+) {
+    return (optiga_crypt_tls_prf(
+        me,
+        OPTIGA_TLS12_PRF_SHA_256,
+        secret,
+        label,
+        label_length,
+        seed,
+        seed_length,
+        derived_key_length,
+        export_to_host,
+        derived_key
+    ));
 }
-#endif // OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
+#endif  // OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
 #ifdef OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED
 /**
  * \brief Derives a key using TLS PRF SHA384.<br>
@@ -773,28 +765,31 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha256(o
  * None
  *
  */
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha384(optiga_crypt_t * me,
-                                                                               uint16_t secret,
-                                                                               const uint8_t * label,
-                                                                               uint16_t label_length,
-                                                                               const uint8_t * seed,
-                                                                               uint16_t seed_length,
-                                                                               uint16_t derived_key_length,
-                                                                               bool_t export_to_host,
-                                                                               uint8_t * derived_key)
-{
-    return (optiga_crypt_tls_prf(me,
-                                 OPTIGA_TLS12_PRF_SHA_384,
-                                 secret,
-                                 label,
-                                 label_length,
-                                 seed,
-                                 seed_length,
-                                 derived_key_length,
-                                 export_to_host,
-                                 derived_key));
+_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha384(
+    optiga_crypt_t *me,
+    uint16_t secret,
+    const uint8_t *label,
+    uint16_t label_length,
+    const uint8_t *seed,
+    uint16_t seed_length,
+    uint16_t derived_key_length,
+    bool_t export_to_host,
+    uint8_t *derived_key
+) {
+    return (optiga_crypt_tls_prf(
+        me,
+        OPTIGA_TLS12_PRF_SHA_384,
+        secret,
+        label,
+        label_length,
+        seed,
+        seed_length,
+        derived_key_length,
+        export_to_host,
+        derived_key
+    ));
 }
-#endif // OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED
+#endif  // OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED
 #ifdef OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED
 /**
  * \brief Derives a key using TLS PRF SHA512.<br>
@@ -843,29 +838,31 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha384(o
  * None
  *
  */
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha512(optiga_crypt_t * me,
-                                                                               uint16_t secret,
-                                                                               const uint8_t * label,
-                                                                               uint16_t label_length,
-                                                                               const uint8_t * seed,
-                                                                               uint16_t seed_length,
-                                                                               uint16_t derived_key_length,
-                                                                               bool_t export_to_host,
-                                                                               uint8_t * derived_key)
-{
-    return (optiga_crypt_tls_prf(me,
-                                 OPTIGA_TLS12_PRF_SHA_512,
-                                 secret,
-                                 label,
-                                 label_length,
-                                 seed,
-                                 seed_length,
-                                 derived_key_length,
-                                 export_to_host,
-                                 derived_key));
+_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha512(
+    optiga_crypt_t *me,
+    uint16_t secret,
+    const uint8_t *label,
+    uint16_t label_length,
+    const uint8_t *seed,
+    uint16_t seed_length,
+    uint16_t derived_key_length,
+    bool_t export_to_host,
+    uint8_t *derived_key
+) {
+    return (optiga_crypt_tls_prf(
+        me,
+        OPTIGA_TLS12_PRF_SHA_512,
+        secret,
+        label,
+        label_length,
+        seed,
+        seed_length,
+        derived_key_length,
+        export_to_host,
+        derived_key
+    ));
 }
-#endif //OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED
-
+#endif  // OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED
 
 #ifdef OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED
 
@@ -913,18 +910,19 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha512(o
  * example_optiga_crypt_rsa_generate_keypair.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_generate_keypair(optiga_crypt_t * me,
-                                                                      optiga_rsa_key_type_t key_type,
-                                                                      uint8_t key_usage,
-                                                                      bool_t export_private_key,
-                                                                      void * private_key,
-                                                                      uint8_t * public_key,
-                                                                      uint16_t * public_key_length);
-#endif //OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED
-
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_generate_keypair(
+    optiga_crypt_t *me,
+    optiga_rsa_key_type_t key_type,
+    uint8_t key_usage,
+    bool_t export_private_key,
+    void *private_key,
+    uint8_t *public_key,
+    uint16_t *public_key_length
+);
+#endif  // OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED
 
 #ifdef OPTIGA_CRYPT_RSA_SIGN_ENABLED
- /**
+/**
  * \brief Generates a RSA signature for the given digest based on the input signature scheme.
  *
  * \details
@@ -961,15 +959,17 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_generate_keypair(optiga_cry
  * example_optiga_crypt_rsa_sign.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_sign(optiga_crypt_t * me,
-                                                          optiga_rsa_signature_scheme_t signature_scheme,
-                                                          const uint8_t * digest,
-                                                          uint8_t digest_length,
-                                                          optiga_key_id_t private_key,
-                                                          uint8_t * signature,
-                                                          uint16_t * signature_length,
-                                                          uint16_t salt_length);
-#endif //OPTIGA_CRYPT_RSA_SIGN_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_sign(
+    optiga_crypt_t *me,
+    optiga_rsa_signature_scheme_t signature_scheme,
+    const uint8_t *digest,
+    uint8_t digest_length,
+    optiga_key_id_t private_key,
+    uint8_t *signature,
+    uint16_t *signature_length,
+    uint16_t salt_length
+);
+#endif  // OPTIGA_CRYPT_RSA_SIGN_ENABLED
 
 #ifdef OPTIGA_CRYPT_RSA_VERIFY_ENABLED
 /**
@@ -1013,16 +1013,18 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_sign(optiga_crypt_t * me,
  * example_optiga_crypt_rsa_verify.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_verify(optiga_crypt_t * me,
-                                                            optiga_rsa_signature_scheme_t signature_scheme,
-                                                            const uint8_t * digest,
-                                                            uint8_t digest_length,
-                                                            const uint8_t * signature,
-                                                            uint16_t signature_length,
-                                                            uint8_t public_key_source_type,
-                                                            const void * public_key,
-                                                            uint16_t salt_length);
-#endif //OPTIGA_CRYPT_RSA_VERIFY_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_verify(
+    optiga_crypt_t *me,
+    optiga_rsa_signature_scheme_t signature_scheme,
+    const uint8_t *digest,
+    uint8_t digest_length,
+    const uint8_t *signature,
+    uint16_t signature_length,
+    uint8_t public_key_source_type,
+    const void *public_key,
+    uint16_t salt_length
+);
+#endif  // OPTIGA_CRYPT_RSA_VERIFY_ENABLED
 
 #ifdef OPTIGA_CRYPT_RSA_PRE_MASTER_SECRET_ENABLED
 /**
@@ -1068,11 +1070,13 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_verify(optiga_crypt_t * me,
  *
  */
 
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_generate_pre_master_secret(optiga_crypt_t * me,
-                                                                                const uint8_t * optional_data,
-                                                                                uint16_t optional_data_length,
-                                                                                uint16_t pre_master_secret_length);
-#endif //OPTIGA_CRYPT_RSA_PRE_MASTER_SECRET_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_generate_pre_master_secret(
+    optiga_crypt_t *me,
+    const uint8_t *optional_data,
+    uint16_t optional_data_length,
+    uint16_t pre_master_secret_length
+);
+#endif  // OPTIGA_CRYPT_RSA_PRE_MASTER_SECRET_ENABLED
 
 #ifdef OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
 
@@ -1121,16 +1125,18 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_generate_pre_master_secret(
  * example_optiga_crypt_encrypt_message.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_message(optiga_crypt_t * me,
-                                                                     optiga_rsa_encryption_scheme_t encryption_scheme,
-                                                                     const uint8_t * message,
-                                                                     uint16_t message_length,
-                                                                     const uint8_t * label,
-                                                                     uint16_t label_length,
-                                                                     uint8_t public_key_source_type,
-                                                                     const void * public_key,
-                                                                     uint8_t * encrypted_message,
-                                                                     uint16_t * encrypted_message_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_message(
+    optiga_crypt_t *me,
+    optiga_rsa_encryption_scheme_t encryption_scheme,
+    const uint8_t *message,
+    uint16_t message_length,
+    const uint8_t *label,
+    uint16_t label_length,
+    uint8_t public_key_source_type,
+    const void *public_key,
+    uint8_t *encrypted_message,
+    uint16_t *encrypted_message_length
+);
 
 /**
  * \brief Encrypts session data using RSA public key.<br>
@@ -1176,16 +1182,18 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_message(optiga_cryp
  * example_optiga_crypt_encrypt_session.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_crypt_t * me,
-                                                                     optiga_rsa_encryption_scheme_t encryption_scheme,
-                                                                     const uint8_t * label,
-                                                                     uint16_t label_length,
-                                                                     uint8_t public_key_source_type,
-                                                                     const void * public_key,
-                                                                     uint8_t * encrypted_message,
-                                                                     uint16_t * encrypted_message_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(
+    optiga_crypt_t *me,
+    optiga_rsa_encryption_scheme_t encryption_scheme,
+    const uint8_t *label,
+    uint16_t label_length,
+    uint8_t public_key_source_type,
+    const void *public_key,
+    uint8_t *encrypted_message,
+    uint16_t *encrypted_message_length
+);
 
-#endif //OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
+#endif  // OPTIGA_CRYPT_RSA_ENCRYPT_ENABLED
 
 #ifdef OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
 /**
@@ -1229,17 +1237,19 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_decrypt.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_decrypt_and_export(optiga_crypt_t * me,
-                                                                         optiga_rsa_encryption_scheme_t encryption_scheme,
-                                                                         const uint8_t * encrypted_message,
-                                                                         uint16_t encrypted_message_length,
-                                                                         const uint8_t * label,
-                                                                         uint16_t label_length,
-                                                                         optiga_key_id_t private_key,
-                                                                         uint8_t * message,
-                                                                         uint16_t * message_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_decrypt_and_export(
+    optiga_crypt_t *me,
+    optiga_rsa_encryption_scheme_t encryption_scheme,
+    const uint8_t *encrypted_message,
+    uint16_t encrypted_message_length,
+    const uint8_t *label,
+    uint16_t label_length,
+    optiga_key_id_t private_key,
+    uint8_t *message,
+    uint16_t *message_length
+);
 
- /**
+/**
  * \brief Decrypts input data using OPTIGA private key and stores it in a OPTIGA session.<br>
  *
  * \details
@@ -1276,15 +1286,17 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_decrypt.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_decrypt_and_store(optiga_crypt_t * me,
-                                                                        optiga_rsa_encryption_scheme_t encryption_scheme,
-                                                                        const uint8_t * encrypted_message,
-                                                                        uint16_t encrypted_message_length,
-                                                                        const uint8_t * label,
-                                                                        uint16_t label_length,
-                                                                        optiga_key_id_t private_key);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_decrypt_and_store(
+    optiga_crypt_t *me,
+    optiga_rsa_encryption_scheme_t encryption_scheme,
+    const uint8_t *encrypted_message,
+    uint16_t encrypted_message_length,
+    const uint8_t *label,
+    uint16_t label_length,
+    optiga_key_id_t private_key
+);
 
-#endif //OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
+#endif  // OPTIGA_CRYPT_RSA_DECRYPT_ENABLED
 
 #ifdef OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED
 /**
@@ -1339,18 +1351,19 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_symmetric_encrypt_decrypt.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_encrypt(optiga_crypt_t * me,
-                                                                    optiga_symmetric_encryption_mode_t
-                                                                    encryption_mode,
-                                                                    optiga_key_id_t symmetric_key_oid,
-                                                                    const uint8_t * plain_data,
-                                                                    uint32_t plain_data_length,
-                                                                    const uint8_t * iv,
-                                                                    uint16_t iv_length,
-                                                                    const uint8_t * associated_data,
-                                                                    uint16_t associated_data_length,
-                                                                    uint8_t * encrypted_data,
-                                                                    uint32_t * encrypted_data_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_encrypt(
+    optiga_crypt_t *me,
+    optiga_symmetric_encryption_mode_t encryption_mode,
+    optiga_key_id_t symmetric_key_oid,
+    const uint8_t *plain_data,
+    uint32_t plain_data_length,
+    const uint8_t *iv,
+    uint16_t iv_length,
+    const uint8_t *associated_data,
+    uint16_t associated_data_length,
+    uint8_t *encrypted_data,
+    uint32_t *encrypted_data_length
+);
 
 /**
  * \brief Encrypt the data using symmetric encryption scheme using ECB mode of operation.<br>
@@ -1393,12 +1406,14 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_symmetric_encrypt_decrypt_ecb.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_encrypt_ecb(optiga_crypt_t * me,
-                                                                        optiga_key_id_t symmetric_key_oid,
-                                                                        const uint8_t * plain_data,
-                                                                        uint32_t plain_data_length,
-                                                                        uint8_t * encrypted_data,
-                                                                        uint32_t * encrypted_data_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_encrypt_ecb(
+    optiga_crypt_t *me,
+    optiga_key_id_t symmetric_key_oid,
+    const uint8_t *plain_data,
+    uint32_t plain_data_length,
+    uint8_t *encrypted_data,
+    uint32_t *encrypted_data_length
+);
 
 /**
  * \brief Initiates a symmetric encryption sequence for input data using symmetric key from OPTIGA.<br>
@@ -1455,19 +1470,20 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_symmetric_encrypt_decrypt.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_encrypt_start(optiga_crypt_t * me,
-                                                                          optiga_symmetric_encryption_mode_t
-                                                                          encryption_mode,
-                                                                          optiga_key_id_t symmetric_key_oid,
-                                                                          const uint8_t * plain_data,
-                                                                          uint32_t plain_data_length,
-                                                                          const uint8_t * iv,
-                                                                          uint16_t iv_length,
-                                                                          const uint8_t * associated_data,
-                                                                          uint16_t associated_data_length,
-                                                                          uint16_t total_plain_data_length,
-                                                                          uint8_t * encrypted_data,
-                                                                          uint32_t * encrypted_data_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_encrypt_start(
+    optiga_crypt_t *me,
+    optiga_symmetric_encryption_mode_t encryption_mode,
+    optiga_key_id_t symmetric_key_oid,
+    const uint8_t *plain_data,
+    uint32_t plain_data_length,
+    const uint8_t *iv,
+    uint16_t iv_length,
+    const uint8_t *associated_data,
+    uint16_t associated_data_length,
+    uint16_t total_plain_data_length,
+    uint8_t *encrypted_data,
+    uint32_t *encrypted_data_length
+);
 
 /**
  * \brief Encrypts input data using symmetric key from OPTIGA and exports block aligned encrypted data.<br>
@@ -1510,11 +1526,13 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_symmetric_encrypt_decrypt.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_encrypt_continue(optiga_crypt_t * me,
-                                                                             const uint8_t * plain_data,
-                                                                             uint32_t plain_data_length,
-                                                                             uint8_t * encrypted_data,
-                                                                             uint32_t * encrypted_data_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_encrypt_continue(
+    optiga_crypt_t *me,
+    const uint8_t *plain_data,
+    uint32_t plain_data_length,
+    uint8_t *encrypted_data,
+    uint32_t *encrypted_data_length
+);
 
 /**
  * \brief Encrypts input data using symmetric key from OPTIGA, exports block aligned encrypted data and completes the encryption sequence.<br>
@@ -1558,12 +1576,14 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_symmetric_encrypt_decrypt.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_encrypt_final(optiga_crypt_t * me,
-                                                                          const uint8_t * plain_data,
-                                                                          uint32_t plain_data_length,
-                                                                          uint8_t * encrypted_data,
-                                                                          uint32_t * encrypted_data_length);
-#endif //OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_encrypt_final(
+    optiga_crypt_t *me,
+    const uint8_t *plain_data,
+    uint32_t plain_data_length,
+    uint8_t *encrypted_data,
+    uint32_t *encrypted_data_length
+);
+#endif  // OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED
 
 #ifdef OPTIGA_CRYPT_SYM_DECRYPT_ENABLED
 /**
@@ -1591,7 +1611,7 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * \param[in]         me                                    Valid instance of #optiga_crypt_t created using #optiga_crypt_create.
  * \param[in]         encryption_mode                       Symmetric encryption mode
  * \param[in]         symmetric_key_oid                     OPTIGA symmetric key OID
- *                                                          - Symmetric key must be available at the specified OID.<br> 
+ *                                                          - Symmetric key must be available at the specified OID.<br>
  * \param[in]         encrypted_data                        Pointer to the data to be decrypted.
  * \param[in]         encrypted_data_length                 Length of the data to be decrypted.
  *                                                          - It must be block aligned, otherwise OPTIGA returns an error.<br>
@@ -1618,18 +1638,19 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_symmetric_encrypt_decrypt.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_decrypt(optiga_crypt_t * me,
-                                                                    optiga_symmetric_encryption_mode_t
-                                                                    encryption_mode,
-                                                                    optiga_key_id_t symmetric_key_oid,
-                                                                    const uint8_t * encrypted_data,
-                                                                    uint32_t encrypted_data_length,
-                                                                    const uint8_t * iv,
-                                                                    uint16_t iv_length,
-                                                                    const uint8_t * associated_data,
-                                                                    uint16_t associated_data_length,
-                                                                    uint8_t * plain_data,
-                                                                    uint32_t * plain_data_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_decrypt(
+    optiga_crypt_t *me,
+    optiga_symmetric_encryption_mode_t encryption_mode,
+    optiga_key_id_t symmetric_key_oid,
+    const uint8_t *encrypted_data,
+    uint32_t encrypted_data_length,
+    const uint8_t *iv,
+    uint16_t iv_length,
+    const uint8_t *associated_data,
+    uint16_t associated_data_length,
+    uint8_t *plain_data,
+    uint32_t *plain_data_length
+);
 /**
  * \brief Decrypt the data using symmetric encryption scheme using ECB mode of operation.<br>
  *
@@ -1653,7 +1674,7 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  *
  * \param[in]         me                                    Valid instance of #optiga_crypt_t created using #optiga_crypt_create.
  * \param[in]         symmetric_key_oid                     OID of the symmetric key object to be used to decrypt the data.
- *                                                          - Symmetric key must be available at the specified OID.<br> 
+ *                                                          - Symmetric key must be available at the specified OID.<br>
  * \param[in]         encrypted_data                        Pointer to the encrypted data to be decrypted.
  * \param[in]         encrypted_data_length                 Length of the encrypted data to be decrypted.
  * \param[in,out]     plain_data                            Pointer to buffer to store decrypted data.
@@ -1671,12 +1692,14 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_symmetric_encrypt_decrypt_ecb.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_decrypt_ecb(optiga_crypt_t * me,
-                                                                        optiga_key_id_t symmetric_key_oid,
-                                                                        const uint8_t * encrypted_data,
-                                                                        uint32_t encrypted_data_length,
-                                                                        uint8_t * plain_data,
-                                                                        uint32_t * plain_data_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_decrypt_ecb(
+    optiga_crypt_t *me,
+    optiga_key_id_t symmetric_key_oid,
+    const uint8_t *encrypted_data,
+    uint32_t encrypted_data_length,
+    uint8_t *plain_data,
+    uint32_t *plain_data_length
+);
 
 /**
  * \brief Initiate symmetric decryption sequence for input data using symmetric key from OPTIGA.<br>
@@ -1705,7 +1728,7 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * \param[in]         me                                    Valid instance of #optiga_crypt_t created using #optiga_crypt_create.
  * \param[in]         encryption_mode                       Symmetric encryption mode
  * \param[in]         symmetric_key_oid                     OPTIGA symmetric key OID
- *                                                          - Symmetric key must be available at the specified OID.<br> 
+ *                                                          - Symmetric key must be available at the specified OID.<br>
  * \param[in]         encrypted_data                        Pointer to the data to be decrypted.
  * \param[in]         encrypted_data_length                 Length of the data to be decrypted.
  *                                                          - It must be block aligned, otherwise OPTIGA returns an error.<br>
@@ -1734,19 +1757,20 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_symmetric_encrypt_decrypt.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_decrypt_start(optiga_crypt_t * me,
-                                                                          optiga_symmetric_encryption_mode_t
-                                                                          encryption_mode,
-                                                                          optiga_key_id_t symmetric_key_oid,
-                                                                          const uint8_t * encrypted_data,
-                                                                          uint32_t encrypted_data_length,
-                                                                          const uint8_t * iv,
-                                                                          uint16_t iv_length,
-                                                                          const uint8_t * associated_data,
-                                                                          uint16_t associated_data_length,
-                                                                          uint16_t total_encrypted_data_length,
-                                                                          uint8_t * plain_data,
-                                                                          uint32_t * plain_data_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_decrypt_start(
+    optiga_crypt_t *me,
+    optiga_symmetric_encryption_mode_t encryption_mode,
+    optiga_key_id_t symmetric_key_oid,
+    const uint8_t *encrypted_data,
+    uint32_t encrypted_data_length,
+    const uint8_t *iv,
+    uint16_t iv_length,
+    const uint8_t *associated_data,
+    uint16_t associated_data_length,
+    uint16_t total_encrypted_data_length,
+    uint8_t *plain_data,
+    uint32_t *plain_data_length
+);
 
 /**
  * \brief Decrypts input encrypted data using symmetric key from OPTIGA and exports block aligned plain data.<br>
@@ -1789,11 +1813,13 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_symmetric_encrypt_decrypt.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_decrypt_continue(optiga_crypt_t * me,
-                                                                             const uint8_t * encrypted_data,
-                                                                             uint32_t encrypted_data_length,
-                                                                             uint8_t * plain_data,
-                                                                             uint32_t * plain_data_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_decrypt_continue(
+    optiga_crypt_t *me,
+    const uint8_t *encrypted_data,
+    uint32_t encrypted_data_length,
+    uint8_t *plain_data,
+    uint32_t *plain_data_length
+);
 
 /**
  * \brief Decrypts input data using symmetric key from OPTIGA, exports block aligned plain data and completes the decryption sequence.<br>
@@ -1837,13 +1863,14 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_symmetric_encrypt_decrypt.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_decrypt_final(optiga_crypt_t * me,
-                                                                          const uint8_t * encrypted_data,
-                                                                          uint32_t encrypted_data_length,
-                                                                          uint8_t * plain_data,
-                                                                          uint32_t * plain_data_length);
-#endif //OPTIGA_CRYPT_SYM_DECRYPT_ENABLED
-
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_decrypt_final(
+    optiga_crypt_t *me,
+    const uint8_t *encrypted_data,
+    uint32_t encrypted_data_length,
+    uint8_t *plain_data,
+    uint32_t *plain_data_length
+);
+#endif  // OPTIGA_CRYPT_SYM_DECRYPT_ENABLED
 
 #ifdef OPTIGA_CRYPT_HMAC_ENABLED
 /**
@@ -1863,12 +1890,12 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * - For <b>protected I2C communication</b>, Refer #OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL.
  *      - Default protection level for this API is #OPTIGA_COMMS_COMMAND_PROTECTION.
  * - Error codes from lower layers is returned as it is to the application.<br>
- 
+
  *
  * \param[in]         me                                    Valid instance of #optiga_crypt_t created using #optiga_crypt_create.
  * \param[in]         type                                  HMAC type
  * \param[in]         secret                                OPTIGA OID with input secret
- *                                                          - Input secret must be available at the specified OID.<br> 
+ *                                                          - Input secret must be available at the specified OID.<br>
  *                                                          - To indicate session OID (already acquired by instance), specify #OPTIGA_KEY_ID_SESSION_BASED
  * \param[in]         input_data                            Pointer to input data for HMAC generation.
  * \param[in]         input_data_length                     Length of input data for HMAC generation.
@@ -1889,13 +1916,15 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_hmac.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hmac(optiga_crypt_t * me,
-                                                       optiga_hmac_type_t type,
-                                                       uint16_t secret,
-                                                       const uint8_t * input_data,
-                                                       uint32_t input_data_length,
-                                                       uint8_t * mac,
-                                                       uint32_t * mac_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hmac(
+    optiga_crypt_t *me,
+    optiga_hmac_type_t type,
+    uint16_t secret,
+    const uint8_t *input_data,
+    uint32_t input_data_length,
+    uint8_t *mac,
+    uint32_t *mac_length
+);
 
 /**
  * \brief Initiates a HMAC generation sequence for the input data using input secret from OPTIGA.<br>
@@ -1938,11 +1967,13 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_hmac.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hmac_start(optiga_crypt_t * me,
-                                                             optiga_hmac_type_t type,
-                                                             uint16_t secret,
-                                                             const uint8_t * input_data,
-                                                             uint32_t input_data_length);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hmac_start(
+    optiga_crypt_t *me,
+    optiga_hmac_type_t type,
+    uint16_t secret,
+    const uint8_t *input_data,
+    uint32_t input_data_length
+);
 
 /**
  * \brief Generates HMAC on the input message using input secret from OPTIGA, update the previously generated HMAC value internally.<br>
@@ -1980,9 +2011,8 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_hmac.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hmac_update(optiga_crypt_t * me,
-                                                              const uint8_t * input_data,
-                                                              uint32_t input_data_length);
+LIBRARY_EXPORTS optiga_lib_status_t
+optiga_crypt_hmac_update(optiga_crypt_t *me, const uint8_t *input_data, uint32_t input_data_length);
 
 /**
  * \brief Generates HMAC on the input message using input secret from OPTIGA and exports the finalized HMAC to host.<br>
@@ -2026,13 +2056,15 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_hmac.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hmac_finalize(optiga_crypt_t * me,
-                                                                const uint8_t * input_data,
-                                                                uint32_t input_data_length,
-                                                                uint8_t * mac,
-                                                                uint32_t * mac_length);
-#endif //OPTIGA_CRYPT_HMAC_ENABLED
-                                                                
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hmac_finalize(
+    optiga_crypt_t *me,
+    const uint8_t *input_data,
+    uint32_t input_data_length,
+    uint8_t *mac,
+    uint32_t *mac_length
+);
+#endif  // OPTIGA_CRYPT_HMAC_ENABLED
+
 #ifdef OPTIGA_CRYPT_HKDF_ENABLED
 /**
  * \brief Derives a key or shared secret using HKDF operation from the secret stored in OPTIGA.<br>
@@ -2083,16 +2115,18 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_rsa_encrypt_session(optiga_cryp
  * example_optiga_crypt_hkdf.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf(optiga_crypt_t * me,
-                                                      optiga_hkdf_type_t type,
-                                                      uint16_t secret,
-                                                      const uint8_t * salt,
-                                                      uint16_t salt_length,
-                                                      const uint8_t * info,
-                                                      uint16_t info_length,
-                                                      uint16_t derived_key_length,
-                                                      bool_t export_to_host,
-                                                      uint8_t * derived_key);
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf(
+    optiga_crypt_t *me,
+    optiga_hkdf_type_t type,
+    uint16_t secret,
+    const uint8_t *salt,
+    uint16_t salt_length,
+    const uint8_t *info,
+    uint16_t info_length,
+    uint16_t derived_key_length,
+    bool_t export_to_host,
+    uint8_t *derived_key
+);
 
 /**
  * \brief Derives a key or shared secret using HKDF-SHA256 operation from the secret stored in OPTIGA.<br>
@@ -2142,26 +2176,29 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf(optiga_crypt_t * me,
  * example_optiga_crypt_hkdf.c
  *
  */
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha256(optiga_crypt_t * me,
-                                                                            uint16_t secret,
-                                                                            const uint8_t * salt,
-                                                                            uint16_t salt_length,
-                                                                            const uint8_t * info,
-                                                                            uint16_t info_length,
-                                                                            uint16_t derived_key_length,
-                                                                            bool_t export_to_host,
-                                                                            uint8_t * derived_key)
-{
-    return (optiga_crypt_hkdf(me,
-                              OPTIGA_HKDF_SHA_256,
-                              secret,
-                              salt,
-                              salt_length,
-                              info,
-                              info_length,
-                              derived_key_length,
-                              export_to_host,
-                              derived_key));
+_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha256(
+    optiga_crypt_t *me,
+    uint16_t secret,
+    const uint8_t *salt,
+    uint16_t salt_length,
+    const uint8_t *info,
+    uint16_t info_length,
+    uint16_t derived_key_length,
+    bool_t export_to_host,
+    uint8_t *derived_key
+) {
+    return (optiga_crypt_hkdf(
+        me,
+        OPTIGA_HKDF_SHA_256,
+        secret,
+        salt,
+        salt_length,
+        info,
+        info_length,
+        derived_key_length,
+        export_to_host,
+        derived_key
+    ));
 }
 
 /**
@@ -2213,26 +2250,29 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha256(opti
  *
  */
 
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha384(optiga_crypt_t * me,
-                                                                            uint16_t secret,
-                                                                            const uint8_t * salt,
-                                                                            uint16_t salt_length,
-                                                                            const uint8_t * info,
-                                                                            uint16_t info_length,
-                                                                            uint16_t derived_key_length,
-                                                                            bool_t export_to_host,
-                                                                            uint8_t * derived_key)
-{
-    return (optiga_crypt_hkdf(me,
-                              OPTIGA_HKDF_SHA_384,
-                              secret,
-                              salt,
-                              salt_length,
-                              info,
-                              info_length,
-                              derived_key_length,
-                              export_to_host,
-                              derived_key));
+_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha384(
+    optiga_crypt_t *me,
+    uint16_t secret,
+    const uint8_t *salt,
+    uint16_t salt_length,
+    const uint8_t *info,
+    uint16_t info_length,
+    uint16_t derived_key_length,
+    bool_t export_to_host,
+    uint8_t *derived_key
+) {
+    return (optiga_crypt_hkdf(
+        me,
+        OPTIGA_HKDF_SHA_384,
+        secret,
+        salt,
+        salt_length,
+        info,
+        info_length,
+        derived_key_length,
+        export_to_host,
+        derived_key
+    ));
 }
 
 /**
@@ -2284,28 +2324,31 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha384(opti
  *
  */
 
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha512(optiga_crypt_t * me,
-                                                                            uint16_t secret,
-                                                                            const uint8_t * salt,
-                                                                            uint16_t salt_length,
-                                                                            const uint8_t * info,
-                                                                            uint16_t info_length,
-                                                                            uint16_t derived_key_length,
-                                                                            bool_t export_to_host,
-                                                                            uint8_t * derived_key)
-{
-    return (optiga_crypt_hkdf(me,
-                              OPTIGA_HKDF_SHA_512,
-                              secret,
-                              salt,
-                              salt_length,
-                              info,
-                              info_length,
-                              derived_key_length,
-                              export_to_host,
-                              derived_key));
+_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha512(
+    optiga_crypt_t *me,
+    uint16_t secret,
+    const uint8_t *salt,
+    uint16_t salt_length,
+    const uint8_t *info,
+    uint16_t info_length,
+    uint16_t derived_key_length,
+    bool_t export_to_host,
+    uint8_t *derived_key
+) {
+    return (optiga_crypt_hkdf(
+        me,
+        OPTIGA_HKDF_SHA_512,
+        secret,
+        salt,
+        salt_length,
+        info,
+        info_length,
+        derived_key_length,
+        export_to_host,
+        derived_key
+    ));
 }
-#endif //OPTIGA_CRYPT_HKDF_ENABLED
+#endif  // OPTIGA_CRYPT_HKDF_ENABLED
 
 #ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
 
@@ -2333,9 +2376,9 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha512(opti
  * \param[in]       export_symmetric_key                    TRUE (1) or Non-Zero value - Exports symmetric key to the host.<br>
  *                                                          FALSE (0) - Stores symmetric key in OPTIGA.
  * \param[in,out]   symmetric_key                           Pointer to buffer of symmetric key.
- *                                                          - If export_symmetric_key is TRUE or non-zero, assign pointer to a buffer to store symmetric key. 
+ *                                                          - If export_symmetric_key is TRUE or non-zero, assign pointer to a buffer to store symmetric key.
  *                                                          - If export_symmetric_key is FALSE, assign pointer to variable of type #optiga_key_id_t.
- *                                                          - The size of the buffer must be sufficient enough to accommodate the key. 
+ *                                                          - The size of the buffer must be sufficient enough to accommodate the key.
  *
  * \retval          #OPTIGA_CRYPT_SUCCESS                   Successful invocation.
  * \retval          #OPTIGA_CRYPT_ERROR_INVALID_INPUT       Wrong Input arguments provided.
@@ -2347,17 +2390,19 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha512(opti
  * example_optiga_crypt_symmetric_generate_key.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_generate_key(optiga_crypt_t * me,
-                                                                        optiga_symmetric_key_type_t key_type,
-                                                                        uint8_t key_usage,
-                                                                        bool_t export_symmetric_key,
-                                                                        void * symmetric_key);
-#endif //OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_generate_key(
+    optiga_crypt_t *me,
+    optiga_symmetric_key_type_t key_type,
+    uint8_t key_usage,
+    bool_t export_symmetric_key,
+    void *symmetric_key
+);
+#endif  // OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
 
 #ifdef OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED
 
 /**
- * \brief Generates a random number using OPTIGA and stores the same in acquired session context at OPTIGA. 
+ * \brief Generates a random number using OPTIGA and stores the same in acquired session context at OPTIGA.
  *
  * \details
  * Generates random stream code for user provided length.
@@ -2373,8 +2418,8 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_generate_key(optiga_c
  * \note
  * - For <b>protected I2C communication</b>, Refer #OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL
  * - Error codes from lower layers is returned as it is.
- * - Minimum length of generated random data is 8 bytes. 
- * - Auth Code is a concatenation of optional data and random data. 
+ * - Minimum length of generated random data is 8 bytes.
+ * - Auth Code is a concatenation of optional data and random data.
  * - Maximum length of auth code is 48 bytes.
  *
  * \param[in]      me                                       Valid instance of #optiga_crypt_t created using #optiga_crypt_create.
@@ -2385,7 +2430,7 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_generate_key(optiga_c
  *                                                          - Can be set to NULL, if not required
  * \param[in]      optional_data_length                     Length of the optional data provided. It is ignored if optional_data is NULL
  *                                                          - Value can be up to 58 bytes
- *                                                          - Difference in random data length and optional data length is less than 8 bytes 
+ *                                                          - Difference in random data length and optional data length is less than 8 bytes
  * \param[in,out]  random_data                              Pointer to the buffer into which random data is stored, must not be NULL.
  * \param[in]      random_data_length                       Length of random data to be generated.
  *                                                          - Minimum range is 8 bytes.
@@ -2397,13 +2442,15 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_symmetric_generate_key(optiga_c
  *                                                          (Refer Solution Reference Manual)
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_generate_auth_code(optiga_crypt_t * me,
-                                                                    optiga_rng_type_t rng_type,
-                                                                    const uint8_t * optional_data,
-                                                                    uint16_t optional_data_length,
-                                                                    uint8_t * random_data,
-                                                                    uint16_t random_data_length);
-#endif //OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_generate_auth_code(
+    optiga_crypt_t *me,
+    optiga_rng_type_t rng_type,
+    const uint8_t *optional_data,
+    uint16_t optional_data_length,
+    uint8_t *random_data,
+    uint16_t random_data_length
+);
+#endif  // OPTIGA_CRYPT_GENERATE_AUTH_CODE_ENABLED
 
 #ifdef OPTIGA_CRYPT_HMAC_VERIFY_ENABLED
 /**
@@ -2428,16 +2475,16 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_generate_auth_code(optiga_crypt
  * \param[in]         me                                    Valid instance of #optiga_crypt_t created using #optiga_crypt_create.
  * \param[in]         type                                  HMAC type as #optiga_hmac_type_t
  * \param[in]         secret                                OPTIGA OID with input secret
- *                                                          - Input secret must be available at the specified OID.<br> 
+ *                                                          - Input secret must be available at the specified OID.<br>
  *                                                          - Data object type must be AUTOREF.
  * \param[in]         input_data                            Pointer to input data for HMAC generation.
  *                                                          - Input data is concatenation of optional data, random and arbitrary data.
- *                                                          - Optional data is input provided to #optiga_crypt_generate_auth_code 
- *                                                            and random data is returned by #optiga_crypt_generate_auth_code. 
+ *                                                          - Optional data is input provided to #optiga_crypt_generate_auth_code
+ *                                                            and random data is returned by #optiga_crypt_generate_auth_code.
  * \param[in]         input_data_length                     Length of input data.
  *                                                          - Must be greater than 0.<br>
  * \param[in]         hmac                                  Pointer to buffer of HMAC generated at host which gets verified at OPTIGA.
- * \param[in]         hmac_length                           Length of the generated <b>hmac</b> at host. 
+ * \param[in]         hmac_length                           Length of the generated <b>hmac</b> at host.
  *                                                          - Host generated hmac length must be the size of output defined in respective hash algorithm used in hmac scheme.
  *
  * \retval            #OPTIGA_CRYPT_SUCCESS                 Successful invocation
@@ -2450,14 +2497,16 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_generate_auth_code(optiga_crypt
  * example_optiga_crypt_hmac_verify.c
  *
  */
- LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hmac_verify(optiga_crypt_t * me,
-                                                              optiga_hmac_type_t type,
-                                                              uint16_t secret,
-                                                              const uint8_t * input_data,
-                                                              uint32_t input_data_length,
-                                                              const uint8_t * hmac,
-                                                              uint32_t hmac_length);
-#endif // OPTIGA_CRYPT_HMAC_VERIFY_ENABLED
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hmac_verify(
+    optiga_crypt_t *me,
+    optiga_hmac_type_t type,
+    uint16_t secret,
+    const uint8_t *input_data,
+    uint32_t input_data_length,
+    const uint8_t *hmac,
+    uint32_t hmac_length
+);
+#endif  // OPTIGA_CRYPT_HMAC_VERIFY_ENABLED
 #ifdef OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED
 /**
  * \brief This operation clears the AUTO state at OPTIGA for input secret OID.<br>
@@ -2486,10 +2535,10 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_generate_auth_code(optiga_crypt
  * example_optiga_crypt_clear_auto_state.c
  *
  */
-LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_clear_auto_state(optiga_crypt_t * me,
-                                                                  uint16_t secret);
+LIBRARY_EXPORTS optiga_lib_status_t
+optiga_crypt_clear_auto_state(optiga_crypt_t *me, uint16_t secret);
 
-#endif //OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED
+#endif  // OPTIGA_CRYPT_CLEAR_AUTO_STATE_ENABLED
 /**
  * \brief Enables the protected I2C communication with OPTIGA for CRYPT instances
  *
@@ -2518,13 +2567,10 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_clear_auto_state(optiga_crypt_t
  */
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
 #define OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL(p_instance, protection_level) \
-{ \
-    optiga_crypt_set_comms_params(p_instance, \
-                                  OPTIGA_COMMS_PROTECTION_LEVEL, \
-                                  protection_level);\
-}
+    { optiga_crypt_set_comms_params(p_instance, OPTIGA_COMMS_PROTECTION_LEVEL, protection_level); }
 #else
-#define OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL(p_instance, protection_level) {}
+#define OPTIGA_CRYPT_SET_COMMS_PROTECTION_LEVEL(p_instance, protection_level) \
+    {}
 #endif
 
 /**
@@ -2546,13 +2592,10 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_clear_auto_state(optiga_crypt_t
  */
 #ifdef OPTIGA_COMMS_SHIELDED_CONNECTION
 #define OPTIGA_CRYPT_SET_COMMS_PROTOCOL_VERSION(p_instance, version) \
-{ \
-    optiga_crypt_set_comms_params(p_instance, \
-                                  OPTIGA_COMMS_PROTOCOL_VERSION, \
-                                  version);\
-}
+    { optiga_crypt_set_comms_params(p_instance, OPTIGA_COMMS_PROTOCOL_VERSION, version); }
 #else
-#define OPTIGA_CRYPT_SET_COMMS_PROTOCOL_VERSION(p_instance, version) {}
+#define OPTIGA_CRYPT_SET_COMMS_PROTOCOL_VERSION(p_instance, version) \
+    {}
 #endif
 
 #ifdef __cplusplus
@@ -2562,6 +2605,5 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_clear_auto_state(optiga_crypt_t
 #endif /*_OPTIGA_CRYPT_H_*/
 
 /**
-* @}
-*/
-
+ * @}
+ */

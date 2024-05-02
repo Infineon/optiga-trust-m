@@ -1,195 +1,328 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2021 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file data_object_confidentiality.h
-*
-* \brief   This file provides the data set for protected update of data object with confidentiality.
-*
-* \ingroup grOptigaExamples
-*
-* @{
-*/
+ * SPDX-FileCopyrightText: 2021-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file data_object_confidentiality.h
+ *
+ * \brief   This file provides the data set for protected update of data object with confidentiality.
+ *
+ * \ingroup grOptigaExamples
+ *
+ * @{
+ */
 
 #include <stdint.h>
 
 /**
  * Manifest for when the  payload is integrity and confidentiality protected with AES-CCM-16-64-128 algorithm
  */
-const uint8_t manifest_int_conf[] = 
-{
+const uint8_t manifest_int_conf[] = {
     // COSE Sign1 Trust
     0x84,
-        // Protected signed header trust
-        0x43,
-            // Trust Sign Algorithm
-            0xA1, 
-            // ECDSA
-            0x01, 0x26, 
-        // Unprotected signed header trust
-        0xA1, 
-            // Root of trust
-            0x04, 0x42, 
-            // Trust Anchor OID
-            0xE0, 0xE3, 
-        // Payload info Byte string of single byte length
-        0x58, 
-            // Byte string length of manifest            
-            0x9D, 
-            // Trust manifest, array of 6 entries
-            0x86, 
-            // Version(Major Type 0)
-            0x01,
-            // NULL
-            0xF6,
-            // NULL
-            0xF6,
-            // Resources, array of 4 entries
-            0x84, 
-                // Trust Payload Type
-                0x20,
-                // 2 byte length  
-                0x19,
-                // Payload Length
-                0x03, 0x2E, 
-                // Trust Payload version
-                0x03, 
-                // Trust Add info data 
-                0x82, 
-                    // Offset( Major Type 0)
-                    0x00, 
-                    // Trust add info write type
-                    0x01, 
-                // Trust Processors, array of 2 entries 
-                0x82, 
-                    // Processing step integrity, array of 2 entries
-                    0x82, 
-                        // Process( Major Type 1)
-                        0x20, 
-                        // Parameters, byte string with single byte length
-                        0x58, 
-                            // Byte string length 
-                            0x25, 
-                            // IFX Digest info, array of 2 entries
-                            0x82, 
-                                // Digest Algorithm
-                                0x18,
-                                    // SHA-256
-                                    0x29, 
-                                // Digest
-                                0x58, 
-                                    // Byte string length
-                                    0x20, 
-                                        // Digest data
-                                        0xBB, 0x6F, 0x4D, 0xA7, 0xE4, 0x51, 0x0F, 0xB7,
-                                        0x2A, 0xFA, 0x60, 0xA4, 0xAB, 0x1A, 0xCE, 0xE0,
-                                        0x48, 0x64, 0x52, 0x7A, 0x66, 0x39, 0x9C, 0x62,
-                                        0x29, 0x3E, 0x82, 0x08, 0x76, 0x78, 0x61, 0x0B,
-                    // Processing step decrypt, array of 2 entries
-                        0x82, 
-                        // Process( Major Type 0)
-                        0x01,
-                        // COSE_Encrypt_Trust array of 3 entries
-                        0x83,
-                            // protected-encrypt-header-Trust
-                            0x43,
-                                // Map 
-                                0xA1,
-                                    // Key 
-                                    0x01,
-                                    // AES-CCM-16-64-128, 128-bit key, 64-bit Authentication(MAC) tag, 13-byte nonce
-                                    0x0A, 
-                            // recipients array of 1
-                            0x81,   
-                                // COSE_Recipient_Trust array of 2
-                                0x82, 
-                                    // protected-recipient-header-Trust
-                                    0x58, 
-                                        // byte string
-                                        0x54, 
-                                            // Map of 3
-                                            0xA3, 
-                                                // Key
-                                                0x04,
-                                                // Value
-                                                0x42,
-                                                    // Shared secret OID
-                                                    0xF1, 0xD1, 
-                                                // Key
-                                                0x01, 
-                                                // Value (KeyDerivationAlgorithms)
-                                                0x3A, 0x00, 0x01, 0x00, 0xB7, 
-                                                // Key
-                                                0x05, 
-                                                // Value array of 2
-                                                0x82, 
-                                                0x44, 
-                                                        // label(4)
-                                                        0x74, 0x65, 0x73, 0x74,
-                                                    0x58, 
-                                                        0x40, 
-                                                        // seed(64)
-                                                        0x0A, 0xA8, 0x30, 0xB5, 0xE6, 0x66, 0xD6, 0x95,
-                                                        0xD7, 0x9B, 0x7B, 0x65, 0x44, 0x86, 0xFF, 0x97,
-                                                        0x28, 0xD5, 0x52, 0xAF, 0x35, 0x11, 0x61, 0x42,
-                                                        0x7F, 0xBA, 0x74, 0x4D, 0x47, 0xCA, 0x71, 0x00,
-                                                        0x8F, 0x22, 0xE7, 0x73, 0xBC, 0xDB, 0xBA, 0xDE,
-                                                        0x24, 0x45, 0x5A, 0x4C, 0xFA, 0x15, 0x82, 0xAC,
-                                                        0xAA, 0xAC, 0x9E, 0x0C, 0x8C, 0x2F, 0x1B, 0x79,
-                                                        0x98, 0x51, 0x38, 0xDF, 0xEB, 0x68, 0x86, 0xA7,
-                                    // ciphertext-recipient-header-Trust
-                                    0xF6,
-                            // AdditionalInfo
-                            0xF6, 
-                // Trust Target
-                0x82,
-                    // Component identifier(0)
-                    0x40, 
-                    // Storage identifier
-                    0x42, 
-                    // Optiga target OID
-                    0xE0, 0xE1, 
-        // Signature info, byte string of single byte length
-        0x58,
-            // Byte string length for ECC 256
-            0x40,
-            // Signature data
-            0x28, 0xD7, 0x29, 0x91, 0x9F, 0xCE, 0x68, 0x55, 0x13, 0xF6, 0xD1, 0x9C, 0xFE, 0xDC, 0x5D, 0xE1,
-            0x0A, 0x02, 0x3A, 0xD7, 0x51, 0xA8, 0x3B, 0xF0, 0x74, 0x56, 0x2A, 0x86, 0xD1, 0x1F, 0x86, 0x6B,
-            0xB0, 0xA2, 0xBB, 0x68, 0x64, 0x90, 0xDC, 0x24, 0x83, 0x8D, 0x3A, 0x4F, 0xF8, 0xDC, 0x8C, 0x19,
-            0xDC, 0xA4, 0x82, 0xFA, 0xF7, 0xB9, 0x76, 0x87, 0xF5, 0x0E, 0xBE, 0xE9, 0xA3, 0xDA, 0x63, 0xDC,
+    // Protected signed header trust
+    0x43,
+    // Trust Sign Algorithm
+    0xA1,
+    // ECDSA
+    0x01,
+    0x26,
+    // Unprotected signed header trust
+    0xA1,
+    // Root of trust
+    0x04,
+    0x42,
+    // Trust Anchor OID
+    0xE0,
+    0xE3,
+    // Payload info Byte string of single byte length
+    0x58,
+    // Byte string length of manifest
+    0x9D,
+    // Trust manifest, array of 6 entries
+    0x86,
+    // Version(Major Type 0)
+    0x01,
+    // NULL
+    0xF6,
+    // NULL
+    0xF6,
+    // Resources, array of 4 entries
+    0x84,
+    // Trust Payload Type
+    0x20,
+    // 2 byte length
+    0x19,
+    // Payload Length
+    0x03,
+    0x2E,
+    // Trust Payload version
+    0x03,
+    // Trust Add info data
+    0x82,
+    // Offset( Major Type 0)
+    0x00,
+    // Trust add info write type
+    0x01,
+    // Trust Processors, array of 2 entries
+    0x82,
+    // Processing step integrity, array of 2 entries
+    0x82,
+    // Process( Major Type 1)
+    0x20,
+    // Parameters, byte string with single byte length
+    0x58,
+    // Byte string length
+    0x25,
+    // IFX Digest info, array of 2 entries
+    0x82,
+    // Digest Algorithm
+    0x18,
+    // SHA-256
+    0x29,
+    // Digest
+    0x58,
+    // Byte string length
+    0x20,
+    // Digest data
+    0xBB,
+    0x6F,
+    0x4D,
+    0xA7,
+    0xE4,
+    0x51,
+    0x0F,
+    0xB7,
+    0x2A,
+    0xFA,
+    0x60,
+    0xA4,
+    0xAB,
+    0x1A,
+    0xCE,
+    0xE0,
+    0x48,
+    0x64,
+    0x52,
+    0x7A,
+    0x66,
+    0x39,
+    0x9C,
+    0x62,
+    0x29,
+    0x3E,
+    0x82,
+    0x08,
+    0x76,
+    0x78,
+    0x61,
+    0x0B,
+    // Processing step decrypt, array of 2 entries
+    0x82,
+    // Process( Major Type 0)
+    0x01,
+    // COSE_Encrypt_Trust array of 3 entries
+    0x83,
+    // protected-encrypt-header-Trust
+    0x43,
+    // Map
+    0xA1,
+    // Key
+    0x01,
+    // AES-CCM-16-64-128, 128-bit key, 64-bit Authentication(MAC) tag, 13-byte nonce
+    0x0A,
+    // recipients array of 1
+    0x81,
+    // COSE_Recipient_Trust array of 2
+    0x82,
+    // protected-recipient-header-Trust
+    0x58,
+    // byte string
+    0x54,
+    // Map of 3
+    0xA3,
+    // Key
+    0x04,
+    // Value
+    0x42,
+    // Shared secret OID
+    0xF1,
+    0xD1,
+    // Key
+    0x01,
+    // Value (KeyDerivationAlgorithms)
+    0x3A,
+    0x00,
+    0x01,
+    0x00,
+    0xB7,
+    // Key
+    0x05,
+    // Value array of 2
+    0x82,
+    0x44,
+    // label(4)
+    0x74,
+    0x65,
+    0x73,
+    0x74,
+    0x58,
+    0x40,
+    // seed(64)
+    0x0A,
+    0xA8,
+    0x30,
+    0xB5,
+    0xE6,
+    0x66,
+    0xD6,
+    0x95,
+    0xD7,
+    0x9B,
+    0x7B,
+    0x65,
+    0x44,
+    0x86,
+    0xFF,
+    0x97,
+    0x28,
+    0xD5,
+    0x52,
+    0xAF,
+    0x35,
+    0x11,
+    0x61,
+    0x42,
+    0x7F,
+    0xBA,
+    0x74,
+    0x4D,
+    0x47,
+    0xCA,
+    0x71,
+    0x00,
+    0x8F,
+    0x22,
+    0xE7,
+    0x73,
+    0xBC,
+    0xDB,
+    0xBA,
+    0xDE,
+    0x24,
+    0x45,
+    0x5A,
+    0x4C,
+    0xFA,
+    0x15,
+    0x82,
+    0xAC,
+    0xAA,
+    0xAC,
+    0x9E,
+    0x0C,
+    0x8C,
+    0x2F,
+    0x1B,
+    0x79,
+    0x98,
+    0x51,
+    0x38,
+    0xDF,
+    0xEB,
+    0x68,
+    0x86,
+    0xA7,
+    // ciphertext-recipient-header-Trust
+    0xF6,
+    // AdditionalInfo
+    0xF6,
+    // Trust Target
+    0x82,
+    // Component identifier(0)
+    0x40,
+    // Storage identifier
+    0x42,
+    // Optiga target OID
+    0xE0,
+    0xE1,
+    // Signature info, byte string of single byte length
+    0x58,
+    // Byte string length for ECC 256
+    0x40,
+    // Signature data
+    0x28,
+    0xD7,
+    0x29,
+    0x91,
+    0x9F,
+    0xCE,
+    0x68,
+    0x55,
+    0x13,
+    0xF6,
+    0xD1,
+    0x9C,
+    0xFE,
+    0xDC,
+    0x5D,
+    0xE1,
+    0x0A,
+    0x02,
+    0x3A,
+    0xD7,
+    0x51,
+    0xA8,
+    0x3B,
+    0xF0,
+    0x74,
+    0x56,
+    0x2A,
+    0x86,
+    0xD1,
+    0x1F,
+    0x86,
+    0x6B,
+    0xB0,
+    0xA2,
+    0xBB,
+    0x68,
+    0x64,
+    0x90,
+    0xDC,
+    0x24,
+    0x83,
+    0x8D,
+    0x3A,
+    0x4F,
+    0xF8,
+    0xDC,
+    0x8C,
+    0x19,
+    0xDC,
+    0xA4,
+    0x82,
+    0xFA,
+    0xF7,
+    0xB9,
+    0x76,
+    0x87,
+    0xF5,
+    0x0E,
+    0xBE,
+    0xE9,
+    0xA3,
+    0xDA,
+    0x63,
+    0xDC,
 
 };
 
 /**
  * Fragment array for continue with 600 bytes of payload, 8 bytes of MAC and 32 bytes of digest of next fragment
  */
-const uint8_t int_conf_continue_fragment_array[] = 
-{
+const uint8_t int_conf_continue_fragment_array[] = {
     0x74, 0x3B, 0xB6, 0xBE, 0x1F, 0xF8, 0xC9, 0x6F, 0xA1, 0x82, 0x07, 0x0B, 0x27, 0x35, 0xA3, 0x20,
     0x07, 0xA3, 0xD2, 0xAB, 0xD5, 0x4D, 0xD7, 0x51, 0x63, 0x87, 0xE9, 0x92, 0x94, 0x82, 0x65, 0xD6,
     0x0E, 0x48, 0x0E, 0xE5, 0xF6, 0x15, 0xF3, 0xA5, 0x88, 0x08, 0x05, 0xEB, 0x90, 0x80, 0x29, 0xDC,
@@ -235,8 +368,7 @@ const uint8_t int_conf_continue_fragment_array[] =
 /**
  * Fragment array for final with 58 bytes of payload and 8 bytes of MAC
  */
-const uint8_t int_conf_final_fragment_array[] = 
-{
+const uint8_t int_conf_final_fragment_array[] = {
     0x66, 0xFF, 0x44, 0xDB, 0x09, 0x25, 0x99, 0x64, 0x85, 0xD8, 0x29, 0x1F, 0xB6, 0x1D, 0x83, 0xF2,
     0xCF, 0x02, 0xD9, 0x77, 0xA5, 0x19, 0x52, 0xBD, 0xFE, 0x72, 0xDA, 0x9A, 0xCC, 0xA6, 0xE3, 0x31,
     0xFB, 0xFA, 0x68, 0x95, 0xC8, 0xA2, 0x53, 0xD4, 0x27, 0x79, 0x1A, 0x18, 0xC5, 0xE9, 0x1E, 0x6C,
@@ -254,5 +386,5 @@ const uint8_t int_conf_final_fragment_array[] =
 };
 
 /**
-* @}
-*/
+ * @}
+ */

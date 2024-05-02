@@ -1,0 +1,29 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+
+Files: CHANGELOG.md CONTRIBUTING.md README.md tests/README.md examples/README.md docs/*
+Copyright: 2024 Infineon Technologies AG
+License:  CC-BY-NC-ND-4.0
+
+Files: examples/mbedtls_port/README.md examples/tools/protected_update_data_set/README.md
+Copyright: 2024 Infineon Technologies AG
+License:  CC-BY-NC-ND-4.0
+
+Files: examples/tools/protected_update_data_set/samples/*
+Copyright: 2024 Infineon Technologies AG
+License:  CC-BY-NC-ND-4.0
+
+Files: examples/tools/protected_update_data_set/bin/*
+Copyright: 2024 Infineon Technologies AG
+License:  MIT
+
+Files: examples/tools/protected_update_data_set/cddl/*
+Copyright: 2024 Infineon Technologies AG
+License:  MIT
+
+Files: examples/tools/protected_update_data_set/visual_studio/*.sln examples/tools/protected_update_data_set/visual_studio/*.vcxproj*
+Copyright: 2021-2024 Infineon Technologies AG
+License:  MIT
+
+Files: extras/pal/*.md
+Copyright: 2024 Infineon Technologies AG
+License:  CC-BY-NC-ND-4.0

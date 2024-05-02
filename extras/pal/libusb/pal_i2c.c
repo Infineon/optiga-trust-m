@@ -1,51 +1,27 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2018 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file pal_i2c.c
-*
-* \brief   This file implements the platform abstraction layer(pal) APIs for I2C.
-*
-* \ingroup  grPAL
-* @{
-*/
+ * SPDX-FileCopyrightText: 2018-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file pal_i2c.c
+ *
+ * \brief   This file implements the platform abstraction layer(pal) APIs for I2C.
+ *
+ * \ingroup  grPAL
+ * @{
+ */
 
 /**********************************************************************************************************************
  * HEADER FILES
  *********************************************************************************************************************/
 #include "pal_i2c.h"
-#ifdef __WIN32__
-#include "libusb.h"
-#else // LINUX
+
 #include <libusb-1.0/libusb.h>
 #include <unistd.h>
-#endif
-#include "pal_usb.h"
+
 #include "pal_common.h"
+#include "pal_usb.h"
 
 /**********************************************************************************************************************
  * MACROS
@@ -55,7 +31,7 @@
 #define LOG_PAL IFX_I2C_LOG
 #else
 #include <stdio.h>
-#define LOG_PAL(...) //printf(__VA_ARGS__)
+#define LOG_PAL(...)  // printf(__VA_ARGS__)
 #endif
 
 /// @cond hidden
@@ -65,27 +41,24 @@
 
 void i2c_master_end_of_transmit_callback(void);
 void i2c_master_end_of_receive_callback(void);
-void invoke_upper_layer_callback(const pal_i2c_t * p_pal_i2c_ctx, optiga_lib_status_t event);
-static uint16_t usb_i2c_poll_operation_result(pal_i2c_t * p_i2c_context);
+void invoke_upper_layer_callback(const pal_i2c_t *p_pal_i2c_ctx, optiga_lib_status_t event);
+static uint16_t usb_i2c_poll_operation_result(pal_i2c_t *p_i2c_context);
 
 /* Variable to indicate the re-entrant count of the i2c bus acquire function*/
 static volatile uint32_t g_entry_count = 0;
 /* Pointer to the current pal i2c context*/
-static pal_i2c_t * gp_pal_i2c_current_ctx;
+static pal_i2c_t *gp_pal_i2c_current_ctx;
 extern pal_usb_t usb_events;
 
 /**********************************************************************************************************************
  * LOCAL ROUTINES
  *********************************************************************************************************************/
 // I2C acquire bus function
-//lint --e{715} suppress the unused p_i2c_context variable lint error , since this is kept for future enhancements
-static pal_status_t pal_i2c_acquire(const void * p_i2c_context)
-{
-    if (g_entry_count == 0)
-    {
+// lint --e{715} suppress the unused p_i2c_context variable lint error , since this is kept for future enhancements
+static pal_status_t pal_i2c_acquire(const void *p_i2c_context) {
+    if (g_entry_count == 0) {
         g_entry_count++;
-        if (g_entry_count == 1)
-        {
+        if (g_entry_count == 1) {
             return PAL_STATUS_SUCCESS;
         }
     }
@@ -93,9 +66,8 @@ static pal_status_t pal_i2c_acquire(const void * p_i2c_context)
 }
 
 // I2C release bus function
-//lint --e{715} suppress the unused p_i2c_context variable lint, since this is kept for future enhancements
-static void pal_i2c_release(const void * p_i2c_context)
-{
+// lint --e{715} suppress the unused p_i2c_context variable lint, since this is kept for future enhancements
+static void pal_i2c_release(const void *p_i2c_context) {
     g_entry_count = 0;
 }
 /// @endcond
@@ -114,75 +86,59 @@ static void pal_i2c_release(const void * p_i2c_context)
  * \param[in] event           Status of the event reported after read/write completion or due to I2C errors
  *
  */
-void invoke_upper_layer_callback (const pal_i2c_t * p_pal_i2c_ctx, optiga_lib_status_t event)
-{
-	upper_layer_callback_t upper_layer_handler;
-    //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+void invoke_upper_layer_callback(const pal_i2c_t *p_pal_i2c_ctx, optiga_lib_status_t event) {
+    upper_layer_callback_t upper_layer_handler;
+    // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
     upper_layer_handler = (upper_layer_callback_t)p_pal_i2c_ctx->upper_layer_event_handler;
 
     upper_layer_handler(p_pal_i2c_ctx->p_upper_layer_ctx, event);
 
-    //Release I2C Bus
+    // Release I2C Bus
     pal_i2c_release(p_pal_i2c_ctx->p_upper_layer_ctx);
 }
 
 /// @cond hidden
 // I2C driver callback function when the transmit is completed successfully
-void i2c_master_end_of_transmit_callback(void)
-{
+void i2c_master_end_of_transmit_callback(void) {
     invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_SUCCESS);
 }
 
-
 // I2C driver callback function when the receive is completed successfully
-void i2c_master_end_of_receive_callback(void)
-{
+void i2c_master_end_of_receive_callback(void) {
     invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_SUCCESS);
 }
 
 // I2C error callback function
-void i2c_master_error_detected_callback(void)
-{
+void i2c_master_error_detected_callback(void) {
     invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_ERROR);
 }
 
-
 // I2C driver callback function when the nack error detected
-void i2c_master_nack_received_callback(void)
-{
+void i2c_master_nack_received_callback(void) {
     i2c_master_error_detected_callback();
 }
 
 // I2C driver callback function when the arbitration lost error detected
-void i2c_master_arbitration_lost_callback(void)
-{
+void i2c_master_arbitration_lost_callback(void) {
     i2c_master_error_detected_callback();
 }
 
-
-uint16_t usb_i2c_poll_operation_result(pal_i2c_t * p_i2c_context)
-{
+uint16_t usb_i2c_poll_operation_result(pal_i2c_t *p_i2c_context) {
     uint8_t report[HID_REPORT_SIZE] = {0};
     LOG_PAL("usb_i2c_poll_operation_result\n. ");
-    while (1)
-    {
-        if (usb_hid_get_feature(REPORT_ID_I2C_STATUS, report, &usb_events) != 5)
-        {
+    while (1) {
+        if (usb_hid_get_feature(REPORT_ID_I2C_STATUS, report, &usb_events) != 5) {
             LOG_PAL("[IFX-HAL]: USB get I2C status failed.\n");
             return PAL_I2C_EVENT_ERROR;
         }
 
-        if (!(report[1] & I2C_STATUS_CONTROLLER_BUSY))
-        {
-            if (report[1] & I2C_STATUS_ERROR_CONDITION)
-            {
+        if (!(report[1] & I2C_STATUS_CONTROLLER_BUSY)) {
+            if (report[1] & I2C_STATUS_ERROR_CONDITION) {
                 return PAL_I2C_EVENT_ERROR;
             }
 
-            if (report[1] & I2C_STATUS_CONTROLLER_IDLE)
-            {
-                if (!(report[1] & I2C_STATUS_BUS_BUSY))
-                {
+            if (report[1] & I2C_STATUS_CONTROLLER_IDLE) {
+                if (!(report[1] & I2C_STATUS_BUS_BUSY)) {
                     return PAL_STATUS_SUCCESS;
                 }
             }
@@ -218,8 +174,7 @@ uint16_t usb_i2c_poll_operation_result(pal_i2c_t * p_i2c_context)
  * \retval  #PAL_STATUS_SUCCESS  Returns when the I2C master init it successfull
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C init fails.
  */
-pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context)
-{
+pal_status_t pal_i2c_init(const pal_i2c_t *p_i2c_context) {
     return PAL_STATUS_SUCCESS;
 }
 
@@ -245,8 +200,7 @@ pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context)
  * \retval  #PAL_STATUS_SUCCESS  Returns when the I2C master de-init it successfull
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C de-init fails.
  */
-pal_status_t pal_i2c_deinit(const pal_i2c_t * p_i2c_context)
-{
+pal_status_t pal_i2c_deinit(const pal_i2c_t *p_i2c_context) {
     LOG_PAL("pal_i2c_deinit\n. ");
     return PAL_STATUS_SUCCESS;
 }
@@ -284,62 +238,54 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t * p_i2c_context)
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
 
-pal_status_t pal_i2c_write(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length)
-{
+pal_status_t pal_i2c_write(const pal_i2c_t *p_i2c_context, uint8_t *p_data, uint16_t length) {
     pal_status_t status = PAL_STATUS_FAILURE;
     int32_t usb_lib_status;
     int32_t transfered = 0;
-    pal_usb_t * pal_usb;
+    pal_usb_t *pal_usb;
     uint8_t report[HID_REPORT_SIZE] = {0};
 
-    pal_usb = (pal_usb_t * ) p_i2c_context->p_i2c_hw_config;
+    pal_usb = (pal_usb_t *)p_i2c_context->p_i2c_hw_config;
     report[0] = REPORT_ID_I2C_WRITE_REQ;
     report[1] = p_i2c_context->slave_address;
     report[2] = I2C_FLAG_START | I2C_FLAG_STOP;
     report[3] = (uint8_t)length;
 
     memcpy(&report[4], p_data, length);
-    //Acquire the I2C bus before read/write
+    // Acquire the I2C bus before read/write
 
-    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context))
-    {
+    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context)) {
         gp_pal_i2c_current_ctx = (pal_i2c_t *)p_i2c_context;
 
-        //Invoke the low level i2c master driver API to write to the bus
-        usb_lib_status = libusb_interrupt_transfer(pal_usb->handle,
-                                                   pal_usb->hid_ep_out,
-                                                   report,
-                                                   sizeof(report),
-                                                   &transfered,
-                                                   USB_TIMEOUT);
-        if (usb_lib_status != 0 || transfered != HID_REPORT_SIZE)
-        {
-            //If I2C Master fails to invoke the write operation, invoke upper layer event handler with error.
-            //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-            ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-                                                       (p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
-            //Release I2C Bus
-            pal_i2c_release((void * )p_i2c_context);
-        }
-        else
-        {
-            if (usb_i2c_poll_operation_result((pal_i2c_t *)p_i2c_context) == PAL_STATUS_SUCCESS)
-            {
+        // Invoke the low level i2c master driver API to write to the bus
+        usb_lib_status = libusb_interrupt_transfer(
+            pal_usb->handle,
+            pal_usb->hid_ep_out,
+            report,
+            sizeof(report),
+            &transfered,
+            USB_TIMEOUT
+        );
+        if (usb_lib_status != 0 || transfered != HID_REPORT_SIZE) {
+            // If I2C Master fails to invoke the write operation, invoke upper layer event handler with error.
+            // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+            ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler)
+            )(p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
+            // Release I2C Bus
+            pal_i2c_release((void *)p_i2c_context);
+        } else {
+            if (usb_i2c_poll_operation_result((pal_i2c_t *)p_i2c_context) == PAL_STATUS_SUCCESS) {
                 i2c_master_end_of_transmit_callback();
                 status = PAL_STATUS_SUCCESS;
-            }
-            else
-            {
+            } else {
                 invoke_upper_layer_callback(gp_pal_i2c_current_ctx, PAL_I2C_EVENT_ERROR);
             }
         }
-    }
-    else
-    {
+    } else {
         status = PAL_STATUS_I2C_BUSY;
-        //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-        ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-                                                        (p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_BUSY);
+        // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+        ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler)
+        )(p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_BUSY);
     }
 
     return status;
@@ -376,13 +322,12 @@ pal_status_t pal_i2c_write(const pal_i2c_t * p_i2c_context, uint8_t * p_data, ui
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C read fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
-pal_status_t pal_i2c_read(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length)
-{
+pal_status_t pal_i2c_read(const pal_i2c_t *p_i2c_context, uint8_t *p_data, uint16_t length) {
     int32_t usb_lib_status = PAL_STATUS_FAILURE;
     int32_t transfered;
     uint8_t report[HID_REPORT_SIZE] = {0};
     uint16_t rx_result;
-    pal_usb_t * pal_usb;
+    pal_usb_t *pal_usb;
     LOG_PAL("[IFX-HAL]: I2C RX (%d)\n", length);
 
     report[0] = REPORT_ID_I2C_READ_REQ;
@@ -390,61 +335,58 @@ pal_status_t pal_i2c_read(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uin
     report[2] = I2C_FLAG_START | I2C_FLAG_STOP;
     report[3] = (uint8_t)length;
     report[4] = 0;
-    pal_usb = (pal_usb_t * ) p_i2c_context->p_i2c_hw_config;
-    //Acquire the I2C bus before read/write
-    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context))
-    {
+    pal_usb = (pal_usb_t *)p_i2c_context->p_i2c_hw_config;
+    // Acquire the I2C bus before read/write
+    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context)) {
         gp_pal_i2c_current_ctx = (pal_i2c_t *)p_i2c_context;
-        usb_lib_status = libusb_interrupt_transfer(pal_usb->handle,
-                                                   pal_usb->hid_ep_out,
-                                                   report,
-                                                   sizeof(report),
-                                                   &transfered,
-                                                   USB_TIMEOUT);
+        usb_lib_status = libusb_interrupt_transfer(
+            pal_usb->handle,
+            pal_usb->hid_ep_out,
+            report,
+            sizeof(report),
+            &transfered,
+            USB_TIMEOUT
+        );
         LOG_PAL("[IFX-HAL]: HID Write status = %d, %d\n", usb_lib_status, transfered);
-        if (usb_lib_status)
-        {
+        if (usb_lib_status) {
             LOG_PAL("[IFX-HAL]: libusb_interrupt_transfer ERROR %d\n.", usb_lib_status);
-            //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-            ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-                                                       (p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
+            // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+            ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler)
+            )(p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
             return usb_lib_status;
         }
-        //Invoke the low level i2c master driver API to read from the bus
+        // Invoke the low level i2c master driver API to read from the bus
         memset(report, 0x00, sizeof(report));
         transfered = 0;
-        usb_lib_status = libusb_interrupt_transfer(pal_usb->handle,
-                                                   pal_usb->hid_ep_in,
-                                                   report,
-                                                   sizeof(report),
-                                                   &transfered,
-                                                   USB_TIMEOUT);
+        usb_lib_status = libusb_interrupt_transfer(
+            pal_usb->handle,
+            pal_usb->hid_ep_in,
+            report,
+            sizeof(report),
+            &transfered,
+            USB_TIMEOUT
+        );
         rx_result = usb_i2c_poll_operation_result((pal_i2c_t *)p_i2c_context);
-        if (rx_result == PAL_STATUS_SUCCESS && usb_lib_status == 0 && transfered >= (2 + length) && report[1] == length)
-        {
+        if (rx_result == PAL_STATUS_SUCCESS && usb_lib_status == 0 && transfered >= (2 + length)
+            && report[1] == length) {
             memcpy(p_data, &report[2], report[1]);
             usb_lib_status = PAL_STATUS_SUCCESS;
             i2c_master_end_of_receive_callback();
+        } else {
+            // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+            ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler)
+            )(p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
+            // Release I2C Bus
+            pal_i2c_release((void *)p_i2c_context);
         }
-        else
-        {
-            //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-            ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-                                                        (p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
-            //Release I2C Bus
-            pal_i2c_release((void * )p_i2c_context);
-        }
-    }
-    else
-    {
+    } else {
         usb_lib_status = PAL_STATUS_I2C_BUSY;
-        //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-        ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-                                                        (p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_BUSY);
+        // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+        ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler)
+        )(p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_BUSY);
     }
     return usb_lib_status;
 }
-
 
 /**
  * Sets the bitrate/speed(KHz) of I2C master.
@@ -474,38 +416,37 @@ pal_status_t pal_i2c_read(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uin
  * \retval  #PAL_STATUS_FAILURE  Returns when the setting of bitrate fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
-pal_status_t pal_i2c_set_bitrate(const pal_i2c_t * p_i2c_context, uint16_t bitrate)
-{
+pal_status_t pal_i2c_set_bitrate(const pal_i2c_t *p_i2c_context, uint16_t bitrate) {
     pal_status_t return_status = PAL_STATUS_SUCCESS;
-//    host_lib_status_t event = PAL_I2C_EVENT_ERROR;
-//    LOG_PAL("pal_i2c_set_bitrate\n. ");
-//    //Acquire the I2C bus before setting the bitrate
-//    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context))
-//    {
-//        // If the user provided bitrate is greater than the I2C master hardware maximum supported value,
-//        // set the I2C master to its maximum supported value.
-//        if (bitrate > PAL_I2C_MASTER_MAX_BITRATE)
-//        {
-//            bitrate = PAL_I2C_MASTER_MAX_BITRATE;
-//        }
-//        return_status = PAL_STATUS_SUCCESS;
-//        event = PAL_I2C_EVENT_SUCCESS;
-//    }
-//    else
-//    {
-//        return_status = PAL_STATUS_I2C_BUSY;
-//        event = PAL_I2C_EVENT_BUSY;
-//    }
-//    if (p_i2c_context->upper_layer_event_handler)
-//    {
-//        //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-//        ((app_event_handler_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->upper_layer_ctx, event);
-//    }
-//    //Release I2C Bus
-//    pal_i2c_release((void * )p_i2c_context);
+    //    host_lib_status_t event = PAL_I2C_EVENT_ERROR;
+    //    LOG_PAL("pal_i2c_set_bitrate\n. ");
+    //    //Acquire the I2C bus before setting the bitrate
+    //    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context))
+    //    {
+    //        // If the user provided bitrate is greater than the I2C master hardware maximum supported value,
+    //        // set the I2C master to its maximum supported value.
+    //        if (bitrate > PAL_I2C_MASTER_MAX_BITRATE)
+    //        {
+    //            bitrate = PAL_I2C_MASTER_MAX_BITRATE;
+    //        }
+    //        return_status = PAL_STATUS_SUCCESS;
+    //        event = PAL_I2C_EVENT_SUCCESS;
+    //    }
+    //    else
+    //    {
+    //        return_status = PAL_STATUS_I2C_BUSY;
+    //        event = PAL_I2C_EVENT_BUSY;
+    //    }
+    //    if (p_i2c_context->upper_layer_event_handler)
+    //    {
+    //        //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+    //        ((app_event_handler_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->upper_layer_ctx, event);
+    //    }
+    //    //Release I2C Bus
+    //    pal_i2c_release((void * )p_i2c_context);
     return return_status;
 }
 
 /**
-* @}
-*/
+ * @}
+ */

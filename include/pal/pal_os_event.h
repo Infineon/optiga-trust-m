@@ -1,39 +1,17 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2021 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file pal_os_event.h
-*
-* \brief   This file provides the prototype declarations of PAL OS event
-*
-* \ingroup  grPAL
-*
-* @{
-*/
+ * SPDX-FileCopyrightText: 2021-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file pal_os_event.h
+ *
+ * \brief   This file provides the prototype declarations of PAL OS event
+ *
+ * \ingroup  grPAL
+ *
+ * @{
+ */
 
 #ifndef _PAL_OS_EVENT_H_
 #define _PAL_OS_EVENT_H_
@@ -47,25 +25,23 @@ extern "C" {
 /**
  * \brief typedef for Callback function when timer elapses.
  */
-typedef void ( * register_callback)(void * );
+typedef void (*register_callback)(void *);
 
 /** \brief PAL os event structure */
-typedef struct pal_os_event
-{
+typedef struct pal_os_event {
     /// context to be passed to callback
-    void * callback_ctx;
+    void *callback_ctx;
     /// os timer
-    void * os_timer;	
+    void *os_timer;
     /// event triggered status
     bool_t is_event_triggered;
-    /// Holds the next event timeout value in microseconds 
+    /// Holds the next event timeout value in microseconds
     uint32_t timeout_us;
     /// To synchronize between events
     uint8_t sync_flag;
     /// registered callback
     register_callback callback_registered;
-}pal_os_event_t;
-
+} pal_os_event_t;
 
 /**
  * \brief Create an os event.
@@ -83,8 +59,8 @@ typedef struct pal_os_event
  * \param[in] callback_args                 Argument to be passed to registered callback
  *
  */
-LIBRARY_EXPORTS pal_os_event_t * pal_os_event_create(register_callback callback,
-                                                     void * callback_args);
+LIBRARY_EXPORTS pal_os_event_t *
+pal_os_event_create(register_callback callback, void *callback_args);
 
 /**
  * \brief Destroys an os event.
@@ -101,7 +77,7 @@ LIBRARY_EXPORTS pal_os_event_t * pal_os_event_create(register_callback callback,
  * \param[in] pal_os_event                  pal_os_event to be destroyed
  *
  */
-LIBRARY_EXPORTS void pal_os_event_destroy(pal_os_event_t * pal_os_event);
+LIBRARY_EXPORTS void pal_os_event_destroy(pal_os_event_t *pal_os_event);
 
 /**
  * \brief Callback registration function to trigger once when timer expires.
@@ -124,10 +100,12 @@ LIBRARY_EXPORTS void pal_os_event_destroy(pal_os_event_t * pal_os_event);
  * \param[in] time_us               time in micro seconds to trigger the call back
  *
  */
-LIBRARY_EXPORTS void pal_os_event_register_callback_oneshot(pal_os_event_t * p_pal_os_event,
-                                                            register_callback callback,
-                                                            void * callback_args,
-                                                            uint32_t time_us);
+LIBRARY_EXPORTS void pal_os_event_register_callback_oneshot(
+    pal_os_event_t *p_pal_os_event,
+    register_callback callback,
+    void *callback_args,
+    uint32_t time_us
+);
 
 /**
  * \brief Timer callback handler.
@@ -143,7 +121,7 @@ LIBRARY_EXPORTS void pal_os_event_register_callback_oneshot(pal_os_event_t * p_p
  * \note
  * - None
  *
-*/
+ */
 void pal_os_event_trigger_registered_callback(void);
 
 /**
@@ -163,9 +141,8 @@ void pal_os_event_trigger_registered_callback(void);
  * \param[in] callback_args                 Arguement to be passed to registered callback
  *
  */
-LIBRARY_EXPORTS void pal_os_event_start(pal_os_event_t * p_pal_os_event,
-                                        register_callback callback,
-                                        void * callback_args);
+LIBRARY_EXPORTS void
+pal_os_event_start(pal_os_event_t *p_pal_os_event, register_callback callback, void *callback_args);
 
 /**
  * \brief Stops an os event.
@@ -182,7 +159,7 @@ LIBRARY_EXPORTS void pal_os_event_start(pal_os_event_t * p_pal_os_event,
  * \param[in] p_pal_os_event                Pointer to os event
  *
  */
-LIBRARY_EXPORTS void pal_os_event_stop(pal_os_event_t * p_pal_os_event);
+LIBRARY_EXPORTS void pal_os_event_stop(pal_os_event_t *p_pal_os_event);
 
 #ifdef __cplusplus
 }
@@ -191,5 +168,5 @@ LIBRARY_EXPORTS void pal_os_event_stop(pal_os_event_t * p_pal_os_event);
 #endif /*_PAL_OS_EVENT_H_*/
 
 /**
-* @}
-*/
+ * @}
+ */

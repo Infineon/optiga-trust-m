@@ -1,40 +1,17 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2021 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file pal_i2c.h
-*
-* \brief   This file provides the prototype declarations of PAL I2C.
-*
-* \ingroup  grPAL
-*
-* @{
-*/
-
+ * SPDX-FileCopyrightText: 2021-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file pal_i2c.h
+ *
+ * \brief   This file provides the prototype declarations of PAL I2C.
+ *
+ * \ingroup  grPAL
+ *
+ * @{
+ */
 
 #ifndef _PAL_I2C_H_
 #define _PAL_I2C_H_
@@ -48,19 +25,18 @@ extern "C" {
 /// Event returned when I2C master completes execution
 #define PAL_I2C_EVENT_SUCCESS (0x0000)
 /// Event returned when I2C master operation fails
-#define PAL_I2C_EVENT_ERROR   (0x0001)
+#define PAL_I2C_EVENT_ERROR (0x0001)
 /// Event returned when lower level I2C bus is busy
-#define PAL_I2C_EVENT_BUSY    (0x0002)
+#define PAL_I2C_EVENT_BUSY (0x0002)
 
 /** @brief PAL I2C context structure */
-typedef struct pal_i2c
-{
+typedef struct pal_i2c {
     /// Pointer to I2C master platform specific context
-    void * p_i2c_hw_config;
+    void *p_i2c_hw_config;
     /// Pointer to store the callers context information
-    void * p_upper_layer_ctx;
+    void *p_upper_layer_ctx;
     /// Pointer to store the callers handler
-    void * upper_layer_event_handler;
+    void *upper_layer_event_handler;
     /// I2C slave address
     uint8_t slave_address;
 } pal_i2c_t;
@@ -81,7 +57,7 @@ typedef struct pal_i2c
  *   - If the I2C bus is in busy state, the API must not initialize and return #PAL_STATUS_I2C_BUSY status.
  *   - Repeated initialization must be taken care with respect to the platform requirements. (Example: Multiple users/applications
  *     sharing the same I2C master resource)
- * 
+ *
  *
  * \pre
  * - None
@@ -94,7 +70,7 @@ typedef struct pal_i2c
  * \retval  #PAL_STATUS_SUCCESS  Returns when the I2C master init it successful
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C init fails.
  */
-LIBRARY_EXPORTS pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context);
+LIBRARY_EXPORTS pal_status_t pal_i2c_init(const pal_i2c_t *p_i2c_context);
 
 /**
  * @brief Sets the I2C Master bitrate
@@ -129,7 +105,7 @@ LIBRARY_EXPORTS pal_status_t pal_i2c_init(const pal_i2c_t * p_i2c_context);
  * \retval  #PAL_STATUS_FAILURE  Returns when the setting of bitrate fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
-LIBRARY_EXPORTS pal_status_t pal_i2c_set_bitrate(const pal_i2c_t * p_i2c_context, uint16_t bitrate);
+LIBRARY_EXPORTS pal_status_t pal_i2c_set_bitrate(const pal_i2c_t *p_i2c_context, uint16_t bitrate);
 
 /**
  * @brief Writes on I2C bus.
@@ -166,7 +142,8 @@ LIBRARY_EXPORTS pal_status_t pal_i2c_set_bitrate(const pal_i2c_t * p_i2c_context
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C write fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
-LIBRARY_EXPORTS pal_status_t pal_i2c_write(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length);
+LIBRARY_EXPORTS pal_status_t
+pal_i2c_write(const pal_i2c_t *p_i2c_context, uint8_t *p_data, uint16_t length);
 
 /**
  * @brief Reads from I2C bus.
@@ -200,7 +177,8 @@ LIBRARY_EXPORTS pal_status_t pal_i2c_write(const pal_i2c_t * p_i2c_context, uint
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C read fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
-LIBRARY_EXPORTS pal_status_t pal_i2c_read(const pal_i2c_t * p_i2c_context, uint8_t * p_data, uint16_t length);
+LIBRARY_EXPORTS pal_status_t
+pal_i2c_read(const pal_i2c_t *p_i2c_context, uint8_t *p_data, uint16_t length);
 
 /**
  * @brief De-initializes the I2C master.
@@ -229,7 +207,7 @@ LIBRARY_EXPORTS pal_status_t pal_i2c_read(const pal_i2c_t * p_i2c_context, uint8
  * \retval  #PAL_STATUS_SUCCESS  Returns when the I2C master de-init it successful
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C de-init fails.
  */
-LIBRARY_EXPORTS pal_status_t pal_i2c_deinit(const pal_i2c_t * p_i2c_context);
+LIBRARY_EXPORTS pal_status_t pal_i2c_deinit(const pal_i2c_t *p_i2c_context);
 
 #ifdef __cplusplus
 }
@@ -238,6 +216,5 @@ LIBRARY_EXPORTS pal_status_t pal_i2c_deinit(const pal_i2c_t * p_i2c_context);
 #endif /* _PAL_I2C_H_ */
 
 /**
-* @}
-*/
-
+ * @}
+ */

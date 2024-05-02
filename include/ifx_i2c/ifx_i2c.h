@@ -1,40 +1,17 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2021 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file ifx_i2c.h
-*
-* \brief   This file defines the API prototype for IFX I2C protocol v2.00 wrapper.
-*
-* \ingroup  grIFXI2C
-*
-* @{
-*/
-
+ * SPDX-FileCopyrightText: 2021-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file ifx_i2c.h
+ *
+ * \brief   This file defines the API prototype for IFX I2C protocol v2.00 wrapper.
+ *
+ * \ingroup  grIFXI2C
+ *
+ * @{
+ */
 
 #ifndef _IFXI2C_H_
 #define _IFXI2C_H_
@@ -43,12 +20,11 @@
 extern "C" {
 #endif
 
-#include "optiga_lib_types.h"
 #include "ifx_i2c_config.h"
+#include "optiga_lib_types.h"
 
 /** @brief IFX I2C Reset types */
-typedef enum ifx_i2c_reset_type
-{
+typedef enum ifx_i2c_reset_type {
     /// Cold reset. Both reset pin and VDD pin are toggled low and then high
     IFX_I2C_COLD_RESET = 0U,
     /// Soft reset. 0x0000 is written to IFX-I2C Soft reset register
@@ -99,13 +75,14 @@ typedef enum ifx_i2c_reset_type
  *   - <b>manage_contex_operation</b> : Used for manage context.The value of the parameter is not modified by the IFX I2C protocol stack.
  *     - The values for <b>manage_contex_operation</b> must be one of the below.
  *       - #IFX_I2C_SESSION_CONTEXT_RESTORE : restore the saved secure session.
- *       - #IFX_I2C_SESSION_CONTEXT_NONE : for no manage context operation. 
+ *       - #IFX_I2C_SESSION_CONTEXT_NONE : for no manage context operation.
  *
  * \param[in,out]  p_ctx                    Pointer to #ifx_i2c_context_t, must not be NULL
  *
  * \retval         #IFX_I2C_STACK_SUCCESS
  * \retval         #IFX_I2C_STACK_ERROR
- */optiga_lib_status_t ifx_i2c_open(ifx_i2c_context_t * p_ctx);
+ */
+optiga_lib_status_t ifx_i2c_open(ifx_i2c_context_t *p_ctx);
 
 /**
  * \brief   Resets the I2C slave.
@@ -134,8 +111,7 @@ typedef enum ifx_i2c_reset_type
  * \retval        #IFX_I2C_STACK_SUCCESS
  * \retval        #IFX_I2C_STACK_ERROR
  */
-optiga_lib_status_t ifx_i2c_reset(ifx_i2c_context_t * p_ctx,
-                                  ifx_i2c_reset_type_t reset_type);
+optiga_lib_status_t ifx_i2c_reset(ifx_i2c_context_t *p_ctx, ifx_i2c_reset_type_t reset_type);
 
 /**
  * \brief   Sends a command and receives a response for the command.
@@ -180,7 +156,7 @@ optiga_lib_status_t ifx_i2c_reset(ifx_i2c_context_t * p_ctx,
  *       - In the receive buffer, the response (received data) from the OPTIGA will be stored from the #IFX_I2C_DATA_OFFSET location. Read the response from this offset.
  *       - Provide the length of command data (tx_data_length) with the payload length excluding the additional overhead.
  *       - Provide the length of response data (p_rx_buffer_len) in-order to copy the response to the buffer provided.
- *   - If the master sequence number or expected slave sequence for next payload transmission crosses 0xFFFFFFF0, 
+ *   - If the master sequence number or expected slave sequence for next payload transmission crosses 0xFFFFFFF0,
  *     master renegotiate a new secure channel and then sends the payload to slave.
  * \image html ifx_i2c_trancv_buffer.png "ifx_i2c_transceive()" width=0cm
  *
@@ -196,11 +172,13 @@ optiga_lib_status_t ifx_i2c_reset(ifx_i2c_context_t * p_ctx,
  * \retval        #IFX_I2C_HANDSHAKE_ERROR
  * \retval        #IFX_I2C_SESSION_ERROR
  */
-optiga_lib_status_t ifx_i2c_transceive(ifx_i2c_context_t * p_ctx,
-                                     const uint8_t * p_tx_data,
-                                     uint16_t tx_data_length,
-                                     uint8_t * p_rx_buffer,
-                                     uint16_t* p_rx_buffer_len);
+optiga_lib_status_t ifx_i2c_transceive(
+    ifx_i2c_context_t *p_ctx,
+    const uint8_t *p_tx_data,
+    uint16_t tx_data_length,
+    uint8_t *p_rx_buffer,
+    uint16_t *p_rx_buffer_len
+);
 
 /**
  * \brief   Closes the IFX I2C protocol stack for a given context.
@@ -227,7 +205,7 @@ optiga_lib_status_t ifx_i2c_transceive(ifx_i2c_context_t * p_ctx,
  *
  * \retval        #IFX_I2C_STACK_SUCCESS
  */
-optiga_lib_status_t ifx_i2c_close(ifx_i2c_context_t * p_ctx);
+optiga_lib_status_t ifx_i2c_close(ifx_i2c_context_t *p_ctx);
 
 /**
  * \brief   Sets the slave address of the target device.
@@ -260,9 +238,8 @@ optiga_lib_status_t ifx_i2c_close(ifx_i2c_context_t * p_ctx);
  * \retval        #IFX_I2C_STACK_SUCCESS
  * \retval        #IFX_I2C_STACK_ERROR
  */
-optiga_lib_status_t ifx_i2c_set_slave_address(ifx_i2c_context_t * p_ctx,
-                                              uint8_t slave_address,
-                                              uint8_t persistent);
+optiga_lib_status_t
+ifx_i2c_set_slave_address(ifx_i2c_context_t *p_ctx, uint8_t slave_address, uint8_t persistent);
 
 #ifdef __cplusplus
 }
@@ -271,4 +248,3 @@ optiga_lib_status_t ifx_i2c_set_slave_address(ifx_i2c_context_t * p_ctx,
 /**
  * @}
  **/
-

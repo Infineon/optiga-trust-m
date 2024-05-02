@@ -1,52 +1,32 @@
 /**
-* MIT License
-*
-* Copyright (c) 2018 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-*
-* \file
-*
-* \brief This file implements the platform abstraction layer(pal) APIs for I2C.
-*
-* \ingroup  grPAL
-* @{
-*/
+ * SPDX-FileCopyrightText: 2018-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \file
+ *
+ * \brief This file implements the platform abstraction layer(pal) APIs for I2C.
+ *
+ * \ingroup  grPAL
+ * @{
+ */
 
 /**********************************************************************************************************************
  * HEADER FILES
  *********************************************************************************************************************/
 #include "pal_i2c.h"
-#include "I2C_MASTER/i2c_master.h"
-#include "I2C_MASTER/i2c_master_extern.h"
-#include "I2C_MASTER/i2c_master_conf.h"
 
 #include "FreeRTOS.h"
+#include "I2C_MASTER/i2c_master.h"
+#include "I2C_MASTER/i2c_master_conf.h"
+#include "I2C_MASTER/i2c_master_extern.h"
 #include "queue.h"
-#include "task.h"
 #include "semphr.h"
+#include "task.h"
 
 /**********************************************************************************************************************
  * MACROS
  *********************************************************************************************************************/
-#define PAL_I2C_MASTER_MAX_BITRATE  (400)
+#define PAL_I2C_MASTER_MAX_BITRATE (400)
 /// @cond hidden
 /*********************************************************************************************************************
  * LOCAL DATA
@@ -55,17 +35,17 @@
 static volatile uint32_t g_entry_count = 0;
 
 /* Pointer to the current pal i2c context*/
-static pal_i2c_t * gp_pal_i2c_current_ctx;
+static pal_i2c_t *gp_pal_i2c_current_ctx;
 
 /**< OPTIGA™ Trust X I2C module queue. */
 QueueHandle_t trustx_i2cresult_queue;
 
 typedef struct i2c_result {
-	/// Pointer to store upper layer callback context (For example: Ifx i2c context)
-	pal_i2c_t * i2c_ctx;
-	/// I2C Transmission result (e.g. PAL_I2C_EVENT_SUCCESS)
-	uint16_t i2c_result;
-}i2c_result_t;
+    /// Pointer to store upper layer callback context (For example: Ifx i2c context)
+    pal_i2c_t *i2c_ctx;
+    /// I2C Transmission result (e.g. PAL_I2C_EVENT_SUCCESS)
+    uint16_t i2c_result;
+} i2c_result_t;
 
 TaskHandle_t xIicCallbackTaskHandle = NULL;
 SemaphoreHandle_t xIicSemaphoreHandle;
@@ -74,127 +54,116 @@ SemaphoreHandle_t xIicSemaphoreHandle;
  * LOCAL ROUTINES
  *********************************************************************************************************************/
 // I2C acquire bus function
-//lint --e{715} suppress the unused p_i2c_context variable lint error , since this is kept for future enhancements
-static pal_status_t pal_i2c_acquire(const void* p_i2c_context)
-{
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+// lint --e{715} suppress the unused p_i2c_context variable lint error , since this is kept for future enhancements
+static pal_status_t pal_i2c_acquire(const void *p_i2c_context) {
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-	if ( xSemaphoreTakeFromISR(xIicSemaphoreHandle, &xHigherPriorityTaskWoken) == pdTRUE )
-		return PAL_STATUS_SUCCESS;
-	else
-		return PAL_STATUS_FAILURE;
+    if (xSemaphoreTakeFromISR(xIicSemaphoreHandle, &xHigherPriorityTaskWoken) == pdTRUE)
+        return PAL_STATUS_SUCCESS;
+    else
+        return PAL_STATUS_FAILURE;
 }
 
 // I2C release bus function
-//lint --e{715} suppress the unused p_i2c_context variable lint, since this is kept for future enhancements
-static void pal_i2c_release(const void* p_i2c_context)
-{
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+// lint --e{715} suppress the unused p_i2c_context variable lint, since this is kept for future enhancements
+static void pal_i2c_release(const void *p_i2c_context) {
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-	xSemaphoreGiveFromISR(xIicSemaphoreHandle, &xHigherPriorityTaskWoken);
+    xSemaphoreGiveFromISR(xIicSemaphoreHandle, &xHigherPriorityTaskWoken);
 }
 /// @endcond
 
-void invoke_upper_layer_callback (const pal_i2c_t * p_pal_i2c_ctx, optiga_lib_status_t event)
-{
+void invoke_upper_layer_callback(const pal_i2c_t *p_pal_i2c_ctx, optiga_lib_status_t event) {
     upper_layer_callback_t upper_layer_handler;
-    //lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t type"
+    // lint --e{611} suppress "void* function pointer is type casted to upper_layer_callback_t type"
     upper_layer_handler = (upper_layer_callback_t)p_pal_i2c_ctx->upper_layer_event_handler;
 
     upper_layer_handler(p_pal_i2c_ctx->p_upper_layer_ctx, event);
 
-    //Release I2C Bus
+    // Release I2C Bus
     pal_i2c_release(p_pal_i2c_ctx->p_upper_layer_ctx);
 }
 
 /// @cond hidden
 // I2C driver callback function when the transmit is completed successfully
-void i2c_master_end_of_transmit_callback(void)
-{
-	i2c_result_t i2_result;
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+void i2c_master_end_of_transmit_callback(void) {
+    i2c_result_t i2_result;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-	i2_result.i2c_ctx = gp_pal_i2c_current_ctx;
-	i2_result.i2c_result = PAL_I2C_EVENT_SUCCESS;
+    i2_result.i2c_ctx = gp_pal_i2c_current_ctx;
+    i2_result.i2c_result = PAL_I2C_EVENT_SUCCESS;
 
     /*
      * You cann't call callback from the timer callback, this might lead to a corruption
      * Use queues instead to activate corresponding handler
      * */
-	xQueueSendFromISR( trustx_i2cresult_queue, ( void * ) &i2_result, &xHigherPriorityTaskWoken );
+    xQueueSendFromISR(trustx_i2cresult_queue, (void *)&i2_result, &xHigherPriorityTaskWoken);
 }
 
-
 // I2C driver callback function when the receive is completed successfully
-void i2c_master_end_of_receive_callback(void)
-{
-	i2c_result_t i2_result;
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+void i2c_master_end_of_receive_callback(void) {
+    i2c_result_t i2_result;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-	i2_result.i2c_ctx = gp_pal_i2c_current_ctx;
-	i2_result.i2c_result = PAL_I2C_EVENT_SUCCESS;
+    i2_result.i2c_ctx = gp_pal_i2c_current_ctx;
+    i2_result.i2c_result = PAL_I2C_EVENT_SUCCESS;
 
     /*
      * You cann't call callback from the timer callback, this might lead to a corruption
      * Use queues instead to activate corresponding handler
      * */
-	xQueueSendFromISR( trustx_i2cresult_queue, ( void * ) &i2_result, &xHigherPriorityTaskWoken );
+    xQueueSendFromISR(trustx_i2cresult_queue, (void *)&i2_result, &xHigherPriorityTaskWoken);
 }
 
 // I2C error callback function
-void i2c_master_error_detected_callback(void)
-{
+void i2c_master_error_detected_callback(void) {
     I2C_MASTER_t *p_i2c_master;
-	i2c_result_t i2_result;
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    i2c_result_t i2_result;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
     p_i2c_master = gp_pal_i2c_current_ctx->p_i2c_hw_config;
-    if (I2C_MASTER_IsTxBusy(p_i2c_master))
-    {
-        //lint --e{534} suppress "Return value is not required to be checked"
+    if (I2C_MASTER_IsTxBusy(p_i2c_master)) {
+        // lint --e{534} suppress "Return value is not required to be checked"
         I2C_MASTER_AbortTransmit(p_i2c_master);
-        while (I2C_MASTER_IsTxBusy(p_i2c_master)){}
+        while (I2C_MASTER_IsTxBusy(p_i2c_master)) {
+        }
     }
 
-    if (I2C_MASTER_IsRxBusy(p_i2c_master))
-    {
-        //lint --e{534} suppress "Return value is not required to be checked"
+    if (I2C_MASTER_IsRxBusy(p_i2c_master)) {
+        // lint --e{534} suppress "Return value is not required to be checked"
         I2C_MASTER_AbortReceive(p_i2c_master);
-        while (I2C_MASTER_IsRxBusy(p_i2c_master)){}
+        while (I2C_MASTER_IsRxBusy(p_i2c_master)) {
+        }
     }
 
-	i2_result.i2c_ctx = gp_pal_i2c_current_ctx;
-	i2_result.i2c_result = PAL_I2C_EVENT_ERROR;
+    i2_result.i2c_ctx = gp_pal_i2c_current_ctx;
+    i2_result.i2c_result = PAL_I2C_EVENT_ERROR;
 
     /*
      * You cann't call callback from the timer callback, this might lead to a corruption
      * Use queues instead to activate corresponding handler
      * */
-	xQueueSendFromISR( trustx_i2cresult_queue, ( void * ) &i2_result, &xHigherPriorityTaskWoken );
+    xQueueSendFromISR(trustx_i2cresult_queue, (void *)&i2_result, &xHigherPriorityTaskWoken);
 }
 
-void i2c_master_nack_received_callback(void)
-{
-	i2c_master_error_detected_callback();
+void i2c_master_nack_received_callback(void) {
+    i2c_master_error_detected_callback();
 }
 
-void i2c_master_arbitration_lost_callback(void)
-{
-	i2c_master_error_detected_callback();
+void i2c_master_arbitration_lost_callback(void) {
+    i2c_master_error_detected_callback();
 }
 
-void i2c_result_handler( void * pvParameters )
-{
-	i2c_result_t i2_result;
+void i2c_result_handler(void *pvParameters) {
+    i2c_result_t i2_result;
 
-	do {
-		if( xQueueReceive( trustx_i2cresult_queue, &( i2_result ), ( TickType_t ) portMAX_DELAY ) )
-		{
-			invoke_upper_layer_callback(i2_result.i2c_ctx, i2_result.i2c_result);
-		}
-	} while(1);
+    do {
+        if (xQueueReceive(trustx_i2cresult_queue, &(i2_result), (TickType_t)portMAX_DELAY)) {
+            invoke_upper_layer_callback(i2_result.i2c_ctx, i2_result.i2c_result);
+        }
+    } while (1);
 
-	vTaskDelete( NULL );
+    vTaskDelete(NULL);
 }
 
 /// @endcond
@@ -214,7 +183,7 @@ void i2c_result_handler( void * pvParameters )
  *   - The implementation must handle the acquiring and releasing of the I2C bus before initializing the I2C master to
  *     avoid interrupting the ongoing slave I2C transactions using the same I2C master.
  *   - If the I2C bus is in busy state, the API must not initialize and return #PAL_STATUS_I2C_BUSY status.
- *   - Repeated initialization must be taken care with respect to the platform requirements. (Example: Multiple users/applications  
+ *   - Repeated initialization must be taken care with respect to the platform requirements. (Example: Multiple users/applications
  *     sharing the same I2C master resource)
  *
  *<b>User Input:</b><br>
@@ -225,36 +194,35 @@ void i2c_result_handler( void * pvParameters )
  * \retval  #PAL_STATUS_SUCCESS  Returns when the I2C master init it successfull
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C init fails.
  */
-pal_status_t pal_i2c_init(const pal_i2c_t* p_i2c_context)
-{
-	uint16_t status = PAL_STATUS_FAILURE;
+pal_status_t pal_i2c_init(const pal_i2c_t *p_i2c_context) {
+    uint16_t status = PAL_STATUS_FAILURE;
 
-	if (xIicCallbackTaskHandle == NULL)
-	{
-		xIicSemaphoreHandle = xSemaphoreCreateBinary();
+    if (xIicCallbackTaskHandle == NULL) {
+        xIicSemaphoreHandle = xSemaphoreCreateBinary();
 
-		status = I2C_MASTER_Init(&i2c_master_0);
-		if (status == 0) {
-			status = PAL_STATUS_SUCCESS;
-		}
+        status = I2C_MASTER_Init(&i2c_master_0);
+        if (status == 0) {
+            status = PAL_STATUS_SUCCESS;
+        }
 
-		/* Create the handler for the callbacks. */
-		xTaskCreate( i2c_result_handler,       /* Function that implements the task. */
-					"TrstI2CXHndlr",          /* Text name for the task. */
-					configMINIMAL_STACK_SIZE,      /* Stack size in words, not bytes. */
-					NULL,    /* Parameter passed into the task. */
-					tskIDLE_PRIORITY,/* Priority at which the task is created. */
-					&xIicCallbackTaskHandle );      /* Used to pass out the created task's handle. */
+        /* Create the handler for the callbacks. */
+        xTaskCreate(
+            i2c_result_handler, /* Function that implements the task. */
+            "TrstI2CXHndlr", /* Text name for the task. */
+            configMINIMAL_STACK_SIZE, /* Stack size in words, not bytes. */
+            NULL, /* Parameter passed into the task. */
+            tskIDLE_PRIORITY, /* Priority at which the task is created. */
+            &xIicCallbackTaskHandle
+        ); /* Used to pass out the created task's handle. */
 
-		/* Create a queue for results. Not more than 2 interrupts one by one are expected*/
-		trustx_i2cresult_queue = xQueueCreate( 2, sizeof( i2c_result_t ) );
+        /* Create a queue for results. Not more than 2 interrupts one by one are expected*/
+        trustx_i2cresult_queue = xQueueCreate(2, sizeof(i2c_result_t));
 
-		pal_i2c_release(p_i2c_context);
-	}
-	else {
-		// Seems like the task has been started already
-		status = PAL_STATUS_SUCCESS;
-	}
+        pal_i2c_release(p_i2c_context);
+    } else {
+        // Seems like the task has been started already
+        status = PAL_STATUS_SUCCESS;
+    }
 
     return status;
 }
@@ -281,9 +249,8 @@ pal_status_t pal_i2c_init(const pal_i2c_t* p_i2c_context)
  * \retval  #PAL_STATUS_SUCCESS  Returns when the I2C master de-init it successfull
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C de-init fails.
  */
-pal_status_t pal_i2c_deinit(const pal_i2c_t* p_i2c_context)
-{
-    if ( xIicCallbackTaskHandle != NULL)
+pal_status_t pal_i2c_deinit(const pal_i2c_t *p_i2c_context) {
+    if (xIicCallbackTaskHandle != NULL)
         vTaskDelete(xIicCallbackTaskHandle);
 
     pal_i2c_acquire(p_i2c_context);
@@ -313,7 +280,7 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t* p_i2c_context)
  * - The input #pal_i2c_t p_i2c_context must not be NULL.<br>
  * - The upper_layer_event_handler must be initialized in the p_i2c_context before invoking the API.<br>
  *
- *<b>Notes:</b><br> 
+ *<b>Notes:</b><br>
  *  - Otherwise the below implementation has to be updated to handle different bitrates based on the input context.<br>
  *  - The caller of this API must take care of the guard time based on the slave's requirement.<br>
  *
@@ -323,43 +290,42 @@ pal_status_t pal_i2c_deinit(const pal_i2c_t* p_i2c_context)
  *
  * \retval  #PAL_STATUS_SUCCESS  Returns when the I2C write is invoked successfully
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C write fails.
- * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy. 
+ * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
- 
-pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t length)
-{
+
+pal_status_t pal_i2c_write(pal_i2c_t *p_i2c_context, uint8_t *p_data, uint16_t length) {
     pal_status_t status = PAL_STATUS_FAILURE;
 
-    //Acquire the I2C bus before read/write
-    if(PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context))
-    {
+    // Acquire the I2C bus before read/write
+    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context)) {
         gp_pal_i2c_current_ctx = p_i2c_context;
 
-        //Invoke the low level i2c master driver API to write to the bus
-        if (I2C_MASTER_STATUS_SUCCESS != I2C_MASTER_Transmit(p_i2c_context->p_i2c_hw_config , (bool)TRUE,
-                                                             (p_i2c_context->slave_address << 1), p_data,
-                                                              length, (bool)TRUE))
-        {
-            //If I2C Master fails to invoke the write operation, invoke upper layer event handler with error.
+        // Invoke the low level i2c master driver API to write to the bus
+        if (I2C_MASTER_STATUS_SUCCESS
+            != I2C_MASTER_Transmit(
+                p_i2c_context->p_i2c_hw_config,
+                (bool)TRUE,
+                (p_i2c_context->slave_address << 1),
+                p_data,
+                length,
+                (bool)TRUE
+            )) {
+            // If I2C Master fails to invoke the write operation, invoke upper layer event handler with error.
 
-            //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-            ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-                                                       (p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_ERROR);
+            // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+            ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler)
+            )(p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
 
-            //Release I2C Bus
+            // Release I2C Bus
             pal_i2c_release((void *)p_i2c_context);
-        }
-        else
-        {
+        } else {
             status = PAL_STATUS_SUCCESS;
         }
-    }
-    else
-    {
+    } else {
         status = PAL_STATUS_I2C_BUSY;
-        //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-        ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-                                                        (p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_BUSY);
+        // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+        ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler)
+        )(p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_BUSY);
     }
     return status;
 }
@@ -383,7 +349,7 @@ pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t l
  * - The input #pal_i2c_t p_i2c_context must not be NULL.<br>
  * - The upper_layer_event_handler must be initialized in the p_i2c_context before invoking the API.<br>
  *
- *<b>Notes:</b><br> 
+ *<b>Notes:</b><br>
  *  - Otherwise the below implementation has to be updated to handle different bitrates based on the input context.<br>
  *  - The caller of this API must take care of the guard time based on the slave's requirement.<br>
  *
@@ -395,45 +361,44 @@ pal_status_t pal_i2c_write(pal_i2c_t* p_i2c_context,uint8_t* p_data , uint16_t l
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C read fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
-pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t length)
-{
+pal_status_t pal_i2c_read(pal_i2c_t *p_i2c_context, uint8_t *p_data, uint16_t length) {
     pal_status_t status = PAL_STATUS_FAILURE;
 
-    //Acquire the I2C bus before read/write
-    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context))
-    {
+    // Acquire the I2C bus before read/write
+    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context)) {
         gp_pal_i2c_current_ctx = p_i2c_context;
 
-        //Invoke the low level i2c master driver API to read from the bus
-        if (I2C_MASTER_STATUS_SUCCESS != I2C_MASTER_Receive(p_i2c_context->p_i2c_hw_config, (bool)TRUE,
-                                                           (p_i2c_context->slave_address << 1), p_data, length,
-                                                           (bool)TRUE, (bool)TRUE))
-        {
-            //If I2C Master fails to invoke the read operation, invoke upper layer event handler with error.
+        // Invoke the low level i2c master driver API to read from the bus
+        if (I2C_MASTER_STATUS_SUCCESS
+            != I2C_MASTER_Receive(
+                p_i2c_context->p_i2c_hw_config,
+                (bool)TRUE,
+                (p_i2c_context->slave_address << 1),
+                p_data,
+                length,
+                (bool)TRUE,
+                (bool)TRUE
+            )) {
+            // If I2C Master fails to invoke the read operation, invoke upper layer event handler with error.
 
-            //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-            ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-                                                       (p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_ERROR);
+            // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+            ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler)
+            )(p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
 
-            //Release I2C Bus
+            // Release I2C Bus
             pal_i2c_release((void *)p_i2c_context);
-        }
-        else
-        {
+        } else {
             status = PAL_STATUS_SUCCESS;
         }
-    }
-    else
-    {
+    } else {
         status = PAL_STATUS_I2C_BUSY;
-        //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-        ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler))
-                                                        (p_i2c_context->p_upper_layer_ctx , PAL_I2C_EVENT_BUSY);
+        // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+        ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler)
+        )(p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_BUSY);
     }
     return status;
 }
 
-   
 /**
  * Sets the bitrate/speed(KHz) of I2C master.
  * <br>
@@ -441,14 +406,14 @@ pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t 
  *<b>API Details:</b>
  * - Sets the bitrate of I2C master if the I2C bus is free, else it returns busy status #PAL_STATUS_I2C_BUSY<br>
  * - The bus is released after the setting the bitrate.<br>
- * - This API must take care of setting the bitrate to I2C master's maximum supported value. 
- * - Eg. In XMC4500, the maximum supported bitrate is 400 KHz. If the supplied bitrate is greater than 400KHz, the API will 
+ * - This API must take care of setting the bitrate to I2C master's maximum supported value.
+ * - Eg. In XMC4500, the maximum supported bitrate is 400 KHz. If the supplied bitrate is greater than 400KHz, the API will
  *   set the I2C master's bitrate to 400KHz.
  * - Use the #PAL_I2C_MASTER_MAX_BITRATE macro to specify the maximum supported bitrate value for the target platform.
- * - If upper_layer_event_handler is initialized, the upper layer handler is invoked with the respective event 
+ * - If upper_layer_event_handler is initialized, the upper layer handler is invoked with the respective event
  *   status listed below.
  *   - #PAL_I2C_EVENT_BUSY when I2C bus in busy state
- *   - #PAL_I2C_EVENT_ERROR when API fails to set the bit rate 
+ *   - #PAL_I2C_EVENT_ERROR when API fails to set the bit rate
  *   - #PAL_I2C_EVENT_SUCCESS when operation is successful
  *<br>
  *
@@ -462,45 +427,41 @@ pal_status_t pal_i2c_read(pal_i2c_t* p_i2c_context , uint8_t* p_data , uint16_t 
  * \retval  #PAL_STATUS_FAILURE  Returns when the setting of bitrate fails.
  * \retval  #PAL_STATUS_I2C_BUSY Returns when the I2C bus is busy.
  */
-pal_status_t pal_i2c_set_bitrate(const pal_i2c_t* p_i2c_context , uint16_t bitrate)
-{
+pal_status_t pal_i2c_set_bitrate(const pal_i2c_t *p_i2c_context, uint16_t bitrate) {
     pal_status_t return_status = PAL_STATUS_FAILURE;
     optiga_lib_status_t event = PAL_I2C_EVENT_ERROR;
 
-    //Acquire the I2C bus before setting the bitrate
-    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context))
-    {
+    // Acquire the I2C bus before setting the bitrate
+    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context)) {
         // If the user provided bitrate is greater than the I2C master hardware maximum supported value,
         // set the I2C master to its maximum supported value.
-        if (bitrate > PAL_I2C_MASTER_MAX_BITRATE)
-        {
+        if (bitrate > PAL_I2C_MASTER_MAX_BITRATE) {
             bitrate = PAL_I2C_MASTER_MAX_BITRATE;
         }
-        if (XMC_I2C_CH_STATUS_OK != XMC_I2C_CH_SetBaudrate(((I2C_MASTER_t *)p_i2c_context->p_i2c_hw_config)->channel, bitrate*1000))
-        {
+        if (XMC_I2C_CH_STATUS_OK
+            != XMC_I2C_CH_SetBaudrate(
+                ((I2C_MASTER_t *)p_i2c_context->p_i2c_hw_config)->channel,
+                bitrate * 1000
+            )) {
             return_status = PAL_STATUS_FAILURE;
-        }
-        else
-        {
+        } else {
             return_status = PAL_STATUS_SUCCESS;
             event = PAL_I2C_EVENT_SUCCESS;
         }
-    }
-    else
-    {
+    } else {
         return_status = PAL_STATUS_I2C_BUSY;
         event = PAL_I2C_EVENT_BUSY;
     }
-    if (p_i2c_context->upper_layer_event_handler)
-    {
-        //lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
-    	((callback_handler_t)(p_i2c_context->upper_layer_event_handler))(p_i2c_context->p_upper_layer_ctx , event);
+    if (p_i2c_context->upper_layer_event_handler) {
+        // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
+        ((callback_handler_t)(p_i2c_context->upper_layer_event_handler)
+        )(p_i2c_context->p_upper_layer_ctx, event);
     }
-    //Release I2C Bus
+    // Release I2C Bus
     pal_i2c_release((void *)p_i2c_context);
     return return_status;
 }
 
 /**
-* @}
-*/
+ * @}
+ */

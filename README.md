@@ -8,10 +8,13 @@ This is the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) Host Libr
   - [Quick navigation](#quick-navigation)
   - [Getting started](#getting-started)
     - [Getting the Host Library](#getting-the-host-library)
-    - [Host library overview](#host-library-overview)
+    - [Building and testing the Host Library](#building-and-testing-the-host-library)
+    - [Porting the Host library](#porting-the-host-library)
+    - [Examples using Host Library](#examples-using-host-library)
+  - [Host library overview](#host-library-overview)
   - [Host Applications](#host-applications)
   - [Contributing](#contributing)
-  - [License](#license)
+  - [Licensing](#licensing)
 
 ## Getting started
 
@@ -21,14 +24,21 @@ Below are the instructions to get the OPTIGA&trade; Trust M Host Library for C.
 
 The OPTIGA&trade; Trust M Host Library for C can be cloned using git command :
 
-    git clone https://github.com/Infineon/optiga-trust-m.git
+    git clone --recurse-submodules https://github.com/Infineon/optiga-trust-m.git
 
-The OPTIGA&trade; Trust M Host Library for C requires MbedTLS module, this module is fetched from the official repository of MbedTLS, this command can be used :
+### Building and testing the Host Library
 
-    git submodule update --init --recursive
+Instructions on how to build and test the host library can be found [here](tests/README.md)
 
+### Porting the Host library 
 
-### Host library overview
+Instructions on how to port the host library to a specific platform can be found [here](extras/pal/README.md)
+
+### Examples using Host Library
+
+Examples to demonstrate basic functionality of the security chip can be found [here](examples/README.md)
+
+## Host library overview
 
 ![](docs/images/optiga_trust_m_system_block_diagram.png)
 
@@ -64,9 +74,8 @@ For more information please refer to the [Wiki page](https://github.com/Infineon
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
-
-[cloning-library]: #cloning-library
+## Licensing
+   
+Please see our [LICENSE](LICENSE) for copyright and license information.
+   
+This project follows the REUSE approach, so copyright and licensing information is available for every file (including third party components) either in the file header, an individual *.license file or the .reuse/dep5 file. All licenses can be found in the [LICENSES](LICENSES) folder.
