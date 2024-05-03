@@ -1,43 +1,21 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2021 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file example_optiga_util_write_data.c
-*
-* \brief   This file provides the example for writing data/metadata to OPTIGA using
-*          #optiga_util_write_data and #optiga_util_write_metadata.
-*
-* \ingroup grOptigaExamples
-*
-* @{
-*/
+ * SPDX-FileCopyrightText: 2021-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file example_optiga_util_write_data.c
+ *
+ * \brief   This file provides the example for writing data/metadata to OPTIGA using
+ *          #optiga_util_write_data and #optiga_util_write_metadata.
+ *
+ * \ingroup grOptigaExamples
+ *
+ * @{
+ */
 
-#include "optiga/optiga_util.h"
 #include "optiga_example.h"
+#include "optiga_util.h"
 
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
 extern void example_optiga_init(void);
@@ -47,8 +25,8 @@ extern void example_optiga_deinit(void);
 /**
  * Sample Trust Anchor
  */
-static const uint8_t trust_anchor [] = {
-    //00    01    02    03    04    05    06    07    08    09    0A    0B    0C    0D    0E    0F
+static const uint8_t trust_anchor[] = {
+    // 00    01    02    03    04    05    06    07    08    09    0A    0B    0C    0D    0E    0F
     0x30, 0x82, 0x02, 0x7E, 0x30, 0x82, 0x02, 0x05, 0xA0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x09, 0x00,
     0x9B, 0x0C, 0x24, 0xB4, 0x5E, 0x7D, 0xE3, 0x73, 0x30, 0x0A, 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE,
     0x3D, 0x04, 0x03, 0x02, 0x30, 0x74, 0x31, 0x0B, 0x30, 0x09, 0x06, 0x03, 0x55, 0x04, 0x06, 0x13,
@@ -90,30 +68,32 @@ static const uint8_t trust_anchor [] = {
     0xF1, 0x30, 0x6B, 0x39, 0xF3, 0x3F, 0xEF, 0x65, 0x61, 0xBE, 0xC4, 0xDD, 0x19, 0x11, 0x1E, 0x83,
     0xF9, 0xE8, 0x3F, 0x41, 0x97, 0x45, 0xFC, 0x61, 0xE0, 0x06, 0xD0, 0xE6, 0xF7, 0x5C, 0x9F, 0xE2,
     0x57, 0xC2,
-    };
+};
 
 /**
  * Sample metadata
  */
-static const uint8_t metadata [] = {
-    //Metadata tag in the data object
-    0x20, 0x05,
-        //Read tag in the metadata
-        0xD1, 0x03,
-            //LcsO < Operation
-            0xE1 , 0xFB, 0x03,
+static const uint8_t metadata[] = {
+    // Metadata tag in the data object
+    0x20,
+    0x05,
+    // Read tag in the metadata
+    0xD1,
+    0x03,
+    // LcsO < Operation
+    0xE1,
+    0xFC,
+    0x07,
 };
 
 /**
  * Callback when optiga_util_xxxx operation is completed asynchronously
  */
 static volatile optiga_lib_status_t optiga_lib_status;
-//lint --e{818} suppress "argument "context" is not used in the sample provided"
-static void optiga_util_callback(void * context, optiga_lib_status_t return_status)
-{
+// lint --e{818} suppress "argument "context" is not used in the sample provided"
+static void optiga_util_callback(void *context, optiga_lib_status_t return_status) {
     optiga_lib_status = return_status;
-    if (NULL != context)
-    {
+    if (NULL != context) {
         // callback to upper layer here
     }
 }
@@ -124,37 +104,33 @@ static void optiga_util_callback(void * context, optiga_lib_status_t return_stat
  * Example for #optiga_util_write_data and #optiga_util_write_metadata
  *
  */
-void example_optiga_util_write_data(void)
-{
+void example_optiga_util_write_data(void) {
     uint32_t time_taken = 0;
     uint16_t optiga_oid;
     uint16_t offset;
 
     optiga_lib_status_t return_status = !OPTIGA_LIB_SUCCESS;
-    optiga_util_t * me = NULL;
+    optiga_util_t *me = NULL;
 
-    do
-    {
-        
+    do {
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
         /**
          * Open the application on OPTIGA which is a precondition to perform any other operations
          * using optiga_util_open_application
          */
         example_optiga_init();
-#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-        
+#endif  // OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+
         OPTIGA_EXAMPLE_LOG_MESSAGE(__FUNCTION__);
-        
+
         /**
          * 1. Create OPTIGA Util Instance
          */
         me = optiga_util_create(0, optiga_util_callback, NULL);
-        if (NULL == me)
-        {
+        if (NULL == me) {
             break;
         }
-        
+
         /**
          * Write Trust Anchor to a Trust Anchor object (e.g. E0E8)
          * using optiga_util_write_data with no shielded connection protection.
@@ -168,15 +144,17 @@ void example_optiga_util_write_data(void)
         OPTIGA_UTIL_SET_COMMS_PROTECTION_LEVEL(me, OPTIGA_COMMS_NO_PROTECTION);
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
-                   
+
         START_PERFORMANCE_MEASUREMENT(time_taken);
-        
-        return_status = optiga_util_write_data(me,
-                                               optiga_oid,
-                                               OPTIGA_UTIL_ERASE_AND_WRITE,
-                                               offset,
-                                               trust_anchor,
-                                               sizeof(trust_anchor));
+
+        return_status = optiga_util_write_data(
+            me,
+            optiga_oid,
+            OPTIGA_UTIL_ERASE_AND_WRITE,
+            offset,
+            trust_anchor,
+            sizeof(trust_anchor)
+        );
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
 
@@ -189,43 +167,37 @@ void example_optiga_util_write_data(void)
          *
          */
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_util_write_metadata(me,
-                                                   0xE0E8,
-                                                   metadata,
-                                                   sizeof(metadata));
+        return_status = optiga_util_write_metadata(me, 0xE0E8, metadata, sizeof(metadata));
 
         WAIT_AND_CHECK_STATUS(return_status, optiga_lib_status);
-        
+
         READ_PERFORMANCE_MEASUREMENT(time_taken);
-        
+
         return_status = OPTIGA_LIB_SUCCESS;
 
     } while (FALSE);
     OPTIGA_EXAMPLE_LOG_STATUS(return_status);
-    
+
 #ifndef OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
     /**
      * Close the application on OPTIGA after all the operations are executed
      * using optiga_util_close_application
      */
     example_optiga_deinit();
-#endif //OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
-    
+#endif  // OPTIGA_INIT_DEINIT_DONE_EXCLUSIVELY
+
     OPTIGA_EXAMPLE_LOG_PERFORMANCE_VALUE(time_taken, return_status);
-    
-    if (me)
-    {
-        //Destroy the instance after the completion of usecase if not required.
+
+    if (me) {
+        // Destroy the instance after the completion of usecase if not required.
         return_status = optiga_util_destroy(me);
-        if(OPTIGA_LIB_SUCCESS != return_status)
-        {
-            //lint --e{774} suppress This is a generic macro
+        if (OPTIGA_LIB_SUCCESS != return_status) {
+            // lint --e{774} suppress This is a generic macro
             OPTIGA_EXAMPLE_LOG_STATUS(return_status);
         }
     }
-    
 }
 
 /**
-* @}
-*/
+ * @}
+ */

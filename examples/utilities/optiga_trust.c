@@ -1,49 +1,28 @@
 /**
-* \copyright
-* MIT License
-*
-* Copyright (c) 2019 Infineon Technologies AG
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all
-* copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-* SOFTWARE
-*
-* \endcopyright
-*
-* \author Infineon Technologies AG
-*
-* \file optiga_trust.c
-*
-* \brief   This file proivdes general OPTIGA init sequence example.
-*
-* \ingroup  grOptigaExample
-*
-* @{
-*/
+ * SPDX-FileCopyrightText: 2019-2024 Infineon Technologies AG
+ * SPDX-License-Identifier: MIT
+ *
+ * \author Infineon Technologies AG
+ *
+ * \file optiga_trust.c
+ *
+ * \brief   This file proivdes general OPTIGA init sequence example.
+ *
+ * \ingroup  grOptigaExample
+ *
+ * @{
+ */
 
-#include <stdlib.h>
 #include <stdio.h>
-#include "optiga/optiga_util.h"
-#include "optiga/common/optiga_lib_logger.h"
-#include "optiga/pal/pal_os_event.h"
-#include "optiga/pal/pal_gpio.h"
-#include "optiga/ifx_i2c/ifx_i2c_config.h"
-#include "optiga/pal/pal_ifx_i2c_config.h"
+#include <stdlib.h>
+
+#include "ifx_i2c_config.h"
 #include "mbedtls/base64.h"
+#include "optiga_lib_logger.h"
+#include "optiga_util.h"
+#include "pal_gpio.h"
+#include "pal_ifx_i2c_config.h"
+#include "pal_os_event.h"
 
 #ifndef CONFIG_OPTIGA_TRUST_M_CERT_SLOT
 #define CONFIG_OPTIGA_TRUST_M_CERT_SLOT 0xE0E0
@@ -53,67 +32,82 @@
  * Callback when optiga_util_xxxx operation is completed asynchronously
  */
 static volatile optiga_lib_status_t optiga_lib_status;
-static void optiga_util_callback(void * context, optiga_lib_status_t return_status)
-{
+static void optiga_util_callback(void *context, optiga_lib_status_t return_status) {
     optiga_lib_status = return_status;
 }
 
-void read_certificate_from_optiga(char * cert_pem, uint16_t * cert_pem_length)
-{
-    size_t  ifx_cert_b64_len = 0;
+void read_certificate_from_optiga(char *cert_pem, uint16_t *cert_pem_length) {
+    size_t ifx_cert_b64_len = 0;
     uint8_t ifx_cert_b64_temp[1200];
     uint16_t offset_to_write = 0, offset_to_read = 0;
     uint16_t size_to_copy = 0;
     optiga_lib_status_t return_status;
 
-    optiga_util_t * me_util = NULL;
+    optiga_util_t *me_util = NULL;
     uint8_t ifx_cert_hex[1024];
-    //uint8_t ifx_cert_b64_temp[1200];
-    //size_t  ifx_cert_b64_len = 0;
-    uint16_t  ifx_cert_hex_len = sizeof(ifx_cert_hex);
-    
-    do
-    {
-        //Create an instance of optiga_util to read the certificate from OPTIGA.
+    // uint8_t ifx_cert_b64_temp[1200];
+    // size_t  ifx_cert_b64_len = 0;
+    uint16_t ifx_cert_hex_len = sizeof(ifx_cert_hex);
+
+    do {
+        // Create an instance of optiga_util to read the certificate from OPTIGA.
         me_util = optiga_util_create(0, optiga_util_callback, NULL);
-        if(!me_util)
-        {
-            optiga_lib_print_message("optiga_util_create failed !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+        if (!me_util) {
+            optiga_lib_print_message(
+                "optiga_util_create failed !!!",
+                OPTIGA_UTIL_SERVICE,
+                OPTIGA_UTIL_SERVICE_COLOR
+            );
             break;
         }
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_util_read_data(me_util, CONFIG_OPTIGA_TRUST_M_CERT_SLOT, 0, ifx_cert_hex, &ifx_cert_hex_len);
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            //optiga_util_read_data api returns error !!!
-            optiga_lib_print_message("optiga_util_read_data api returns error !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+        return_status = optiga_util_read_data(
+            me_util,
+            CONFIG_OPTIGA_TRUST_M_CERT_SLOT,
+            0,
+            ifx_cert_hex,
+            &ifx_cert_hex_len
+        );
+        if (OPTIGA_LIB_SUCCESS != return_status) {
+            // optiga_util_read_data api returns error !!!
+            optiga_lib_print_message(
+                "optiga_util_read_data api returns error !!!",
+                OPTIGA_UTIL_SERVICE,
+                OPTIGA_UTIL_SERVICE_COLOR
+            );
             break;
         }
-            
-        while (optiga_lib_status == OPTIGA_LIB_BUSY);
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //optiga_util_read_data failed
-            optiga_lib_print_message("optiga_util_read_data failed",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+
+        while (optiga_lib_status == OPTIGA_LIB_BUSY)
+            ;
+        if (OPTIGA_LIB_SUCCESS != optiga_lib_status) {
+            // optiga_util_read_data failed
+            optiga_lib_print_message(
+                "optiga_util_read_data failed",
+                OPTIGA_UTIL_SERVICE,
+                OPTIGA_UTIL_SERVICE_COLOR
+            );
             break;
         }
-        //ESP_LOG_BUFFER_HEX("OPTIGA Certificate", ifx_cert_hex, ifx_cert_hex_len);
-        
-        //convert to PEM format
+        // ESP_LOG_BUFFER_HEX("OPTIGA Certificate", ifx_cert_hex, ifx_cert_hex_len);
+
+        // convert to PEM format
         printf("read ifx cer\r\n");
-        mbedtls_base64_encode((unsigned char *)ifx_cert_b64_temp, sizeof(ifx_cert_b64_temp),
-                              &ifx_cert_b64_len,
-        //in case of TLS chain format of ceritificate
-                              ifx_cert_hex + 9, ifx_cert_hex_len - 9);
+        mbedtls_base64_encode(
+            (unsigned char *)ifx_cert_b64_temp,
+            sizeof(ifx_cert_b64_temp),
+            &ifx_cert_b64_len,
+            // in case of TLS chain format of ceritificate
+            ifx_cert_hex + 9,
+            ifx_cert_hex_len - 9
+        );
         //                      ifx_cert_hex , ifx_cert_hex_len);
 
         memcpy(cert_pem, "-----BEGIN CERTIFICATE-----\n", 28);
         offset_to_write += 28;
-        
-       
-        //Properly copy certificate and format it as pkcs expects
-        for (offset_to_read = 0; offset_to_read < ifx_cert_b64_len;)
-        {
+
+        // Properly copy certificate and format it as pkcs expects
+        for (offset_to_read = 0; offset_to_read < ifx_cert_b64_len;) {
             // The last block of data usually is less than 64, thus we need to find the leftover
             if ((offset_to_read + 64) >= ifx_cert_b64_len)
                 size_to_copy = ifx_cert_b64_len - offset_to_read;
@@ -129,81 +123,89 @@ void read_certificate_from_optiga(char * cert_pem, uint16_t * cert_pem_length)
         memcpy(cert_pem + offset_to_write, "-----END CERTIFICATE-----\n\0", 27);
 
         *cert_pem_length = offset_to_write + 27;
-        
-        //to print certificate 
-       /* for(int i=0; i<1200; i++)
+
+        // to print certificate
+        /* for(int i=0; i<1200; i++)
         {
             printf("%c", cert_pem[i]);
-        }   */    
-    } while(0);
+        }   */
+    } while (0);
 
-    //me_util instance to be destroyed 
-    if (me_util)
-    {
+    // me_util instance to be destroyed
+    if (me_util) {
         optiga_util_destroy(me_util);
     }
 }
 
-void read_trust_anchor_from_optiga(uint16_t oid, char * cert_pem, uint16_t * cert_pem_length)
-{
-    size_t  ifx_cert_b64_len = 0;
+void read_trust_anchor_from_optiga(uint16_t oid, char *cert_pem, uint16_t *cert_pem_length) {
+    size_t ifx_cert_b64_len = 0;
     uint8_t ifx_cert_b64_temp[1200];
     uint16_t offset_to_write = 0, offset_to_read = 0;
     uint16_t size_to_copy = 0;
     optiga_lib_status_t return_status;
 
-    optiga_util_t * me_util = NULL;
+    optiga_util_t *me_util = NULL;
     uint8_t ifx_cert_hex[1300];
-    uint16_t  ifx_cert_hex_len = sizeof(ifx_cert_hex);
+    uint16_t ifx_cert_hex_len = sizeof(ifx_cert_hex);
 
-    do
-    {
-        //Create an instance of optiga_util to read the certificate from OPTIGA.
+    do {
+        // Create an instance of optiga_util to read the certificate from OPTIGA.
         me_util = optiga_util_create(0, optiga_util_callback, NULL);
-        if(!me_util)
-        {
-            optiga_lib_print_message("optiga_util_create failed !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+        if (!me_util) {
+            optiga_lib_print_message(
+                "optiga_util_create failed !!!",
+                OPTIGA_UTIL_SERVICE,
+                OPTIGA_UTIL_SERVICE_COLOR
+            );
             break;
         }
-        optiga_lib_status = OPTIGA_LIB_BUSY;   
+        optiga_lib_status = OPTIGA_LIB_BUSY;
         return_status = optiga_util_read_data(me_util, oid, 0, ifx_cert_hex, &ifx_cert_hex_len);
-        if (OPTIGA_LIB_SUCCESS != return_status)
-        {
-            //optiga_util_read_data api returns error !!!
-            optiga_lib_print_message("optiga_util_read_data api for trust anchor returns error !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+        if (OPTIGA_LIB_SUCCESS != return_status) {
+            // optiga_util_read_data api returns error !!!
+            optiga_lib_print_message(
+                "optiga_util_read_data api for trust anchor returns error !!!",
+                OPTIGA_UTIL_SERVICE,
+                OPTIGA_UTIL_SERVICE_COLOR
+            );
             break;
         }
-            
-        while (optiga_lib_status == OPTIGA_LIB_BUSY)
-        {
+
+        while (optiga_lib_status == OPTIGA_LIB_BUSY) {
             pal_os_timer_delay_in_milliseconds(30);
         }
-        
-        if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-        {
-            //optiga_util_read_data failed
-            optiga_lib_print_message("optiga_util_read_data failed for reading trust anchor",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+
+        if (OPTIGA_LIB_SUCCESS != optiga_lib_status) {
+            // optiga_util_read_data failed
+            optiga_lib_print_message(
+                "optiga_util_read_data failed for reading trust anchor",
+                OPTIGA_UTIL_SERVICE,
+                OPTIGA_UTIL_SERVICE_COLOR
+            );
             break;
         }
 
-        //ESP_LOG_BUFFER_HEX("OPTIGA Certificate", ifx_cert_hex, ifx_cert_hex_len);
-        
-        //convert to PEM format
-       // printf("read ifx cer\r\n");
-        mbedtls_base64_encode((unsigned char *)ifx_cert_b64_temp, sizeof(ifx_cert_b64_temp),
-                              &ifx_cert_b64_len,
-        //in case of TLS chain format of ceritificate
-        //                    ifx_cert_hex + 9, ifx_cert_hex_len - 9);
-                              ifx_cert_hex, ifx_cert_hex_len);
+        // ESP_LOG_BUFFER_HEX("OPTIGA Certificate", ifx_cert_hex, ifx_cert_hex_len);
+
+        // convert to PEM format
+        //  printf("read ifx cer\r\n");
+        mbedtls_base64_encode(
+            (unsigned char *)ifx_cert_b64_temp,
+            sizeof(ifx_cert_b64_temp),
+            &ifx_cert_b64_len,
+            // in case of TLS chain format of ceritificate
+            //                     ifx_cert_hex + 9, ifx_cert_hex_len - 9);
+            ifx_cert_hex,
+            ifx_cert_hex_len
+        );
 
         memcpy(cert_pem, "-----BEGIN CERTIFICATE-----\n", 28);
         offset_to_write += 28;
-        
-        //TBD: Verify the given cert_pem length against the ifx_cert_b64_len after conversion
-        
-        //Properly copy certificate and format it as pkcs expects
-        for (offset_to_read = 0; offset_to_read < ifx_cert_b64_len;)
-        {
+
+        // TBD: Verify the given cert_pem length against the ifx_cert_b64_len after conversion
+
+        // Properly copy certificate and format it as pkcs expects
+        for (offset_to_read = 0; offset_to_read < ifx_cert_b64_len;) {
             // The last block of data usually is less than 64, thus we need to find the leftover
             if ((offset_to_read + 64) >= ifx_cert_b64_len)
                 size_to_copy = ifx_cert_b64_len - offset_to_read;
@@ -219,123 +221,124 @@ void read_trust_anchor_from_optiga(uint16_t oid, char * cert_pem, uint16_t * cer
         memcpy(cert_pem + offset_to_write, "-----END CERTIFICATE-----\n\0", 27);
 
         *cert_pem_length = offset_to_write + 27;
-       /* for(int i=0; i<1200; i++)
+        /* for(int i=0; i<1200; i++)
         {
             printf("%c", cert_pem[i]);
-        }*/       
-    } while(0);
+        }*/
+    } while (0);
 
-    //me_util instance to be destroyed 
-    if (me_util)
-    {
+    // me_util instance to be destroyed
+    if (me_util) {
         optiga_util_destroy(me_util);
     }
 }
 
-void write_data_object (uint16_t oid, const uint8_t * p_data, uint16_t length)
-{
-    optiga_util_t * me_util = NULL;
+void write_data_object(uint16_t oid, const uint8_t *p_data, uint16_t length) {
+    optiga_util_t *me_util = NULL;
     optiga_lib_status_t return_status;
-    
-    do
-    {
-        //Create an instance of optiga_util to open the application on OPTIGA.
+
+    do {
+        // Create an instance of optiga_util to open the application on OPTIGA.
         me_util = optiga_util_create(0, optiga_util_callback, NULL);
-        if(!me_util)
-        {
-            optiga_lib_print_message("optiga_util_create failed !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+        if (!me_util) {
+            optiga_lib_print_message(
+                "optiga_util_create failed !!!",
+                OPTIGA_UTIL_SERVICE,
+                OPTIGA_UTIL_SERVICE_COLOR
+            );
             break;
         }
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_util_write_data(me_util,
-                                               oid,
-                                               OPTIGA_UTIL_ERASE_AND_WRITE,
-                                               0,
-                                               p_data,
-                                               length);
+        return_status =
+            optiga_util_write_data(me_util, oid, OPTIGA_UTIL_ERASE_AND_WRITE, 0, p_data, length);
         {
-            if (OPTIGA_LIB_SUCCESS != return_status)
-            {
-                optiga_lib_print_message("optiga_util_wirte_data api returns error !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+            if (OPTIGA_LIB_SUCCESS != return_status) {
+                optiga_lib_print_message(
+                    "optiga_util_wirte_data api returns error !!!",
+                    OPTIGA_UTIL_SERVICE,
+                    OPTIGA_UTIL_SERVICE_COLOR
+                );
                 break;
             }
 
-            while (OPTIGA_LIB_BUSY == optiga_lib_status)
-            {
-                //Wait until the optiga_util_write_data operation is completed
+            while (OPTIGA_LIB_BUSY == optiga_lib_status) {
+                // Wait until the optiga_util_write_data operation is completed
             }
 
-            if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-            {
-                optiga_lib_print_message("optiga_util_write_data failed",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+            if (OPTIGA_LIB_SUCCESS != optiga_lib_status) {
+                optiga_lib_print_message(
+                    "optiga_util_write_data failed",
+                    OPTIGA_UTIL_SERVICE,
+                    OPTIGA_UTIL_SERVICE_COLOR
+                );
                 return_status = optiga_lib_status;
                 break;
-            }
-            else
-            {
-                optiga_lib_print_message("optiga_util_write_data successful",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+            } else {
+                optiga_lib_print_message(
+                    "optiga_util_write_data successful",
+                    OPTIGA_UTIL_SERVICE,
+                    OPTIGA_UTIL_SERVICE_COLOR
+                );
             }
         }
     } while (0);
 
-    //me_util instance can be destroyed 
-    //if no close_application w.r.t hibernate is required to be performed
-    if (me_util)
-    {
+    // me_util instance can be destroyed
+    // if no close_application w.r.t hibernate is required to be performed
+    if (me_util) {
         optiga_util_destroy(me_util);
     }
 }
 
-static void write_device_certificate (void)
-{
-    //Device certificate
-    const uint8_t certificate [] = {
-        0x30, 0x82, 0x02, 0x3E, 0x30, 0x82, 0x01, 0xE4, 0xA0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x66, 
-        0xAD, 0x36, 0x73, 0xED, 0xA4, 0x34, 0x24, 0x30, 0x0A, 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 
-        0x04, 0x03, 0x02, 0x30, 0x77, 0x31, 0x0B, 0x30, 0x09, 0x06, 0x03, 0x55, 0x04, 0x06, 0x13, 0x02, 
-        0x44, 0x45, 0x31, 0x21, 0x30, 0x1F, 0x06, 0x03, 0x55, 0x04, 0x0A, 0x0C, 0x18, 0x49, 0x6E, 0x66, 
-        0x69, 0x6E, 0x65, 0x6F, 0x6E, 0x20, 0x54, 0x65, 0x63, 0x68, 0x6E, 0x6F, 0x6C, 0x6F, 0x67, 0x69, 
-        0x65, 0x73, 0x20, 0x41, 0x47, 0x31, 0x13, 0x30, 0x11, 0x06, 0x03, 0x55, 0x04, 0x0B, 0x0C, 0x0A, 
-        0x4F, 0x50, 0x54, 0x49, 0x47, 0x41, 0x28, 0x54, 0x4D, 0x29, 0x31, 0x30, 0x30, 0x2E, 0x06, 0x03, 
-        0x55, 0x04, 0x03, 0x0C, 0x27, 0x49, 0x6E, 0x66, 0x69, 0x6E, 0x65, 0x6F, 0x6E, 0x20, 0x4F, 0x50, 
-        0x54, 0x49, 0x47, 0x41, 0x28, 0x54, 0x4D, 0x29, 0x20, 0x54, 0x72, 0x75, 0x73, 0x74, 0x20, 0x4D, 
-        0x20, 0x54, 0x65, 0x73, 0x74, 0x20, 0x43, 0x41, 0x20, 0x30, 0x30, 0x30, 0x30, 0x1E, 0x17, 0x0D, 
-        0x31, 0x39, 0x30, 0x38, 0x30, 0x33, 0x31, 0x31, 0x33, 0x39, 0x30, 0x30, 0x5A, 0x17, 0x0D, 0x32, 
-        0x39, 0x30, 0x38, 0x30, 0x33, 0x31, 0x31, 0x33, 0x39, 0x30, 0x30, 0x5A, 0x30, 0x50, 0x31, 0x0B, 
-        0x30, 0x09, 0x06, 0x03, 0x55, 0x04, 0x06, 0x13, 0x02, 0x49, 0x4E, 0x31, 0x0B, 0x30, 0x09, 0x06, 
-        0x03, 0x55, 0x04, 0x07, 0x13, 0x02, 0x4C, 0x4E, 0x31, 0x0B, 0x30, 0x09, 0x06, 0x03, 0x55, 0x04, 
-        0x0A, 0x13, 0x02, 0x4F, 0x4E, 0x31, 0x0B, 0x30, 0x09, 0x06, 0x03, 0x55, 0x04, 0x0B, 0x13, 0x02, 
-        0x4F, 0x55, 0x31, 0x1A, 0x30, 0x18, 0x06, 0x03, 0x55, 0x04, 0x03, 0x0C, 0x11, 0x49, 0x6E, 0x66, 
-        0x69, 0x6E, 0x65, 0x6F, 0x6E, 0x5F, 0x49, 0x6F, 0x54, 0x5F, 0x4E, 0x6F, 0x64, 0x65, 0x30, 0x59, 
-        0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08, 0x2A, 0x86, 0x48, 
-        0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0x55, 0x1E, 0x0A, 0xD9, 0x01, 0x19, 0xD0, 
-        0x44, 0x3E, 0xBD, 0xE4, 0x4B, 0xEC, 0xA3, 0xA2, 0xE9, 0x07, 0x08, 0xD2, 0x0A, 0x39, 0x20, 0xE1, 
-        0x0C, 0x69, 0xD7, 0xD6, 0xAE, 0xA5, 0xDD, 0x6F, 0x41, 0x42, 0xE2, 0x73, 0x51, 0x0C, 0x6D, 0xD0, 
-        0x05, 0x02, 0x60, 0x5F, 0x6D, 0x45, 0x35, 0x4F, 0xCC, 0x7F, 0x0C, 0xDB, 0x1E, 0xBB, 0xDD, 0x4D, 
-        0x8E, 0x40, 0xBC, 0x55, 0x65, 0xD2, 0x7A, 0x2F, 0x81, 0xA3, 0x81, 0x80, 0x30, 0x7E, 0x30, 0x0C, 
-        0x06, 0x03, 0x55, 0x1D, 0x13, 0x01, 0x01, 0xFF, 0x04, 0x02, 0x30, 0x00, 0x30, 0x1D, 0x06, 0x03, 
-        0x55, 0x1D, 0x0E, 0x04, 0x16, 0x04, 0x14, 0xB9, 0x46, 0xB7, 0x00, 0x01, 0xD9, 0x5E, 0xFC, 0x80, 
-        0x42, 0x0E, 0xED, 0x6A, 0xF9, 0x0B, 0x53, 0x79, 0xA7, 0x4F, 0xAE, 0x30, 0x1F, 0x06, 0x03, 0x55, 
-        0x1D, 0x23, 0x04, 0x18, 0x30, 0x16, 0x80, 0x14, 0x53, 0x1B, 0x46, 0x32, 0xF2, 0xBA, 0x1B, 0xEC, 
-        0x35, 0x23, 0xB0, 0xC6, 0x84, 0xE2, 0xBC, 0x7F, 0x11, 0xDA, 0xA2, 0x2E, 0x30, 0x0E, 0x06, 0x03, 
-        0x55, 0x1D, 0x0F, 0x01, 0x01, 0xFF, 0x04, 0x04, 0x03, 0x02, 0x07, 0x80, 0x30, 0x1E, 0x06, 0x09, 
-        0x60, 0x86, 0x48, 0x01, 0x86, 0xF8, 0x42, 0x01, 0x0D, 0x04, 0x11, 0x16, 0x0F, 0x78, 0x63, 0x61, 
-        0x20, 0x63, 0x65, 0x72, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x65, 0x30, 0x0A, 0x06, 0x08, 
-        0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x04, 0x03, 0x02, 0x03, 0x48, 0x00, 0x30, 0x45, 0x02, 0x21, 0x00, 
-        0x98, 0x00, 0x55, 0x8D, 0x58, 0xE9, 0x24, 0xB9, 0x69, 0x1B, 0x12, 0x0D, 0x4E, 0xE0, 0xAB, 0xF3, 
-        0x00, 0xDA, 0x14, 0x3A, 0x39, 0x05, 0xE7, 0xC8, 0xCE, 0xBD, 0x07, 0x0F, 0x7D, 0x03, 0xEA, 0x54, 
-        0x02, 0x20, 0x45, 0x77, 0x6C, 0x77, 0xD0, 0xCC, 0x51, 0xF8, 0xD5, 0x77, 0x5C, 0xE7, 0xBC, 0xED, 
-        0x56, 0xD8, 0x39, 0xF9, 0x98, 0x8C, 0x06, 0xFF, 0x56, 0x73, 0x79, 0x04, 0x1E, 0x37, 0xAB, 0x5F, 
-        0x8B, 0x73, 
+static void write_device_certificate(void) {
+    // Device certificate
+    const uint8_t certificate[] = {
+        0x30, 0x82, 0x02, 0x3E, 0x30, 0x82, 0x01, 0xE4, 0xA0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08,
+        0x66, 0xAD, 0x36, 0x73, 0xED, 0xA4, 0x34, 0x24, 0x30, 0x0A, 0x06, 0x08, 0x2A, 0x86, 0x48,
+        0xCE, 0x3D, 0x04, 0x03, 0x02, 0x30, 0x77, 0x31, 0x0B, 0x30, 0x09, 0x06, 0x03, 0x55, 0x04,
+        0x06, 0x13, 0x02, 0x44, 0x45, 0x31, 0x21, 0x30, 0x1F, 0x06, 0x03, 0x55, 0x04, 0x0A, 0x0C,
+        0x18, 0x49, 0x6E, 0x66, 0x69, 0x6E, 0x65, 0x6F, 0x6E, 0x20, 0x54, 0x65, 0x63, 0x68, 0x6E,
+        0x6F, 0x6C, 0x6F, 0x67, 0x69, 0x65, 0x73, 0x20, 0x41, 0x47, 0x31, 0x13, 0x30, 0x11, 0x06,
+        0x03, 0x55, 0x04, 0x0B, 0x0C, 0x0A, 0x4F, 0x50, 0x54, 0x49, 0x47, 0x41, 0x28, 0x54, 0x4D,
+        0x29, 0x31, 0x30, 0x30, 0x2E, 0x06, 0x03, 0x55, 0x04, 0x03, 0x0C, 0x27, 0x49, 0x6E, 0x66,
+        0x69, 0x6E, 0x65, 0x6F, 0x6E, 0x20, 0x4F, 0x50, 0x54, 0x49, 0x47, 0x41, 0x28, 0x54, 0x4D,
+        0x29, 0x20, 0x54, 0x72, 0x75, 0x73, 0x74, 0x20, 0x4D, 0x20, 0x54, 0x65, 0x73, 0x74, 0x20,
+        0x43, 0x41, 0x20, 0x30, 0x30, 0x30, 0x30, 0x1E, 0x17, 0x0D, 0x31, 0x39, 0x30, 0x38, 0x30,
+        0x33, 0x31, 0x31, 0x33, 0x39, 0x30, 0x30, 0x5A, 0x17, 0x0D, 0x32, 0x39, 0x30, 0x38, 0x30,
+        0x33, 0x31, 0x31, 0x33, 0x39, 0x30, 0x30, 0x5A, 0x30, 0x50, 0x31, 0x0B, 0x30, 0x09, 0x06,
+        0x03, 0x55, 0x04, 0x06, 0x13, 0x02, 0x49, 0x4E, 0x31, 0x0B, 0x30, 0x09, 0x06, 0x03, 0x55,
+        0x04, 0x07, 0x13, 0x02, 0x4C, 0x4E, 0x31, 0x0B, 0x30, 0x09, 0x06, 0x03, 0x55, 0x04, 0x0A,
+        0x13, 0x02, 0x4F, 0x4E, 0x31, 0x0B, 0x30, 0x09, 0x06, 0x03, 0x55, 0x04, 0x0B, 0x13, 0x02,
+        0x4F, 0x55, 0x31, 0x1A, 0x30, 0x18, 0x06, 0x03, 0x55, 0x04, 0x03, 0x0C, 0x11, 0x49, 0x6E,
+        0x66, 0x69, 0x6E, 0x65, 0x6F, 0x6E, 0x5F, 0x49, 0x6F, 0x54, 0x5F, 0x4E, 0x6F, 0x64, 0x65,
+        0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08,
+        0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0x55, 0x1E, 0x0A,
+        0xD9, 0x01, 0x19, 0xD0, 0x44, 0x3E, 0xBD, 0xE4, 0x4B, 0xEC, 0xA3, 0xA2, 0xE9, 0x07, 0x08,
+        0xD2, 0x0A, 0x39, 0x20, 0xE1, 0x0C, 0x69, 0xD7, 0xD6, 0xAE, 0xA5, 0xDD, 0x6F, 0x41, 0x42,
+        0xE2, 0x73, 0x51, 0x0C, 0x6D, 0xD0, 0x05, 0x02, 0x60, 0x5F, 0x6D, 0x45, 0x35, 0x4F, 0xCC,
+        0x7F, 0x0C, 0xDB, 0x1E, 0xBB, 0xDD, 0x4D, 0x8E, 0x40, 0xBC, 0x55, 0x65, 0xD2, 0x7A, 0x2F,
+        0x81, 0xA3, 0x81, 0x80, 0x30, 0x7E, 0x30, 0x0C, 0x06, 0x03, 0x55, 0x1D, 0x13, 0x01, 0x01,
+        0xFF, 0x04, 0x02, 0x30, 0x00, 0x30, 0x1D, 0x06, 0x03, 0x55, 0x1D, 0x0E, 0x04, 0x16, 0x04,
+        0x14, 0xB9, 0x46, 0xB7, 0x00, 0x01, 0xD9, 0x5E, 0xFC, 0x80, 0x42, 0x0E, 0xED, 0x6A, 0xF9,
+        0x0B, 0x53, 0x79, 0xA7, 0x4F, 0xAE, 0x30, 0x1F, 0x06, 0x03, 0x55, 0x1D, 0x23, 0x04, 0x18,
+        0x30, 0x16, 0x80, 0x14, 0x53, 0x1B, 0x46, 0x32, 0xF2, 0xBA, 0x1B, 0xEC, 0x35, 0x23, 0xB0,
+        0xC6, 0x84, 0xE2, 0xBC, 0x7F, 0x11, 0xDA, 0xA2, 0x2E, 0x30, 0x0E, 0x06, 0x03, 0x55, 0x1D,
+        0x0F, 0x01, 0x01, 0xFF, 0x04, 0x04, 0x03, 0x02, 0x07, 0x80, 0x30, 0x1E, 0x06, 0x09, 0x60,
+        0x86, 0x48, 0x01, 0x86, 0xF8, 0x42, 0x01, 0x0D, 0x04, 0x11, 0x16, 0x0F, 0x78, 0x63, 0x61,
+        0x20, 0x63, 0x65, 0x72, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x65, 0x30, 0x0A, 0x06,
+        0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x04, 0x03, 0x02, 0x03, 0x48, 0x00, 0x30, 0x45, 0x02,
+        0x21, 0x00, 0x98, 0x00, 0x55, 0x8D, 0x58, 0xE9, 0x24, 0xB9, 0x69, 0x1B, 0x12, 0x0D, 0x4E,
+        0xE0, 0xAB, 0xF3, 0x00, 0xDA, 0x14, 0x3A, 0x39, 0x05, 0xE7, 0xC8, 0xCE, 0xBD, 0x07, 0x0F,
+        0x7D, 0x03, 0xEA, 0x54, 0x02, 0x20, 0x45, 0x77, 0x6C, 0x77, 0xD0, 0xCC, 0x51, 0xF8, 0xD5,
+        0x77, 0x5C, 0xE7, 0xBC, 0xED, 0x56, 0xD8, 0x39, 0xF9, 0x98, 0x8C, 0x06, 0xFF, 0x56, 0x73,
+        0x79, 0x04, 0x1E, 0x37, 0xAB, 0x5F, 0x8B, 0x73,
     };
-    
-    write_data_object (CONFIG_OPTIGA_TRUST_M_CERT_SLOT, certificate, sizeof(certificate));
+
+    write_data_object(CONFIG_OPTIGA_TRUST_M_CERT_SLOT, certificate, sizeof(certificate));
 }
 
-static void write_optiga_trust_anchor(void)
-{
-
+static void write_optiga_trust_anchor(void) {
 #if 0
     /* DigiCert Baltimore Root --Used Globally--*/
     // This cert should be used when connecting to Azure IoT on the Azure Cloud available globally. 
@@ -398,7 +401,7 @@ static void write_optiga_trust_anchor(void)
         0xE7, 0x81, 0x1D, 0x19, 0xC3, 0x24, 0x42, 0xEA, 0x63, 0x39, 0xA9, 
     };
         write_data_object(CONFIG_OPTIGA_TRUST_M_TRUSTANCHOR_SLOT, trust_anchor, sizeof(trust_anchor));
-#endif //Baltimore
+#endif  // Baltimore
 #if 0
     /* DigiCert Global Root CA */
     // This cert should be used when connecting to Azure IoT on the https://portal.azure.cn Cloud address.
@@ -466,7 +469,7 @@ static void write_optiga_trust_anchor(void)
         0x95, 0x6D, 0xDE, 
     };
         write_data_object(CONFIG_OPTIGA_TRUST_M_TRUSTANCHOR_SLOT, trust_anchor, sizeof(trust_anchor));
-#endif //DigiCert Global Root CA
+#endif  // DigiCert Global Root CA
 #if 0
     /* D-TRUST Root Class 3 CA 2 2009 */
     // This cert should be used when connecting to Azure IoT on the https://portal.microsoftazure.de Cloud address.    
@@ -541,7 +544,7 @@ static void write_optiga_trust_anchor(void)
         0x74, 0x65, 0xD7, 0x5C, 0xFE, 0xA3, 0xE2,         
     };
     write_data_object(CONFIG_OPTIGA_TRUST_M_TRUSTANCHOR_SLOT, trust_anchor, sizeof(trust_anchor));
-#endif //D-TRUST Root Class 3 CA 2 2009
+#endif  // D-TRUST Root Class 3 CA 2 2009
 #if 0
 
     /* User can provide a specific server certificate here and can load in any data object of optiga */
@@ -550,93 +553,106 @@ static void write_optiga_trust_anchor(void)
                        //provide region specific server root CA certificate  
     };
      write_data_object(CONFIG_OPTIGA_TRUST_M_TRUSTANCHOR_SLOT, trust_anchor, sizeof(trust_anchor));
-#endif //Region Specific Certificate 
+#endif  // Region Specific Certificate
 }
 
-static void write_platform_binding_secret (void)
-{
-    //Platform binding shared secret for example purpose
-    const uint8_t platform_binding_shared_secret [] = {
-        0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 
-        0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10,
-        0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 
-        0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20,
-        0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 
-        0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30,
-        0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 
-        0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40
+static void write_platform_binding_secret(void) {
+    // Platform binding shared secret for example purpose
+    const uint8_t platform_binding_shared_secret[] = {
+        0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D,
+        0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A,
+        0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
+        0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34,
+        0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40};
+
+    write_data_object(
+        0xE140,
+        platform_binding_shared_secret,
+        sizeof(platform_binding_shared_secret)
+    );
+}
+
+static void write_set_high_performance(void) {
+    const uint8_t current_limit[] = {
+        0x0F,
     };
-    
-    write_data_object (0xE140, platform_binding_shared_secret, sizeof(platform_binding_shared_secret));
+
+    write_data_object(0xE0C4, current_limit, sizeof(current_limit));
 }
 
-static void write_set_high_performance (void)
-{
-    const uint8_t current_limit [] = {
-    0x0F,
-    };
-    
-    write_data_object (0xE0C4, current_limit, sizeof(current_limit));
-}
-
-void optiga_trust_init(void)
-{
+void optiga_trust_init(void) {
     optiga_lib_status_t return_status;
-    optiga_util_t * me_util = NULL;
+    optiga_util_t *me_util = NULL;
 
     pal_init();
 
-    optiga_lib_print_message("OPTIGA Trust initialization",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
-    
-    do
-    {
-        //Create an instance of optiga_util to open the application on OPTIGA.
+    optiga_lib_print_message(
+        "OPTIGA Trust initialization",
+        OPTIGA_UTIL_SERVICE,
+        OPTIGA_UTIL_SERVICE_COLOR
+    );
+
+    do {
+        // Create an instance of optiga_util to open the application on OPTIGA.
         me_util = optiga_util_create(0, optiga_util_callback, NULL);
-        if(!me_util)
-        {
-            optiga_lib_print_message("optiga_util_create failed !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+        if (!me_util) {
+            optiga_lib_print_message(
+                "optiga_util_create failed !!!",
+                OPTIGA_UTIL_SERVICE,
+                OPTIGA_UTIL_SERVICE_COLOR
+            );
             break;
         }
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
         return_status = optiga_util_open_application(me_util, 0);
         {
-            if (OPTIGA_LIB_SUCCESS != return_status)
-            {
-                //optiga_util_open_application api returns error !!!
-                optiga_lib_print_message("optiga_util_open_application api returns error !!!",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+            if (OPTIGA_LIB_SUCCESS != return_status) {
+                // optiga_util_open_application api returns error !!!
+                optiga_lib_print_message(
+                    "optiga_util_open_application api returns error !!!",
+                    OPTIGA_UTIL_SERVICE,
+                    OPTIGA_UTIL_SERVICE_COLOR
+                );
                 break;
             }
-            
-            while (optiga_lib_status == OPTIGA_LIB_BUSY);
-            if (OPTIGA_LIB_SUCCESS != optiga_lib_status)
-            {
-                //optiga_util_open_application failed
-                optiga_lib_print_message("optiga_util_open_application failed",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
+
+            while (optiga_lib_status == OPTIGA_LIB_BUSY)
+                ;
+            if (OPTIGA_LIB_SUCCESS != optiga_lib_status) {
+                // optiga_util_open_application failed
+                optiga_lib_print_message(
+                    "optiga_util_open_application failed",
+                    OPTIGA_UTIL_SERVICE,
+                    OPTIGA_UTIL_SERVICE_COLOR
+                );
                 break;
             }
         }
 
-        //The below specified functions can be used to personalize OPTIGA w.r.t
-        //certificates, Trust Anchors, etc.
-        
-        //write_device_certificate ();
-        //write_set_high_performance();  //setting current limitation to 15mA
-        //write_platform_binding_secret ();  
-        //read_certificate ();
-        //write_optiga_trust_anchor();  //can be used to write server root certificate to optiga data object
+        // The below specified functions can be used to personalize OPTIGA w.r.t
+        // certificates, Trust Anchors, etc.
 
-        optiga_lib_print_message("OPTIGA Trust initialization is successful",OPTIGA_UTIL_SERVICE,OPTIGA_UTIL_SERVICE_COLOR);
-    }while(0);
+        // write_device_certificate ();
+        // write_set_high_performance();  //setting current limitation to 15mA
+        // write_platform_binding_secret ();
+        // read_certificate ();
+        // write_optiga_trust_anchor();  //can be used to write server root certificate to optiga data object
 
-    //me_util instance can be destroyed 
-    //if no close_application w.r.t hibernate is required to be performed
-    if (me_util)
-    {
+        optiga_lib_print_message(
+            "OPTIGA Trust initialization is successful",
+            OPTIGA_UTIL_SERVICE,
+            OPTIGA_UTIL_SERVICE_COLOR
+        );
+    } while (0);
+
+    // me_util instance can be destroyed
+    // if no close_application w.r.t hibernate is required to be performed
+    if (me_util) {
         optiga_util_destroy(me_util);
     }
 }
 
 /**
-* @}
-*/
+ * @}
+ */
