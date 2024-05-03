@@ -19,6 +19,8 @@ This is the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) Host Libr
 
 ## Getting started
 
+Information on the Product including Documentation, GetStarted Guides or Application Notes can be found in OPTIGA&trade; Trust M Overview Repository [here](https://github.com/Infineon/optiga-trust-m-overview)
+
 ### Getting the Host Library
 
 Below are the instructions to get the OPTIGA&trade; Trust M Host Library for C.

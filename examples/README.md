@@ -2,24 +2,20 @@
 
 This folders are used to demonstrate basic functionality of the security chip. 
 
-The list of available Application Notes and Examples is following:
+The list of available Host Applications, Platform and current status can be found in the table below :
 
-1. [Get started guide](https://github.com/Infineon/getstarted-optiga-trust-m)
-2. ModusToolbox™ Code Examples
-    - [OPTIGA™ Trust M: Cryptography](https://github.com/Infineon/mtb-example-optiga-crypto)
-    - [OPTIGA™ Trust M: MQTT Client](https://github.com/Infineon/mtb-example-optiga-mqtt-client)
-    - [OPTIGA™ Trust M: Power management](https://github.com/Infineon/mtb-example-optiga-power-management)
-    - [OPTIGA™ Trust M: Data management](https://github.com/Infineon/mtb-example-optiga-data-management)
-3. [Off-Chip TLS example (mbedTLS)](https://github.com/Infineon/mbedtls-optiga-trust-m)
-4. [Linux Command Line Interface](https://github.com/Infineon/linux-optiga-trust-m)
-5. Cloud:
-    1. [AWS FreeRTOS example](https://github.com/Infineon/amazon-freertos-optiga-trust)
-    2. [Microsoft Azure IoT example](https://github.com/Infineon/azure-optiga-trust-m)
-6. [Zephyr OS driver](https://github.com/Infineon/zephyr)
-7. [Arduino library](https://github.com/Infineon/arduino-optiga-trust-m)
-8. [Personalize OPTIGA™ Trust](https://github.com/Infineon/personalize-optiga-trust)
-9. [Python package](https://github.com/Infineon/python-optiga-trust)
-10. [I2C Utilities](https://github.com/Infineon/i2c-utils-optiga-trust)
+| Host application                                                                                                                                         | Platform      | Status |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------ |
+| [OPTIGA™ Trust M Cryptography](https://github.com/Infineon/mtb-example-optiga-crypto)                                                                    | ModusToolbox™ | Active |
+| [OPTIGA™ Trust M MQTT Client](https://github.com/Infineon/mtb-example-optiga-mqtt-client)                                                                | ModusToolbox™ | Active |
+| [OPTIGA™ Trust M Power management](https://github.com/Infineon/mtb-example-optiga-power-management)                                                      | ModusToolbox™ | Active |
+| [OPTIGA™ Trust M Data management](https://github.com/Infineon/mtb-example-optiga-data-management)                                                        | ModusToolbox™ | Active |
+| [OPTIGA™ Trust M TLS with mbedTLS](https://github.com/Infineon/mbedtls-optiga-trust-m)                                                                   | Make          | Active |
+| [OPTIGA™ Trust M AWS FreeRTOS](https://github.com/Infineon/amazon-freertos-optiga-trust)                                                                 | CMake         | Active |
+| [OPTIGA™ Trust M Microsoft Azure IoT](https://github.com/Infineon/azure-esp32-optiga-trust/)                                                             | Make          | Active |
+| [OPTIGA™ Trust M PKCS#11 interface](https://github.com/Infineon/pkcs11-optiga-trust-m)                                                                   | CMake         | Active |
+| [OPTIGA™ Trust M Matter integration](https://github.com/project-chip/connectedhomeip/tree/master/examples/lock-app/infineon/psoc6#building-with-optiga-trust-m-as-hsm) | Ninja         | Active |
+| [OPTIGA™ Trust M Zephyr PAL & Application](https://github.com/Infineon/optiga-trust-m-zephyr)                                          | CMake         | Active |
 
 # Troubleshooting
 
