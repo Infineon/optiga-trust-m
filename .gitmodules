@@ -3,4 +3,4 @@
 
 [submodule "external/mbedtls"]
 	path = external/mbedtls
-	url = https://github.com/Mbed-TLS/mbedtls
+	url = https://github.com/Mbed-TLS/mbedtls.git
