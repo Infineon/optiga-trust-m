@@ -28,7 +28,3 @@ OPTIGA_UTIL_SET_COMMS_PROTOCOL_VERSION(me, OPTIGA_COMMS_PROTOCOL_VERSION_PRE_SHA
 OPTIGA_UTIL_SET_COMMS_PROTECTION_LEVEL(me, OPTIGA_COMMS_RESPONSE_PROTECTION);
 ```
 Which afterwards raises the **0x107 handshake error**. In most of the cases it happens because the [Pairing](https://github.com/Infineon/optiga-trust-m/wiki/Shielded-Connection-101#pairing) didn't happen. In this case you need either to remove these two lines of the code, or [pair](https://github.com/Infineon/optiga-trust-m/blob/master/examples/optiga/usecases/example_pair_host_and_optiga_using_pre_shared_secret.c) your device with the secure element.
-
-## Fail to initialise the chip/execute a command
-
-All examples require a common initialisation sequence, for instance like [here](https://github.com/Infineon/getstarted-optiga-trust-m/blob/master/xmc4800_iot_kit/optiga_shell.c#L85). Generic sequence and a code sample is given [here](https://github.com/Infineon/optiga-trust-m/wiki/Initialisation-hints)
