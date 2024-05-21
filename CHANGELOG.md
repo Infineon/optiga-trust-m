@@ -1,3 +1,8 @@
+## 5.0.1 (2024-05-21)
+* Fix to allow compilation using zephyr PAL.
+* Changes in README.md for host applications.
+* Added missing license headers
+
 ## 5.0.0 (2024-04-10)
 * New folder structure.
 * Mbedtls is now configured to be used a submodule from https://github.com/Mbed-TLS/mbedtls/tree/v2.28.7.
