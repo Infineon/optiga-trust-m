@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (c) OASIS Open 2016
+// SPDX-License-Identifier: LicenseRef-oasis-ipr-policy
+
 /* Copyright (c) OASIS Open 2016. All Rights Reserved./
  * /Distributed under the terms of the OASIS IPR Policy,
  * [http://www.oasis-open.org/policies-guidelines/ipr], AS-IS, WITHOUT ANY
