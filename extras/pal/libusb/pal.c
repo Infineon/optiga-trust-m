@@ -15,9 +15,15 @@
 /**********************************************************************************************************************
  * HEADER FILES
  *********************************************************************************************************************/
+
+#ifdef __WIN32__
+#include "libusb.h"
+#else  // LINUX
 #include <libusb-1.0/libusb.h>
 #include <unistd.h>
+#endif
 
+#include "optiga_lib_logger.h"
 #include "pal_common.h"
 #include "pal_i2c.h"
 #include "pal_usb.h"
@@ -54,18 +60,19 @@ pal_status_t pal_init(void) {
     do {
         if (hw_initialised == 0) {
             if (libusb_init(NULL)) {
-                LOG_PAL("Failed to init libusb\n.");
+                LOG_PAL("%sFailed to init LibUSB\n", OPTIGA_PAL_LAYER);
                 break;
             }
 
             // libusb_set_debug(NULL, 4);
+            libusb_set_option(LIBUSB_OPTION_LOG_LEVEL, LIBUSB_LOG_LEVEL_DEBUG);
 
             dev_handle = libusb_open_device_with_vid_pid(NULL, USB_VID, USB_PID);
 
             usb_events.handle = dev_handle;
 
             if (usb_events.handle == NULL) {
-                LOG_PAL("Error: dev_handle is NULL!\n.");
+                LOG_PAL("%sError: dev_handle is NULL!\n", OPTIGA_PAL_LAYER);
                 break;
             }
 
@@ -107,7 +114,7 @@ pal_status_t pal_init(void) {
                 break;
             }
 
-            LOG_PAL("LibUSB PAL initialised\n");
+            LOG_PAL("%sLibUSB PAL initialised\n", OPTIGA_PAL_LAYER);
 
             ret = PAL_STATUS_SUCCESS;
             hw_initialised = 1;

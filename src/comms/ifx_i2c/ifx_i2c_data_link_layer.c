@@ -113,17 +113,11 @@
 
 // Logs the transmitted data to OPTIGA from IFXI2C layer in hexadecimal format
 #define OPTIGA_IFXI2C_LOG_TRANSMIT_HEX_DATA(array, array_len, p_ifx_i2c_ctx) \
-    { \
-        OPTIGA_COMMS_LOG_MESSAGE(""); \
-        optiga_lib_print_array_hex_format(array, array_len, OPTIGA_UNPROTECTED_DATA_COLOR); \
-    }
+    { optiga_lib_print_array_hex_format(array, array_len, OPTIGA_UNPROTECTED_DATA_COLOR); }
 
 // Logs the received data from OPTIGA in hexadecimal format
 #define OPTIGA_IFXI2C_LOG_RECEIVE_HEX_DATA(array, array_len, p_ifx_i2c_ctx) \
-    { \
-        OPTIGA_COMMS_LOG_MESSAGE(""); \
-        optiga_lib_print_array_hex_format(array, array_len, OPTIGA_UNPROTECTED_DATA_COLOR); \
-    }
+    { optiga_lib_print_array_hex_format(array, array_len, OPTIGA_UNPROTECTED_DATA_COLOR); }
 
 #endif
 
@@ -293,9 +287,10 @@ _STATIC_H optiga_lib_status_t ifx_i2c_dl_send_frame_internal(
         p_buffer[0] |= (uint8_t)(p_ctx->dl.tx_seq_nr << DL_FCTR_FRNR_OFFSET);
         // Reset resync received
         p_ctx->dl.resynced = 0;
-        OPTIGA_COMMS_LOG_MESSAGE(">>>>");
+        OPTIGA_COMMS_LOG_MESSAGE(">>>> (Data frame)");
     } else  // Control frame
     {
+        OPTIGA_COMMS_LOG_MESSAGE(">>>> (Control frame)");
         p_buffer[0] |= DL_FCTR_FTYPE_MASK;
     }
 

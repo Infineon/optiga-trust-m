@@ -1,16 +1,16 @@
 /**
- * SPDX-FileCopyrightText: 2020-2024 Infineon Technologies AG
+ * SPDX-FileCopyrightText: 2018-2024 Infineon Technologies AG
  * SPDX-License-Identifier: MIT
- *
- * \author Infineon Technologies AG
- *
- * \file pal_os_event.c
- *
- * \brief   This file implements the platform abstraction layer APIs for os event/scheduler.
- *
- * \ingroup  grPAL
- * @{
- */
+*
+* \author Infineon Technologies AG
+*
+* \file pal_os_event.c
+*
+* \brief   This file implements the platform abstraction layer APIs for os event/scheduler.
+*
+* \ingroup  grPAL
+* @{
+*/
 
 #include "pal_os_event.h"
 
@@ -73,55 +73,14 @@ void pal_os_event_start(
         p_pal_os_event->is_event_triggered = TRUE;
         pal_os_event_register_callback_oneshot(p_pal_os_event, callback, callback_args, 1000);
     }
+
     TRUSTM_PAL_EVENT_DBGFN("<");
 }
 
 void pal_os_event_stop(pal_os_event_t *p_pal_os_event) {
     TRUSTM_PAL_EVENT_DBGFN(">");
-
-    // lint --e{714} suppress "The API pal_os_event_stop is not exposed in header file but used as extern in optiga_cmd.c"
+    //lint --e{714} suppress "The API pal_os_event_stop is not exposed in header file but used as extern in optiga_cmd.c"
     p_pal_os_event->is_event_triggered = FALSE;
-
-    TRUSTM_PAL_EVENT_DBGFN("<");
-}
-
-void pal_os_event_disarm(void) {
-    struct itimerspec its;
-
-    TRUSTM_PAL_EVENT_DBGFN(">");
-    its.it_value.tv_sec = 0;
-    its.it_value.tv_nsec = 0;
-    its.it_interval.tv_sec = 0;
-    its.it_interval.tv_nsec = 0;
-
-    if (timer_settime(timerid, 0, &its, NULL) == -1) {
-        printf("Error in timer_settime\n");
-        exit(1);
-    }
-
-    TRUSTM_PAL_EVENT_DBGFN("<");
-}
-
-void pal_os_event_arm(void) {
-    struct itimerspec its;
-
-    TRUSTM_PAL_EVENT_DBGFN(">");
-    its.it_value.tv_sec = 0;
-    its.it_value.tv_nsec = 1000000;
-    its.it_interval.tv_sec = 0;
-    its.it_interval.tv_nsec = 294967296;
-
-    if (timer_settime(timerid, 0, &its, NULL) == -1) {
-        printf("Error in timer_settime\n");
-        exit(1);
-    }
-
-    TRUSTM_PAL_EVENT_DBGFN("<");
-}
-
-void pal_os_event_destroy1(void) {
-    TRUSTM_PAL_EVENT_DBGFN(">");
-    timer_delete(timerid);
     TRUSTM_PAL_EVENT_DBGFN("<");
 }
 
@@ -133,8 +92,7 @@ pal_os_event_t *pal_os_event_create(register_callback callback, void *callback_a
 
     if ((NULL != callback) && (NULL != callback_args)) {
         /* Establishing handler for signal */
-
-        sa.sa_flags = SA_SIGINFO;
+        sa.sa_flags = SA_SIGINFO | SA_RESTART;
         sa.sa_sigaction = handler;
         sigemptyset(&sa.sa_mask);
         if (sigaction(SIG, &sa, NULL) == -1) {
@@ -148,6 +106,7 @@ pal_os_event_t *pal_os_event_create(register_callback callback, void *callback_a
         sev.sigev_signo = SIG;
         sev.sigev_value.sival_ptr = &timerid;
         if (timer_create(CLOCKID, &sev, &timerid) == -1) {
+            printf("error in timer_create\n");
             exit(1);
         }
 
@@ -194,11 +153,11 @@ void pal_os_event_register_callback_oneshot(
     struct itimerspec its;
     long long freq_nanosecs;
     int ret = 0;
-    // sigset_t mask;
+    //sigset_t mask;
 
     TRUSTM_PAL_EVENT_DBGFN(">");
 
-    // uint8_t scheduler_timer;
+    //uint8_t scheduler_timer;
     p_pal_os_event->callback_registered = callback;
     p_pal_os_event->callback_ctx = callback_args;
 
@@ -222,13 +181,17 @@ void pal_os_event_register_callback_oneshot(
 
     TRUSTM_PAL_EVENT_DBGFN("<");
 }
-// lint --e{818,715} suppress "As there is no implementation, pal_os_event is not used"
+
+//lint --e{818,715} suppress "As there is no implementation, pal_os_event is not used"
 void pal_os_event_destroy(pal_os_event_t *pal_os_event) {
     TRUSTM_PAL_EVENT_DBGFN(">");
-    timer_delete(timerid);
+    pal_os_event_stop(pal_os_event);
+    if (timerid != 0) {
+        timer_delete(timerid);
+    }
     TRUSTM_PAL_EVENT_DBGFN("<");
 }
 
 /**
- * @}
- */
+* @}
+*/

@@ -235,6 +235,12 @@ static public_key_from_host_t ut_peer_public_key_details = {
     (uint8_t)OPTIGA_ECC_CURVE_NIST_P_256,
 };
 
+extern void optiga_cmd_set_shielded_connection_option(
+    optiga_cmd_t *me,
+    uint8_t value,
+    uint8_t shielded_connection_option
+);
+
 static uint8_t ut_rsa_public_key[150] = {0x00};
 static uint16_t ut_rsa_public_key_length = 0;
 
