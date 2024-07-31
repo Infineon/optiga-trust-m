@@ -15,12 +15,17 @@
 /**********************************************************************************************************************
  * HEADER FILES
  *********************************************************************************************************************/
-#include "pal_i2c.h"
 
+#ifdef __WIN32__
+#include "libusb.h"
+#else  // LINUX
 #include <libusb-1.0/libusb.h>
 #include <unistd.h>
+#endif
 
+#include "optiga_lib_logger.h"
 #include "pal_common.h"
+#include "pal_i2c.h"
 #include "pal_usb.h"
 
 /**********************************************************************************************************************
@@ -125,10 +130,10 @@ void i2c_master_arbitration_lost_callback(void) {
 
 uint16_t usb_i2c_poll_operation_result(pal_i2c_t *p_i2c_context) {
     uint8_t report[HID_REPORT_SIZE] = {0};
-    LOG_PAL("usb_i2c_poll_operation_result\n. ");
+    LOG_PAL("%sUSB I2C Poll Operation result\n", OPTIGA_PAL_LAYER);
     while (1) {
         if (usb_hid_get_feature(REPORT_ID_I2C_STATUS, report, &usb_events) != 5) {
-            LOG_PAL("[IFX-HAL]: USB get I2C status failed.\n");
+            LOG_PAL("%sUSB HID Get Feature: I2C status failed\n", OPTIGA_PAL_LAYER);
             return PAL_I2C_EVENT_ERROR;
         }
 
@@ -201,7 +206,7 @@ pal_status_t pal_i2c_init(const pal_i2c_t *p_i2c_context) {
  * \retval  #PAL_STATUS_FAILURE  Returns when the I2C de-init fails.
  */
 pal_status_t pal_i2c_deinit(const pal_i2c_t *p_i2c_context) {
-    LOG_PAL("pal_i2c_deinit\n. ");
+    LOG_PAL("%sPAL I2C deinit\n", OPTIGA_PAL_LAYER);
     return PAL_STATUS_SUCCESS;
 }
 
@@ -328,7 +333,8 @@ pal_status_t pal_i2c_read(const pal_i2c_t *p_i2c_context, uint8_t *p_data, uint1
     uint8_t report[HID_REPORT_SIZE] = {0};
     uint16_t rx_result;
     pal_usb_t *pal_usb;
-    LOG_PAL("[IFX-HAL]: I2C RX (%d)\n", length);
+
+    LOG_PAL("%sPAL I2C Read (%d)\n", OPTIGA_PAL_LAYER, length);
 
     report[0] = REPORT_ID_I2C_READ_REQ;
     report[1] = p_i2c_context->slave_address;
@@ -347,9 +353,12 @@ pal_status_t pal_i2c_read(const pal_i2c_t *p_i2c_context, uint8_t *p_data, uint1
             &transfered,
             USB_TIMEOUT
         );
-        LOG_PAL("[IFX-HAL]: HID Write status = %d, %d\n", usb_lib_status, transfered);
+
+        LOG_PAL("%sHID Write status = %d, %d\n", OPTIGA_PAL_LAYER, usb_lib_status, transfered);
+
         if (usb_lib_status) {
-            LOG_PAL("[IFX-HAL]: libusb_interrupt_transfer ERROR %d\n.", usb_lib_status);
+            LOG_PAL("%slibusb_interrupt_transfer ERROR %d\n", OPTIGA_PAL_LAYER, usb_lib_status);
+
             // lint --e{611} suppress "void* function pointer is type casted to app_event_handler_t type"
             ((upper_layer_callback_t)(p_i2c_context->upper_layer_event_handler)
             )(p_i2c_context->p_upper_layer_ctx, PAL_I2C_EVENT_ERROR);
@@ -419,7 +428,7 @@ pal_status_t pal_i2c_read(const pal_i2c_t *p_i2c_context, uint8_t *p_data, uint1
 pal_status_t pal_i2c_set_bitrate(const pal_i2c_t *p_i2c_context, uint16_t bitrate) {
     pal_status_t return_status = PAL_STATUS_SUCCESS;
     //    host_lib_status_t event = PAL_I2C_EVENT_ERROR;
-    //    LOG_PAL("pal_i2c_set_bitrate\n. ");
+    //    LOG_PAL("%spal_i2c_set_bitrate\n", OPTIGA_PAL_LAYER);
     //    //Acquire the I2C bus before setting the bitrate
     //    if (PAL_STATUS_SUCCESS == pal_i2c_acquire(p_i2c_context))
     //    {

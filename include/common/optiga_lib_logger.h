@@ -23,10 +23,12 @@ extern "C" {
 #include "optiga_lib_types.h"
 
 // Logger levels
-#define OPTIGA_UTIL_SERVICE "[optiga util]     : "
-#define OPTIGA_CRYPT_SERVICE "[optiga crypt]    : "
-#define OPTIGA_COMMAND_LAYER "[optiga cmd]      : "
-#define OPTIGA_COMMUNICATION_LAYER "[optiga comms]    : "
+#define OPTIGA_LAYER_EMPTY "        "
+#define OPTIGA_UTIL_SERVICE "[util]  "
+#define OPTIGA_CRYPT_SERVICE "[crypt] "
+#define OPTIGA_COMMAND_LAYER "[cmd]   "
+#define OPTIGA_COMMUNICATION_LAYER "[comms] "
+#define OPTIGA_PAL_LAYER "[pal]   "
 
 // Logger colors options
 #define OPTIGA_LIB_LOGGER_COLOR_RED "\x1b[31m"
@@ -181,7 +183,8 @@ void optiga_lib_print_array_hex_format(
     { \
         sprintf( \
             (char_t *)p_output_buffer, \
-            "%25s%s%s", \
+            "%s%s%s%s", \
+            OPTIGA_LAYER_EMPTY, \
             p_color, \
             p_temp_buffer, \
             OPTIGA_LIB_LOGGER_COLOR_DEFAULT \

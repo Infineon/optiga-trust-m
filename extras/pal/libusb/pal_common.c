@@ -15,14 +15,19 @@
 /**********************************************************************************************************************
  * HEADER FILES
  *********************************************************************************************************************/
-//#include <DAVE.h>
-#include "pal_common.h"
 
+#ifdef __WIN32__
+#include "libusb.h"
+#else  // LINUX
 #include <libusb-1.0/libusb.h>
 #include <unistd.h>
+#endif
 
+#include "optiga_lib_logger.h"
+#include "pal_common.h"
 #include "pal_gpio.h"
 #include "pal_usb.h"
+
 /**********************************************************************************************************************
  * MACROS
  *********************************************************************************************************************/
@@ -46,9 +51,12 @@
 int usb_hid_set_feature(uint8_t report_id, uint8_t *data, uint8_t length, pal_usb_t *usb_events) {
     int status;
     uint8_t report[HID_REPORT_SIZE] = {0};
+
     report[0] = report_id;
+
     memcpy(&report[1], data, length);
-    LOG_PAL("usb_hid_set_feature\n. ");
+    LOG_PAL("%sUSB HID Set Feature\n", OPTIGA_PAL_LAYER);
+
     status = libusb_control_transfer(
         usb_events->handle,
         LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE,
@@ -59,7 +67,8 @@ int usb_hid_set_feature(uint8_t report_id, uint8_t *data, uint8_t length, pal_us
         sizeof(report),
         USB_TIMEOUT
     );
-    LOG_PAL("[IFX-HAL]: HID Set Feature status = %d\n", status);
+
+    LOG_PAL("%sHID Set Feature status: %d\n", OPTIGA_PAL_LAYER, status);
 
     if (status >= (1 + length)) {
         return PAL_STATUS_SUCCESS;
@@ -70,7 +79,9 @@ int usb_hid_set_feature(uint8_t report_id, uint8_t *data, uint8_t length, pal_us
 
 uint16_t ifx_i2c_usb_reset(pal_usb_t usb_events) {
     uint8_t payload[3];
-    LOG_PAL("ifx_i2c_usb_reset\n. ");
+
+    LOG_PAL("%sUSB I2C Reset\n", OPTIGA_PAL_LAYER);
+
     payload[0] = 0x20;  // I2C Reset
 
     if (usb_hid_set_feature(REPORT_ID_SYSTEM_SETTING, payload, 1, &usb_events)
@@ -88,9 +99,10 @@ uint16_t ifx_i2c_usb_reset(pal_usb_t usb_events) {
 }
 
 int usb_hid_get_feature(uint8_t report_id, uint8_t *report, pal_usb_t *usb_events) {
-    int i;
     int status;
-    LOG_PAL("usb_hid_get_feature\n. ");
+
+    LOG_PAL("%sUSB HID Get Feature\n", OPTIGA_PAL_LAYER);
+
     report[0] = report_id;
 
     if (usb_events == NULL)
@@ -107,11 +119,15 @@ int usb_hid_get_feature(uint8_t report_id, uint8_t *report, pal_usb_t *usb_event
         USB_TIMEOUT
     );
 
-    LOG_PAL("[IFX-HAL]: HID Get Feature status %d: ", status);
+    LOG_PAL("%sHID Set Feature status = %d\n", OPTIGA_PAL_LAYER, status);
+
+    LOG_PAL("%sHID Set Feature report: ", OPTIGA_PAL_LAYER);
+    int i;
     for (i = 0; i < status; i++) {
         LOG_PAL("%02X ", report[i]);
     }
-    LOG_PAL("   ");
+    LOG_PAL("\n");
+
     return status;
 }
 
@@ -119,7 +135,7 @@ uint16_t usb_set_gpio_reset_pin(uint8_t high, pal_gpio_t *p_gpio_context) {
     pal_usb_t *pal_usb;
     uint8_t report[HID_REPORT_SIZE] = {0};
     pal_usb = (pal_usb_t *)&p_gpio_context->p_gpio_hw;
-    LOG_PAL("usb_set_gpio_reset_pin\n. ");
+    LOG_PAL("USB Set GPIO Reset Pin\n");
     if (usb_hid_get_feature(REPORT_ID_GPIO, report, pal_usb) != 5) {
         return PAL_I2C_EVENT_ERROR;
     }
@@ -134,31 +150,4 @@ uint16_t usb_set_gpio_reset_pin(uint8_t high, pal_gpio_t *p_gpio_context) {
     report[4] |= (1 << 5);  // GPIOA-H direction output
 
     return usb_hid_set_feature(REPORT_ID_GPIO, report + 1, 4, pal_usb);
-}
-
-void print_status(uint8_t s) {
-    if (s & 0x01) {
-        LOG_PAL("Busy; other bits invalid. ");
-    } else {
-        LOG_PAL("Idle. ");
-        if (s & 0x02) {
-            LOG_PAL("Error. ");
-        }
-        if (s & 0x04) {
-            LOG_PAL("Addr NACK. ");
-        }
-        if (s & 0x08) {
-            LOG_PAL("Data NACK. ");
-        }
-        if (s & 0x10) {
-            LOG_PAL("Arb Lost. ");
-        }
-        if (s & 0x20) {
-            LOG_PAL("Idle. ");
-        }
-        if (s & 0x40) {
-            LOG_PAL("Bus Busy. ");
-        }
-    }
-    LOG_PAL("\n");
 }

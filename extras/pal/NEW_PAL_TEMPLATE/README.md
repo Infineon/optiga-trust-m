@@ -150,10 +150,10 @@ void pal_os_event_trigger_registered_callback(void)
 
 This is a code sample demonstrating initialization routine for the security chip, as well as a hibernation example
 ```c
-#include "optiga/optiga_util.h"
-#include "optiga/pal/pal_os_event.h"
-#include "optiga/pal/pal.h"
-#include "optiga/pal/pal_os_timer.h"
+#include "optiga_util.h"
+#include "pal_os_event.h"
+#include "pal.h"
+#include "pal_os_timer.h"
 /**
  * Callback when optiga_util_xxxx operation is completed asynchronously
  */

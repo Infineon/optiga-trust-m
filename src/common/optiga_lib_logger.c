@@ -89,7 +89,7 @@ _STATIC_H void optiga_lib_print_length_of_data(uint16_t value) {
     uint8_t uint16t_conv_buffer[10] = {0};
     char_t print_buffer[50];
 
-    sprintf((char_t *)print_buffer, "%37s", "Length of data - ");
+    sprintf((char_t *)print_buffer, "%s%s", OPTIGA_LAYER_EMPTY, "Length of data - ");
     strcat(print_buffer, OPTIGA_HEX_BYTE_SEPERATOR);
     optiga_lib_word_to_hex_string(value, uint16t_conv_buffer);
     strcat(print_buffer, (char_t *)uint16t_conv_buffer);
@@ -103,7 +103,11 @@ void optiga_lib_print_string(const char_t *p_log_string) {
     }
 
     // lint --e{534} The return value is not used hence not checked*/
-    pal_logger_write(&logger_console, (const uint8_t *)p_log_string, strlen(p_log_string));
+    pal_logger_write(
+        &logger_console,
+        (const uint8_t *)p_log_string,
+        (uint32_t)strlen(p_log_string)
+    );
 }
 
 void optiga_lib_print_string_with_newline(const char_t *p_log_string) {
@@ -114,7 +118,11 @@ void optiga_lib_print_string_with_newline(const char_t *p_log_string) {
     }
 
     // lint --e{534} The return value is not used hence not checked*/
-    pal_logger_write(&logger_console, (const uint8_t *)p_log_string, strlen(p_log_string));
+    pal_logger_write(
+        &logger_console,
+        (const uint8_t *)p_log_string,
+        (uint32_t)strlen(p_log_string)
+    );
     // lint --e{534} The return value is not used hence not checked*/
     pal_logger_write(&logger_console, new_line_characters, 2);
 }
@@ -133,7 +141,11 @@ void optiga_lib_print_message(
 
     OPTIGA_LIB_LOGGER_PRINT_INFO(color_buffer, p_log_string, p_log_layer, p_log_color);
     // lint --e{534} The return value is not used hence not checked*/
-    pal_logger_write(&logger_console, (const uint8_t *)color_buffer, strlen(color_buffer));
+    pal_logger_write(
+        &logger_console,
+        (const uint8_t *)color_buffer,
+        (uint32_t)strlen(color_buffer)
+    );
     // lint --e{534} The return value is not used hence not checked*/
     pal_logger_write(&logger_console, new_line_characters, 2);
 }
@@ -174,7 +186,11 @@ void optiga_lib_print_status(
     );
 
     // lint --e{534} The return value is not used hence not checked*/
-    pal_logger_write(&logger_console, (const uint8_t *)color_buffer, strlen(color_buffer));
+    pal_logger_write(
+        &logger_console,
+        (const uint8_t *)color_buffer,
+        (uint32_t)strlen(color_buffer)
+    );
     // Print new line
     // lint --e{534} The return value is not used hence not checked*/
     pal_logger_write(&logger_console, new_line_characters, 2);
@@ -190,7 +206,7 @@ void optiga_lib_print_array_hex_format(
     uint16_t index;
     uint16_t temp_length;
     char_t new_line_characters[2] = {OPTIGA_LOGGER_NEW_LINE_CHAR};
-    uint8_t buffer_window = 32;  // Alignment of 16 bytes per line
+    uint8_t buffer_window = 16;  // Alignment of 16 bytes per line
 
     if ((NULL == p_log_string) || (NULL == p_log_color)) {
         return;
@@ -224,7 +240,7 @@ void optiga_lib_print_array_hex_format(
         pal_logger_write(
             &logger_console,
             (const uint8_t *)output_buffer,
-            strlen(output_buffer) + 2
+            (uint32_t)(strlen(output_buffer) + 2)
         );
     }
 }

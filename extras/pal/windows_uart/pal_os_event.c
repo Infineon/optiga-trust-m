@@ -1,16 +1,16 @@
 /**
- * SPDX-FileCopyrightText: 2019-2024 Infineon Technologies AG
- * SPDX-License-Identifier: MIT
- *
- * \author Infineon Technologies AG
- *
- * \file pal_os_event.c
- *
- * \brief   This file implements the platform abstraction layer APIs for os event/scheduler.
- *
- * \ingroup  grPAL
- * @{
- */
+* SPDX-FileCopyrightText: 2018-2024 Infineon Technologies AG
+* SPDX-License-Identifier: MIT
+*
+* \author Infineon Technologies AG
+*
+* \file pal_os_event.c
+*
+* \brief   This file implements the platform abstraction layer APIs for os event/scheduler.
+*
+* \ingroup  grPAL
+* @{
+*/
 
 #include <errno.h>
 #include <stdint.h>

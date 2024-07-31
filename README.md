@@ -12,6 +12,7 @@ This is the [OPTIGA™ Trust M](https://www.infineon.com/optiga-trust) Host Libr
     - [Building and testing the Host Library](#building-and-testing-the-host-library)
     - [Porting the Host library](#porting-the-host-library)
     - [Examples using Host Library](#examples-using-host-library)
+    - [Configuring Mbed TLS library](#configuring-mbed-tls-library)
   - [Host library overview](#host-library-overview)
   - [Host Applications](#host-applications)
   - [Contributing](#contributing)
@@ -40,6 +41,29 @@ Instructions on how to port the host library to a specific platform can be found
 ### Examples using Host Library
 
 Examples to demonstrate basic functionality of the security chip can be found [here](examples/README.md)
+
+### Configuring Mbed TLS library
+
+The OPTIGA&trade; Trust M Host Library for C relies on Mbed TLS. This library is cloned from a submodule under [external/mbedtls](external/mbedtls/) folder. It comes with a default configuration that needs to be modified to the application purpose. Under [config/mbedtls_default_config.h](config/mbedtls_default_config.h) a default configuration is provided and should be changed depending on need.
+
+During compilation, the following define needs to be added:
+
+> During compilation, the following define needs to be added :
+```
+MBEDTLS_USER_CONFIG_FILE="config/mbedtls_default_config.h"
+```
+
+for Makefile :
+
+```
+-DMBEDTLS_USER_CONFIG_FILE="config/mbedtls_default_config.h"
+```
+
+for CMake :
+
+```
+target_compile_definitions(app PRIVATE MBEDTLS_USER_CONFIG_FILE="${CMAKE_CURRENT_SOURCE_DIR}/config/mbedtls_user_config.h")
+```
 
 ## Host library overview
 

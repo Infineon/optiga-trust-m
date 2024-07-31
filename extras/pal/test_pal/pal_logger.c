@@ -24,11 +24,9 @@ pal_logger_write(void *p_logger_context, const uint8_t *p_log_data, uint32_t log
     (void)(p_logger_context);
 
     int p_log_data_pos;
-    printf("pal_loger_write : ");
     for (p_log_data_pos = 0; p_log_data_pos < log_data_length; p_log_data_pos++) {
         printf("%c", *(p_log_data + p_log_data_pos));
     }
-    printf("\n");
 
     return PAL_STATUS_SUCCESS;
 }

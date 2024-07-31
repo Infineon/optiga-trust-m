@@ -692,7 +692,7 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf(
  * example_optiga_crypt_tls_prf_sha256.c
  *
  */
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha256(
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha256(
     optiga_crypt_t *me,
     uint16_t secret,
     const uint8_t *label,
@@ -702,20 +702,7 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha256(
     uint16_t derived_key_length,
     bool_t export_to_host,
     uint8_t *derived_key
-) {
-    return (optiga_crypt_tls_prf(
-        me,
-        OPTIGA_TLS12_PRF_SHA_256,
-        secret,
-        label,
-        label_length,
-        seed,
-        seed_length,
-        derived_key_length,
-        export_to_host,
-        derived_key
-    ));
-}
+);
 #endif  // OPTIGA_CRYPT_TLS_PRF_SHA256_ENABLED
 #ifdef OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED
 /**
@@ -765,7 +752,7 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha256(
  * None
  *
  */
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha384(
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha384(
     optiga_crypt_t *me,
     uint16_t secret,
     const uint8_t *label,
@@ -775,20 +762,7 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha384(
     uint16_t derived_key_length,
     bool_t export_to_host,
     uint8_t *derived_key
-) {
-    return (optiga_crypt_tls_prf(
-        me,
-        OPTIGA_TLS12_PRF_SHA_384,
-        secret,
-        label,
-        label_length,
-        seed,
-        seed_length,
-        derived_key_length,
-        export_to_host,
-        derived_key
-    ));
-}
+);
 #endif  // OPTIGA_CRYPT_TLS_PRF_SHA384_ENABLED
 #ifdef OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED
 /**
@@ -838,7 +812,7 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha384(
  * None
  *
  */
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha512(
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha512(
     optiga_crypt_t *me,
     uint16_t secret,
     const uint8_t *label,
@@ -848,20 +822,7 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_tls_prf_sha512(
     uint16_t derived_key_length,
     bool_t export_to_host,
     uint8_t *derived_key
-) {
-    return (optiga_crypt_tls_prf(
-        me,
-        OPTIGA_TLS12_PRF_SHA_512,
-        secret,
-        label,
-        label_length,
-        seed,
-        seed_length,
-        derived_key_length,
-        export_to_host,
-        derived_key
-    ));
-}
+);
 #endif  // OPTIGA_CRYPT_TLS_PRF_SHA512_ENABLED
 
 #ifdef OPTIGA_CRYPT_RSA_GENERATE_KEYPAIR_ENABLED
@@ -2176,7 +2137,7 @@ LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf(
  * example_optiga_crypt_hkdf.c
  *
  */
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha256(
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha256(
     optiga_crypt_t *me,
     uint16_t secret,
     const uint8_t *salt,
@@ -2186,20 +2147,7 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha256(
     uint16_t derived_key_length,
     bool_t export_to_host,
     uint8_t *derived_key
-) {
-    return (optiga_crypt_hkdf(
-        me,
-        OPTIGA_HKDF_SHA_256,
-        secret,
-        salt,
-        salt_length,
-        info,
-        info_length,
-        derived_key_length,
-        export_to_host,
-        derived_key
-    ));
-}
+);
 
 /**
  * \brief Derives a key or shared secret using HKDF-SHA384 operation from the secret stored in OPTIGA.<br>
@@ -2250,7 +2198,7 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha256(
  *
  */
 
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha384(
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha384(
     optiga_crypt_t *me,
     uint16_t secret,
     const uint8_t *salt,
@@ -2260,20 +2208,7 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha384(
     uint16_t derived_key_length,
     bool_t export_to_host,
     uint8_t *derived_key
-) {
-    return (optiga_crypt_hkdf(
-        me,
-        OPTIGA_HKDF_SHA_384,
-        secret,
-        salt,
-        salt_length,
-        info,
-        info_length,
-        derived_key_length,
-        export_to_host,
-        derived_key
-    ));
-}
+);
 
 /**
  * \brief Derives a key or shared secret using HKDF-SHA512 operation from the secret stored in OPTIGA.<br>
@@ -2324,7 +2259,7 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha384(
  *
  */
 
-_STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha512(
+LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha512(
     optiga_crypt_t *me,
     uint16_t secret,
     const uint8_t *salt,
@@ -2334,20 +2269,7 @@ _STATIC_INLINE LIBRARY_EXPORTS optiga_lib_status_t optiga_crypt_hkdf_sha512(
     uint16_t derived_key_length,
     bool_t export_to_host,
     uint8_t *derived_key
-) {
-    return (optiga_crypt_hkdf(
-        me,
-        OPTIGA_HKDF_SHA_512,
-        secret,
-        salt,
-        salt_length,
-        info,
-        info_length,
-        derived_key_length,
-        export_to_host,
-        derived_key
-    ));
-}
+);
 #endif  // OPTIGA_CRYPT_HKDF_ENABLED
 
 #ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED

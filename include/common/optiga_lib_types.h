@@ -26,17 +26,11 @@ extern "C" {
 #include <string.h>
 
 /// @cond hidden
-#ifdef _OPTIGA_EXPORTS_DLLEXPORT_H_
-
 #ifdef OPTIGA_LIB_EXPORTS
 #define LIBRARY_EXPORTS __declspec(dllexport)
 #else
-#define LIBRARY_EXPORTS __declspec(dllimport)
-#endif  // OPTIGA_LIB_EXPORTS
-
-#else
 #define LIBRARY_EXPORTS
-#endif /*_OPTIGA_EXPORTS_DLLEXPORT_H_*/
+#endif /*OPTIGA_LIB_EXPORTS*/
 /// @endcond
 
 /// Definition for false

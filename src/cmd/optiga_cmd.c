@@ -503,6 +503,10 @@ struct optiga_cmd {
 
 _STATIC_H optiga_lib_status_t optiga_cmd_get_error_code_handler(optiga_cmd_t *me);
 
+#if defined(OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) || defined(OPTIGA_CRYPT_RSA_SIGN_ENABLED)
+_STATIC_H void optiga_cmd_ecc_r_s_padding_check(uint8_t *sig, uint16_t *sig_len);
+#endif  // (OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) || defined(OPTIGA_CRYPT_RSA_SIGN_ENABLED)
+
 #if defined(OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) || defined(OPTIGA_CRYPT_SYM_DECRYPT_ENABLED) \
     || defined(OPTIGA_CRYPT_HMAC_ENABLED) || defined(OPTIGA_CRYPT_HMAC_VERIFY_ENABLED)
 
@@ -1195,7 +1199,14 @@ _STATIC_H void optiga_cmd_execute_comms_open(optiga_cmd_t *me, uint8_t *exit_loo
 
                 (void)optiga_comms_set_callback_context(me->p_optiga->p_optiga_comms, me);
                 me->exit_status = optiga_comms_open(me->p_optiga->p_optiga_comms);
-
+#ifdef OPTIGA_SYNC_COMMS
+                pal_os_event_register_callback_oneshot(
+                    me->p_optiga->p_pal_os_event_ctx,
+                    (register_callback)optiga_cmd_event_trigger_execute,
+                    me,
+                    OPTIGA_CMD_SCHEDULER_RUNNING_TIME_MS
+                );
+#endif
                 if (OPTIGA_LIB_SUCCESS != me->exit_status) {
                     EXIT_STATE_WITH_ERROR(me, *exit_loop);
                     break;
@@ -1355,6 +1366,14 @@ _STATIC_H void optiga_cmd_execute_prepare_command(optiga_cmd_t *me, uint8_t *exi
                     EXIT_STATE_WITH_ERROR(me, *exit_loop);
                     break;
                 }
+#ifdef OPTIGA_SYNC_COMMS
+                pal_os_event_register_callback_oneshot(
+                    me->p_optiga->p_pal_os_event_ctx,
+                    (register_callback)optiga_cmd_event_trigger_execute,
+                    me,
+                    OPTIGA_CMD_SCHEDULER_IDLING_TIME_MS
+                );
+#endif
 
                 me->cmd_next_execution_state = OPTIGA_CMD_EXEC_PROCESS_RESPONSE;
                 me->cmd_sub_execution_state = OPTIGA_CMD_EXEC_PROCESS_OPTIGA_RESPONSE;
@@ -1704,6 +1723,14 @@ _STATIC_H optiga_lib_status_t optiga_cmd_get_error_code_handler(optiga_cmd_t *me
                 p_optiga->optiga_comms_buffer,
                 &p_optiga->comms_rx_size
             );
+#ifdef OPTIGA_SYNC_COMMS
+            pal_os_event_register_callback_oneshot(
+                me->p_optiga->p_pal_os_event_ctx,
+                (register_callback)optiga_cmd_event_trigger_execute,
+                me,
+                OPTIGA_CMD_SCHEDULER_IDLING_TIME_MS
+            );
+#endif
             if (OPTIGA_COMMS_SUCCESS != return_status) {
                 return_status = OPTIGA_CMD_ERROR;
                 break;
@@ -2414,6 +2441,12 @@ _STATIC_H optiga_lib_status_t optiga_cmd_calc_sign_handler(optiga_cmd_t *me) {
                         me->p_optiga->optiga_comms_buffer + OPTIGA_CMD_APDU_INDATA_OFFSET,
                         *(p_optiga_calc_sign->p_signature_length)
                     );
+
+                    uint16_t *p_signature_length = p_optiga_calc_sign->p_signature_length;
+                    uint8_t *p_signature = p_optiga_calc_sign->p_signature;
+
+                    optiga_cmd_ecc_r_s_padding_check(p_signature, p_signature_length);
+
                     OPTIGA_CMD_LOG_MESSAGE("Response of calculate sign command is processed...");
                     return_status = OPTIGA_LIB_SUCCESS;
                 }
@@ -4634,6 +4667,54 @@ optiga_cmd_gen_symkey(optiga_cmd_t *me, uint8_t cmd_param, optiga_gen_symkey_par
     return (OPTIGA_LIB_SUCCESS);
 }
 #endif  // OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
+
+#if defined(OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) || defined(OPTIGA_CRYPT_RSA_SIGN_ENABLED)
+_STATIC_H void optiga_cmd_ecc_r_s_padding_check(uint8_t *sig, uint16_t *sig_len) {
+    OPTIGA_CMD_LOG_MESSAGE("Check r-/s-value padding.\n");
+    OPTIGA_CMD_LOG_HEX_DATA(sig, *sig_len);
+
+#ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
+    if ((sig == NULL) || (*sig_len < 2)) {
+        return;
+    }
+#endif  // OPTIGA_LIB_DEBUG_NULL_CHECK
+
+    uint16_t start_r = 0;
+    uint16_t start_s = sig[1] + 2;
+
+    if ((*sig_len < start_r + 3) || (*sig_len < start_s + 3)) {
+        return;
+    }
+
+    uint8_t delta_r =
+        ((sig[start_r] == 0x02) && (sig[start_r + 2] == 0x00) && (sig[start_r + 3] <= 0x7F));
+    uint8_t delta_s =
+        ((sig[start_s] == 0x02) && (sig[start_s + 2] == 0x00) && (sig[start_s + 3] <= 0x7F));
+
+    uint16_t len_r = sig[start_r + 1];
+    uint16_t len_s = sig[start_s + 1];
+
+    if ((delta_r == 0) && (delta_s == 0)) {
+        return;
+    }
+
+    if (delta_r) {
+        OPTIGA_CMD_LOG_MESSAGE("Check r-value.\n");
+        sig[start_r + 1] -= 1;  // Update r value length
+        *sig_len -= 1;  // Update overall signature length
+        memcpy(&sig[start_r + 2], &sig[start_r + 2 + delta_r], len_r - delta_r + 2);
+    }
+
+    if (delta_s) {
+        OPTIGA_CMD_LOG_MESSAGE("Check s-value.\n");
+        sig[start_s + 1 - delta_r] -= 1;  // Update s value length
+        *sig_len -= 1;  // Update overall signature length
+    }
+    memcpy(&sig[start_s + 2 - delta_r], &sig[start_s + 2 + delta_s], len_s - delta_s);
+
+    OPTIGA_CMD_LOG_HEX_DATA(sig, *sig_len);
+}
+#endif  // (OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) || defined(OPTIGA_CRYPT_RSA_SIGN_ENABLED)
 
 /**
  * @}

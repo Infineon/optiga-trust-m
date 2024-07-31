@@ -1,3 +1,12 @@
+## 5.1.0 (2024-07-29)
+* Improved signature encoding for secp521r1 signature
+* Improved logging output
+* Fixed race condition in pal_os_event callback in libusb PAL.
+* Added checks to signature padding check
+* Added default configuration for MBedTLS.
+* Removed warnings during library compilation
+* Resolved initialization fails when triggering reset.
+
 ## 5.0.1 (2024-05-21)
 * Fix to allow compilation using zephyr PAL.
 * Changes in README.md for host applications.
