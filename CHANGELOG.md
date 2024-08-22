@@ -1,16 +1,22 @@
+## 5.2.0 (2024-08-22)
+* Add shared memory pthread mutex for multi-process and multi-threads applications for Linux.
+* Improve pal_os_event logging.
+* Improve logging for Linux UART.
+* Improve logging for Windows UART.
+
 ## 5.1.0 (2024-07-29)
-* Improved signature encoding for secp521r1 signature
-* Improved logging output
+* Improved signature encoding for secp521r1 signature.
+* Improved logging output.
 * Fixed race condition in pal_os_event callback in libusb PAL.
-* Added checks to signature padding check
+* Added checks to signature padding check.
 * Added default configuration for MBedTLS.
-* Removed warnings during library compilation
+* Removed warnings during library compilation.
 * Resolved initialization fails when triggering reset.
 
 ## 5.0.1 (2024-05-21)
 * Fix to allow compilation using zephyr PAL.
 * Changes in README.md for host applications.
-* Added missing license headers
+* Added missing license headers.
 
 ## 5.0.0 (2024-04-10)
 * New folder structure.
