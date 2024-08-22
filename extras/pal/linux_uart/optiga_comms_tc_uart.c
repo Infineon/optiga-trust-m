@@ -36,16 +36,16 @@ static optiga_lib_status_t _optiga_comms_get_params(com_context_t *p_com_ctx, ch
         // Read configuration file
         pConfigFile = fopen(file_path, "r");
         if (NULL == pConfigFile) {
-            printf("\n!!!Unable to open %s\n", CONFIG_FILE_NAME);
+            printf("Error: Unable to open %s\n", CONFIG_FILE_NAME);
             break;
         }
 
         if (NULL == fgets(szConfig, sizeof(szConfig), pConfigFile)) {
-            printf("\n!!!Unable to read %s\n", CONFIG_FILE_NAME);
+            printf("Error: Unable to read %s\n", CONFIG_FILE_NAME);
             break;
         }
         string_length = strlen(szConfig);
-        // printf ("\nData read from %s", szConfig);
+        // printf ("Data read from %s\n", szConfig);
         strcpy((char *)p_com_ctx->com_port, szConfig);
         return_status = OPTIGA_COMMS_SUCCESS;
     } while (0);
@@ -136,7 +136,7 @@ static int open_serial_port(const char *device, uint32_t baud_rate) {
             cfsetospeed(&options, B115200);
             break;
         default:
-            fprintf(stderr, "warning: baud rate %u is not supported, using 9600.\n", baud_rate);
+            fprintf(stderr, "Warning: baud rate %u is not supported, using 9600.\n", baud_rate);
             cfsetospeed(&options, B9600);
             break;
     }
@@ -307,16 +307,14 @@ optiga_lib_status_t optiga_comms_transceive(
             tx_data_length + 8
         );
         if (number_of_bytes_written != (tx_data_length + 8)) {
-            printf("COM port write failed\n");
-            printf("Error is %d\n", number_of_bytes_written);
+            printf("Error: COM port write failed with error %02X\n", number_of_bytes_written);
             break;
         }
 
         number_of_bytes_written =
             read_port(((com_context_t *)p_ctx->p_comms_ctx)->fd, byte_of_data, 6);
         if (number_of_bytes_written != 6) {
-            printf("COM port read 1 failed\n");
-            fprintf(stderr, "%s\n", strerror(errno));
+            printf("Error: COM port read 1 failed with error %s\n", strerror(errno));
             break;
         }
 
@@ -325,17 +323,17 @@ optiga_lib_status_t optiga_comms_transceive(
             // If ok, calculate the expected packet
             *p_rx_data_len = (uint16_t)((byte_of_data[4] << 8) | (byte_of_data[5]));
         } else {
-            printf("No Start Sequence found\n");
+            printf("Error: No Start Sequence found.\n");
             break;
         }
 
         // Unpack data and return
         if (*p_rx_data_len == 0xffff) {
-            printf("Receive error\n");
+            printf("Error: Receive error\n");
             api_status = OPTIGA_COMMS_ERROR;
         } else {
             if (*p_rx_data_len > (MAX_TRANSMIT_FRAME_SIZE - 8)) {
-                printf("Receive error. Frame too big %02X\n", *p_rx_data_len);
+                printf("Error: Receive error. Frame too big: %02X\n", *p_rx_data_len);
                 break;
             }
 
@@ -346,8 +344,7 @@ optiga_lib_status_t optiga_comms_transceive(
                 *p_rx_data_len + 2
             );
             if (number_of_bytes_written != (*p_rx_data_len + 2)) {
-                printf("COM port read 2 failed\n");
-                fprintf(stderr, "%s\n", strerror(errno));
+                printf("Error: COM port read 2 failed with error %s\n", strerror(errno));
                 break;
             }
 
@@ -358,7 +355,7 @@ optiga_lib_status_t optiga_comms_transceive(
             )((byte_of_data[6 + *p_rx_data_len] << 8) | (byte_of_data[7 + *p_rx_data_len]));
             // Check whether the CRC is correct
             if (crc16 != calc_crc16(byte_of_data, *p_rx_data_len + 6)) {
-                printf("Receive error. Invalid CRC16\n");
+                printf("Error: Receive error. Invalid CRC16\n");
                 break;
             }
 
@@ -383,11 +380,11 @@ optiga_lib_status_t optiga_comms_close(optiga_comms_t *p_ctx) {
 
     do {
         if (NULL == p_ctx) {
-            printf("\n!!!optiga_comms_close invoked with NULL Pointer");
+            printf("Error: optiga_comms_close invoked with NULL Pointer.\n");
             break;
         }
 
-        printf("\nClose the %s port done", p_comm_context->com_port);
+        printf("Error: Closing the %s port done.\n", p_comm_context->com_port);
         close(p_comm_context->fd);
 
         if (p_comm_context->com_port) {

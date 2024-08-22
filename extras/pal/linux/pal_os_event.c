@@ -24,29 +24,26 @@
 
 #include "pal_os_timer.h"
 
-//#define TRUSTM_PAL_EVENT_DEBUG = 1
+//~ #define TRUSTM_PAL_EVENT_DEBUG  1
 
-#ifdef TRUSTM_PAL_EVENT_DEBUG
-
+#if TRUSTM_PAL_EVENT_DEBUG == 1
 #define TRUSTM_PAL_EVENT_DBG(x, ...) \
     fprintf(stderr, "%s:%d " x "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 #define TRUSTM_PAL_EVENT_DBGFN(x, ...) \
     fprintf(stderr, "%s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define TRUSTM_PAL_EVENT_ERRFN(x, ...) \
-    fprintf(stderr, "Error in %s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define TRUSTM_PAL_EVENT_MSGFN(x, ...) \
-    fprintf(stderr, "Message:%s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-
+#elif TRUSTM_PAL_EVENT_DEBUG == 2
+#define TRUSTM_PAL_EVENT_DBG(x, ...) Log("%s:%d " x "\n", "Log", __LINE__, ##__VA_ARGS__)
+#define TRUSTM_PAL_EVENT_DBGFN(x, ...) \
+    Log("%s:%d %s: " x "\n", "Log", __LINE__, __FUNCTION__, ##__VA_ARGS__)
 #else
-
 #define TRUSTM_PAL_EVENT_DBG(x, ...)
 #define TRUSTM_PAL_EVENT_DBGFN(x, ...)
+#endif
+
 #define TRUSTM_PAL_EVENT_ERRFN(x, ...) \
     fprintf(stderr, "Error in %s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
 #define TRUSTM_PAL_EVENT_MSGFN(x, ...) \
     fprintf(stderr, "Message:%s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-
-#endif
 
 #define CLOCKID CLOCK_REALTIME
 #define SIG SIGRTMIN

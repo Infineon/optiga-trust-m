@@ -35,6 +35,7 @@ set(PAL_LINUX_FILES
     ${PROJECT_SOURCE_DIR}/../extras/pal/linux/pal_os_lock.c
     ${PROJECT_SOURCE_DIR}/../extras/pal/linux/pal_os_memory.c
     ${PROJECT_SOURCE_DIR}/../extras/pal/linux/pal_os_timer.c
+    ${PROJECT_SOURCE_DIR}/../extras/pal/linux/pal_shared_mutex.c
     ${PROJECT_SOURCE_DIR}/../extras/pal/linux/pal.c
 )
 aux_source_directory(${PROJECT_SOURCE_DIR}/../extras/pal/linux/target/rpi3 PAL_LINUX_RPI_FILES)

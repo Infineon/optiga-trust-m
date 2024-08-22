@@ -14,6 +14,8 @@
 
 #include "pal_os_lock.h"
 
+#include "include/pal_shared_mutex.h"
+shared_mutex_t trustm_mutex;
 void pal_os_lock_create(pal_os_lock_t *p_lock, uint8_t lock_type) {
     p_lock->type = lock_type;
     p_lock->lock = 0;
@@ -25,21 +27,15 @@ void pal_os_lock_destroy(pal_os_lock_t *p_lock) {}
 
 pal_status_t pal_os_lock_acquire(pal_os_lock_t *p_lock) {
     pal_status_t return_status = PAL_STATUS_FAILURE;
-
-    if (!(p_lock->lock)) {
-        p_lock->lock++;
-        if (1 != p_lock->lock) {
-            p_lock->lock--;
-        }
-        return_status = PAL_STATUS_SUCCESS;
-    }
+    return_status = pal_shm_mutex_acquire(&trustm_mutex, "/trustm-mutex");
+    if (return_status == PAL_STATUS_SUCCESS)
+        p_lock->lock = 1;
     return return_status;
 }
 
 void pal_os_lock_release(pal_os_lock_t *p_lock) {
-    if (0 != p_lock->lock) {
-        p_lock->lock--;
-    }
+    pal_shm_mutex_release(&trustm_mutex);
+    p_lock->lock = 0;
 }
 
 void pal_os_lock_enter_critical_section() {}

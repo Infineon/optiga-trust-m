@@ -34,12 +34,12 @@ static optiga_lib_status_t _optiga_comms_get_params(com_context_t *p_com_ctx, ch
         //Read configuration file
         pConfigFile = fopen(file_path, "r");
         if (NULL == pConfigFile) {
-            printf("\n!!!Unable to open %s\n", CONFIG_FILE_NAME);
+            printf("Unable to open %s\n", CONFIG_FILE_NAME);
             break;
         }
 
         if (NULL == fgets(szConfig, sizeof(szConfig), pConfigFile)) {
-            printf("\n!!!Unable to read %s\n", CONFIG_FILE_NAME);
+            printf("Unable to read %s\n", CONFIG_FILE_NAME);
             break;
         }
         string_length = strlen(szConfig);
@@ -144,7 +144,7 @@ optiga_lib_status_t optiga_comms_open(optiga_comms_t *p_ctx) {
     );
     if (INVALID_HANDLE_VALUE == p_comms_context->com_handle) {
         last_error = GetLastError();
-        printf("\n!!!Error in opening serial port : %d", last_error);
+        printf("Error in opening serial port: %02X\n", last_error);
     } else {
         dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
         GetCommState(p_comms_context->com_handle, &dcbSerialParams);
@@ -202,8 +202,7 @@ static int ReadFileAll(HANDLE com_handle, uint8_t *buffer, size_t size) {
     while (received < size) {
         bool_status = ReadFile(com_handle, buffer, (DWORD)size, (LPDWORD)&NoBytesRead, NULL);
         if (0 == bool_status) {
-            printf("COM port read failed\n");
-            printf("Error is %d", GetLastError());
+            printf("COM port read failed with error: %02X\n", GetLastError());
             received = 0;
             break;
         }
@@ -283,16 +282,14 @@ optiga_lib_status_t optiga_comms_transceive(
             NULL
         );
         if (0 == bool_status) {
-            printf("COM port write failed\n");
-            printf("Error is %d", GetLastError());
+            printf("COM port write failed with error: %02X\n", GetLastError());
             break;
         }
 
         // Receive at first only the start sequence and the length
         NoBytesRead = ReadFileAll(COMM_CTX->com_handle, &byte_of_data[0], 6);
         if (0 == NoBytesRead) {
-            printf("COM port read failed\n");
-            printf("Error is %d", GetLastError());
+            printf("COM port read failed with error: %02X\n", GetLastError());
             break;
         }
 
@@ -318,8 +315,7 @@ optiga_lib_status_t optiga_comms_transceive(
             // receive the rest of the message using the calculated packet size + 2 bytes for the crc16
             NoBytesRead = ReadFileAll(COMM_CTX->com_handle, &byte_of_data[6], *p_rx_data_len + 2);
             if (0 == NoBytesRead) {
-                printf("COM port read failed\n");
-                printf("Error is %d\n", GetLastError());
+                printf("COM port read failed with error %02X\n", GetLastError());
                 break;
             }
 
@@ -355,15 +351,15 @@ optiga_lib_status_t optiga_comms_close(optiga_comms_t *p_ctx) {
 
     do {
         if (NULL == p_ctx) {
-            printf("\n!!!optiga_comms_close invoked with NULL Pointer");
+            printf("Error: optiga_comms_close invoked with NULL Pointer");
             break;
         }
         if (p_comm_context->com_handle) {
-            printf("\nClose the %s port done", p_comm_context->com_port);
+            printf("Closing the %s port done.\n", p_comm_context->com_port);
             CloseHandle(p_comm_context->com_handle);
             p_comm_context->com_handle = 0x00;
         } else {
-            printf("\n!!! COM Port handle invalid");
+            printf("Error: COM Port handle invalid\n");
         }
 
         if (p_comm_context->com_port) {
