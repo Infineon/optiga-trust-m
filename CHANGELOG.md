@@ -1,3 +1,6 @@
+## 5.3.0 (2024-08-28)
+* Add options for default configuration for MBEDTLS.
+
 ## 5.2.0 (2024-08-22)
 * Add shared memory pthread mutex for multi-process and multi-threads applications for Linux.
 * Improve pal_os_event logging.
