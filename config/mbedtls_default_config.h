@@ -1392,7 +1392,7 @@
  *
  * This module is required for X.509 CRL parsing.
  */
-#undef MBEDTLS_X509_CRL_PARSE_C
+#define MBEDTLS_X509_CRL_PARSE_C
 
 /**
  * \def MBEDTLS_X509_CSR_PARSE_C

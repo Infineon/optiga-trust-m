@@ -33,7 +33,7 @@ void pal_crypt_version_unit_test() {
     ut_pal_status = pal_crypt_version(ut_crypt_lib_version_info, &ut_crypt_lib_version_info_len);
     assert(ut_pal_status == PAL_STATUS_SUCCESS);
     assert(ut_crypt_lib_version_info_len == (uint8_t)strlen(MBEDTLS_VERSION_STRING));
-    assert(strcmp((char *)ut_crypt_lib_version_info, (char *)MBEDTLS_VERSION_STRING) == 0);
+    assert(strcmp((const char *)ut_crypt_lib_version_info, MBEDTLS_VERSION_STRING) == 0);
 
     /* pal_crypt_version check
      * if length is wrong status should be failure
