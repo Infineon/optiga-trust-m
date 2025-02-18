@@ -38,7 +38,6 @@
 
 #include "optiga/pal/pal.h"
 #include "optiga/pal/pal_gpio.h"
-#include "optiga/pal/pal_i2c.h"
 #include "optiga/pal/pal_os_event.h"
 #include "optiga/pal/pal_os_timer.h"
 #include "pal_psoc_gpio_mapping.h"
@@ -55,9 +54,6 @@ extern pal_gpio_t optiga_reset_0;
 
 pal_status_t pal_init(void)
 {
-    // This function call is used to create a semaphore outside of the ISR
-    pal_i2c_init(NULL);
-
     #ifdef OPTIGA_TRUSTM_VDD
     pal_gpio_init(&optiga_vdd_0);
     #endif
@@ -65,14 +61,13 @@ pal_status_t pal_init(void)
     #ifdef OPTIGA_TRUSTM_RST
     pal_gpio_init(&optiga_reset_0);
     #endif
+    pal_timer_init();
     return PAL_STATUS_SUCCESS;
 }
 
 
 pal_status_t pal_deinit(void)
 {
-    // This function call is used to destroy a semaphore outside of the ISR
-    pal_i2c_deinit(NULL);
     return PAL_STATUS_SUCCESS;
 }
 

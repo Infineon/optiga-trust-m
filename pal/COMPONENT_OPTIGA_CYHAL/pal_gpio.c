@@ -50,7 +50,7 @@ pal_status_t pal_gpio_init(const pal_gpio_t * p_gpio_context)
 {
     pal_status_t cy_hal_status = PAL_STATUS_SUCCESS;
     pal_psoc_gpio_t* pin_config = (pal_psoc_gpio_t *)p_gpio_context->p_gpio_hw;
-    cy_hal_status = cyhal_gpio_init(pin_config->gpio,
+    cy_hal_status = cyhal_gpio_init(pin_config->port_num,
                                        CYHAL_GPIO_DIR_OUTPUT, 
                                        CYHAL_GPIO_DRIVE_STRONG, 
                                        pin_config->init_state);
@@ -66,7 +66,7 @@ pal_status_t pal_gpio_init(const pal_gpio_t * p_gpio_context)
 pal_status_t pal_gpio_deinit(const pal_gpio_t * p_gpio_context)
 {
     pal_psoc_gpio_t* pin_config = (pal_psoc_gpio_t *)p_gpio_context->p_gpio_hw;
-    cyhal_gpio_free(pin_config->gpio);
+    cyhal_gpio_free(pin_config->port_num);
     return (PAL_STATUS_SUCCESS);
 }
 
@@ -75,7 +75,7 @@ void pal_gpio_set_high(const pal_gpio_t * p_gpio_context)
     if ((p_gpio_context != NULL) && (p_gpio_context->p_gpio_hw != NULL))
     {
         pal_psoc_gpio_t* pin_config = (pal_psoc_gpio_t *)p_gpio_context->p_gpio_hw;
-        cyhal_gpio_write((cyhal_gpio_t)(pin_config->gpio), true);
+        cyhal_gpio_write(pin_config->port_num, true);
     }
 }
 
@@ -84,7 +84,7 @@ void pal_gpio_set_low(const pal_gpio_t * p_gpio_context)
     if ((p_gpio_context != NULL) && (p_gpio_context->p_gpio_hw != NULL))
     {
         pal_psoc_gpio_t* pin_config = (pal_psoc_gpio_t *)p_gpio_context->p_gpio_hw;
-        cyhal_gpio_write((cyhal_gpio_t)(pin_config->gpio), false);
+        cyhal_gpio_write(pin_config->port_num, false);
     }
 }
 

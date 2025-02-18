@@ -26,43 +26,43 @@
 *
 * \author Infineon Technologies AG
 *
-* \file pal_psoc_gpio_mapping.h
+* \file pal_psoc_i2c_mapping.h
 *
-* \brief   This file provides the PSOC specific gpio pin mapping.
+* \brief   This file provides the PSOC specific I2C pin mapping.
 *
 * \ingroup  grPAL
 *
 * @{
 */
 
-#ifndef PAL_PSOC_GPIO_MAPPING
-#define PAL_PSOC_GPIO_MAPPING
+#ifndef PAL_PSOC_I2C_MAPPING
+#define PAL_PSOC_I2C_MAPPING
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "pal.h"
 #include "cyhal.h"
 
+#include "pal.h"
+#include "cyhal_i2c.h"
 /**
  * \brief Structure defines PSOC6 gpio pin configuration.
  */
-typedef struct pal_psoc_gpio
+typedef struct pal_psoc_i2c
 {
-    cyhal_gpio_t  gpio;
-    bool_t        init_state;
-
-} pal_psoc_gpio_t;
+    cyhal_i2c_t *     i2c_master_channel;
+    cyhal_gpio_t      sda_port_num;
+    cyhal_gpio_t      sca_port_num;
+}   pal_psoc_i2c_t;
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PAL_PSOC_GPIO_MAPPING */
+#endif /* PAL_PSOC_I2C_MAPPING */
 
 /**
 * @}
 */
-
