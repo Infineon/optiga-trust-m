@@ -1,3 +1,10 @@
+## 5.4.0 (2025-08-12)
+* Added support for MbedTLS 3.6
+* Migrate to REUSE for license management.
+* fix warning issues.
+* Added multiple cmake files for different purposes.
+* changes to the documentation.
+
 ## 5.3.0 (2024-08-28)
 * Add options for default configuration for MBEDTLS.
 

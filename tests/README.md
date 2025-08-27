@@ -7,9 +7,27 @@ To run the tests, in a console, run the following commands :
 
 1- Navigate to your OPTIGA&trade; Trust M repository folder.
 
-2- Execute the CMakefile.txt present in this folder :
+2- The Host library support a range of platforms for which the library can be used. To execute the CMakefile.txt present in this folder, use the following commands :
 
-    cmake -S tests/ -B ./build
+    a) I2C Interface over Linux : cmake -S tests -B build -DBUILD_RPI_I2C=ON
+
+    b) Test Interface over Linux : cmake -S tests -B build
+
+    c) UART Interface over Linux : cmake -S tests -B build -DBUILD_RPI_UART=ON
+
+    d) LIBUSB on Linux : cmake -S tests -B build -DBUILD_LIBUSB=ON
+
+For MbedTLS 3.x, same commands plus -DBUILD_MBEDTLS_3=ON :
+
+    a) I2C Interface over Linux : cmake -S tests -B build -DBUILD_RPI_I2C=ON -DBUILD_MBEDTLS_3=ON
+
+    b) Test Interface over Linux : cmake -S tests -B build -DBUILD_MBEDTLS_3=ON
+
+    c) UART Interface over Linux : cmake -S tests -B build -DBUILD_RPI_UART=ON -DBUILD_MBEDTLS_3=ON
+
+    d) LIBUSB on Linux : cmake -S tests -B build -DBUILD_LIBUSB=ON -DBUILD_MBEDTLS_3=ON
+
+Other options can be added to this cmake, which is the version of MbedTLS to be used. by default it is MbedTLS2, if MbedTLS3 is desired, please add the following define to the previous command : -DBUILD_MBEDTLS_3=ON
 
 3- Execute the Makefile :
 

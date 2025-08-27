@@ -281,7 +281,7 @@ pal_status_t pal_crypt_version(uint8_t *p_crypt_lib_version_info, uint16_t *leng
             break;
         }
 
-        pal_os_memcpy(p_crypt_lib_version_info, MBEDTLS_VERSION_STRING, sizeof_version_number);
+        strcpy((char *)p_crypt_lib_version_info, MBEDTLS_VERSION_STRING);
         *length = sizeof_version_number;
 
         return_value = PAL_STATUS_SUCCESS;

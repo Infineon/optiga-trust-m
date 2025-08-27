@@ -60,7 +60,7 @@ pal_status_t pal_init(void) {
     do {
         if (hw_initialised == 0) {
             if (libusb_init(NULL)) {
-                LOG_PAL("%sFailed to init LibUSB\n", OPTIGA_PAL_LAYER);
+                LOG_PAL("%sFailed to init libusb\n", OPTIGA_PAL_LAYER);
                 break;
             }
 
@@ -114,7 +114,7 @@ pal_status_t pal_init(void) {
                 break;
             }
 
-            LOG_PAL("%sLibUSB PAL initialised\n", OPTIGA_PAL_LAYER);
+            LOG_PAL("%libusb PAL initialised\n", OPTIGA_PAL_LAYER);
 
             ret = PAL_STATUS_SUCCESS;
             hw_initialised = 1;

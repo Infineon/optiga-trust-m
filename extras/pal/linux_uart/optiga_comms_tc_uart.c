@@ -23,11 +23,9 @@ com_context_t com_context = {0};
 static optiga_lib_status_t _optiga_comms_get_params(com_context_t *p_com_ctx, char *path) {
     optiga_lib_status_t return_status = OPTIGA_COMMS_ERROR;
     FILE *pConfigFile = NULL;
-    uint8_t string_length;
     char file_path[1000];
     char szConfig[50];
     char *file_name = CONFIG_FILE_NAME;
-    char comport[20];
 
     do {
         // read xml file from current location
@@ -44,7 +42,6 @@ static optiga_lib_status_t _optiga_comms_get_params(com_context_t *p_com_ctx, ch
             printf("Error: Unable to read %s\n", CONFIG_FILE_NAME);
             break;
         }
-        string_length = strlen(szConfig);
         // printf ("Data read from %s\n", szConfig);
         strcpy((char *)p_com_ctx->com_port, szConfig);
         return_status = OPTIGA_COMMS_SUCCESS;
@@ -53,6 +50,8 @@ static optiga_lib_status_t _optiga_comms_get_params(com_context_t *p_com_ctx, ch
     if (NULL != pConfigFile) {
         fclose(pConfigFile);
     }
+
+    return return_status;
 }
 
 optiga_lib_status_t
@@ -219,7 +218,6 @@ static ssize_t read_port(int fd, uint8_t *buffer, size_t size) {
  */
 optiga_lib_status_t optiga_comms_open(optiga_comms_t *p_ctx) {
     com_context_t *p_comms_context = (com_context_t *)(p_ctx->p_comms_ctx);
-    optiga_lib_status_t api_status = OPTIGA_COMMS_ERROR;
 
     p_comms_context->com_port = (char *)calloc(15, 1);
     _optiga_comms_get_params((com_context_t *)p_ctx->p_comms_ctx, "");
@@ -275,12 +273,8 @@ optiga_lib_status_t optiga_comms_transceive(
     optiga_lib_status_t api_status = OPTIGA_COMMS_ERROR;
     uint32_t number_of_bytes_written = 0;
     uint8_t byte_of_data[MAX_TRANSMIT_FRAME_SIZE] = {0};
-    uint32_t NoBytesRead;
-    uint32_t index = 0;
-    uint8_t failure_status[] = {0xff, 0xff};
     uint8_t max_transmit_frame[MAX_TRANSMIT_FRAME_SIZE];
     uint16_t crc16 = 0x0000;
-    ;
     uint8_t start_seq[] = {0xbe, 0xef, 0xde, 0xad};
 
     do {

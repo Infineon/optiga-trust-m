@@ -23,7 +23,9 @@ extern "C" {
 #include "optiga_lib_config.h"
 
 /// Determines the minimum of two values
+#ifndef MIN
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#endif
 
 /** @brief For hash input as start */
 #define OPTIGA_CRYPT_HASH_START (0x00)

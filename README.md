@@ -44,7 +44,15 @@ Examples to demonstrate basic functionality of the security chip can be found [h
 
 ### Configuring Mbed TLS library
 
-The OPTIGA&trade; Trust M Host Library for C relies on Mbed TLS. This library is cloned from a submodule under [external/mbedtls](external/mbedtls/) folder. It comes with a default configuration that needs to be modified to the application purpose. Under [config/mbedtls_default_config.h](config/mbedtls_default_config.h) a default configuration is provided and should be changed depending on need.
+The OPTIGA&trade; Trust M Host Library for C relies on Mbed TLS.
+
+The OPTIGA&trade; Trust M Host Library for C supports both MbedTLS 2.x and MbedTLS 3.x, the later will be referred to as "mbedtls-3.x".
+
+This library is cloned from a submodule under [external/mbedtls](external/mbedtls/) for Mbedtls 2.x and [external/mbedtls-3.x](external/mbedtls-3.x/) for MbedTLS 3.x folder. It comes with a default configuration that needs to be modified to the application purpose. 
+
+Under [config/mbedtls_default_config.h](config/mbedtls_default_config.h) a default configuration for MbedTLS 2.x is provided and should be changed depending on need.
+
+Under [config/mbedtls_3.x_default_config.h](config/mbedtls_3.x_default_config.h) a default configuration for MbedTLS 3.x is provided and should be changed depending on need.
 
 During compilation, the following define needs to be added:
 
@@ -52,17 +60,29 @@ During compilation, the following define needs to be added:
 ```
 MBEDTLS_USER_CONFIG_FILE="config/mbedtls_default_config.h"
 ```
+or
+```
+MBEDTLS_USER_CONFIG_FILE="config/mbedtls_3.x_default_config.h"
+```
 
 for Makefile :
 
 ```
 -DMBEDTLS_USER_CONFIG_FILE="config/mbedtls_default_config.h"
 ```
+or
+```
+-DMBEDTLS_USER_CONFIG_FILE="config/mbedtls_3.x_default_config.h"
+```
 
 for CMake :
 
 ```
 target_compile_definitions(app PRIVATE MBEDTLS_USER_CONFIG_FILE="${CMAKE_CURRENT_SOURCE_DIR}/config/mbedtls_user_config.h")
+```
+or
+```
+target_compile_definitions(app PRIVATE MBEDTLS_USER_CONFIG_FILE="${CMAKE_CURRENT_SOURCE_DIR}/config/mbedtls_3.x_user_config.h")
 ```
 
 ## Host library overview

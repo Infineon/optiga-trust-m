@@ -103,11 +103,9 @@ static int GPIOWrite(pal_linux_gpio_t *pin, int value) {
     return (0);
 }
 
-#define GPIO_VALUE_FMT_STR "/sys/class/gpio/gpio%d/value"
-
 // lint --e{714,715} suppress "This function is used for to support multiple platforms "
 pal_status_t pal_gpio_init(const pal_gpio_t *p_gpio_context) {
-#define VALUE_MAX 30
+#define VALUE_MAX 32
     char path[VALUE_MAX] = {0};
 
     if (p_gpio_context->p_gpio_hw != NULL) {
@@ -126,7 +124,7 @@ pal_status_t pal_gpio_init(const pal_gpio_t *p_gpio_context) {
         if (-1 == GPIODirection(res_pin, OUT))
             return (2);
 
-        snprintf(path, VALUE_MAX, GPIO_VALUE_FMT_STR, res_pin);
+        snprintf(path, VALUE_MAX, "/sys/class/gpio/gpio%d/value", res_pin);
         int fd = open(path, O_WRONLY);
         if (fd < 0) {
             fprintf(stderr, "Failed to open gpio value for writing!\n");

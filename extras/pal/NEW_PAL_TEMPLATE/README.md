@@ -273,3 +273,9 @@ int32_t main(void)
     return return_value;
 }
 ```
+
+## Adding your own Cmake to the CmakeLists.txt
+
+Folders in [extras/pal](..) like [libusb](../libusb), [linux](../linux), [linux_uart](../linux_uart), [test_pal](../test_pal) already contain predefined .cmake files that would allow successful compilation. If a new PAL is introduced, a .cmake file can be created to include the files to be compiled and then a line needs to be added in the [CMakeFiles.txt](../../../tests/CMakeLists.txt) in order to use it :
+
+include(${PROJECT_SOURCE_DIR}/../extras/pal/new_pal/new_pal.cmake)

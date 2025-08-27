@@ -196,7 +196,7 @@ optiga_lib_status_t optiga_comms_reset(optiga_comms_t *p_ctx, uint8_t reset_type
 * \retval  Length of the message
 */
 static int ReadFileAll(HANDLE com_handle, uint8_t *buffer, size_t size) {
-    int received = 0;
+    size_t received = 0;
     BOOL bool_status;
     int NoBytesRead;
     while (received < size) {

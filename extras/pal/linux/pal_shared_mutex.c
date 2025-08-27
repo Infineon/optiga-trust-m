@@ -123,7 +123,7 @@ static int shared_mutex_close(shared_mutex_t mutex) {
     return 0;
 }
 
-static int shared_mutex_destroy(shared_mutex_t mutex) {
+__attribute__((unused)) static int shared_mutex_destroy(shared_mutex_t mutex) {
     if ((errno = pthread_mutex_destroy(mutex.ptr))) {
         perror("pthread_mutex_destroy");
         return -1;
