@@ -1623,7 +1623,7 @@ optiga_cmd_create(uint8_t optiga_instance_id, callback_handler_t handler, void *
 }
 
 optiga_lib_status_t optiga_cmd_destroy(optiga_cmd_t *me) {
-    optiga_lib_status_t return_status = OPTIGA_CMD_ERROR;
+    optiga_lib_status_t return_status = OPTIGA_LIB_SUCCESS;
 
     pal_os_lock_enter_critical_section();
     do {

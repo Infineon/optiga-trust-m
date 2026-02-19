@@ -27,6 +27,7 @@
 #define HIGH 1
 
 static int GPIOWrite(pal_linux_gpio_gpiod_t *pin, int value) {
+#if defined(LIBGPIOD_V1)
     int ret = 0;
     ret = gpiod_ctxless_set_value(
         pin->gpio_device,
@@ -46,6 +47,76 @@ static int GPIOWrite(pal_linux_gpio_gpiod_t *pin, int value) {
     }
 
     return 0;
+#else
+    struct gpiod_chip *chip = NULL;
+    struct gpiod_line_settings *settings = NULL;
+    struct gpiod_line_config *line_cfg = NULL;
+    struct gpiod_request_config *req_cfg = NULL;
+    struct gpiod_line_request *request = NULL;
+    unsigned int offset;
+    int ret = -1;
+
+    offset = (unsigned int)pin->gpio_device_offset;
+
+    chip = gpiod_chip_open(pin->gpio_device);
+    if (!chip) {
+        fprintf(stderr, "Failed to open chip %s: %s\n", pin->gpio_device, strerror(errno));
+        goto cleanup;
+    }
+
+    settings = gpiod_line_settings_new();
+    if (!settings) {
+        goto cleanup;
+    }
+
+    gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_OUTPUT);
+    gpiod_line_settings_set_output_value(
+        settings,
+        value ? GPIOD_LINE_VALUE_ACTIVE : GPIOD_LINE_VALUE_INACTIVE
+    );
+
+    line_cfg = gpiod_line_config_new();
+    if (!line_cfg) {
+        goto cleanup;
+    }
+
+    if (gpiod_line_config_add_line_settings(line_cfg, &offset, 1, settings) < 0) {
+        fprintf(stderr, "add_line_settings failed: %s\n", strerror(errno));
+        goto cleanup;
+    }
+    req_cfg = gpiod_request_config_new();
+    if (!req_cfg) {
+        goto cleanup;
+    }
+
+    gpiod_request_config_set_consumer(req_cfg, "trustm");
+
+    request = gpiod_chip_request_lines(chip, req_cfg, line_cfg);
+    if (!request) {
+        fprintf(
+            stderr,
+            "Request_lines failed (dev=%s offset=%u): %s\n",
+            pin->gpio_device,
+            offset,
+            strerror(errno)
+        );
+        goto cleanup;
+    }
+    ret = 0;
+cleanup:
+    if (request)
+        gpiod_line_request_release(request);
+    if (settings)
+        gpiod_line_settings_free(settings);
+    if (line_cfg)
+        gpiod_line_config_free(line_cfg);
+    if (req_cfg)
+        gpiod_request_config_free(req_cfg);
+    if (chip)
+        gpiod_chip_close(chip);
+    return ret;
+
+#endif
 }
 
 // lint --e{714,715} suppress "This function is used for to support multiple platforms "

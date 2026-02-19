@@ -749,7 +749,7 @@ optiga_crypt_create(uint8_t optiga_instance_id, callback_handler_t handler, void
 }
 
 optiga_lib_status_t optiga_crypt_destroy(optiga_crypt_t *me) {
-    optiga_lib_status_t return_value;
+    optiga_lib_status_t return_value = OPTIGA_LIB_SUCCESS;
 
     do {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
@@ -758,10 +758,6 @@ optiga_lib_status_t optiga_crypt_destroy(optiga_crypt_t *me) {
             break;
         }
 #endif
-        if (OPTIGA_LIB_INSTANCE_BUSY == me->instance_state) {
-            return_value = OPTIGA_CRYPT_ERROR_INSTANCE_IN_USE;
-            break;
-        }
         return_value = optiga_cmd_destroy(me->my_cmd);
         pal_os_free(me);
 

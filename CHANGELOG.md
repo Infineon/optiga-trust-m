@@ -1,3 +1,8 @@
+## 5.5.0 (2026-02-19)
+* Updated pal_os_event for Linux pal layer.
+* Added robust thread management to use and control timers during events.
+* Added support for libgpiod version 2.2.
+
 ## 5.4.0 (2025-08-12)
 * Added support for MbedTLS 3.6
 * Migrate to REUSE for license management.
