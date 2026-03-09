@@ -147,7 +147,7 @@ void pal_os_event_disarm(void) {
         if (wait_for_timer_ready_locked(50) != 0) {
             TRUSTM_PAL_EVENT_ERRFN(
                 "pal_os_event_disarm: timer not ready (timeout), state=%d",
-                g_pal_os_event_timer.state
+                (int)g_pal_os_event_timer.state
             );
             pthread_mutex_unlock(&g_pal_os_event_timer.lock);
             return;
@@ -186,7 +186,7 @@ void pal_os_event_arm(void) {
         if (wait_for_timer_ready_locked(50) != 0) {
             TRUSTM_PAL_EVENT_ERRFN(
                 "pal_os_event_arm: timer not ready (timeout), state=%d",
-                g_pal_os_event_timer.state
+                (int)g_pal_os_event_timer.state
             );
             pthread_mutex_unlock(&g_pal_os_event_timer.lock);
             return;
@@ -288,7 +288,7 @@ void pal_os_event_register_callback_oneshot(
         if (wait_for_timer_ready_locked(50 /* ms */) != 0) {
             TRUSTM_PAL_EVENT_ERRFN(
                 "oneshot: timer not ready (timeout), state=%d",
-                g_pal_os_event_timer.state
+                (int)g_pal_os_event_timer.state
             );
             pthread_mutex_unlock(&g_pal_os_event_timer.lock);
             return;
@@ -333,7 +333,7 @@ void pal_os_event_destroy1(void) {
     } else {
         TRUSTM_PAL_EVENT_ERRFN(
             "pal_os_event_destroy1: timer not READY (state=%d)",
-            g_pal_os_event_timer.state
+            (int)g_pal_os_event_timer.state
         );
     }
     pthread_mutex_unlock(&g_pal_os_event_timer.lock);
@@ -364,7 +364,7 @@ void pal_os_event_destroy(pal_os_event_t *pal_os_event) {
     } else {
         TRUSTM_PAL_EVENT_ERRFN(
             "pal_os_event_destroy: timer not READY (state=%d)",
-            g_pal_os_event_timer.state
+            (int)g_pal_os_event_timer.state
         );
     }
     pthread_mutex_unlock(&g_pal_os_event_timer.lock);

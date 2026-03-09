@@ -1,3 +1,6 @@
+## 5.6.0 (2026-03-05)
+* Updated pal_os_event for Linux pal layer to fix Cross-compilation issue for ARMv7.
+
 ## 5.5.0 (2026-02-19)
 * Updated pal_os_event for Linux pal layer.
 * Added robust thread management to use and control timers during events.
