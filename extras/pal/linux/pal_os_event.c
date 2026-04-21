@@ -41,6 +41,13 @@
 #define TRUSTM_PAL_EVENT_DBGFN(x, ...)
 #endif
 
+#ifndef TRUSTM_LINUX_TIMER_WAIT
+/*
+ * Wait time (in ms) before checking the status of the timer
+ */
+#define TRUSTM_LINUX_TIMER_WAIT 1
+#endif /* TRUSTM_LINUX_TIMER_WAIT */
+
 #define TRUSTM_PAL_EVENT_ERRFN(x, ...) \
     fprintf(stderr, "Error in %s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
 #define TRUSTM_PAL_EVENT_MSGFN(x, ...) \
@@ -68,10 +75,15 @@ static pal_os_event_timer_t g_pal_os_event_timer = {
     .timer_valid = 0,
     .state = TIMER_UNINIT};
 
+/* Return codes for wait_for_timer_ready_locked */
+#define TIMER_RC_READY 0 /* timer is ready */
+#define TIMER_RC_DESTROYED -1 /* timer was destroyed */
+#define TIMER_RC_TIMEOUT -2 /* unexpected timeout */
+
 static int wait_for_timer_ready_locked(long timeout_ms) {
     struct timespec abstime;
     if (clock_gettime(CLOCK_REALTIME, &abstime) != 0) {
-        return -1;
+        return TIMER_RC_TIMEOUT;
     }
     const long sec = timeout_ms / 1000;
     const long nsec_add = (timeout_ms % 1000) * 1000000L;
@@ -83,31 +95,34 @@ static int wait_for_timer_ready_locked(long timeout_ms) {
     }
 
     while (g_pal_os_event_timer.state != TIMER_READY) {
+        /*
+         * TIMER_UNINIT means the timer was either:
+         * - destroyed (normal at session shutdown), or
+         * - never created
+         *
+         * No thread will signal this condvar, so return immediately.
+         */
+        if (g_pal_os_event_timer.state == TIMER_UNINIT) {
+            return TIMER_RC_DESTROYED;
+        }
         int rc = pthread_cond_timedwait(
             &g_pal_os_event_timer.cond,
             &g_pal_os_event_timer.lock,
             &abstime
         );
         if (rc == ETIMEDOUT) {
-            return -1; /* timed out */
+            return TIMER_RC_TIMEOUT;
         } else if (rc != 0) {
-            return -1; /* other error */
+            return TIMER_RC_TIMEOUT;
         }
     }
-    return 0;
+    return TIMER_RC_READY;
 }
 
 static void timer_thread_func(union sigval sv) {
     (void)sv;
-    register_callback cb = NULL;
 
-    /* Fetch and clear the registered callback */
-    cb = pal_os_event_0.callback_registered;
-    pal_os_event_0.callback_registered = NULL;
-
-    if (cb) {
-        cb((void *)pal_os_event_0.callback_ctx);
-    }
+    pal_os_event_trigger_registered_callback();
 }
 
 void pal_os_event_start(
@@ -132,6 +147,7 @@ void pal_os_event_stop(pal_os_event_t *p_pal_os_event) {
 
 void pal_os_event_disarm(void) {
     struct itimerspec its;
+    int ret;
     memset(&its, 0, sizeof(its));
 
     TRUSTM_PAL_EVENT_DBGFN(">");
@@ -144,11 +160,14 @@ void pal_os_event_disarm(void) {
     pthread_mutex_lock(&g_pal_os_event_timer.lock);
 
     if (g_pal_os_event_timer.state != TIMER_READY) {
-        if (wait_for_timer_ready_locked(50) != 0) {
+        ret = wait_for_timer_ready_locked(TRUSTM_LINUX_TIMER_WAIT);
+        if (ret == TIMER_RC_TIMEOUT) {
             TRUSTM_PAL_EVENT_ERRFN(
                 "pal_os_event_disarm: timer not ready (timeout), state=%d",
                 (int)g_pal_os_event_timer.state
             );
+        }
+        if (ret != TIMER_RC_READY) {
             pthread_mutex_unlock(&g_pal_os_event_timer.lock);
             return;
         }
@@ -171,6 +190,7 @@ void pal_os_event_disarm(void) {
 
 void pal_os_event_arm(void) {
     struct itimerspec its;
+    int ret;
     memset(&its, 0, sizeof(its));
 
     TRUSTM_PAL_EVENT_DBGFN(">");
@@ -183,11 +203,14 @@ void pal_os_event_arm(void) {
     pthread_mutex_lock(&g_pal_os_event_timer.lock);
 
     if (g_pal_os_event_timer.state != TIMER_READY) {
-        if (wait_for_timer_ready_locked(50) != 0) {
+        ret = wait_for_timer_ready_locked(TRUSTM_LINUX_TIMER_WAIT);
+        if (ret == TIMER_RC_TIMEOUT) {
             TRUSTM_PAL_EVENT_ERRFN(
                 "pal_os_event_arm: timer not ready (timeout), state=%d",
                 (int)g_pal_os_event_timer.state
             );
+        }
+        if (ret != TIMER_RC_READY) {
             pthread_mutex_unlock(&g_pal_os_event_timer.lock);
             return;
         }
@@ -248,11 +271,25 @@ pal_os_event_t *pal_os_event_create(register_callback callback, void *callback_a
 
 void pal_os_event_trigger_registered_callback(void) {
     register_callback callback;
+    void *ctx;
 
-    if (pal_os_event_0.callback_registered) {
-        callback = pal_os_event_0.callback_registered;
-        pal_os_event_0.callback_registered = NULL;
-        callback((void *)pal_os_event_0.callback_ctx);
+    /*
+     * Snapshot and clear both fields under the lock to prevent a TOCTOU race
+     * with concurrent register_callback_oneshot calls.
+     *
+     * The lock must be released before invoking cb() because callback
+     * `optiga_cmd_queue_scheduler()` sets the timer via
+     * `pal_os_event_register_callback_oneshot`
+     */
+    pthread_mutex_lock(&g_pal_os_event_timer.lock);
+    callback = pal_os_event_0.callback_registered;
+    ctx = pal_os_event_0.callback_ctx;
+    pal_os_event_0.callback_registered = NULL;
+    pal_os_event_0.callback_ctx = NULL;
+    pthread_mutex_unlock(&g_pal_os_event_timer.lock);
+
+    if (callback) {
+        callback(ctx);
     }
 }
 
@@ -263,13 +300,11 @@ void pal_os_event_register_callback_oneshot(
     uint32_t time_us
 ) {
     struct itimerspec its;
-    memset(&its, 0, sizeof(its));
+    int ret;
     long long freq_nanosecs;
+    memset(&its, 0, sizeof(its));
 
     TRUSTM_PAL_EVENT_DBGFN(">");
-
-    p_pal_os_event->callback_registered = callback;
-    p_pal_os_event->callback_ctx = callback_args;
 
     freq_nanosecs = (long long)time_us * 1000LL;
     its.it_value.tv_sec = (time_t)(freq_nanosecs / 1000000000LL);
@@ -285,15 +320,23 @@ void pal_os_event_register_callback_oneshot(
     pthread_mutex_lock(&g_pal_os_event_timer.lock);
 
     if (g_pal_os_event_timer.state != TIMER_READY) {
-        if (wait_for_timer_ready_locked(50 /* ms */) != 0) {
+        ret = wait_for_timer_ready_locked(TRUSTM_LINUX_TIMER_WAIT);
+        if (ret == TIMER_RC_TIMEOUT) {
             TRUSTM_PAL_EVENT_ERRFN(
                 "oneshot: timer not ready (timeout), state=%d",
                 (int)g_pal_os_event_timer.state
             );
+        }
+        if (ret != TIMER_RC_READY) {
             pthread_mutex_unlock(&g_pal_os_event_timer.lock);
             return;
         }
     }
+
+    /* Write callback and ctx inside the lock, as in pal_os_event_trigger_registered_callback
+     * to eliminate the data race. */
+    p_pal_os_event->callback_registered = callback;
+    p_pal_os_event->callback_ctx = callback_args;
 
     if (timer_settime(g_pal_os_event_timer.timerid, 0, &its, NULL) == -1) {
         int errsv = errno;
