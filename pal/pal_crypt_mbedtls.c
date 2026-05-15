@@ -39,6 +39,8 @@
 #include "optiga/pal/pal_crypt.h"
 #include "optiga/pal/pal_os_memory.h"
 #include "mbedtls/ccm.h"
+#include "mbedtls/cipher.h"
+#include "mbedtls/platform_util.h"
 #include "mbedtls/md.h"
 #include "mbedtls/ssl.h"
 #include "mbedtls/version.h"
@@ -179,12 +181,18 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
 {
     #define AES128_KEY_BITS_SIZE    (16U)
     #define MAC_TAG_BUFFER_SIZE     (16U)
-    
+    #define CCM_SLOTS               (4U)
+
+    /* Per-key CCM context cache: setkey once per unique key, never free.
+     * Avoids newlib malloc-mutex contention with the busy-waiting Matter task. */
+    static mbedtls_ccm_context s_enc_ccm[CCM_SLOTS];
+    static uint8_t  s_enc_key_cache[CCM_SLOTS][AES128_KEY_BITS_SIZE];
+    static uint8_t  s_enc_slot_used[CCM_SLOTS] = {0};
+    static uint8_t  s_enc_next_slot = 0U;
+
     pal_status_t return_status = PAL_STATUS_FAILURE;
     uint8_t mac_output[MAC_TAG_BUFFER_SIZE];
-    mbedtls_ccm_context sEncrypt;
-
-    mbedtls_ccm_init(&sEncrypt);
+    mbedtls_ccm_context * p_ccm = NULL;
 
     do
     {
@@ -195,13 +203,36 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
             break;
         }
 #endif
-
-        if (0 != mbedtls_ccm_setkey(&sEncrypt, MBEDTLS_CIPHER_ID_AES, p_encrypt_key, 8 * AES128_KEY_BITS_SIZE))
+        /* Look up an existing slot for this key. */
+        for (uint8_t i = 0U; i < CCM_SLOTS; i++)
         {
-            break;
+            if (s_enc_slot_used[i] &&
+                0 == memcmp(s_enc_key_cache[i], p_encrypt_key, AES128_KEY_BITS_SIZE))
+            {
+                p_ccm = &s_enc_ccm[i];
+                break;
+            }
         }
-        
-        if (0 != mbedtls_ccm_encrypt_and_tag(&sEncrypt,
+        if (NULL == p_ccm)
+        {
+            uint8_t slot = s_enc_next_slot;
+            if (slot >= CCM_SLOTS)
+            {
+                break;
+            }
+            mbedtls_ccm_init(&s_enc_ccm[slot]);
+            if (0 != mbedtls_ccm_setkey(&s_enc_ccm[slot], MBEDTLS_CIPHER_ID_AES,
+                                        p_encrypt_key, 8 * AES128_KEY_BITS_SIZE))
+            {
+                break;
+            }
+            memcpy(s_enc_key_cache[slot], p_encrypt_key, AES128_KEY_BITS_SIZE);
+            s_enc_slot_used[slot] = 1U;
+            s_enc_next_slot = slot + 1U;
+            p_ccm = &s_enc_ccm[slot];
+        }
+
+        if (0 != mbedtls_ccm_encrypt_and_tag(p_ccm,
                                               plain_text_length,
                                               p_nonce,
                                               nonce_length,
@@ -211,7 +242,6 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
                                               p_cipher_text,
                                               mac_output,
                                               mac_size))
-        
         {
             break;
         }
@@ -219,9 +249,10 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
         memcpy((p_cipher_text + plain_text_length), mac_output, mac_size);
         return_status = PAL_STATUS_SUCCESS;
     } while (FALSE);
-    mbedtls_ccm_free(&sEncrypt);
+    /* No mbedtls_ccm_free — contexts are cached for the process lifetime. */
     #undef AES128_KEY_BITS_SIZE
-    #undef MAC_TAG_BUFFER_SIZE    
+    #undef MAC_TAG_BUFFER_SIZE
+    #undef CCM_SLOTS
     return return_status;
 }
 
@@ -238,10 +269,16 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
                                           uint8_t * p_plain_text)
 {
     #define AES128_KEY_BITS_SIZE    (16U)
-    pal_status_t return_status = PAL_STATUS_FAILURE;
-    mbedtls_ccm_context sDecrypt;
+    #define CCM_SLOTS               (4U)
 
-    mbedtls_ccm_init(&sDecrypt);
+    /* See pal_crypt_encrypt_aes128_ccm — same per-key cache. */
+    static mbedtls_ccm_context s_dec_ccm[CCM_SLOTS];
+    static uint8_t  s_dec_key_cache[CCM_SLOTS][AES128_KEY_BITS_SIZE];
+    static uint8_t  s_dec_slot_used[CCM_SLOTS] = {0};
+    static uint8_t  s_dec_next_slot = 0U;
+
+    pal_status_t return_status = PAL_STATUS_FAILURE;
+    mbedtls_ccm_context * p_ccm = NULL;
 
     do
     {
@@ -252,20 +289,42 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
             break;
         }
 #endif
-
-        if (0 != mbedtls_ccm_setkey(&sDecrypt, MBEDTLS_CIPHER_ID_AES, p_decrypt_key, 8 * AES128_KEY_BITS_SIZE))
+        for (uint8_t i = 0U; i < CCM_SLOTS; i++)
         {
-            break;
+            if (s_dec_slot_used[i] &&
+                0 == memcmp(s_dec_key_cache[i], p_decrypt_key, AES128_KEY_BITS_SIZE))
+            {
+                p_ccm = &s_dec_ccm[i];
+                break;
+            }
+        }
+        if (NULL == p_ccm)
+        {
+            uint8_t slot = s_dec_next_slot;
+            if (slot >= CCM_SLOTS)
+            {
+                break;
+            }
+            mbedtls_ccm_init(&s_dec_ccm[slot]);
+            if (0 != mbedtls_ccm_setkey(&s_dec_ccm[slot], MBEDTLS_CIPHER_ID_AES,
+                                        p_decrypt_key, 8 * AES128_KEY_BITS_SIZE))
+            {
+                break;
+            }
+            memcpy(s_dec_key_cache[slot], p_decrypt_key, AES128_KEY_BITS_SIZE);
+            s_dec_slot_used[slot] = 1U;
+            s_dec_next_slot = slot + 1U;
+            p_ccm = &s_dec_ccm[slot];
         }
 
-        if (0 != mbedtls_ccm_auth_decrypt(&sDecrypt,
+        if (0 != mbedtls_ccm_auth_decrypt(p_ccm,
                                           (cipher_text_length - mac_size),
                                           p_nonce,
                                           nonce_length,
                                           p_associated_data,
                                           associated_data_length,
                                           p_cipher_text,
-                                          p_plain_text, 
+                                          p_plain_text,
                                           &p_cipher_text[cipher_text_length - mac_size],
                                           mac_size))
         {
@@ -273,8 +332,9 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(pal_crypt_t* p_pal_crypt,
         }
         return_status = PAL_STATUS_SUCCESS;
     } while (FALSE);
-    mbedtls_ccm_free(&sDecrypt);
+    /* No mbedtls_ccm_free — contexts are cached for the process lifetime. */
     #undef AES128_KEY_BITS_SIZE
+    #undef CCM_SLOTS
     return return_status;
 }
 
