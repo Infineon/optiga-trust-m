@@ -1,4 +1,11 @@
+## 5.7.0 (2026-05-22)
+
+* Updated pal_os_event for Linux pal layer for better performance
+* Fixed the potential race condition in pal/linux/pal_os_event.c
+* Modified timer timeout to be configurable
+
 ## 5.6.0 (2026-03-05)
+
 * Updated pal_os_event for Linux pal layer to fix Cross-compilation issue for ARMv7.
 
 ## 5.5.0 (2026-02-19)
