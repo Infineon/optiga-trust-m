@@ -18,7 +18,7 @@
 #include <mbedtls/version.h>
 #include <psa/crypto.h>
 #include <pthread.h>
-#include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "optiga_lib_common.h"
@@ -58,7 +58,8 @@ pal_status_t pal_crypt_tls_prf_sha256(
     pal_status_t return_value = PAL_STATUS_FAILURE;
     psa_status_t st;
     psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t key_id = 0;
+    psa_key_id_t key_id = PSA_KEY_ID_NULL;
+    bool key_imported = false;
     psa_algorithm_t alg = PSA_ALG_TLS12_PRF(PSA_ALG_SHA_256);
     psa_key_derivation_operation_t operation = PSA_KEY_DERIVATION_OPERATION_INIT;
     do {
@@ -84,6 +85,7 @@ pal_status_t pal_crypt_tls_prf_sha256(
         if (st != PSA_SUCCESS) {
             break;
         }
+        key_imported = true;
 
         /* Derive the key */
         st = psa_key_derivation_setup(&operation, alg);
@@ -125,9 +127,14 @@ pal_status_t pal_crypt_tls_prf_sha256(
     } while (FALSE);
 
     /* Clean up */
-    psa_key_derivation_abort(&operation);
-    if (key_id != 0) {
+    (void)psa_key_derivation_abort(&operation);
+    if (key_imported) {
         (void)psa_destroy_key(key_id);
+    }
+
+    /* Do not leak partial key material to the caller on failure. */
+    if (return_value != PAL_STATUS_SUCCESS && p_derived_key != NULL) {
+        pal_os_memset(p_derived_key, 0, derived_key_length);
     }
 
     return return_value;
@@ -151,7 +158,8 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(
     pal_status_t return_value = PAL_STATUS_FAILURE;
     psa_status_t st;
     psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t key_id = 0;
+    psa_key_id_t key_id = PSA_KEY_ID_NULL;
+    bool key_imported = false;
     size_t out_len = 0;
 
     do {
@@ -177,6 +185,7 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(
         if (st != PSA_SUCCESS) {
             break;
         }
+        key_imported = true;
 
         /* Output layout expected by the caller: ciphertext || tag */
         st = psa_aead_encrypt(
@@ -196,7 +205,7 @@ pal_status_t pal_crypt_encrypt_aes128_ccm(
             return_value = PAL_STATUS_SUCCESS;
         }
     } while (FALSE);
-    if (key_id != 0) {
+    if (key_imported) {
         (void)psa_destroy_key(key_id);
     }
 
@@ -221,7 +230,8 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(
     pal_status_t return_value = PAL_STATUS_FAILURE;
     psa_status_t st;
     psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t key_id = 0;
+    psa_key_id_t key_id = PSA_KEY_ID_NULL;
+    bool key_imported = false;
     size_t out_len = 0;
 
     do {
@@ -251,6 +261,7 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(
         if (st != PSA_SUCCESS) {
             break;
         }
+        key_imported = true;
 
         st = psa_aead_decrypt(
             key_id,
@@ -270,7 +281,7 @@ pal_status_t pal_crypt_decrypt_aes128_ccm(
         }
     } while (FALSE);
 
-    if (key_id != 0) {
+    if (key_imported) {
         (void)psa_destroy_key(key_id);
     }
 
@@ -288,11 +299,12 @@ pal_status_t pal_crypt_version(uint8_t *p_crypt_lib_version_info, uint16_t *leng
 #endif  // OPTIGA_LIB_DEBUG_NULL_CHECK
 
     vlen = strlen(v);
-    if (vlen > *length) {
+    if (vlen + 1U > (size_t)*length) {
         return PAL_STATUS_FAILURE;
     }
 
     pal_os_memcpy(p_crypt_lib_version_info, v, vlen);
+    p_crypt_lib_version_info[vlen] = (uint8_t)'\0';
     *length = (uint16_t)vlen;
 
     return PAL_STATUS_SUCCESS;
