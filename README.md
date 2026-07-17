@@ -46,55 +46,28 @@ Examples to demonstrate basic functionality of the security chip can be found [h
 
 The OPTIGA&trade; Trust M Host Library for C relies on Mbed TLS.
 
-The OPTIGA&trade; Trust M Host Library for C supports MbedTLS 2.x, MbedTLS 3.x and MbedTLS 4.x. The later two are referred to as "mbedtls-3.x" and "mbedtls-4.x" respectively.
+The OPTIGA&trade; Trust M Host Library for C supports Mbed TLS 4.x (with TF-PSA-Crypto).
 
-This library is cloned from a submodule under [external/mbedtls](external/mbedtls/) for Mbedtls 2.x, [external/mbedtls-3.x](external/mbedtls-3.x/) for MbedTLS 3.x and [external/mbedtls-4.x](external/mbedtls-4.x/) for MbedTLS 4.x. It comes with a default configuration that needs to be modified to the application purpose.
+Note: For support for Mbed TLS 2.x/3.x, please check out the [`feature/mbedtls-3.x`](https://github.com/Infineon/optiga-trust-m/tree/feature/mbedtls-3.x) branch.
+This library is cloned from a submodule under [external/mbedtls-4.x](external/mbedtls-4.x/). It comes with a default configuration that needs to be modified to the application purpose.
 
-Under [config/mbedtls_default_config.h](config/mbedtls_default_config.h) a default configuration for MbedTLS 2.x is provided and should be changed depending on need.
+Two configuration files are provided and should be adjusted to fit your application:
 
-Under [config/mbedtls_3.x_default_config.h](config/mbedtls_3.x_default_config.h) a default configuration for MbedTLS 3.x is provided and should be changed depending on need.
+* [config/mbedtls_4.x_default_config.h](config/mbedtls_4.x_default_config.h) — default configuration for the Mbed TLS 4.x TLS/X.509 layer. Passed to the compiler via `MBEDTLS_USER_CONFIG_FILE`.
+* [config/tf_psa_default_config.h](config/tf_psa_default_config.h) — default PSA-crypto configuration for OPTIGA&trade; Trust M. Passed to the compiler via `TF_PSA_CRYPTO_USER_CONFIG_FILE`.
 
-Under [config/mbedtls_4.x_default_config.h](config/mbedtls_4.x_default_config.h) a default configuration for the Mbed TLS 4.x TLS/X.509 layer is provided. In MbedTLS 4.x, cryptographic-algorithm selection has moved to the PSA crypto configuration; the corresponding PSA-crypto defaults for OPTIGA&trade; Trust M are shipped in [config/tf_psa_default_config.h](config/tf_psa_default_config.h) and are consumed via `-DTF_PSA_CRYPTO_USER_CONFIG_FILE=...`.
+In Mbed TLS 4.x, selection of cryptographic algorithms has moved from the TLS/X.509 config to the PSA crypto config, so both defines are typically required.
 
-Note: MbedTLS 4.x carries `tf-psa-crypto` as its own submodule. After cloning, initialize it recursively with `git submodule update --init --recursive external/mbedtls-4.x`.
+Note: Mbed TLS 4.x carries `tf-psa-crypto` as its own submodule. After cloning, initialize it recursively with `git submodule update --init --recursive external/mbedtls-4.x`.
 
-During compilation, the following define needs to be added:
-
-```
-MBEDTLS_USER_CONFIG_FILE="config/mbedtls_default_config.h"
-```
-
-or
-
-```
-MBEDTLS_USER_CONFIG_FILE="config/mbedtls_3.x_default_config.h"
-```
-
-or
+During compilation, the following defines need to be added:
 
 ```
 MBEDTLS_USER_CONFIG_FILE="config/mbedtls_4.x_default_config.h"
-```
-
-For MbedTLS 4.x, PSA-crypto tuning is a separate override; add it alongside `MBEDTLS_USER_CONFIG_FILE`:
-
-```
 TF_PSA_CRYPTO_USER_CONFIG_FILE="config/tf_psa_default_config.h"
 ```
 
 for `gcc` / `CFLAGS` (e.g. inside a Makefile via `CFLAGS += ...`) :
-
-```
--DMBEDTLS_USER_CONFIG_FILE="config/mbedtls_default_config.h"
-```
-
-or
-
-```
--DMBEDTLS_USER_CONFIG_FILE="config/mbedtls_3.x_default_config.h"
-```
-
-or
 
 ```
 -DMBEDTLS_USER_CONFIG_FILE="config/mbedtls_4.x_default_config.h" \
@@ -102,18 +75,6 @@ or
 ```
 
 for CMake :
-
-```
-target_compile_definitions(app PRIVATE MBEDTLS_USER_CONFIG_FILE="${CMAKE_CURRENT_SOURCE_DIR}/config/mbedtls_default_config.h")
-```
-
-or
-
-```
-target_compile_definitions(app PRIVATE MBEDTLS_USER_CONFIG_FILE="${CMAKE_CURRENT_SOURCE_DIR}/config/mbedtls_3.x_default_config.h")
-```
-
-or
 
 ```
 target_compile_definitions(app PRIVATE

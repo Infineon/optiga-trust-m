@@ -10,15 +10,7 @@ option(BUILD_RPI_I2C "Compile for Raspberry Pi, protocol : I2C" OFF)
 option(BUILD_RPI_UART "Compile for Raspberry Pi, protocol : UART" OFF)
 option(BUILD_LIBUSB "Compile for Raspberry Pi, protocol : libusb" OFF)
 
-# Compile for mbedtls-3.x
-option(BUILD_MBEDTLS_3 "Compile using mbedtls-3.x" OFF)
-
-# message log for mbedtls
-if(BUILD_MBEDTLS_3)
-    message("Building using mbedtls-3.x")
-else()
-    message("Building using mbedtls-2.x")
-endif()
+message("Building using mbedtls-4.x")
 
 include(${PROJECT_SOURCE_DIR}/core.cmake)
 

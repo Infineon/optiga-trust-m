@@ -331,9 +331,6 @@ pal_status_t CalcHMAC(
 ) {
     pal_status_t return_value = PAL_STATUS_FAILURE;
 
-    const mbedtls_md_info_t *hmac_info;
-    mbedtls_md_type_t digest_type;
-
     do {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
         if ((NULL == input_data) || (NULL == hmac)) {
@@ -341,19 +338,40 @@ pal_status_t CalcHMAC(
         }
 #endif  // OPTIGA_LIB_DEBUG_NULL_CHECK
 
-        digest_type = OPTIGA_HMAC_SHA_256;
+        psa_status_t status;
+        psa_key_attributes_t attr = PSA_KEY_ATTRIBUTES_INIT;
+        psa_key_id_t key_id = 0;
+        size_t mac_len = 0;
 
-        hmac_info = mbedtls_md_info_from_type(digest_type);
+        status = psa_crypto_init();
+        if (PSA_SUCCESS != status) {
+            break;
+        }
 
-        if (0
-            != mbedtls_md_hmac(
-                hmac_info,
-                secret_key,
-                secret_key_len,
-                input_data,
-                input_data_length,
-                hmac
-            )) {
+        psa_set_key_type(&attr, PSA_KEY_TYPE_HMAC);
+        psa_set_key_bits(&attr, (size_t)secret_key_len * 8U);
+        psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_SIGN_MESSAGE);
+        psa_set_key_algorithm(&attr, PSA_ALG_HMAC(PSA_ALG_SHA_256));
+
+        status = psa_import_key(&attr, secret_key, (size_t)secret_key_len, &key_id);
+        psa_reset_key_attributes(&attr);
+        if (PSA_SUCCESS != status) {
+            break;
+        }
+
+        status = psa_mac_compute(
+            key_id,
+            PSA_ALG_HMAC(PSA_ALG_SHA_256),
+            input_data,
+            (size_t)input_data_length,
+            hmac,
+            PSA_CRYPT_SHA256_SIZE,
+            &mac_len
+        );
+
+        psa_destroy_key(key_id);
+
+        if ((PSA_SUCCESS != status) || (PSA_CRYPT_SHA256_SIZE != mac_len)) {
             break;
         }
 

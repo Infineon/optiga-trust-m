@@ -395,6 +395,7 @@ void ut_optiga_util_write_data_metadata_fct() {
      * Read data from a data object (e.g. certificate data object)
      * using optiga_util_read_data.
      */
+    ut_optiga_util_instance->instance_state = OPTIGA_LIB_INSTANCE_FREE;
     optiga_lib_status = OPTIGA_LIB_BUSY;
 
     ut_return_status = optiga_util_write_data(
@@ -412,6 +413,7 @@ void ut_optiga_util_write_data_metadata_fct() {
     /* This is a dummy PAL, no chip exists */
     // assert(OPTIGA_LIB_SUCCESS == optiga_lib_status);
 
+    ut_optiga_util_instance->instance_state = OPTIGA_LIB_INSTANCE_FREE;
     optiga_lib_status = OPTIGA_LIB_BUSY;
     ut_return_status =
         optiga_util_write_metadata(ut_optiga_util_instance, 0xE0E8, metadata, sizeof(metadata));
@@ -424,6 +426,7 @@ void ut_optiga_util_write_data_metadata_fct() {
 
     optiga_counter_oid = 0xE120;
     offset = 0x00;
+    ut_optiga_util_instance->instance_state = OPTIGA_LIB_INSTANCE_FREE;
     optiga_lib_status = OPTIGA_LIB_BUSY;
 
     ut_return_status = optiga_util_write_data(
@@ -442,6 +445,7 @@ void ut_optiga_util_write_data_metadata_fct() {
     // assert(OPTIGA_LIB_SUCCESS == optiga_lib_status);
 
     // In this example, the counter is update by 5 and the final count would be 15
+    ut_optiga_util_instance->instance_state = OPTIGA_LIB_INSTANCE_FREE;
     optiga_lib_status = OPTIGA_LIB_BUSY;
     ut_return_status = optiga_util_update_count(ut_optiga_util_instance, optiga_counter_oid, 0x05);
 
@@ -502,6 +506,7 @@ void ut_optiga_util_read_data_metadata_fct() {
      */
     optiga_oid = 0xE0E0;
     bytes_to_read = sizeof(read_data_buffer);
+    ut_optiga_util_instance->instance_state = OPTIGA_LIB_INSTANCE_FREE;
     optiga_lib_status = OPTIGA_LIB_BUSY;
     ut_return_status = optiga_util_read_metadata(
         ut_optiga_util_instance,

@@ -17,12 +17,13 @@
 #define OPTIGA_CRYPT_UNIT_TEST
 
 #include <assert.h>
+#include <psa/crypto.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "mbedtls/ccm.h"
-#include "mbedtls/md.h"
 #include "mbedtls/ssl.h"
+#include "mbedtls/version.h"
+#define PSA_CRYPT_SHA256_SIZE (32U)
 #include "optiga_cmd.h"
 #include "optiga_crypt.h"
 #include "optiga_lib_common.h"

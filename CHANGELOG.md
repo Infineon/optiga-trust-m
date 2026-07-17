@@ -1,10 +1,16 @@
-## 5.8.0 (2026-07-16)
+## 5.8.0 (2026-07-17)
 
-* Added support for MbedTLS 4.x / TF-PSA-Crypto:
-  * New `BUILD_MBEDTLS_4` CMake option.
-  * New `config/mbedtls_4.x_default_config.h` and `extras/pal/pal_crypt_psa.c`
-    (PSA-based implementation of the shielded-connection PAL crypto).
-  * Added `external/mbedtls-4.x` submodule for the 4.x variant.
+* Migrated the Mbed TLS dependency from Mbed TLS 2.x / 3.x to Mbed TLS 4.x
+  (with TF-PSA-Crypto). Mbed TLS 4.x is now the only supported version.
+  * Added `external/mbedtls-4.x` submodule (replaces the previous
+    `external/mbedtls` and `external/mbedtls-3.x` submodules).
+  * Added `config/mbedtls_4.x_default_config.h` for the Mbed TLS 4.x
+    TLS/X.509 layer and `config/tf_psa_default_config.h` for the PSA
+    crypto configuration (consumed via `TF_PSA_CRYPTO_USER_CONFIG_FILE`).
+  * Added `extras/pal/pal_crypt_psa.c`, a PSA-based implementation of the
+    shielded-connection PAL crypto (replaces `extras/pal/pal_crypt_mbedtls.c`).
+  * Removed `config/mbedtls_default_config.h` and
+    `config/mbedtls_3.x_default_config.h`.
 
 ## 5.7.0 (2026-05-22)
 

@@ -16,11 +16,7 @@ set(PAL_FILES
     ${PROJECT_SOURCE_DIR}/../extras/pal/linux_uart/pal_os_timer.c
 )
 
-if(BUILD_MBEDTLS_3)
-add_compile_options(-Wall -fprofile-arcs -ftest-coverage --coverage -DMBEDTLS_USER_CONFIG_FILE="../config/mbedtls_3.x_default_config.h" -DOPTIGA_USE_SOFT_RESET -DPAL_OS_HAS_EVENT_INIT -DOPTIGA_SYNC_COMMS)
-else()
-add_compile_options(-Wall -fprofile-arcs -ftest-coverage --coverage -DMBEDTLS_USER_CONFIG_FILE="../config/mbedtls_default_config.h" -DOPTIGA_USE_SOFT_RESET -DPAL_OS_HAS_EVENT_INIT -DOPTIGA_SYNC_COMMS)
-endif()
+add_compile_options(-Wall -fprofile-arcs -ftest-coverage --coverage -DMBEDTLS_USER_CONFIG_FILE="../config/mbedtls_4.x_default_config.h" -DTF_PSA_CRYPTO_USER_CONFIG_FILE="../config/tf_psa_default_config.h" -DOPTIGA_USE_SOFT_RESET -DPAL_OS_HAS_EVENT_INIT -DOPTIGA_SYNC_COMMS)
 add_link_options(-lrt -fprofile-arcs -ftest-coverage --coverage)
 
 add_library(optiga_trust_M_lib STATIC 
