@@ -2234,6 +2234,8 @@ optiga_lib_status_t optiga_cmd_set_data_object(
  */
 _STATIC_H optiga_lib_status_t optiga_cmd_get_random_handler(optiga_cmd_t *me) {
     uint16_t total_apdu_length;
+    uint16_t expected_response_data_length;
+    uint16_t response_data_length;
     optiga_get_random_params_t *p_random_params = (optiga_get_random_params_t *)me->p_input;
     optiga_lib_status_t return_status = OPTIGA_CMD_ERROR;
     uint16_t index_for_data = OPTIGA_CMD_APDU_INDATA_OFFSET;
@@ -2302,6 +2304,13 @@ _STATIC_H optiga_lib_status_t optiga_cmd_get_random_handler(optiga_cmd_t *me) {
         } break;
         case OPTIGA_CMD_EXEC_PROCESS_RESPONSE: {
             OPTIGA_CMD_LOG_MESSAGE("Processing response for get random command...");
+            if (OPTIGA_CMD_APDU_HEADER_SIZE > me->p_optiga->comms_rx_size) {
+                OPTIGA_CMD_LOG_MESSAGE("Error in processing get random response...");
+                // lint --e{835} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                // lint --e{845} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                break;
+            }
             // check if the random data retrieval app was successful
             if (OPTIGA_CMD_APDU_SUCCESS
                 != me->p_optiga->optiga_comms_buffer[OPTIGA_COMMS_DATA_OFFSET]) {
@@ -2311,6 +2320,26 @@ _STATIC_H optiga_lib_status_t optiga_cmd_get_random_handler(optiga_cmd_t *me) {
                 SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
                 break;
             }
+
+            expected_response_data_length =
+                (OPTIGA_CMD_RANDOM_PARAM_TYPE_PRE_MASTER_SECRET == (uint8_t)me->cmd_param)
+                    ? OPTIGA_CMD_ZERO_LENGTH_OR_VALUE
+                    : p_random_params->random_data_length;
+            optiga_common_get_uint16(
+                &me->p_optiga->optiga_comms_buffer
+                     [OPTIGA_CMD_APDU_INDATA_OFFSET - OPTIGA_CMD_UINT16_SIZE_IN_BYTES],
+                &response_data_length
+            );
+            if ((expected_response_data_length != response_data_length)
+                || (expected_response_data_length
+                    != (me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE))) {
+                OPTIGA_CMD_LOG_MESSAGE("Error in processing get random response...");
+                // lint --e{835} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                // lint --e{845} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                break;
+            }
+
             if (OPTIGA_CMD_RANDOM_PARAM_TYPE_PRE_MASTER_SECRET != (uint8_t)me->cmd_param) {
                 // copy data from optiga comms buffer to user provided buffer
                 pal_os_memcpy(
