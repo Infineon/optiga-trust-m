@@ -1,3 +1,8 @@
+
+## 5.8.1 (2026-08-12)
+
+* Added boundary checking to validate random response lengths 
+  
 ## 5.8.0 (2026-07-17)
 
 * Migrated the Mbed TLS dependency from Mbed TLS 2.x / 3.x to Mbed TLS 4.x
