@@ -886,6 +886,10 @@ _STATIC_H void optiga_cmd_queue_scheduler(void *p_optiga) {
 
     optiga_context_t *p_optiga_ctx = (optiga_context_t *)p_optiga;
 
+    if ((FALSE == p_optiga_ctx->instance_init_state)
+        || (NULL == p_optiga_ctx->p_pal_os_event_ctx)) {
+        return;
+    }
     pal_os_event_t *my_os_event = p_optiga_ctx->p_pal_os_event_ctx;
 
     if (((0
@@ -1602,17 +1606,23 @@ optiga_cmd_create(uint8_t optiga_instance_id, callback_handler_t handler, void *
         me->optiga_context_datastore_id = g_hibernate_datastore_id_list[optiga_instance_id];
 
         if (FALSE == me->p_optiga->instance_init_state) {
-            // create pal os event
-            me->p_optiga->p_pal_os_event_ctx =
-                pal_os_event_create(optiga_cmd_queue_scheduler, me->p_optiga);
             me->p_optiga->p_optiga_comms = optiga_comms_create(optiga_cmd_execute_handler, me);
             if (NULL == me->p_optiga->p_optiga_comms) {
                 pal_os_free(me);
                 me = NULL;
                 break;
             }
+            // create pal os event
+            me->p_optiga->p_pal_os_event_ctx =
+                pal_os_event_create(optiga_cmd_queue_scheduler, me->p_optiga);
             me->p_optiga->instance_init_state = TRUE;
             me->p_optiga->p_optiga_comms->p_pal_os_event_ctx = me->p_optiga->p_pal_os_event_ctx;
+            pal_os_event_register_callback_oneshot(
+                me->p_optiga->p_pal_os_event_ctx,
+                optiga_cmd_queue_scheduler,
+                me->p_optiga,
+                1000
+            );
         }
         // attach optiga cmd queue entry
         optiga_cmd_queue_assign_slot(me, &(me->queue_id));
