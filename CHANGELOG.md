@@ -1,3 +1,6 @@
+## 5.8.2 (2026-09-04)
+
+* Fixed potential race condition in optiga_cmd.c
 
 ## 5.8.1 (2026-08-12)
 

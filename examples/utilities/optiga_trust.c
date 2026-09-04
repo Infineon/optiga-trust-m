@@ -39,8 +39,8 @@ static void optiga_util_callback(void *context, optiga_lib_status_t return_statu
 void read_certificate_from_optiga(char *cert_pem, uint16_t *cert_pem_length) {
     size_t ifx_cert_b64_len = 0;
     uint8_t ifx_cert_b64_temp[1200];
-    uint16_t offset_to_write = 0, offset_to_read = 0;
-    uint16_t size_to_copy = 0;
+    size_t offset_to_write = 0, offset_to_read = 0;
+    size_t size_to_copy = 0;
     optiga_lib_status_t return_status;
 
     optiga_util_t *me_util = NULL;
@@ -93,7 +93,7 @@ void read_certificate_from_optiga(char *cert_pem, uint16_t *cert_pem_length) {
 
         // convert to PEM format
         printf("read ifx cer\r\n");
-        mbedtls_base64_encode(
+        return_status = mbedtls_base64_encode(
             (unsigned char *)ifx_cert_b64_temp,
             sizeof(ifx_cert_b64_temp),
             &ifx_cert_b64_len,
@@ -102,6 +102,14 @@ void read_certificate_from_optiga(char *cert_pem, uint16_t *cert_pem_length) {
             ifx_cert_hex_len - 9
         );
         //                      ifx_cert_hex , ifx_cert_hex_len);
+        if ((0 != return_status) || (ifx_cert_b64_len > sizeof(ifx_cert_b64_temp))) {
+            optiga_lib_print_message(
+                "mbedtls_base64_encode failed !!!",
+                OPTIGA_UTIL_SERVICE,
+                OPTIGA_UTIL_SERVICE_COLOR
+            );
+            break;
+        }
 
         memcpy(cert_pem, "-----BEGIN CERTIFICATE-----\n", 28);
         offset_to_write += 28;
@@ -140,8 +148,8 @@ void read_certificate_from_optiga(char *cert_pem, uint16_t *cert_pem_length) {
 void read_trust_anchor_from_optiga(uint16_t oid, char *cert_pem, uint16_t *cert_pem_length) {
     size_t ifx_cert_b64_len = 0;
     uint8_t ifx_cert_b64_temp[1200];
-    uint16_t offset_to_write = 0, offset_to_read = 0;
-    uint16_t size_to_copy = 0;
+    size_t offset_to_write = 0, offset_to_read = 0;
+    size_t size_to_copy = 0;
     optiga_lib_status_t return_status;
 
     optiga_util_t *me_util = NULL;
@@ -189,7 +197,7 @@ void read_trust_anchor_from_optiga(uint16_t oid, char *cert_pem, uint16_t *cert_
 
         // convert to PEM format
         //  printf("read ifx cer\r\n");
-        mbedtls_base64_encode(
+        return_status = mbedtls_base64_encode(
             (unsigned char *)ifx_cert_b64_temp,
             sizeof(ifx_cert_b64_temp),
             &ifx_cert_b64_len,
@@ -198,6 +206,14 @@ void read_trust_anchor_from_optiga(uint16_t oid, char *cert_pem, uint16_t *cert_
             ifx_cert_hex,
             ifx_cert_hex_len
         );
+        if ((0 != return_status) || (ifx_cert_b64_len > sizeof(ifx_cert_b64_temp))) {
+            optiga_lib_print_message(
+                "mbedtls_base64_encode failed for trust anchor !!!",
+                OPTIGA_UTIL_SERVICE,
+                OPTIGA_UTIL_SERVICE_COLOR
+            );
+            break;
+        }
 
         memcpy(cert_pem, "-----BEGIN CERTIFICATE-----\n", 28);
         offset_to_write += 28;
