@@ -2397,6 +2397,7 @@ optiga_cmd_get_random(optiga_cmd_t *me, uint8_t cmd_param, optiga_get_random_par
  */
 _STATIC_H optiga_lib_status_t optiga_cmd_calc_sign_handler(optiga_cmd_t *me) {
     uint16_t total_apdu_length;
+    uint16_t response_data_length;
     optiga_calc_sign_params_t *p_optiga_calc_sign = (optiga_calc_sign_params_t *)me->p_input;
     optiga_lib_status_t return_status = OPTIGA_CMD_ERROR;
     uint16_t private_key_oid;
@@ -2461,18 +2462,38 @@ _STATIC_H optiga_lib_status_t optiga_cmd_calc_sign_handler(optiga_cmd_t *me) {
         } break;
         case OPTIGA_CMD_EXEC_PROCESS_RESPONSE: {
             OPTIGA_CMD_LOG_MESSAGE("Processing response for calculate sign command...");
+            if (OPTIGA_CMD_APDU_HEADER_SIZE > me->p_optiga->comms_rx_size) {
+                OPTIGA_CMD_LOG_MESSAGE("Error in processing calculate sign response...");
+                // lint --e{835} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                // lint --e{845} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                *(p_optiga_calc_sign->p_signature_length) = 0x00;
+                break;
+            }
             // check if the calculate signature command was successful
             if (OPTIGA_CMD_APDU_SUCCESS
                 == me->p_optiga->optiga_comms_buffer[OPTIGA_COMMS_DATA_OFFSET]) {
+                optiga_common_get_uint16(
+                    &me->p_optiga->optiga_comms_buffer
+                         [OPTIGA_CMD_APDU_INDATA_OFFSET - OPTIGA_CMD_UINT16_SIZE_IN_BYTES],
+                    &response_data_length
+                );
+                if (response_data_length
+                    != (me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE)) {
+                    OPTIGA_CMD_LOG_MESSAGE("Error in processing calculate sign response...");
+                    // lint --e{835} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                    // lint --e{845} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                    SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                    *(p_optiga_calc_sign->p_signature_length) = 0x00;
+                    break;
+                }
                 // if the received signature length is greater than the user provided signature buffer length
-                if ((*(p_optiga_calc_sign->p_signature_length))
-                    < (me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE)) {
+                if ((*(p_optiga_calc_sign->p_signature_length)) < response_data_length) {
                     OPTIGA_CMD_LOG_MESSAGE("Error in processing calculate sign response...");
                     *(p_optiga_calc_sign->p_signature_length) = 0x00;
                     return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
                 } else {
-                    *(p_optiga_calc_sign->p_signature_length) =
-                        me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE;
+                    *(p_optiga_calc_sign->p_signature_length) = response_data_length;
                     // copy signed data from optiga comms buffer to user provided buffer
 
                     pal_os_memcpy(
