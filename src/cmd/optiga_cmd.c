@@ -108,6 +108,10 @@
 #define OPTIGA_CMD_SIGN_DIGEST_TAG (0x01)
 #define OPTIGA_CMD_SIGN_OID_TAG (0x03)
 #define OPTIGA_CMD_SIGN_OID_LEN (0x0002)
+#ifdef OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
+#define OPTIGA_CMD_ECDSA_SIGNATURE_SCHEME (0x11)
+#define OPTIGA_CMD_ECDSA_INTEGER_TAG (0x02)
+#endif
 
 // Calc SSec tag values
 #define OPTIGA_CMD_SSEC_PRIVATE_KEY_TAG (0x01)
@@ -119,6 +123,7 @@
 #define OPTIGA_CMD_SSEC_EXPORT_LEN (0x0000)
 #define OPTIGA_CMD_SSEC_STORE_SESSION_TAG (0x08)
 #define OPTIGA_CMD_SSEC_STORE_SESSION_LEN (0x0002)
+#define OPTIGA_CMD_SSEC_MAX_SHARED_SECRET_LEN (0x0042)
 
 // Verify sign tag values
 #define OPTIGA_CMD_VERIFY_SIGN_DIGEST_TAG (0x01)
@@ -348,6 +353,9 @@
 #define OPTIGA_CMD_SCHEDULER_IDLING_TIME_MS (1000U)
 // Frequency of scheduler polling when asynchronous requests is being processed
 #define OPTIGA_CMD_SCHEDULER_RUNNING_TIME_MS (50U)
+// Maximum time (us) a session request may wait for a free session slot before
+// the scheduler fails it out instead of re-arming indefinitely
+#define OPTIGA_CMD_SESSION_WAIT_TIMEOUT_US (30000000UL)
 
 /** \brief The enum represents diffrent main state of command handler */
 typedef enum optiga_cmd_state {
@@ -503,9 +511,9 @@ struct optiga_cmd {
 
 _STATIC_H optiga_lib_status_t optiga_cmd_get_error_code_handler(optiga_cmd_t *me);
 
-#if defined(OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) || defined(OPTIGA_CRYPT_RSA_SIGN_ENABLED)
-_STATIC_H void optiga_cmd_ecc_r_s_padding_check(uint8_t *sig, uint16_t *sig_len);
-#endif  // (OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) || defined(OPTIGA_CRYPT_RSA_SIGN_ENABLED)
+#ifdef OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
+_STATIC_H optiga_lib_status_t optiga_cmd_ecc_r_s_padding_check(uint8_t *sig, uint16_t *sig_len);
+#endif  // OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
 
 #if defined(OPTIGA_CRYPT_SYM_ENCRYPT_ENABLED) || defined(OPTIGA_CRYPT_SYM_DECRYPT_ENABLED) \
     || defined(OPTIGA_CRYPT_HMAC_ENABLED) || defined(OPTIGA_CRYPT_HMAC_VERIFY_ENABLED)
@@ -1010,6 +1018,28 @@ _STATIC_H void optiga_cmd_queue_scheduler(void *p_optiga) {
                 OPTIGA_CMD_QUEUE_PROCESSING;
             p_optiga_ctx->last_time_stamp = reference_time_stamp;
         } else {
+            optiga_cmd_t *p_stuck_cmd = NULL;
+            uint8_t stuck_index = 0xFF;
+            for (index = 0; index < OPTIGA_CMD_MAX_REGISTRATIONS; index++) {
+                p_queue_entry = &(p_optiga_ctx->optiga_cmd_execution_queue[index]);
+                if ((OPTIGA_CMD_QUEUE_REQUEST == p_queue_entry->state_of_entry)
+                    && (OPTIGA_CMD_QUEUE_REQUEST_SESSION == p_queue_entry->request_type)
+                    && ((pal_os_timer_get_time_in_microseconds() - p_queue_entry->arrival_time)
+                        > OPTIGA_CMD_SESSION_WAIT_TIMEOUT_US)) {
+                    p_stuck_cmd = (optiga_cmd_t *)p_queue_entry->registered_ctx;
+                    stuck_index = index;
+                    break;
+                }
+            }
+            if (NULL != p_stuck_cmd) {
+                p_optiga_ctx->optiga_cmd_execution_queue[stuck_index].state_of_entry =
+                    OPTIGA_CMD_QUEUE_ASSIGNED;
+                p_optiga_ctx->optiga_cmd_execution_queue[stuck_index].arrival_time = 0xFFFFFFFF;
+                p_optiga_ctx->optiga_cmd_execution_queue[stuck_index].registered_ctx = NULL;
+                p_optiga_ctx->optiga_cmd_execution_queue[stuck_index].request_type = 0;
+                p_stuck_cmd->exit_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
+                p_stuck_cmd->handler(p_stuck_cmd->caller_context, p_stuck_cmd->exit_status);
+            }
             pal_os_event_register_callback_oneshot(
                 my_os_event,
                 optiga_cmd_queue_scheduler,
@@ -1462,7 +1492,9 @@ _STATIC_H void optiga_cmd_execute_process_optiga_response(optiga_cmd_t *me, uint
         } else {
             // After OPTIGA error is analyzed, invoke upper layer handler and release lock
             if (OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT == me->exit_status) {
-                me->cmd_sub_execution_state = OPTIGA_CMD_EXEC_RELEASE_LOCK;
+                if (OPTIGA_CMD_EXEC_RELEASE_SESSION != me->cmd_sub_execution_state) {
+                    me->cmd_sub_execution_state = OPTIGA_CMD_EXEC_RELEASE_LOCK;
+                }
                 *exit_loop = FALSE;
                 break;
             } else if (OPTIGA_CMD_EXEC_RELEASE_SESSION == me->cmd_sub_execution_state) {
@@ -1934,6 +1966,13 @@ _STATIC_H optiga_lib_status_t optiga_cmd_close_application_handler(optiga_cmd_t 
                 break;
             }
             if (OPTIGA_CMD_PARAM_INITIALIZE_APP_CONTEXT != me->cmd_param) {
+                if (me->p_optiga->comms_rx_size < (uint16_t
+                    )(OPTIGA_CMD_APDU_INDATA_OFFSET
+                      + sizeof(me->p_optiga->optiga_context_handle_buffer))) {
+                    OPTIGA_CMD_LOG_MESSAGE("Error in processing close app response...");
+                    SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                    break;
+                }
                 pal_os_memcpy(
                     me->p_optiga->optiga_context_handle_buffer,
                     me->p_optiga->optiga_comms_buffer + OPTIGA_CMD_APDU_INDATA_OFFSET,
@@ -2397,6 +2436,7 @@ optiga_cmd_get_random(optiga_cmd_t *me, uint8_t cmd_param, optiga_get_random_par
  */
 _STATIC_H optiga_lib_status_t optiga_cmd_calc_sign_handler(optiga_cmd_t *me) {
     uint16_t total_apdu_length;
+    uint16_t response_data_length;
     optiga_calc_sign_params_t *p_optiga_calc_sign = (optiga_calc_sign_params_t *)me->p_input;
     optiga_lib_status_t return_status = OPTIGA_CMD_ERROR;
     uint16_t private_key_oid;
@@ -2461,18 +2501,38 @@ _STATIC_H optiga_lib_status_t optiga_cmd_calc_sign_handler(optiga_cmd_t *me) {
         } break;
         case OPTIGA_CMD_EXEC_PROCESS_RESPONSE: {
             OPTIGA_CMD_LOG_MESSAGE("Processing response for calculate sign command...");
+            if (OPTIGA_CMD_APDU_HEADER_SIZE > me->p_optiga->comms_rx_size) {
+                OPTIGA_CMD_LOG_MESSAGE("Error in processing calculate sign response...");
+                // lint --e{835} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                // lint --e{845} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                *(p_optiga_calc_sign->p_signature_length) = 0x00;
+                break;
+            }
             // check if the calculate signature command was successful
             if (OPTIGA_CMD_APDU_SUCCESS
                 == me->p_optiga->optiga_comms_buffer[OPTIGA_COMMS_DATA_OFFSET]) {
+                optiga_common_get_uint16(
+                    &me->p_optiga->optiga_comms_buffer
+                         [OPTIGA_CMD_APDU_INDATA_OFFSET - OPTIGA_CMD_UINT16_SIZE_IN_BYTES],
+                    &response_data_length
+                );
+                if (response_data_length
+                    != (me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE)) {
+                    OPTIGA_CMD_LOG_MESSAGE("Error in processing calculate sign response...");
+                    // lint --e{835} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                    // lint --e{845} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                    SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                    *(p_optiga_calc_sign->p_signature_length) = 0x00;
+                    break;
+                }
                 // if the received signature length is greater than the user provided signature buffer length
-                if ((*(p_optiga_calc_sign->p_signature_length))
-                    < (me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE)) {
+                if ((*(p_optiga_calc_sign->p_signature_length)) < response_data_length) {
                     OPTIGA_CMD_LOG_MESSAGE("Error in processing calculate sign response...");
                     *(p_optiga_calc_sign->p_signature_length) = 0x00;
                     return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
                 } else {
-                    *(p_optiga_calc_sign->p_signature_length) =
-                        me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE;
+                    *(p_optiga_calc_sign->p_signature_length) = response_data_length;
                     // copy signed data from optiga comms buffer to user provided buffer
 
                     pal_os_memcpy(
@@ -2481,10 +2541,21 @@ _STATIC_H optiga_lib_status_t optiga_cmd_calc_sign_handler(optiga_cmd_t *me) {
                         *(p_optiga_calc_sign->p_signature_length)
                     );
 
-                    uint16_t *p_signature_length = p_optiga_calc_sign->p_signature_length;
-                    uint8_t *p_signature = p_optiga_calc_sign->p_signature;
-
-                    optiga_cmd_ecc_r_s_padding_check(p_signature, p_signature_length);
+#ifdef OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
+                    if ((OPTIGA_CMD_ECDSA_SIGNATURE_SCHEME == me->cmd_param)
+                        && (OPTIGA_LIB_SUCCESS
+                            != optiga_cmd_ecc_r_s_padding_check(
+                                p_optiga_calc_sign->p_signature,
+                                p_optiga_calc_sign->p_signature_length
+                            ))) {
+                        OPTIGA_CMD_LOG_MESSAGE("Error in processing calculate sign response...");
+                        // lint --e{835} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                        // lint --e{845} suppress "SET_DEV_ERROR_NOTIFICATION is generically written for any unsigned interger value"
+                        SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                        *(p_optiga_calc_sign->p_signature_length) = 0x00;
+                        break;
+                    }
+#endif  // OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
 
                     OPTIGA_CMD_LOG_MESSAGE("Response of calculate sign command is processed...");
                     return_status = OPTIGA_LIB_SUCCESS;
@@ -2809,11 +2880,25 @@ _STATIC_H optiga_lib_status_t optiga_cmd_calc_ssec_handler(optiga_cmd_t *me) {
                 break;
             }
             if (FALSE != p_optiga_ecdh->export_to_host) {
+                uint16_t shared_secret_length;
+                if (OPTIGA_CMD_APDU_HEADER_SIZE > me->p_optiga->comms_rx_size) {
+                    OPTIGA_CMD_LOG_MESSAGE("Error in processing calculate shared secret response..."
+                    );
+                    SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                    break;
+                }
+                shared_secret_length = me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE;
+                if (shared_secret_length > OPTIGA_CMD_SSEC_MAX_SHARED_SECRET_LEN) {
+                    OPTIGA_CMD_LOG_MESSAGE("Error in processing calculate shared secret response..."
+                    );
+                    SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                    break;
+                }
                 // copy shared secret from optiga comms buffer to user provided buffer
                 pal_os_memcpy(
                     p_optiga_ecdh->shared_secret,
                     me->p_optiga->optiga_comms_buffer + OPTIGA_CMD_APDU_INDATA_OFFSET,
-                    (me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE)
+                    shared_secret_length
                 );
             }
             OPTIGA_CMD_LOG_MESSAGE("Response of calculate shared secret command is processed...");
@@ -3044,6 +3129,13 @@ _STATIC_H optiga_lib_status_t optiga_cmd_derive_key_handler(optiga_cmd_t *me) {
             // session release
             return_status = OPTIGA_LIB_SUCCESS;
             if (NULL != p_optiga_derive_key->derived_key) {
+                if (me->p_optiga->comms_rx_size < (uint16_t
+                    )(OPTIGA_CMD_APDU_HEADER_SIZE + p_optiga_derive_key->derived_key_length)) {
+                    OPTIGA_CMD_LOG_MESSAGE("Error in processing derive key response...");
+                    SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                    return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
+                    break;
+                }
                 pal_os_memcpy(
                     p_optiga_derive_key->derived_key,
                     me->p_optiga->optiga_comms_buffer + OPTIGA_CMD_APDU_INDATA_OFFSET,
@@ -3239,8 +3331,24 @@ _STATIC_H optiga_lib_status_t optiga_cmd_gen_keypair_handler(optiga_cmd_t *me) {
                      [OPTIGA_CMD_APDU_INDATA_OFFSET - OPTIGA_CMD_UINT16_SIZE_IN_BYTES],
                 &out_data_size
             );
+            if ((OPTIGA_CMD_APDU_HEADER_SIZE > me->p_optiga->comms_rx_size)
+                || (out_data_size > (me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE))) {
+                OPTIGA_CMD_LOG_MESSAGE("Error in processing generate keypair response...");
+                *p_optiga_gen_keypair->public_key_length = 0;
+                SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                break;
+            }
 
             while (out_data_size > header_offset) {
+                if ((uint16_t
+                    )(header_offset + OPTIGA_CMD_NO_OF_BYTES_IN_TAG
+                      + OPTIGA_CMD_UINT16_SIZE_IN_BYTES)
+                    > out_data_size) {
+                    OPTIGA_CMD_LOG_MESSAGE("Error in processing generate keypair response...");
+                    *p_optiga_gen_keypair->public_key_length = 0;
+                    return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
+                    break;
+                }
                 if (OPTIGA_CMD_GEN_KEY_PAIR_PUBLIC_KEY_TAG
                     == me->p_optiga
                            ->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET + header_offset]) {
@@ -3250,6 +3358,14 @@ _STATIC_H optiga_lib_status_t optiga_cmd_gen_keypair_handler(optiga_cmd_t *me) {
                               + OPTIGA_CMD_NO_OF_BYTES_IN_TAG],
                         &public_key_length
                     );
+                    if ((uint32_t)header_offset + OPTIGA_CMD_NO_OF_BYTES_IN_TAG
+                            + OPTIGA_CMD_UINT16_SIZE_IN_BYTES + public_key_length
+                        > out_data_size) {
+                        OPTIGA_CMD_LOG_MESSAGE("Error in processing generate keypair response...");
+                        return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
+                        *p_optiga_gen_keypair->public_key_length = 0;
+                        break;
+                    }
                     if (public_key_length > *p_optiga_gen_keypair->public_key_length) {
                         OPTIGA_CMD_LOG_MESSAGE("Error in processing generate keypair response...");
                         return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
@@ -3277,6 +3393,13 @@ _STATIC_H optiga_lib_status_t optiga_cmd_gen_keypair_handler(optiga_cmd_t *me) {
                     );
                     // Check the private key length for algorithm
                     if (private_key_length != optiga_cmd_check_private_key_length(me->cmd_param)) {
+                        OPTIGA_CMD_LOG_MESSAGE("Error in processing generate keypair response...");
+                        return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
+                        break;
+                    }
+                    if ((uint32_t)header_offset + OPTIGA_CMD_NO_OF_BYTES_IN_TAG
+                            + OPTIGA_CMD_UINT16_SIZE_IN_BYTES + private_key_length
+                        > out_data_size) {
                         OPTIGA_CMD_LOG_MESSAGE("Error in processing generate keypair response...");
                         return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
                         break;
@@ -4663,11 +4786,28 @@ _STATIC_H optiga_lib_status_t optiga_cmd_gen_symkey_handler(optiga_cmd_t *me) {
                     != me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET]) {
                     break;
                 }
+                if ((OPTIGA_CMD_APDU_HEADER_SIZE + OPTIGA_CMD_NO_OF_BYTES_IN_TAG
+                     + OPTIGA_CMD_UINT16_SIZE_IN_BYTES)
+                    > me->p_optiga->comms_rx_size) {
+                    OPTIGA_CMD_LOG_MESSAGE("Error in processing generate symmetric key response..."
+                    );
+                    SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                    break;
+                }
                 optiga_common_get_uint16(
                     &me->p_optiga->optiga_comms_buffer
                          [OPTIGA_CMD_APDU_INDATA_OFFSET + OPTIGA_CMD_NO_OF_BYTES_IN_TAG],
                     &gen_sym_key_length
                 );
+
+                if (gen_sym_key_length > (uint16_t
+                    )(me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE
+                      - OPTIGA_CMD_NO_OF_BYTES_IN_TAG - OPTIGA_CMD_UINT16_SIZE_IN_BYTES)) {
+                    OPTIGA_CMD_LOG_MESSAGE("Error in processing generate symmetric key response..."
+                    );
+                    SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
+                    break;
+                }
 
                 pal_os_memcpy(
                     (uint8_t *)p_optiga_gen_symkey->symmetric_key,
@@ -4707,41 +4847,45 @@ optiga_cmd_gen_symkey(optiga_cmd_t *me, uint8_t cmd_param, optiga_gen_symkey_par
 }
 #endif  // OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
 
-#if defined(OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) || defined(OPTIGA_CRYPT_RSA_SIGN_ENABLED)
-_STATIC_H void optiga_cmd_ecc_r_s_padding_check(uint8_t *sig, uint16_t *sig_len) {
-    OPTIGA_CMD_LOG_MESSAGE("Check r-/s-value padding.\n");
-    OPTIGA_CMD_LOG_HEX_DATA(sig, *sig_len);
-
+#ifdef OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
+_STATIC_H optiga_lib_status_t optiga_cmd_ecc_r_s_padding_check(uint8_t *sig, uint16_t *sig_len) {
 #ifdef OPTIGA_LIB_DEBUG_NULL_CHECK
-    if ((sig == NULL) || (*sig_len < 2)) {
-        return;
+    if ((sig == NULL) || (sig_len == NULL)) {
+        return OPTIGA_CMD_ERROR_INVALID_INPUT;
     }
 #endif  // OPTIGA_LIB_DEBUG_NULL_CHECK
 
-    uint16_t start_r = 0;
-    uint16_t start_s = sig[1] + 2;
+    OPTIGA_CMD_LOG_MESSAGE("Check r-/s-value padding.\n");
+    OPTIGA_CMD_LOG_HEX_DATA(sig, *sig_len);
 
-    if ((*sig_len < start_r + 3) || (*sig_len < start_s + 3)) {
-        return;
+    if ((*sig_len < 4) || (OPTIGA_CMD_ECDSA_INTEGER_TAG != sig[0])) {
+        return OPTIGA_CMD_ERROR;
     }
 
-    uint8_t delta_r =
-        ((sig[start_r] == 0x02) && (sig[start_r + 2] == 0x00) && (sig[start_r + 3] <= 0x7F));
-    uint8_t delta_s =
-        ((sig[start_s] == 0x02) && (sig[start_s + 2] == 0x00) && (sig[start_s + 3] <= 0x7F));
+    uint16_t len_r = sig[1];
+    uint16_t start_s = len_r + 2;
+    if ((0 == len_r) || ((start_s + 2) > *sig_len)
+        || (OPTIGA_CMD_ECDSA_INTEGER_TAG != sig[start_s])) {
+        return OPTIGA_CMD_ERROR;
+    }
 
-    uint16_t len_r = sig[start_r + 1];
     uint16_t len_s = sig[start_s + 1];
+    if ((0 == len_s) || ((start_s + 2 + len_s) != *sig_len)) {
+        return OPTIGA_CMD_ERROR;
+    }
+
+    uint8_t delta_r = ((len_r > 1) && (sig[2] == 0x00) && (sig[3] <= 0x7F));
+    uint8_t delta_s = ((len_s > 1) && (sig[start_s + 2] == 0x00) && (sig[start_s + 3] <= 0x7F));
 
     if ((delta_r == 0) && (delta_s == 0)) {
-        return;
+        return OPTIGA_LIB_SUCCESS;
     }
 
     if (delta_r) {
         OPTIGA_CMD_LOG_MESSAGE("Check r-value.\n");
-        sig[start_r + 1] -= 1;  // Update r value length
+        sig[1] -= 1;  // Update r value length
         *sig_len -= 1;  // Update overall signature length
-        memcpy(&sig[start_r + 2], &sig[start_r + 2 + delta_r], len_r - delta_r + 2);
+        memmove(&sig[2], &sig[2 + delta_r], len_r - delta_r + 2);
     }
 
     if (delta_s) {
@@ -4749,11 +4893,12 @@ _STATIC_H void optiga_cmd_ecc_r_s_padding_check(uint8_t *sig, uint16_t *sig_len)
         sig[start_s + 1 - delta_r] -= 1;  // Update s value length
         *sig_len -= 1;  // Update overall signature length
     }
-    memcpy(&sig[start_s + 2 - delta_r], &sig[start_s + 2 + delta_s], len_s - delta_s);
+    memmove(&sig[start_s + 2 - delta_r], &sig[start_s + 2 + delta_s], len_s - delta_s);
 
     OPTIGA_CMD_LOG_HEX_DATA(sig, *sig_len);
+    return OPTIGA_LIB_SUCCESS;
 }
-#endif  // (OPTIGA_CRYPT_ECDSA_SIGN_ENABLED) || defined(OPTIGA_CRYPT_RSA_SIGN_ENABLED)
+#endif  // OPTIGA_CRYPT_ECDSA_SIGN_ENABLED
 
 /**
  * @}

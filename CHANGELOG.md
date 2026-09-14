@@ -1,3 +1,10 @@
+## 5.8.3 (2026-09-14)
+
+* Added boundary checking to validate CalcSign response length in optiga_cmd.c 
+* Added Validation for CalcSign signature encoding in optiga_cmd.c 
+* Fixed UART transceive buffer overflow from unvalidated wire-supplied response length in examples
+* Improved the session slot handling and unbounded scheduler retry on session exhaustion
+
 ## 5.8.2 (2026-09-04)
 
 * Fixed potential race condition in optiga_cmd.c
