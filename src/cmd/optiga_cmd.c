@@ -123,7 +123,6 @@
 #define OPTIGA_CMD_SSEC_EXPORT_LEN (0x0000)
 #define OPTIGA_CMD_SSEC_STORE_SESSION_TAG (0x08)
 #define OPTIGA_CMD_SSEC_STORE_SESSION_LEN (0x0002)
-#define OPTIGA_CMD_SSEC_MAX_SHARED_SECRET_LEN (0x0042)
 
 // Verify sign tag values
 #define OPTIGA_CMD_VERIFY_SIGN_DIGEST_TAG (0x01)
@@ -735,6 +734,80 @@ _STATIC_H void optiga_cmd_prepare_tag_header(
 
     *position = start_position;
 }
+
+_STATIC_H bool_t
+optiga_cmd_is_valid_response_length(const optiga_cmd_t *me, uint16_t expected_data_length) {
+    uint16_t response_data_length;
+
+    if ((uint32_t)me->p_optiga->comms_rx_size
+        != ((uint32_t)OPTIGA_CMD_APDU_HEADER_SIZE + expected_data_length)) {
+        return FALSE;
+    }
+
+    optiga_common_get_uint16(
+        &me->p_optiga
+             ->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET - OPTIGA_CMD_UINT16_SIZE_IN_BYTES],
+        &response_data_length
+    );
+    return ((response_data_length == expected_data_length) ? TRUE : FALSE);
+}
+
+#ifdef OPTIGA_CRYPT_ECDH_ENABLED
+_STATIC_H uint16_t optiga_cmd_get_ecdh_secret_length(uint8_t key_type) {
+    uint16_t secret_length = 0;
+
+    switch (key_type) {
+        case OPTIGA_ECC_CURVE_NIST_P_256: {
+            secret_length = 0x20;
+        } break;
+        case OPTIGA_ECC_CURVE_NIST_P_384: {
+            secret_length = 0x30;
+        } break;
+#ifdef OPTIGA_CRYPT_ECC_NIST_P_521_ENABLED
+        case OPTIGA_ECC_CURVE_NIST_P_521: {
+            secret_length = 0x42;
+        } break;
+#endif
+#ifdef OPTIGA_CRYPT_ECC_BRAINPOOL_P_R1_ENABLED
+        case OPTIGA_ECC_CURVE_BRAIN_POOL_P_256R1: {
+            secret_length = 0x20;
+        } break;
+        case OPTIGA_ECC_CURVE_BRAIN_POOL_P_384R1: {
+            secret_length = 0x30;
+        } break;
+        case OPTIGA_ECC_CURVE_BRAIN_POOL_P_512R1: {
+            secret_length = 0x40;
+        } break;
+#endif
+        default:
+            break;
+    }
+
+    return secret_length;
+}
+#endif  // OPTIGA_CRYPT_ECDH_ENABLED
+
+#ifdef OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
+_STATIC_H uint16_t optiga_cmd_get_symmetric_key_length(uint8_t key_type) {
+    uint16_t key_length = 0;
+
+    switch (key_type) {
+        case OPTIGA_SYMMETRIC_AES_128: {
+            key_length = 0x10;
+        } break;
+        case OPTIGA_SYMMETRIC_AES_192: {
+            key_length = 0x18;
+        } break;
+        case OPTIGA_SYMMETRIC_AES_256: {
+            key_length = 0x20;
+        } break;
+        default:
+            break;
+    }
+
+    return key_length;
+}
+#endif  // OPTIGA_CRYPT_SYM_GENERATE_KEY_ENABLED
 
 _STATIC_H void optiga_cmd_event_trigger_execute(void *p_ctx) {
     optiga_cmd_execute_handler(p_ctx, OPTIGA_LIB_SUCCESS);
@@ -1966,9 +2039,11 @@ _STATIC_H optiga_lib_status_t optiga_cmd_close_application_handler(optiga_cmd_t 
                 break;
             }
             if (OPTIGA_CMD_PARAM_INITIALIZE_APP_CONTEXT != me->cmd_param) {
-                if (me->p_optiga->comms_rx_size < (uint16_t
-                    )(OPTIGA_CMD_APDU_INDATA_OFFSET
-                      + sizeof(me->p_optiga->optiga_context_handle_buffer))) {
+                if (FALSE
+                    == optiga_cmd_is_valid_response_length(
+                        me,
+                        sizeof(me->p_optiga->optiga_context_handle_buffer)
+                    )) {
                     OPTIGA_CMD_LOG_MESSAGE("Error in processing close app response...");
                     SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
                     break;
@@ -2880,15 +2955,10 @@ _STATIC_H optiga_lib_status_t optiga_cmd_calc_ssec_handler(optiga_cmd_t *me) {
                 break;
             }
             if (FALSE != p_optiga_ecdh->export_to_host) {
-                uint16_t shared_secret_length;
-                if (OPTIGA_CMD_APDU_HEADER_SIZE > me->p_optiga->comms_rx_size) {
-                    OPTIGA_CMD_LOG_MESSAGE("Error in processing calculate shared secret response..."
-                    );
-                    SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
-                    break;
-                }
-                shared_secret_length = me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE;
-                if (shared_secret_length > OPTIGA_CMD_SSEC_MAX_SHARED_SECRET_LEN) {
+                uint16_t shared_secret_length =
+                    optiga_cmd_get_ecdh_secret_length(p_optiga_ecdh->public_key->key_type);
+                if ((OPTIGA_CMD_ZERO_LENGTH_OR_VALUE == shared_secret_length)
+                    || (FALSE == optiga_cmd_is_valid_response_length(me, shared_secret_length))) {
                     OPTIGA_CMD_LOG_MESSAGE("Error in processing calculate shared secret response..."
                     );
                     SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
@@ -3129,8 +3199,11 @@ _STATIC_H optiga_lib_status_t optiga_cmd_derive_key_handler(optiga_cmd_t *me) {
             // session release
             return_status = OPTIGA_LIB_SUCCESS;
             if (NULL != p_optiga_derive_key->derived_key) {
-                if (me->p_optiga->comms_rx_size < (uint16_t
-                    )(OPTIGA_CMD_APDU_HEADER_SIZE + p_optiga_derive_key->derived_key_length)) {
+                uint16_t expected_response_length = p_optiga_derive_key->derived_key_length;
+                if (expected_response_length < OPTIGA_CMD_DERIVE_KEY_DERIVE_KEY_LEN_MIN) {
+                    expected_response_length = OPTIGA_CMD_DERIVE_KEY_DERIVE_KEY_LEN_MIN;
+                }
+                if (FALSE == optiga_cmd_is_valid_response_length(me, expected_response_length)) {
                     OPTIGA_CMD_LOG_MESSAGE("Error in processing derive key response...");
                     SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
                     return_status = OPTIGA_CMD_ERROR_MEMORY_INSUFFICIENT;
@@ -3158,6 +3231,12 @@ optiga_cmd_derive_key(optiga_cmd_t *me, uint8_t cmd_param, optiga_derive_key_par
     OPTIGA_CMD_LOG_MESSAGE(__FUNCTION__);
 
     do {
+        if ((NULL != p_optiga_tls_prf_sha256->derived_key)
+            && ((OPTIGA_CMD_ZERO_LENGTH_OR_VALUE == p_optiga_tls_prf_sha256->derived_key_length)
+                || (p_optiga_tls_prf_sha256->derived_key_length
+                    > (OPTIGA_MAX_COMMS_BUFFER_SIZE - OPTIGA_CMD_APDU_HEADER_SIZE)))) {
+            break;
+        }
         if ((OPTIGA_KEY_ID_SESSION_BASED
              == (optiga_key_id_t)p_optiga_tls_prf_sha256->input_shared_secret_oid)
             && (OPTIGA_CMD_ZERO_LENGTH_OR_VALUE == me->session_oid)) {
@@ -4782,13 +4861,17 @@ _STATIC_H optiga_lib_status_t optiga_cmd_gen_symkey_handler(optiga_cmd_t *me) {
             }
 
             if (FALSE != p_optiga_gen_symkey->export_symmetric_key) {
+                uint16_t expected_key_length = optiga_cmd_get_symmetric_key_length(me->cmd_param);
                 if (OPTIGA_CMD_GEN_SYM_KEY_TAG
                     != me->p_optiga->optiga_comms_buffer[OPTIGA_CMD_APDU_INDATA_OFFSET]) {
                     break;
                 }
-                if ((OPTIGA_CMD_APDU_HEADER_SIZE + OPTIGA_CMD_NO_OF_BYTES_IN_TAG
-                     + OPTIGA_CMD_UINT16_SIZE_IN_BYTES)
-                    > me->p_optiga->comms_rx_size) {
+                if ((OPTIGA_CMD_ZERO_LENGTH_OR_VALUE == expected_key_length)
+                    || (FALSE
+                        == optiga_cmd_is_valid_response_length(
+                            me,
+                            (uint16_t)(OPTIGA_CMD_TAG_LENGTH_SIZE + expected_key_length)
+                        ))) {
                     OPTIGA_CMD_LOG_MESSAGE("Error in processing generate symmetric key response..."
                     );
                     SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
@@ -4800,9 +4883,7 @@ _STATIC_H optiga_lib_status_t optiga_cmd_gen_symkey_handler(optiga_cmd_t *me) {
                     &gen_sym_key_length
                 );
 
-                if (gen_sym_key_length > (uint16_t
-                    )(me->p_optiga->comms_rx_size - OPTIGA_CMD_APDU_HEADER_SIZE
-                      - OPTIGA_CMD_NO_OF_BYTES_IN_TAG - OPTIGA_CMD_UINT16_SIZE_IN_BYTES)) {
+                if (gen_sym_key_length != expected_key_length) {
                     OPTIGA_CMD_LOG_MESSAGE("Error in processing generate symmetric key response..."
                     );
                     SET_DEV_ERROR_NOTIFICATION(OPTIGA_CMD_EXIT_HANDLER_CALL);
