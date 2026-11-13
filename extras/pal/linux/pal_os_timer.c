@@ -16,7 +16,7 @@
 
 #include <errno.h>
 #include <stdio.h>
-#include <sys/time.h>
+#include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -37,39 +37,35 @@ LIBRARY_EXPORTS void pal_os_timer_delay_in_milliseconds(uint16_t milliseconds);
 
 /// @cond hidden
 /**
-* Gets tick count value in milliseconds
-*
-*\param[in] none
-*
-
-* \retval  uint32_t time in milliseconds
+* Reads the monotonic clock. The stack measures every timeout as a difference
+* of these timestamps, so they must not follow wall-clock steps (settimeofday,
+* NTP, a late RTC load), which would fail or stall an operation in flight.
 */
-static uint32_t pal_os_get_clock_tick_count() {
-    uint32_t now_ms = 0;
-    struct timeval tv;
+static struct timespec pal_os_monotonic_now(void) {
+    struct timespec now;
 
-    // gettimeofday() returns 0 for success, or -1 for failure
-    if (0 == gettimeofday(&tv, NULL)) {
-        now_ms = ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
-    } else {
-        now_ms = 0;
+    if (0 != clock_gettime(CLOCK_MONOTONIC, &now)) {
         exit(-1);
     }
-    // LOG(LOG_PREFIX "pal_os_timer_get_time_in_milliseconds() <\n");
-    return now_ms;
-}
-
-uint32_t pal_os_timer_get_time_in_microseconds(void) {
-    return pal_os_get_clock_tick_count() * 1000;
+    return now;
 }
 
 /**
- * Funtion to wait or delay until the supplied milli seconds time
+ * Gets the time in microseconds; wraps modulo 2^32, the stack only subtracts.
+ */
+uint32_t pal_os_timer_get_time_in_microseconds(void) {
+    struct timespec now = pal_os_monotonic_now();
+    return (uint32_t)((uint64_t)now.tv_sec * 1000000u + (uint64_t)now.tv_nsec / 1000u);
+}
+
+/**
+ * Gets the time in milliseconds; wraps modulo 2^32, the stack only subtracts.
  *
  * \retval  uint32_t time in milliseconds
  */
 uint32_t pal_os_timer_get_time_in_milliseconds(void) {
-    return pal_os_get_clock_tick_count();
+    struct timespec now = pal_os_monotonic_now();
+    return (uint32_t)((uint64_t)now.tv_sec * 1000u + (uint64_t)now.tv_nsec / 1000000u);
 }
 
 /**
@@ -84,14 +80,15 @@ void pal_os_timer_delay_in_milliseconds(uint16_t milliseconds) {
     clock_gettime(CLOCK_MONOTONIC, &deadline);
 
     deadline.tv_sec += milliseconds / 1000;
-    deadline.tv_nsec += (milliseconds % 1000) * 1000 * 1000;
+    deadline.tv_nsec += (long)(milliseconds % 1000) * 1000 * 1000;
+    /* An unnormalised tv_nsec makes clock_nanosleep fail with EINVAL, i.e. no delay. */
+    if (deadline.tv_nsec >= 1000000000L) {
+        deadline.tv_sec += 1;
+        deadline.tv_nsec -= 1000000000L;
+    }
 
-    /* Sleep until deadline */
-    while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &deadline, NULL) != 0) {
-        if (errno != EINTR) {
-            /* error handling here */
-            break;
-        }
+    /* clock_nanosleep returns the error number; it does not set errno. */
+    while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &deadline, NULL) == EINTR) {
     }
 }
 
