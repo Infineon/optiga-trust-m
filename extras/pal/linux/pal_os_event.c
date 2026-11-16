@@ -11,6 +11,22 @@
  * \ingroup  grPAL
  */
 
+/*
+ * The library drives every command as a chain of one-shot timer callbacks,
+ * and each step arms its successor before it returns. On an MCU the next step
+ * cannot start until the current one has returned, because both run in the
+ * same timer interrupt. Delivering each expiry on a new thread (SIGEV_THREAD)
+ * breaks that: under CPU load, step N+1 can run while step N is still
+ * unwinding and still holds the I2C bus flag, both write the single callback
+ * slot, one step is lost, and the operation never completes.
+ *
+ * Here one event thread waits on a CLOCK_MONOTONIC timerfd and runs each
+ * callback to completion inside the PAL critical section (pal_os_lock.c),
+ * which restores the single-interrupt model.
+ */
+
+#define _GNU_SOURCE /* pthread_setname_np */
+
 #include "pal_os_event.h"
 
 #include <errno.h>
@@ -18,111 +34,97 @@
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include <sys/timerfd.h>
 #include <unistd.h>
 
-#include "pal_os_timer.h"
-
-//~ #define TRUSTM_PAL_EVENT_DEBUG  1
-
-#if TRUSTM_PAL_EVENT_DEBUG == 1
-#define TRUSTM_PAL_EVENT_DBG(x, ...) \
-    fprintf(stderr, "%s:%d " x "\n", __FILE__, __LINE__, ##__VA_ARGS__)
-#define TRUSTM_PAL_EVENT_DBGFN(x, ...) \
-    fprintf(stderr, "%s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#elif TRUSTM_PAL_EVENT_DEBUG == 2
-#define TRUSTM_PAL_EVENT_DBG(x, ...) Log("%s:%d " x "\n", "Log", __LINE__, ##__VA_ARGS__)
-#define TRUSTM_PAL_EVENT_DBGFN(x, ...) \
-    Log("%s:%d %s: " x "\n", "Log", __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#else
-#define TRUSTM_PAL_EVENT_DBG(x, ...)
-#define TRUSTM_PAL_EVENT_DBGFN(x, ...)
-#endif
-
-#ifndef TRUSTM_LINUX_TIMER_WAIT
-/*
- * Wait time (in ms) before checking the status of the timer
- */
-#define TRUSTM_LINUX_TIMER_WAIT 1
-#endif /* TRUSTM_LINUX_TIMER_WAIT */
-
-#define TRUSTM_PAL_EVENT_ERRFN(x, ...) \
-    fprintf(stderr, "Error in %s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define TRUSTM_PAL_EVENT_MSGFN(x, ...) \
-    fprintf(stderr, "Message:%s:%d %s: " x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
-
-/* Use monotonic clock to avoid wall-clock adjustments affecting timers */
-#define CLOCKID CLOCK_MONOTONIC
-
-typedef enum { TIMER_UNINIT = 0, TIMER_READY, TIMER_DESTROYING } timer_state_t;
-
-typedef struct {
-    timer_t timerid; /* POSIX timer id */
-    pthread_mutex_t lock; /* protects timer operations */
-    pthread_cond_t cond; /* transitions condition */
-    int timer_valid; /* is timer valid */
-    timer_state_t state;
-} pal_os_event_timer_t;
+#include "pal_os_lock.h"
 
 static pal_os_event_t pal_os_event_0 = {0};
+/* Set inside the critical section once the timerfd and the thread both exist;
+ * never changes after that, so the event thread reads it without the lock. */
+static int g_timer_fd = -1;
 
-static pal_os_event_timer_t g_pal_os_event_timer = {
-    .timerid = (timer_t)0,
-    .lock = PTHREAD_MUTEX_INITIALIZER,
-    .cond = PTHREAD_COND_INITIALIZER,
-    .timer_valid = 0,
-    .state = TIMER_UNINIT};
+static void *event_thread(void *arg) {
+    sigset_t all;
+    (void)arg;
 
-/* Return codes for wait_for_timer_ready_locked */
-#define TIMER_RC_READY 0 /* timer is ready */
-#define TIMER_RC_DESTROYED -1 /* timer was destroyed */
-#define TIMER_RC_TIMEOUT -2 /* unexpected timeout */
+    sigfillset(&all);
+    pthread_sigmask(SIG_BLOCK, &all, NULL);
 
-static int wait_for_timer_ready_locked(long timeout_ms) {
-    struct timespec abstime;
-    if (clock_gettime(CLOCK_REALTIME, &abstime) != 0) {
-        return TIMER_RC_TIMEOUT;
-    }
-    const long sec = timeout_ms / 1000;
-    const long nsec_add = (timeout_ms % 1000) * 1000000L;
-    abstime.tv_sec += sec;
-    abstime.tv_nsec += nsec_add;
-    if (abstime.tv_nsec >= 1000000000L) {
-        abstime.tv_sec += 1;
-        abstime.tv_nsec -= 1000000000L;
-    }
-
-    while (g_pal_os_event_timer.state != TIMER_READY) {
-        /*
-         * TIMER_UNINIT means the timer was either:
-         * - destroyed (normal at session shutdown), or
-         * - never created
-         *
-         * No thread will signal this condvar, so return immediately.
-         */
-        if (g_pal_os_event_timer.state == TIMER_UNINIT) {
-            return TIMER_RC_DESTROYED;
+    for (;;) {
+        uint64_t expirations;
+        if (read(g_timer_fd, &expirations, sizeof(expirations)) < 0) {
+            if (errno != EINTR) {
+                fprintf(stderr, "pal_os_event: read(timerfd) failed: %s\n", strerror(errno));
+                return NULL;
+            }
+            continue;
         }
-        int rc = pthread_cond_timedwait(
-            &g_pal_os_event_timer.cond,
-            &g_pal_os_event_timer.lock,
-            &abstime
-        );
-        if (rc == ETIMEDOUT) {
-            return TIMER_RC_TIMEOUT;
-        } else if (rc != 0) {
-            return TIMER_RC_TIMEOUT;
-        }
+        pal_os_event_trigger_registered_callback();
     }
-    return TIMER_RC_READY;
 }
 
-static void timer_thread_func(union sigval sv) {
-    (void)sv;
+/* Called inside the critical section. On failure nothing is kept, so the next
+ * create retries. */
+static void event_thread_start(void) {
+    pthread_attr_t attr;
+    pthread_t thread;
+    int rc;
+    int fd = timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC);
 
-    pal_os_event_trigger_registered_callback();
+    if (fd < 0) {
+        fprintf(stderr, "pal_os_event: timerfd_create failed: %s\n", strerror(errno));
+        return;
+    }
+    /* Published before the thread starts, so the thread never reads -1. */
+    g_timer_fd = fd;
+
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    rc = pthread_create(&thread, &attr, event_thread, NULL);
+    pthread_attr_destroy(&attr);
+    if (rc != 0) {
+        fprintf(stderr, "pal_os_event: pthread_create failed: %s\n", strerror(rc));
+        g_timer_fd = -1;
+        close(fd);
+        return;
+    }
+    pthread_setname_np(thread, "optiga-event");
+}
+
+pal_os_event_t *pal_os_event_create(register_callback callback, void *callback_args) {
+    pal_os_event_t *event = NULL;
+
+    /* The thread and timerfd live for the rest of the process: destroy only
+     * disarms, so a later create (a new util/crypt instance) reuses them. */
+    pal_os_lock_enter_critical_section();
+    if (g_timer_fd < 0) {
+        event_thread_start();
+    }
+    if (g_timer_fd >= 0) {
+        event = &pal_os_event_0;
+        if ((NULL != callback) && (NULL != callback_args)) {
+            pal_os_event_start(event, callback, callback_args);
+        }
+    }
+    pal_os_lock_exit_critical_section();
+    return event;
+}
+
+void pal_os_event_destroy(pal_os_event_t *pal_os_event) {
+    struct itimerspec disarm;
+    (void)pal_os_event;
+
+    memset(&disarm, 0, sizeof(disarm));
+    pal_os_lock_enter_critical_section();
+    if (g_timer_fd >= 0) {
+        timerfd_settime(g_timer_fd, 0, &disarm, NULL);
+    }
+    pal_os_event_0.callback_registered = NULL;
+    pal_os_event_0.callback_ctx = NULL;
+    pal_os_event_0.is_event_triggered = FALSE;
+    pal_os_lock_exit_critical_section();
 }
 
 void pal_os_event_start(
@@ -130,167 +132,18 @@ void pal_os_event_start(
     register_callback callback,
     void *callback_args
 ) {
-    TRUSTM_PAL_EVENT_DBGFN(">");
-
+    pal_os_lock_enter_critical_section();
     if (FALSE == p_pal_os_event->is_event_triggered) {
         p_pal_os_event->is_event_triggered = TRUE;
         pal_os_event_register_callback_oneshot(p_pal_os_event, callback, callback_args, 1000);
     }
-    TRUSTM_PAL_EVENT_DBGFN("<");
+    pal_os_lock_exit_critical_section();
 }
 
 void pal_os_event_stop(pal_os_event_t *p_pal_os_event) {
-    TRUSTM_PAL_EVENT_DBGFN(">");
+    pal_os_lock_enter_critical_section();
     p_pal_os_event->is_event_triggered = FALSE;
-    TRUSTM_PAL_EVENT_DBGFN("<");
-}
-
-void pal_os_event_disarm(void) {
-    struct itimerspec its;
-    int ret;
-    memset(&its, 0, sizeof(its));
-
-    TRUSTM_PAL_EVENT_DBGFN(">");
-
-    its.it_value.tv_sec = 0;
-    its.it_value.tv_nsec = 0;
-    its.it_interval.tv_sec = 0;
-    its.it_interval.tv_nsec = 0;
-
-    pthread_mutex_lock(&g_pal_os_event_timer.lock);
-
-    if (g_pal_os_event_timer.state != TIMER_READY) {
-        ret = wait_for_timer_ready_locked(TRUSTM_LINUX_TIMER_WAIT);
-        if (ret == TIMER_RC_TIMEOUT) {
-            TRUSTM_PAL_EVENT_ERRFN(
-                "pal_os_event_disarm: timer not ready (timeout), state=%d",
-                (int)g_pal_os_event_timer.state
-            );
-        }
-        if (ret != TIMER_RC_READY) {
-            pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-            return;
-        }
-    }
-
-    if (timer_settime(g_pal_os_event_timer.timerid, 0, &its, NULL) == -1) {
-        TRUSTM_PAL_EVENT_ERRFN(
-            "pal_os_event_disarm: timer_settime failed: errno=%d (%s)",
-            errno,
-            strerror(errno)
-        );
-        pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-        exit(1);
-    }
-
-    pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-
-    TRUSTM_PAL_EVENT_DBGFN("<");
-}
-
-void pal_os_event_arm(void) {
-    struct itimerspec its;
-    int ret;
-    memset(&its, 0, sizeof(its));
-
-    TRUSTM_PAL_EVENT_DBGFN(">");
-
-    its.it_value.tv_sec = 0;
-    its.it_value.tv_nsec = 1000000;
-    its.it_interval.tv_sec = 0;
-    its.it_interval.tv_nsec = 294967296;
-
-    pthread_mutex_lock(&g_pal_os_event_timer.lock);
-
-    if (g_pal_os_event_timer.state != TIMER_READY) {
-        ret = wait_for_timer_ready_locked(TRUSTM_LINUX_TIMER_WAIT);
-        if (ret == TIMER_RC_TIMEOUT) {
-            TRUSTM_PAL_EVENT_ERRFN(
-                "pal_os_event_arm: timer not ready (timeout), state=%d",
-                (int)g_pal_os_event_timer.state
-            );
-        }
-        if (ret != TIMER_RC_READY) {
-            pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-            return;
-        }
-    }
-
-    if (timer_settime(g_pal_os_event_timer.timerid, 0, &its, NULL) == -1) {
-        TRUSTM_PAL_EVENT_ERRFN(
-            "pal_os_event_arm: timer_settime failed: errno=%d (%s)",
-            errno,
-            strerror(errno)
-        );
-        pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-        exit(1);
-    }
-
-    pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-
-    TRUSTM_PAL_EVENT_DBGFN("<");
-}
-
-pal_os_event_t *pal_os_event_create(register_callback callback, void *callback_args) {
-    TRUSTM_PAL_EVENT_DBGFN(">");
-
-    if ((NULL != callback) && (NULL != callback_args)) {
-        struct sigevent sev;
-        memset(&sev, 0, sizeof(sev));
-        sev.sigev_notify = SIGEV_THREAD;
-        sev.sigev_notify_function = timer_thread_func;
-        sev.sigev_notify_attributes = NULL;
-        sev.sigev_value.sival_ptr = NULL;
-
-        pthread_mutex_lock(&g_pal_os_event_timer.lock);
-        if (g_pal_os_event_timer.state != TIMER_READY) {
-            if (timer_create(CLOCKID, &sev, &g_pal_os_event_timer.timerid) == -1) {
-                pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-                TRUSTM_PAL_EVENT_ERRFN(
-                    "timer_create failed: errno=%d (%s)",
-                    errno,
-                    strerror(errno)
-                );
-                exit(1);
-            }
-            g_pal_os_event_timer.state = TIMER_READY;
-            g_pal_os_event_timer.timer_valid = 1;
-            pthread_cond_broadcast(&g_pal_os_event_timer.cond);
-        } else {
-            TRUSTM_PAL_EVENT_ERRFN("pal_os_event_create: timer already READY");
-        }
-        pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-
-        pal_os_event_start(&pal_os_event_0, callback, callback_args);
-    }
-
-    TRUSTM_PAL_EVENT_DBGFN("<");
-
-    return (&pal_os_event_0);
-}
-
-void pal_os_event_trigger_registered_callback(void) {
-    register_callback callback;
-    void *ctx;
-
-    /*
-     * Snapshot and clear both fields under the lock to prevent a TOCTOU race
-     * with concurrent register_callback_oneshot calls.
-     *
-     * The lock must be released before invoking cb() because callback
-     * `optiga_cmd_queue_scheduler()` sets the timer via
-     * `pal_os_event_register_callback_oneshot`
-     */
-    pthread_mutex_lock(&g_pal_os_event_timer.lock);
-    callback = pal_os_event_0.callback_registered;
-    ctx = pal_os_event_0.callback_ctx;
-    pal_os_event_0.callback_registered = NULL;
-    pal_os_event_0.callback_ctx = NULL;
-    pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-
-    if (callback) {
-        callback(ctx);
-    }
+    pal_os_lock_exit_critical_section();
 }
 
 void pal_os_event_register_callback_oneshot(
@@ -300,117 +153,47 @@ void pal_os_event_register_callback_oneshot(
     uint32_t time_us
 ) {
     struct itimerspec its;
-    int ret;
-    long long freq_nanosecs;
-    memset(&its, 0, sizeof(its));
 
-    TRUSTM_PAL_EVENT_DBGFN(">");
-
-    freq_nanosecs = (long long)time_us * 1000LL;
-    its.it_value.tv_sec = (time_t)(freq_nanosecs / 1000000000LL);
-    its.it_value.tv_nsec = (long)(freq_nanosecs % 1000000000LL);
-    its.it_interval.tv_sec = 0;
-    its.it_interval.tv_nsec = 0;
-
-    if (its.it_value.tv_nsec < 0 || its.it_value.tv_nsec >= 1000000000L) {
-        TRUSTM_PAL_EVENT_ERRFN("oneshot: invalid tv_nsec: %ld", (long)its.it_value.tv_nsec);
+    if (NULL == p_pal_os_event) {
         return;
     }
-
-    pthread_mutex_lock(&g_pal_os_event_timer.lock);
-
-    if (g_pal_os_event_timer.state != TIMER_READY) {
-        ret = wait_for_timer_ready_locked(TRUSTM_LINUX_TIMER_WAIT);
-        if (ret == TIMER_RC_TIMEOUT) {
-            TRUSTM_PAL_EVENT_ERRFN(
-                "oneshot: timer not ready (timeout), state=%d",
-                (int)g_pal_os_event_timer.state
-            );
-        }
-        if (ret != TIMER_RC_READY) {
-            pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-            return;
-        }
+    /* A zero it_value would disarm the timerfd instead of firing at once. */
+    if (0 == time_us) {
+        time_us = 1;
     }
+    memset(&its, 0, sizeof(its));
+    its.it_value.tv_sec = time_us / 1000000u;
+    its.it_value.tv_nsec = (long)(time_us % 1000000u) * 1000L;
 
-    /* Write callback and ctx inside the lock, as in pal_os_event_trigger_registered_callback
-     * to eliminate the data race. */
+    pal_os_lock_enter_critical_section();
+    if (g_timer_fd < 0) {
+        pal_os_lock_exit_critical_section();
+        return;
+    }
     p_pal_os_event->callback_registered = callback;
     p_pal_os_event->callback_ctx = callback_args;
-
-    if (timer_settime(g_pal_os_event_timer.timerid, 0, &its, NULL) == -1) {
-        int errsv = errno;
-        pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-        TRUSTM_PAL_EVENT_ERRFN(
-            "pal_os_event_register_callback_oneshot: timer_settime FAILED: errno=%d (%s)",
-            errsv,
-            strerror(errsv)
-        );
-        return;
+    if (timerfd_settime(g_timer_fd, 0, &its, NULL) != 0) {
+        fprintf(stderr, "pal_os_event: timerfd_settime failed: %s\n", strerror(errno));
     }
-
-    pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-
-    TRUSTM_PAL_EVENT_DBGFN("<");
+    pal_os_lock_exit_critical_section();
 }
 
-void pal_os_event_destroy1(void) {
-    TRUSTM_PAL_EVENT_DBGFN(">");
+void pal_os_event_trigger_registered_callback(void) {
+    struct itimerspec pending;
 
-    pthread_mutex_lock(&g_pal_os_event_timer.lock);
-    if (g_pal_os_event_timer.state == TIMER_READY) {
-        struct itimerspec its;
-        memset(&its, 0, sizeof(its));
-
-        g_pal_os_event_timer.state = TIMER_DESTROYING;
-        g_pal_os_event_timer.timer_valid = 0;
-        pthread_cond_broadcast(&g_pal_os_event_timer.cond);
-
-        (void)timer_settime(g_pal_os_event_timer.timerid, 0, &its, NULL);
-        if (timer_delete(g_pal_os_event_timer.timerid) != 0) {
-            TRUSTM_PAL_EVENT_ERRFN("timer_delete failed: errno=%d (%s)", errno, strerror(errno));
+    pal_os_lock_enter_critical_section();
+    /* If the timer is armed again, a registration landed between the expiry
+     * and this lock; that callback is not due yet and the thread wakes for it. */
+    if ((timerfd_gettime(g_timer_fd, &pending) == 0) && (0 == pending.it_value.tv_sec)
+        && (0 == pending.it_value.tv_nsec)) {
+        register_callback callback = pal_os_event_0.callback_registered;
+        void *ctx = pal_os_event_0.callback_ctx;
+        /* Cleared first: the callback normally registers its successor. */
+        pal_os_event_0.callback_registered = NULL;
+        pal_os_event_0.callback_ctx = NULL;
+        if (NULL != callback) {
+            callback(ctx);
         }
-
-        g_pal_os_event_timer.state = TIMER_UNINIT;
-        pthread_cond_broadcast(&g_pal_os_event_timer.cond);
-    } else {
-        TRUSTM_PAL_EVENT_ERRFN(
-            "pal_os_event_destroy1: timer not READY (state=%d)",
-            (int)g_pal_os_event_timer.state
-        );
     }
-    pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-
-    TRUSTM_PAL_EVENT_DBGFN("<");
-}
-
-void pal_os_event_destroy(pal_os_event_t *pal_os_event) {
-    (void)pal_os_event;
-    TRUSTM_PAL_EVENT_DBGFN(">");
-
-    pthread_mutex_lock(&g_pal_os_event_timer.lock);
-    if (g_pal_os_event_timer.state == TIMER_READY) {
-        struct itimerspec its;
-        memset(&its, 0, sizeof(its));
-
-        g_pal_os_event_timer.state = TIMER_DESTROYING;
-        g_pal_os_event_timer.timer_valid = 0;
-        pthread_cond_broadcast(&g_pal_os_event_timer.cond);
-
-        (void)timer_settime(g_pal_os_event_timer.timerid, 0, &its, NULL);
-        if (timer_delete(g_pal_os_event_timer.timerid) != 0) {
-            TRUSTM_PAL_EVENT_ERRFN("timer_delete failed: errno=%d (%s)", errno, strerror(errno));
-        }
-
-        g_pal_os_event_timer.state = TIMER_UNINIT;
-        pthread_cond_broadcast(&g_pal_os_event_timer.cond);
-    } else {
-        TRUSTM_PAL_EVENT_ERRFN(
-            "pal_os_event_destroy: timer not READY (state=%d)",
-            (int)g_pal_os_event_timer.state
-        );
-    }
-    pthread_mutex_unlock(&g_pal_os_event_timer.lock);
-
-    TRUSTM_PAL_EVENT_DBGFN("<");
+    pal_os_lock_exit_critical_section();
 }
