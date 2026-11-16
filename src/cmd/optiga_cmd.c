@@ -822,6 +822,9 @@ _STATIC_H void optiga_cmd_execute(
     void *input,
     uint16_t apdu_data
 ) {
+    // The API call runs the state machine on the caller's context up to queueing the request, while
+    // the event context runs optiga_cmd_queue_scheduler on the same queue: keep the two apart.
+    pal_os_lock_enter_critical_section();
     me->p_input = input;
     me->cmd_next_execution_state = start_state;
     me->cmd_sub_execution_state = sub_state;
@@ -830,6 +833,7 @@ _STATIC_H void optiga_cmd_execute(
     me->cmd_param = cmd_param;
     me->apdu_data = apdu_data;
     optiga_cmd_execute_handler(me, OPTIGA_LIB_SUCCESS);
+    pal_os_lock_exit_critical_section();
 }
 
 /*

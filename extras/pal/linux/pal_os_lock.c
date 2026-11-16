@@ -14,8 +14,31 @@
 
 #include "pal_os_lock.h"
 
+#include <pthread.h>
+
 #include "include/pal_shared_mutex.h"
 shared_mutex_t trustm_mutex;
+
+/*
+ * The library is written for one execution context: on an MCU the critical
+ * section keeps the timer interrupt out while the application enters the API.
+ * On Linux the event thread (pal_os_event.c) plays the interrupt, so the
+ * critical section is a process-wide mutex that the event thread holds while
+ * it runs a callback. It is recursive because callbacks re-enter the PAL
+ * (pal_os_event_register_callback_oneshot, pal_os_event_start/stop) and the
+ * library enters the critical section from inside API calls.
+ */
+static pthread_mutex_t g_critical_section;
+static pthread_once_t g_critical_section_once = PTHREAD_ONCE_INIT;
+
+static void critical_section_init(void) {
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&g_critical_section, &attr);
+    pthread_mutexattr_destroy(&attr);
+}
+
 void pal_os_lock_create(pal_os_lock_t *p_lock, uint8_t lock_type) {
     p_lock->type = lock_type;
     p_lock->lock = 0;
@@ -38,9 +61,14 @@ void pal_os_lock_release(pal_os_lock_t *p_lock) {
     p_lock->lock = 0;
 }
 
-void pal_os_lock_enter_critical_section() {}
+void pal_os_lock_enter_critical_section() {
+    pthread_once(&g_critical_section_once, critical_section_init);
+    pthread_mutex_lock(&g_critical_section);
+}
 
-void pal_os_lock_exit_critical_section() {}
+void pal_os_lock_exit_critical_section() {
+    pthread_mutex_unlock(&g_critical_section);
+}
 
 /**
  * @}
